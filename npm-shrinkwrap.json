@@ -10,10 +10,10 @@
       "license": "MIT",
       "dependencies": {
         "@azure/msal-common": "^15.14.1",
-        "@azure/msal-node": "^3.8.6",
-        "@inquirer/confirm": "^6.0.4",
-        "@inquirer/input": "^5.0.4",
-        "@inquirer/select": "^5.0.4",
+        "@azure/msal-node": "^3.8.7",
+        "@inquirer/confirm": "^6.0.6",
+        "@inquirer/input": "^5.0.6",
+        "@inquirer/select": "^5.0.6",
         "@xmldom/xmldom": "^0.9.8",
         "adaptive-expressions": "^4.23.3",
         "adaptivecards": "^3.0.5",
@@ -56,7 +56,7 @@
         "@types/json-schema": "^7.0.15",
         "@types/json-to-ast": "^2.1.4",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^24.10.9",
+        "@types/node": "^24.10.13",
         "@types/node-forge": "^1.3.14",
         "@types/omelette": "^0.4.5",
         "@types/semver": "^7.7.1",
@@ -476,21 +476,21 @@
       }
     },
     "node_modules/@azure/msal-common": {
-      "version": "15.14.1",
-      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-15.14.1.tgz",
-      "integrity": "sha512-IkzF7Pywt6QKTS0kwdCv/XV8x8JXknZDvSjj/IccooxnP373T5jaadO3FnOrbWo3S0UqkfIDyZNTaQ/oAgRdXw==",
+      "version": "15.14.2",
+      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-15.14.2.tgz",
+      "integrity": "sha512-n8RBJEUmd5QotoqbZfd+eGBkzuFI1KX6jw2b3WcpSyGjwmzoeI/Jb99opIBPHpb8y312NB+B6+FGi2ZVSR8yfA==",
       "license": "MIT",
       "engines": {
         "node": ">=0.8.0"
       }
     },
     "node_modules/@azure/msal-node": {
-      "version": "3.8.6",
-      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-3.8.6.tgz",
-      "integrity": "sha512-XTmhdItcBckcVVTy65Xp+42xG4LX5GK+9AqAsXPXk4IqUNv+LyQo5TMwNjuFYBfAB2GTG9iSQGk+QLc03vhf3w==",
+      "version": "3.8.7",
+      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-3.8.7.tgz",
+      "integrity": "sha512-a+Xnrae+uwLnlw68bplS1X4kuJ9F/7K6afuMFyRkNIskhjgDezl5Fhrx+1pmAlDmC0VaaAxjRQMp1OmcqVwkIg==",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "15.14.1",
+        "@azure/msal-common": "15.14.2",
         "jsonwebtoken": "^9.0.0",
         "uuid": "^8.3.0"
       },
@@ -930,12 +930,12 @@
       }
     },
     "node_modules/@inquirer/confirm": {
-      "version": "6.0.4",
-      "resolved": "https://registry.npmjs.org/@inquirer/confirm/-/confirm-6.0.4.tgz",
-      "integrity": "sha512-WdaPe7foUnoGYvXzH4jp4wH/3l+dBhZ3uwhKjXjwdrq5tEIFaANxj6zrGHxLdsIA0yKM0kFPVcEalOZXBB5ISA==",
+      "version": "6.0.6",
+      "resolved": "https://registry.npmjs.org/@inquirer/confirm/-/confirm-6.0.6.tgz",
+      "integrity": "sha512-9ZkrGYiWnOKQPc3xfLIORE3lZW1qvtgRoJcoqopr5zssBn7yk4yONmzGynEOjc16FnUXzkAejj/I29BbfcoUfQ==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^11.1.1",
+        "@inquirer/core": "^11.1.3",
         "@inquirer/type": "^4.0.3"
       },
       "engines": {
@@ -951,18 +951,18 @@
       }
     },
     "node_modules/@inquirer/core": {
-      "version": "11.1.1",
-      "resolved": "https://registry.npmjs.org/@inquirer/core/-/core-11.1.1.tgz",
-      "integrity": "sha512-hV9o15UxX46OyQAtaoMqAOxGR8RVl1aZtDx1jHbCtSJy1tBdTfKxLPKf7utsE4cRy4tcmCQ4+vdV+ca+oNxqNA==",
+      "version": "11.1.3",
+      "resolved": "https://registry.npmjs.org/@inquirer/core/-/core-11.1.3.tgz",
+      "integrity": "sha512-TBAGPDGvpwFSQ4nkawQzq5/X7DhElANjvKeUtcjpVnBIfuH/OEu4M+79R3+bGPtwxST4DOIGRtF933mUH2bRVw==",
       "license": "MIT",
       "dependencies": {
         "@inquirer/ansi": "^2.0.3",
         "@inquirer/figures": "^2.0.3",
         "@inquirer/type": "^4.0.3",
         "cli-width": "^4.1.0",
+        "fast-wrap-ansi": "^0.2.0",
         "mute-stream": "^3.0.0",
-        "signal-exit": "^4.1.0",
-        "wrap-ansi": "^9.0.2"
+        "signal-exit": "^4.1.0"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0"
@@ -986,12 +986,12 @@
       }
     },
     "node_modules/@inquirer/input": {
-      "version": "5.0.4",
-      "resolved": "https://registry.npmjs.org/@inquirer/input/-/input-5.0.4.tgz",
-      "integrity": "sha512-4B3s3jvTREDFvXWit92Yc6jF1RJMDy2VpSqKtm4We2oVU65YOh2szY5/G14h4fHlyQdpUmazU5MPCFZPRJ0AOw==",
+      "version": "5.0.6",
+      "resolved": "https://registry.npmjs.org/@inquirer/input/-/input-5.0.6.tgz",
+      "integrity": "sha512-RZsJcjMJA3QNI9q9OiAi1fAom+Pb8on6alJB1Teh5jjKaiG5C79P69cG955ZRfgPdxTmI4uyhf33+94Xj7xWig==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^11.1.1",
+        "@inquirer/core": "^11.1.3",
         "@inquirer/type": "^4.0.3"
       },
       "engines": {
@@ -1007,13 +1007,13 @@
       }
     },
     "node_modules/@inquirer/select": {
-      "version": "5.0.4",
-      "resolved": "https://registry.npmjs.org/@inquirer/select/-/select-5.0.4.tgz",
-      "integrity": "sha512-s8KoGpPYMEQ6WXc0dT9blX2NtIulMdLOO3LA1UKOiv7KFWzlJ6eLkEYTDBIi+JkyKXyn8t/CD6TinxGjyLt57g==",
+      "version": "5.0.6",
+      "resolved": "https://registry.npmjs.org/@inquirer/select/-/select-5.0.6.tgz",
+      "integrity": "sha512-9DyVbNCo4q0C3CkGd6zW0SW3NQuuk4Hy0NSbP6zErz2YNWF4EHHJCRzcV34/CDQLraeAQXbHYlMofuUrs6BBZQ==",
       "license": "MIT",
       "dependencies": {
         "@inquirer/ansi": "^2.0.3",
-        "@inquirer/core": "^11.1.1",
+        "@inquirer/core": "^11.1.3",
         "@inquirer/figures": "^2.0.3",
         "@inquirer/type": "^4.0.3"
       },
@@ -2883,9 +2883,9 @@
       }
     },
     "node_modules/@types/node": {
-      "version": "24.10.9",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.10.9.tgz",
-      "integrity": "sha512-ne4A0IpG3+2ETuREInjPNhUGis1SFjv1d5asp8MzEAGtOZeTeHVDOYqOgqfhvseqg/iXty2hjBf1zAOb7RNiNw==",
+      "version": "24.10.13",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.10.13.tgz",
+      "integrity": "sha512-oH72nZRfDv9lADUBSo104Aq7gPHpQZc4BTx38r9xf9pg5LfP6EzSyH2n7qFmmxRQXh7YlUXODcYsg6PuTDSxGg==",
       "license": "MIT",
       "dependencies": {
         "undici-types": "~7.16.0"
@@ -4612,6 +4612,30 @@
       "integrity": "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
       "dev": true,
       "license": "MIT"
+    },
+    "node_modules/fast-string-truncated-width": {
+      "version": "3.0.3",
+      "resolved": "https://registry.npmjs.org/fast-string-truncated-width/-/fast-string-truncated-width-3.0.3.tgz",
+      "integrity": "sha512-0jjjIEL6+0jag3l2XWWizO64/aZVtpiGE3t0Zgqxv0DPuxiMjvB3M24fCyhZUO4KomJQPj3LTSUnDP3GpdwC0g==",
+      "license": "MIT"
+    },
+    "node_modules/fast-string-width": {
+      "version": "3.0.2",
+      "resolved": "https://registry.npmjs.org/fast-string-width/-/fast-string-width-3.0.2.tgz",
+      "integrity": "sha512-gX8LrtNEI5hq8DVUfRQMbr5lpaS4nMIWV+7XEbXk2b8kiQIizgnlr12B4dA3ZEx3308ze0O4Q1R+cHts8kyUJg==",
+      "license": "MIT",
+      "dependencies": {
+        "fast-string-truncated-width": "^3.0.2"
+      }
+    },
+    "node_modules/fast-wrap-ansi": {
+      "version": "0.2.0",
+      "resolved": "https://registry.npmjs.org/fast-wrap-ansi/-/fast-wrap-ansi-0.2.0.tgz",
+      "integrity": "sha512-rLV8JHxTyhVmFYhBJuMujcrHqOT2cnO5Zxj37qROj23CP39GXubJRBUFF0z8KFK77Uc0SukZUf7JZhsVEQ6n8w==",
+      "license": "MIT",
+      "dependencies": {
+        "fast-string-width": "^3.0.2"
+      }
     },
     "node_modules/fast-xml-parser": {
       "version": "4.5.3",
