@@ -1,5 +1,5 @@
-import mocha from 'mocha';
-import * as core from '@actions/core';
+const mocha = require('mocha');
+const core = import('@actions/core');
 
 const { EVENT_RUN_END, EVENT_TEST_FAIL, EVENT_RUN_BEGIN } =
   mocha.Runner.constants;
@@ -122,4 +122,4 @@ class TestSummaryReporter {
   }
 }
 
-export default TestSummaryReporter;
+module.exports = TestSummaryReporter;

@@ -1,7 +1,7 @@
 {
   "extension": ["ts"],
   "spec": "dist/**/*.spec.js",
-  "reporter": "scripts/ci-test-summary.mjs",
+  "reporter": "scripts/ci-test-summary.cjs",
   "require": "source-map-support/register",
   "watch": "dist/**/*.js",
   "timeout": 10000,
