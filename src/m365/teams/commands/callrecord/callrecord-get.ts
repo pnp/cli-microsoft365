@@ -7,7 +7,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid()
+  id: z.uuid().alias('i')
 });
 declare type Options = z.infer<typeof options>;
 
@@ -32,7 +32,7 @@ class TeamsCallRecordGetCommand extends GraphApplicationCommand {
     try {
       const callRecordId = args.options.id;
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving call record {callRecordId}...`);
+        await logger.logToStderr(`Retrieving call record ${callRecordId}...`);
       }
 
       // only one relationship can be expanded at a time
@@ -47,7 +47,7 @@ class TeamsCallRecordGetCommand extends GraphApplicationCommand {
       const callRecordPart1 = await request.get<any>(requestOptions);
 
       requestOptions = {
-        url: `${this.resource}/v1.0/communications/callRecords/${callRecordId}?$select=id&$expand=participants_v2`,
+        url: `${this.resource}/v1.0/communications/callRecords/${callRecordId}?$select=participants_v2&$expand=participants_v2`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

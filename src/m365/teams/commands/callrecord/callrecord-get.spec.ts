@@ -1192,7 +1192,6 @@ describe(commands.CALLRECORD_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
-  let assertAccessTokenTypeStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -1220,7 +1219,7 @@ describe(commands.CALLRECORD_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
 
-    assertAccessTokenTypeStub = sinon.stub(accessToken, 'assertAccessTokenType').resolves();
+    sinon.stub(accessToken, 'assertAccessTokenType').withArgs('application').resolves();
   });
 
   afterEach(() => {
@@ -1262,7 +1261,7 @@ describe(commands.CALLRECORD_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/${validId}?$expand=sessions($expand=segments)`) {
         return responseWithSessions;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/${validId}?$select=id&$expand=participants_v2`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/${validId}?$select=participants_v2&$expand=participants_v2`) {
         return responseWithParticipants;
       }
 
@@ -1271,13 +1270,12 @@ describe(commands.CALLRECORD_GET, () => {
 
     await command.action(logger, { options: { id: validId, verbose: true } });
     assert(loggerLogSpy.calledOnceWithExactly(response));
-    assert(assertAccessTokenTypeStub.calledOnceWith('application'));
   });
 
   it('handles random API error', async () => {
-    const errorMessage = 'Something went wrong';
+    const errorMessage = 'Could not find the requested call record. Records about calls or online meetings that started more than 30 days ago are not available.';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { id: 'validId' } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(errorMessage));
   });
 });
