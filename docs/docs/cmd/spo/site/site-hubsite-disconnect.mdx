@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site hubsite disconnect
 
@@ -14,13 +16,35 @@ m365 spo site hubsite disconnect [options]
 
 ```md definition-list
 `-u, --siteUrl <siteUrl>`
-: URL of the site collection to disconnect from its hub site
+: URL of the site collection to disconnect from its hub site.
+
+`--asAdmin`
+: Disconnect the site from a hub site as SharePoint admin.
 
 `-f, --force`
-: Don't prompt for confirmation
+: Don't prompt for confirmation.
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
@@ -28,6 +52,12 @@ Disconnect a specific site collection from its hub site. Will prompt for confirm
 
 ```sh
 m365 spo site hubsite disconnect --siteUrl https://contoso.sharepoint.com/sites/sales
+```
+
+Disconnect a specific site collection from its hub site as SharePoint admin.
+
+```sh
+m365 spo site hubsite disconnect --siteUrl https://contoso.sharepoint.com/sites/sales --asAdmin
 ```
 
 Disconnect a specific site collection from its hub site without prompting for confirmation.
