@@ -24,7 +24,6 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
   ...asciinemaOptions
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const proxiedSrc = `https://corsproxy.io/?url=${encodeURIComponent(src)}`;
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -35,12 +34,12 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
     const loadAsciinemaPlayer = async () => {
       if (ref.current && isMounted) {
         const AsciinemaPlayerLibrary = await import('asciinema-player');
-        AsciinemaPlayerLibrary.create(proxiedSrc, ref.current, asciinemaOptions);
+        AsciinemaPlayerLibrary.create(src, ref.current, asciinemaOptions);
       }
     };
 
     loadAsciinemaPlayer();
-  }, [proxiedSrc, asciinemaOptions, isMounted]);
+  }, [src, asciinemaOptions, isMounted]);
 
   return (
     <BrowserOnly fallback={<div />}>
