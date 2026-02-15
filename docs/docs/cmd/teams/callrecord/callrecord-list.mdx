@@ -32,17 +32,28 @@ m365 teams callrecord list [options]
 
 ## Remarks
 
-:::info
-
-This command only supports application permissions. Use scope `CallRecords.Read.All`.
-
-:::
-
 :::note
 
 It is only possible to retrieve call records from the past 30 days.
 
 :::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  This command does not support delegated permissions.
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                      |
+  |-----------------|----------------------------------|
+  | Microsoft Graph | CallRecords.Read.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
