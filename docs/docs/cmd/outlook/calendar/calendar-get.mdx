@@ -1,0 +1,165 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# outlook calendar get
+
+Retrieves the calendar of a user or a group.
+
+## Usage
+
+```sh
+m365 outlook calendar get [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: ID of the calendar. Specify either `id` or `name`, but not both.
+
+`-n, --name [name]`
+: Name of the calendar. Specify either `id` or `name`, but not both.
+
+`--userId [userId]`
+: ID of the user. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: UPN of the user. Specify either `userId` or `userName`, but not both.
+
+`--calendarGroupId [calendarGroupId]`
+: ID of the calendar group. Specify either `calendarGroupId` or `calendarGroupName`, but not both.
+
+`--calendarGroupName [calendarGroupName]`
+: Name of the calendar group. Specify either `calendarGroupId` or `calendarGroupName`, but not both.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Calendar.ReadBasic |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Calendar.ReadBasic |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Get the calendar for the current signed-in user by id.
+
+```sh
+m365 outlook calendar get --userId "@meId" --id "AAMkAGI2TGuLAAA=" 
+```
+
+Get the calendar from a specific calendar group for the current signed-in user by name.
+
+```sh
+m365 outlook calendar get --userId "@meId" --calendarGroupName "Colleague calendars" --name "Calendar" 
+```
+
+Get the calendar from a specific calendar group for a specific user by name.
+
+```sh
+m365 outlook calendar get --userId b743445a-112c-4fda-9afd-05943f9c7b36 --calendarGroupId "AAMkADIxYjJiYmIzLTFmNjYtNGNhMy0YOkcEEh3vhfAAAGgdFjAAA="  --name "Calendar" 
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "AQMkAGRAAAA==",
+    "name": "Calendar",
+    "color": "lightOrange",
+    "hexColor": "#f7630c",
+    "groupClassId": "0006f0b7-0000-0000-c000-000000000046",
+    "isDefaultCalendar": true,
+    "changeKey": "fJKVL07sbkmIfHqjbDnRgQAACWzbtQ==",
+    "canShare": true,
+    "canViewPrivateItems": true,
+    "canEdit": true,
+    "allowedOnlineMeetingProviders": [
+      "teamsForBusiness"
+    ],
+    "defaultOnlineMeetingProvider": "teamsForBusiness",
+    "isTallyingResponses": true,
+    "isRemovable": false,
+    "owner": {
+      "name": "John Doe",
+      "address": "john.doe@contoso.com"
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  allowedOnlineMeetingProviders: ["teamsForBusiness"]
+  canEdit                      : true
+  canShare                     : true
+  canViewPrivateItems          : true
+  changeKey                    : fJKVL07sbkmIfHqjbDnRgQAACWzbtQ==
+  color                        : lightOrange
+  defaultOnlineMeetingProvider : teamsForBusiness
+  groupClassId                 : 0006f0b7-0000-0000-c000-000000000046
+  hexColor                     : #f7630c
+  id                           : AQMkAGRAAAA==
+  isDefaultCalendar            : true
+  isRemovable                  : false
+  isTallyingResponses          : true
+  name                         : Calendar
+  owner                        : {"name":"John Doe","address":"john.doe@contoso.com"}
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,name,color,hexColor,groupClassId,isDefaultCalendar,changeKey,canShare,canViewPrivateItems,canEdit,defaultOnlineMeetingProvider,isTallyingResponses,isRemovable
+  AQMkAGRAAAA==,Calendar,lightOrange,#f7630c,0006f0b7-0000-0000-c000-000000000046,1,fJKVL07sbkmIfHqjbDnRgQAACWzbtQ==,1,1,1,teamsForBusiness,1,0
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # outlook calendar get --name "Calendar" --userName "john.doe@contoso.com"
+
+  Date: 2/9/2026
+
+  ## Calendar (AQMkAGRAAAA==)
+
+  Property | Value
+  ---------|-------
+  id | AQMkAGRAAAA==
+  name | Calendar
+  color | lightOrange
+  hexColor | #f7630c
+  groupClassId | 0006f0b7-0000-0000-c000-000000000046
+  isDefaultCalendar | true
+  changeKey | fJKVL07sbkmIfHqjbDnRgQAACWzbtQ==
+  canShare | true
+  canViewPrivateItems | true
+  canEdit | true
+  defaultOnlineMeetingProvider | teamsForBusiness
+  isTallyingResponses | true
+  isRemovable | false
+  ```
+
+  </TabItem>
+</Tabs>
