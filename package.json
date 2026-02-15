@@ -284,7 +284,7 @@
     "axios": "^1.13.4",
     "chalk": "^5.6.2",
     "clipboardy": "^5.1.0",
-    "configstore": "^7.1.0",
+    "configstore": "^8.0.0",
     "csv-parse": "^6.1.0",
     "csv-stringify": "^6.6.0",
     "easy-table": "^1.2.0",
@@ -303,7 +303,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@actions/core": "^2.0.3",
+    "@actions/core": "^3.0.0",
     "@microsoft/microsoft-graph-types": "^2.43.1",
     "@stylistic/eslint-plugin": "^5.7.1",
     "@types/adm-zip": "^0.5.7",
