@@ -7037,6 +7037,7 @@
         }
       ],
       "license": "MIT",
+      "peer": true,
       "engines": {
         "node": ">= 4.7.0"
       }
