@@ -16,15 +16,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -37,7 +37,7 @@ jobs:
       - name: Compress output
         run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build
           path: build.tar
@@ -47,19 +47,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -69,7 +69,7 @@ jobs:
         run: npm ci
       - name: Cache .eslintcache
         id: eslintcache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .eslintcache
@@ -81,7 +81,7 @@ jobs:
       - name: Compress output
         if: always()
         run: tar -cvf coverage.tar coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: coverage
@@ -91,14 +91,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/docs/node_modules
@@ -121,19 +121,19 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -151,13 +151,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
@@ -177,14 +177,14 @@ jobs:
       - name: Wait for npm publish
         run: node scripts/wait-npm-publish.js latest ${{ steps.package_version.outputs.version }}
       - name: Build and push ${{ steps.package_version.outputs.version }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: m365pnp/cli-microsoft365:${{ steps.package_version.outputs.version }}
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
       - name: Build and push latest
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: m365pnp/cli-microsoft365:latest

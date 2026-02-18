@@ -15,15 +15,15 @@ jobs:
         node: [*node_version]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -40,7 +40,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
@@ -73,7 +73,7 @@ jobs:
         with:
           minimum-size: 16GB
           disk-root: "C:"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
       - name: Unpack build artifact (non-Windows)
@@ -83,13 +83,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z x build.tar && del build.tar
       - name: Use Node.js ${{ matrix.nodeRun }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.nodeRun }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -100,7 +100,7 @@ jobs:
       - name: Cache .eslintcache
         if: matrix.nodeRun == matrix.nodeBuild
         id: eslintcache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .eslintcache
@@ -121,7 +121,7 @@ jobs:
       - name: Compress output (Windows)
         if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
@@ -131,14 +131,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             **/docs/node_modules
