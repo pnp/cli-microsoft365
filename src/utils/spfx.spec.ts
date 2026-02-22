@@ -45,7 +45,12 @@ describe('utils/spfx', () => {
 
   it('returns correct Node version when only minor version differ', () => {
     const version = spfx.getHighestNodeVersion('8.1 || 8.2');
-    assert.strictEqual(version, '8.x');
+    assert.strictEqual(version, '8.2.x');
+  });
+
+  it('returns correct Node version when only minor version differ - reverse case', () => {
+    const version = spfx.getHighestNodeVersion('8.2 || 8.1');
+    assert.strictEqual(version, '8.2.x');
   });
 
   it('returns highest major for disjoint ranges', () => {
@@ -75,7 +80,7 @@ describe('utils/spfx', () => {
 
   it('returns correct version for exact version without operator', () => {
     const version = spfx.getHighestNodeVersion('16.13.0');
-    assert.strictEqual(version, '16.x');
+    assert.strictEqual(version, '16.13.0');
   });
 
   it('returns highest version when mixing < and <= operators', () => {
@@ -89,9 +94,5 @@ describe('utils/spfx', () => {
 
   it('throws when range cannot be normalized', () => {
     assert.throws(() => spfx.getHighestNodeVersion('invalid-range'), new Error("Unable to resolve the highest Node version for range 'invalid-range'."));
-  });
-
-  it('throws when no valid ranges found', () => {
-    assert.throws(() => spfx.getHighestNodeVersion('invalid-string'), new Error("Unable to resolve the highest Node version for range 'invalid-string'."));
   });
 });

@@ -1,4 +1,4 @@
-import { Range, validRange } from 'semver';
+import { Range, coerce, gt, validRange } from 'semver';
 import { Project } from '../m365/spfx/commands/project/project-model/index.js';
 
 export const spfx = {
@@ -30,6 +30,21 @@ export const spfx = {
     let highestMajor: number | null = null;
     let exactVersion: string | null = null;
 
+    const simpleVersionPattern = /^\d+(\.\d+(\.\d+)?)?$/;
+    if (ranges.every(r => simpleVersionPattern.test(r))) {
+      const highest = ranges.reduce((best, curr) =>
+        gt(coerce(curr)!, coerce(best)!) ? curr : best
+      );
+      const parts = highest.split('.');
+      if (parts.length >= 3) {
+        return highest;
+      }
+
+      if (parts.length === 2) {
+        return `${highest}.x`;
+      }
+    }
+
     for (const rangeString of ranges) {
       const normalized = validRange(rangeString);
       if (!normalized) {
@@ -54,8 +69,8 @@ export const spfx = {
               exactVersion = comparator.semver.version;
             }
           }
-          else if (comparator.operator === '>=' || comparator.operator === '>' || comparator.operator === '') {
-            // For lower bounds or exact versions, use the major version
+          else if (comparator.operator === '>=' || comparator.operator === '>') {
+            // For lower bounds use the major version
             maxMajor = Math.max(maxMajor, comparator.semver.major);
           }
         }

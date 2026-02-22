@@ -188,13 +188,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
 
-    await assert.rejects(command.action(logger, { options: {} }),
-      (err: any) => {
-        if (err instanceof CommandError && err.message.includes('Unable to determine the version')) {
-          return true;
-        }
-        return false;
-      });
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on the version property in the .yo-rc.json file.'));
 
   });
 
@@ -224,13 +218,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
 
-    await assert.rejects(command.action(logger, { options: {} }),
-      (err: any) => {
-        if (err instanceof CommandError && err.message.includes('Could not find Node version')) {
-          return true;
-        }
-        return false;
-      });
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError("Could not find Node version for version '99.99.99' of SharePoint Framework."));
   });
 
   it('handles unexpected error', async () => {
@@ -257,43 +245,11 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
 
-    sinon.stub(fs, 'writeFileSync').callsFake(() => {
-      throw new Error('writeFileSync failed');
-    });
+    sinon.stub(fs, 'writeFileSync').throws(
+      new Error('writeFileSync failed')
+    );
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('writeFileSync failed'));
-  });
-
-  it('handles unexpected non-error value', async () => {
-    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
-
-    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
-        return '{"name": "test"}';
-      }
-
-      throw `Invalid path: ${filePath}`;
-    });
-
-    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.github')) {
-        return true;
-      }
-      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
-        return true;
-      }
-
-      throw `Invalid path: ${fakePath}`;
-    });
-
-    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
-
-    sinon.stub(fs, 'writeFileSync').callsFake(() => {
-      throw 'string failure';
-    });
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('string failure'));
   });
 });

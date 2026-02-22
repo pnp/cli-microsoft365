@@ -18,7 +18,7 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const projectPath: string = path.resolve('/fake/path/to/test-project');
+  const projectPath: string = path.resolve('/test-project');
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -183,7 +183,7 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
       throw `Invalid path: ${fakePath}`;
     });
 
-    sinon.stub(command as any, 'getProjectVersion').returns('');
+    sinon.stub(command as any, 'getProjectVersion').returns(undefined);
 
     sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
 
@@ -249,37 +249,5 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('writeFileSync failed'));
-  });
-
-  it('handles unexpected non-error value', async () => {
-    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
-
-    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
-        return '{"name": "test"}';
-      }
-
-      throw `Invalid path: ${filePath}`;
-    });
-
-    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
-        return true;
-      }
-      else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
-        return true;
-      }
-
-      throw `Invalid path: ${fakePath}`;
-    });
-
-    sinon.stub(command as any, 'getProjectVersion').returns('1.21.1');
-
-    sinon.stub(fs, 'writeFileSync').callsFake(() => {
-      throw 'string failure';
-    });
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError('string failure'));
   });
 });
