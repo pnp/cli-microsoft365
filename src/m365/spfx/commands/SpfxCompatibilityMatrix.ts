@@ -605,7 +605,7 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
     },
     node: {
       range: '>=22.14.0 <23.0.0',
-      fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
     },
     sp: SharePointVersion.SPO,
     yo: {
@@ -620,7 +620,22 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
     },
     node: {
       range: '>=22.14.0 <23.0.0',
-      fix: 'Install Node.js >=22.14.0 < 23.0.0'
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
+    },
+    sp: SharePointVersion.SPO,
+    yo: {
+      range: '^4 || ^5 || ^6',
+      fix: 'npm i -g yo@6'
+    }
+  },
+  '1.22.2': {
+    heft: {
+      range: '^1',
+      fix: 'npm i -g @rushstack/heft@1'
+    },
+    node: {
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
     },
     sp: SharePointVersion.SPO,
     yo: {
