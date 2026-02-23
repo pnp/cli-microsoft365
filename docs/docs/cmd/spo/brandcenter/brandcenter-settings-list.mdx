@@ -51,7 +51,9 @@ m365 spo brandcenter settings list
   ```json
   {
     "BrandColorsListId": "00000000-0000-0000-0000-000000000000",
-    "BrandColorsListUrl": null,
+    "BrandColorsListUrl": {
+      "DecodedUrl": "https://contoso.sharepoint.com/sites/BrandGuide/_catalogs/brandcolors"
+    },
     "BrandFontLibraryId": "23af51de-856c-4d00-aa11-0d03af0e46e3",
     "BrandFontLibraryUrl": {
       "DecodedUrl": "https://contoso.sharepoint.com/sites/BrandGuide/Fonts"
@@ -109,7 +111,7 @@ m365 spo brandcenter settings list
 
   ```txt
   BrandColorsListId              : 00000000-0000-0000-0000-000000000000
-  BrandColorsListUrl             : null
+  BrandColorsListUrl             : {"DecodedUrl": "https://contoso.sharepoint.com/sites/BrandGuide/_catalogs/brandcolors"}
   BrandFontLibraryId             : 23af51de-856c-4d00-aa11-0d03af0e46e3
   BrandFontLibraryUrl            : {"DecodedUrl":"https://contoso.sharepoint.com/sites/BrandGuide/Fonts"}
   IsBrandCenterSiteFeatureEnabled: true
@@ -123,8 +125,8 @@ m365 spo brandcenter settings list
   <TabItem value="CSV">
 
   ```csv
-  BrandColorsListId,BrandColorsListUrl,BrandFontLibraryId,IsBrandCenterSiteFeatureEnabled,IsPublicCdnEnabled,SiteId,SiteUrl
-  00000000-0000-0000-0000-000000000000,,23af51de-856c-4d00-aa11-0d03af0e46e3,1,1,52b46e48-9c0c-40cb-a955-13eb6c717ff3,https://contoso.sharepoint.com/sites/BrandGuide
+  BrandColorsListId,BrandFontLibraryId,IsBrandCenterSiteFeatureEnabled,IsPublicCdnEnabled,SiteId,SiteUrl
+  00000000-0000-0000-0000-000000000000,23af51de-856c-4d00-aa11-0d03af0e46e3,1,1,52b46e48-9c0c-40cb-a955-13eb6c717ff3,https://contoso.sharepoint.com/sites/BrandGuide
   ```
 
   </TabItem>

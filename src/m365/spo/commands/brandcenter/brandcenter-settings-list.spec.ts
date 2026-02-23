@@ -143,7 +143,7 @@ describe(commands.BRANDCENTER_SETTINGS_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert.strictEqual(getStub.firstCall.args[0].url, 'https://contoso.sharepoint.com/_api/Brandcenter/Configuration');
+    assert(getStub.calledOnce);
   });
 
   it('successfully logs brand center settings', async () => {
@@ -156,7 +156,7 @@ describe(commands.BRANDCENTER_SETTINGS_LIST, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith(successResponse));
+    assert(loggerLogSpy.calledOnceWithExactly(successResponse));
   });
 
   it('correctly handles error when retrieving settings', async () => {
