@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 type AsciinemaPlayerProps = {
   src: string;
@@ -25,6 +26,7 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const resolvedSrc = useBaseUrl(src);
 
   useEffect(() => {
     setIsMounted(true);
@@ -34,12 +36,12 @@ const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
     const loadAsciinemaPlayer = async () => {
       if (ref.current && isMounted) {
         const AsciinemaPlayerLibrary = await import('asciinema-player');
-        AsciinemaPlayerLibrary.create(src, ref.current, asciinemaOptions);
+        AsciinemaPlayerLibrary.create(resolvedSrc, ref.current, asciinemaOptions);
       }
     };
 
     loadAsciinemaPlayer();
-  }, [src, asciinemaOptions, isMounted]);
+  }, [resolvedSrc, asciinemaOptions, isMounted]);
 
   return (
     <BrowserOnly fallback={<div />}>
