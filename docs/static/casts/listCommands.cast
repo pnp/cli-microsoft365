@@ -76,7 +76,7 @@
 [11.950998, "o", "p"]
 [12.294976, "o", "\r\n"]
 [13.290006, "o", "\r\n"]
-[13.29021, "o", "CLI for Microsoft 365 v4.1.0\r\n"]
+[13.29021, "o", "CLI for Microsoft 365 v11.4.0\r\n"]
 [13.290306, "o", "Manage Microsoft 365 and SharePoint Framework projects on any platform\r\n\r\n"]
 [13.29079, "o", "Commands:\r\n\r\n"]
 [13.29092, "o", "  spo app add [options]        Adds an app to the specified SharePoint Online app catalog\r\n"]
