@@ -146,6 +146,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: commandOptionsSchema.parse({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('doesn\'t fail if tenant properties web property value is empty', async () => {
@@ -157,17 +158,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
-    let correctResponse: boolean = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.includes('No tenant properties found')) {
-        correctResponse = true;
-      }
-    });
-    assert(correctResponse, 'Incorrect response');
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object', async () => {
@@ -179,6 +170,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: commandOptionsSchema.parse({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {
@@ -190,17 +182,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
-    let correctResponse: boolean = false;
-    log.forEach(l => {
-      if (!l || typeof l !== 'string') {
-        return;
-      }
-
-      if (l.includes('No tenant properties found')) {
-        correctResponse = true;
-      }
-    });
-    assert(correctResponse, 'Incorrect response');
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('doesn\'t fail if tenant properties web property value is invalid JSON', async () => {

@@ -66,25 +66,29 @@ class SpoStorageEntityListCommand extends SpoCommand {
         if (this.verbose) {
           await logger.logToStderr('No tenant properties found');
         }
+
+        await logger.log([]);
       }
       else {
         const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
         const keys: string[] = Object.keys(properties);
+
         if (keys.length === 0) {
           if (this.verbose) {
             await logger.logToStderr('No tenant properties found');
           }
+
+          await logger.log([]);
         }
         else {
-          await logger.log(keys.map((key: string): any => {
-            const property: TenantProperty = properties[key];
-            return {
-              Key: key,
-              Value: property.Value,
-              Description: property.Description,
-              Comment: property.Comment
-            };
+          const result = keys.map(key => ({
+            Key: key,
+            Value: properties[key].Value,
+            Description: properties[key].Description,
+            Comment: properties[key].Comment
           }));
+
+          await logger.log(result);
         }
       }
     }
