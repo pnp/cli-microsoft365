@@ -10,15 +10,16 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './storageentity-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './storageentity-list.js';
 
 describe(commands.STORAGEENTITY_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -48,7 +50,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      spo.getTenantAppCatalogUrl
     ]);
   });
 
@@ -67,28 +69,24 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('retrieves the list of configured tenant properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return {
-            storageentitiesindex: JSON.stringify({
-              'Property1': {
-                Value: 'dolor1'
-              },
-              'Property2': {
-                Comment: 'Lorem2',
-                Description: 'ipsum2',
-                Value: 'dolor2'
-              }
-            })
-          };
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return {
+          storageentitiesindex: JSON.stringify({
+            'Property1': {
+              Value: 'dolor1'
+            },
+            'Property2': {
+              Comment: 'Lorem2',
+              Description: 'ipsum2',
+              Value: 'dolor2'
+            }
+          })
+        };
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(loggerLogSpy.calledWith([
       {
         Key: 'Property1',
@@ -105,41 +103,67 @@ describe(commands.STORAGEENTITY_LIST, () => {
     ]));
   });
 
-  it('doesn\'t fail if no tenant properties have been configured', async () => {
+  it('retrieves tenant properties using tenant app catalog URL when appCatalogUrl is not specified', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves('https://contoso.sharepoint.com/sites/appcatalog');
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { storageentitiesindex: '' };
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return {
+          storageentitiesindex: JSON.stringify({
+            'Property1': {
+              Value: 'dolor1'
+            }
+          })
+        };
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(loggerLogSpy.calledWith([
+      {
+        Key: 'Property1',
+        Description: undefined,
+        Comment: undefined,
+        Value: 'dolor1'
+      }
+    ]));
+  });
+
+  it('throws error when tenant app catalog is not found and appCatalogUrl is not specified', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(null);
+
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
+      new CommandError('Tenant app catalog URL not found. Specify the URL of the app catalog site using the appCatalogUrl option.'));
+  });
+
+  it('doesn\'t fail if no tenant properties have been configured', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return { storageentitiesindex: '' };
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return {};
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return {};
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     let correctResponse: boolean = false;
     log.forEach(l => {
       if (!l || typeof l !== 'string') {
         return;
       }
 
-      if (l.indexOf('No tenant properties found') > -1) {
+      if (l.includes('No tenant properties found')) {
         correctResponse = true;
       }
     });
@@ -148,39 +172,31 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { storageentitiesindex: JSON.stringify({}) };
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return { storageentitiesindex: JSON.stringify({}) };
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { storageentitiesindex: JSON.stringify({}) };
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return { storageentitiesindex: JSON.stringify({}) };
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     let correctResponse: boolean = false;
     log.forEach(l => {
       if (!l || typeof l !== 'string') {
         return;
       }
 
-      if (l.indexOf('No tenant properties found') > -1) {
+      if (l.includes('No tenant properties found')) {
         correctResponse = true;
       }
     });
@@ -189,12 +205,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if tenant properties web property value is invalid JSON', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { storageentitiesindex: 'a' };
-        }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/appcatalog/_api/web/AllProperties?$select=storageentitiesindex') {
+        return { storageentitiesindex: 'a' };
       }
 
       throw 'Invalid request';
@@ -208,52 +220,27 @@ describe(commands.STORAGEENTITY_LIST, () => {
       errorMessage = err.message;
     }
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError(`${errorMessage}`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) }), new CommandError(`${errorMessage}`));
   });
 
-  it('requires app catalog URL', () => {
-    const options = command.options;
-    let requiresAppCatalogUrl = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<appCatalogUrl>') > -1) {
-        requiresAppCatalogUrl = true;
-      }
-    });
-    assert(requiresAppCatalogUrl);
+  it('fails validation if appCatalogUrl is not a valid URL', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('accepts valid SharePoint Online app catalog URL', async () => {
-    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when appCatalogUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts valid SharePoint Online site URL', async () => {
-    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('rejects invalid SharePoint Online URL', async () => {
-    const url = 'http://contoso';
-    const actual = await command.validate({ options: { appCatalogUrl: url } }, commandInfo);
-    assert.strictEqual(actual, `'${url}' is not a valid SharePoint Online site URL.`);
-  });
-
-  it('fails validation when no SharePoint Online app catalog URL specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
+  it('passes validation when appCatalogUrl is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('handles promise rejection', async () => {
     sinon.stub(request, 'get').rejects(new Error('error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) }), new CommandError('error'));
   });
 });
