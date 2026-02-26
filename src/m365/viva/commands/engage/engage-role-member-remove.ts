@@ -36,17 +36,17 @@ class VivaEngageRoleMemberRemoveCommand extends GraphCommand {
     return 'Removes a user from a Viva Engage role';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType<Options> {
     return options;
   }
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.roleId, options.roleName].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either roleId, or roleName, but not both.'
+        error: 'Specify either roleId, or roleName, but not both.'
       })
       .refine(options => [options.userId, options.userName].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either userId, or userName, but not both.'
+        error: 'Specify either userId, or userName, but not both.'
       });
   }
 
