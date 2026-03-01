@@ -41,7 +41,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
@@ -74,7 +74,7 @@ jobs:
         with:
           minimum-size: 16GB
           disk-root: "C:"
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
       - name: Unpack build artifact (non-Windows)
@@ -122,7 +122,7 @@ jobs:
       - name: Compress output (Windows)
         if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
@@ -170,7 +170,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: build-ubuntu-latest-${{ env.NODE_VERSION }}
       - name: Unpack build artifact
@@ -199,7 +199,7 @@ jobs:
       - name: Compress output
         run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: build-ubuntu-latest-${{ env.NODE_VERSION }}
           path: build.tar
@@ -227,7 +227,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           name: build-ubuntu-latest-${{ env.NODE_VERSION }}
       - name: Unpack build artifact
