@@ -80,7 +80,7 @@ class OutlookCalendarGroupListCommand extends GraphCommand {
             const hasSharedScope = scopes.some(s => s === 'Calendars.Read.Shared' || s === 'Calendars.ReadWrite.Shared');
 
             if (!hasSharedScope) {
-              throw `Retrieving calendar groups of other users requires the 'Calendars.Read.Shared' or 'Calendars.ReadWrite.Shared' permission scope. Make sure the access token contains this scope.`;
+              throw `To retrieve calendar groups of other users, the Entra ID application used for authentication must have either the Calendars.Read.Shared or Calendars.ReadWrite.Shared delegated permission assigned.`;
             }
           }
 
