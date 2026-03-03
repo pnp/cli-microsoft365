@@ -324,14 +324,14 @@ describe(commands.CALENDARGROUP_LIST, () => {
   it('throws error when using delegated permissions with other userId without shared scope', async () => {
     await assert.rejects(
       command.action(logger, { options: commandOptionsSchema.parse({ userId }) }),
-      new CommandError(`Retrieving calendar groups of other users requires the 'Calendars.Read.Shared' or 'Calendars.ReadWrite.Shared' permission scope. Make sure the access token contains this scope.`)
+      new CommandError(`To retrieve calendar groups of other users, the Entra ID application used for authentication must have either the Calendars.Read.Shared or Calendars.ReadWrite.Shared delegated permission assigned.`)
     );
   });
 
   it('throws error when using delegated permissions with other userName without shared scope', async () => {
     await assert.rejects(
       command.action(logger, { options: commandOptionsSchema.parse({ userName }) }),
-      new CommandError(`Retrieving calendar groups of other users requires the 'Calendars.Read.Shared' or 'Calendars.ReadWrite.Shared' permission scope. Make sure the access token contains this scope.`)
+      new CommandError(`To retrieve calendar groups of other users, the Entra ID application used for authentication must have either the Calendars.Read.Shared or Calendars.ReadWrite.Shared delegated permission assigned.`)
     );
   });
 
