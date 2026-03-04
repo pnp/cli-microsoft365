@@ -146,7 +146,7 @@ m365 spo list set [options]
 : Gets or sets the list experience for the list. Allowed values `Auto`, `NewExperience`, `ClassicExperience`.
 
 `--majorVersionLimit [majorVersionLimit]`
-: Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.
+: Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only. When specified, versioning is automatically enabled.
 
 `--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]`
 : Gets or sets the maximum number of major versions that are allowed for an item in a document library that uses version control with both major and minor versions.
@@ -205,6 +205,12 @@ m365 spo list set [options]
 `--validationMessage [validationMessage]`
 : Gets or sets the message that is displayed when validation fails for a list item.
 
+`--versionAutoExpireTrim [versionAutoExpireTrim]`
+: Boolean that indicates whether the automatic version trim should be enabled. Cannot be used together with `versionExpireAfterDays` unless set to `false`. Valid values are `true`, `false`.
+
+`--versionExpireAfterDays [versionExpireAfterDays]`
+: Number that defines how many days a version should be removed after. When using this option, be sure to also set `majorVersionLimit`. Cannot be used together with `versionAutoExpireTrim` set to `true`.
+
 `--writeSecurity [writeSecurity]`
 : Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item).
 ```
@@ -235,6 +241,18 @@ Update the title of a list retrieved by it's original title.
 
 ```sh
 m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents --newTitle 'Different Title'
+```
+
+Enable automatic version trimming on a list.
+
+```sh
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --versionAutoExpireTrim true
+```
+
+Set versions to expire after 30 days and keep a maximum of 500 major versions.
+
+```sh
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --versionExpireAfterDays 30 --majorVersionLimit 500
 ```
 
 ## Response
