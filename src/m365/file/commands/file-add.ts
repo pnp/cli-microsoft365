@@ -150,11 +150,9 @@ class FileAddCommand extends GraphCommand {
     const _fileWebUrl = new URL(fileWebUrl);
     const _siteUrl = new URL(siteUrl || fileWebUrl);
     const isSiteUrl = typeof siteUrl !== 'undefined';
-    let siteId: string = '';
-    let driveRelativeFileUrl: string = '';
     const siteInfo = await this.getGraphSiteInfoFromFullUrl(_siteUrl.host, _siteUrl.pathname, isSiteUrl);
 
-    siteId = siteInfo.id;
+    let siteId = siteInfo.id;
     let siteRelativeFileUrl: string = _fileWebUrl.pathname.replace(siteInfo.serverRelativeUrl, '');
     // normalize site-relative URLs for root site collections and root sites
 
@@ -163,7 +161,7 @@ class FileAddCommand extends GraphCommand {
     }
 
     const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
-    driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
+    let driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
     // chunk 0 is empty because the URL starts with /
 
     const driveId = await this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
@@ -207,7 +205,7 @@ class FileAddCommand extends GraphCommand {
     if (currentPath.endsWith('/sites') ||
       currentPath.endsWith('/teams') ||
       currentPath.endsWith('/personal')) {
-      return await this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, '');
+      return await this.getGraphSiteInfo(hostName, urlChunks, currentChunk + 1, '');
     }
 
     if (!currentPath.startsWith('/')) {

@@ -99,7 +99,7 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
     const removeAppRoleAssignment = async (): Promise<void> => {
       let sp: ServicePrincipal;
       // get the service principal associated with the appId
-      let spMatchQuery: string = '';
+      let spMatchQuery: string;
       if (args.options.appId) {
         spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
       }

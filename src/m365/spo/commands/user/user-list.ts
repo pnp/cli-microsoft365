@@ -52,12 +52,8 @@ class SpoUserListCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving users from web ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
-
-    requestUrl = `${args.options.webUrl}/_api/web/siteusers`;
-
     const requestOptions: any = {
-      url: requestUrl,
+      url: `${args.options.webUrl}/_api/web/siteusers`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

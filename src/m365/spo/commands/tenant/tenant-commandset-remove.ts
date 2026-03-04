@@ -144,7 +144,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Getting the tenant command set ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
     }
 
-    let filter: string = '';
+    let filter: string;
     if (args.options.title) {
       filter = `Title eq '${args.options.title}'`;
     }

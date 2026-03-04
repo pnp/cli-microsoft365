@@ -171,7 +171,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
   }
 
   private validateProperties(propertiesString: string): boolean | string {
-    let properties: any = null;
+    let properties: any;
     try {
       properties = JSON.parse(propertiesString);
     }

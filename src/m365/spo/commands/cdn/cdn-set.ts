@@ -85,8 +85,7 @@ class SpoCdnSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const cdnTypeString: string = args.options.type || 'Public';
     const enabled: boolean = args.options.enabled;
-    let cdnType: number = 0;
-    let spoAdminUrl: string = '';
+    let cdnType: number;
 
     switch (cdnTypeString) {
       case "Private": {
@@ -104,7 +103,7 @@ class SpoCdnSetCommand extends SpoCommand {
     }
 
     try {
-      spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       let requestBody = '';

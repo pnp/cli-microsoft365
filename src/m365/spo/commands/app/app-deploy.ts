@@ -102,13 +102,11 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let appId: string = '';
     const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
-    let appCatalogUrl: string = '';
 
     try {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
-      appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
+      const appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
       let res: { UniqueId: string };
       if (args.options.id) {
@@ -134,7 +132,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         res = await request.get(requestOptions);
       }
 
-      appId = res.UniqueId;
+      const appId = res.UniqueId;
 
       if (this.verbose) {
         await logger.logToStderr(`Deploying app...`);

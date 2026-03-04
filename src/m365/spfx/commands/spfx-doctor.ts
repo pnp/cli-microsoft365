@@ -770,11 +770,10 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     await this.logMessage('Verifying configuration of your system for working with the SharePoint Framework');
     await this.logMessage(' ');
 
-    let spfxVersion: string = '';
     let prerequisites: SpfxVersionPrerequisites;
 
     try {
-      spfxVersion = args.options.spfxVersion ?? await this.getSharePointFrameworkVersion();
+      const spfxVersion = args.options.spfxVersion ?? await this.getSharePointFrameworkVersion();
 
       if (!spfxVersion) {
         await this.logMessage(formatting.getStatus(CheckStatus.Failure, `SharePoint Framework`));

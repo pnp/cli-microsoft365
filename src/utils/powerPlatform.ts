@@ -36,7 +36,7 @@ export interface PowerPageWebsite {
 
 export const powerPlatform = {
   async getDynamicsInstanceApiUrl(environment: string, asAdmin?: boolean): Promise<string> {
-    let url: string = '';
+    let url: string;
     if (asAdmin) {
       url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${formatting.encodeQueryParameter(environment)}`;
     }
