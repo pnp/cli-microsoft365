@@ -84,12 +84,10 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
-    let appCatalogSiteUrl: string = '';
-    let spoUrl: string = '';
 
     try {
-      spoUrl = await spo.getSpoUrl(logger, this.debug);
-      appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      const appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
       if (this.verbose) {
         await logger.logToStderr(`Retrieving apps...`);

@@ -128,7 +128,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         await logger.logToStderr(`Removing field ${fieldId || title || internalName} ${messageEnd}...`);
       }
 
-      let fieldRestUrl: string = '';
+      let fieldRestUrl: string;
       if (fieldId) {
         fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(fieldId)}')`;
       }

@@ -249,7 +249,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         translateY: 0
       }
     };
-    let header: PageHeader | CustomPageHeader = defaultPageHeader;
     let pageFullName: string = args.options.pageName.toLowerCase();
     if (!pageFullName.endsWith('.aspx')) {
       pageFullName += '.aspx';
@@ -258,7 +257,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     let canvasContent: string = "";
     let bannerImageUrl: string = "";
     let description: string = "";
-    let title: string = "";
     let authorByline: string[] = args.options.authors ? args.options.authors.split(',').map(a => a.trim()) : [];
     let topicHeader: string = args.options.topicHeader || "";
 
@@ -276,7 +274,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       };
 
       const page = await request.get<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }>(requestOptions);
-      title = page.Title;
+      let title = page.Title;
 
       let pageData: ClientSidePageProperties;
       if (page.IsPageCheckedOutToCurrentUser) {
@@ -294,18 +292,18 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         pageData = await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
+      let header: PageHeader | CustomPageHeader;
       switch (args.options.type) {
         case 'None':
           header = noPageHeader;
           break;
-        case 'Default':
-          header = defaultPageHeader;
-          break;
         case 'Custom':
           header = customPageHeader;
           break;
+        case 'Default':
         default:
           header = defaultPageHeader;
+          break;
       }
 
       if (pageData) {

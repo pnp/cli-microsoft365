@@ -202,7 +202,7 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let webUrl: string = '';
+    let webUrl: string;
 
     try {
       if (args.options.webUrl) {

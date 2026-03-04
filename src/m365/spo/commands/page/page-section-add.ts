@@ -380,34 +380,34 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
     switch (args.options.sectionTemplate) {
       case 'OneColumnFullWidth':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 0, args, zoneId));
         break;
       case 'TwoColumn':
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, args, zoneId));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 6, args, zoneId));
         break;
       case 'ThreeColumn':
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 4, args, zoneId));
         break;
       case 'TwoColumnLeft':
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, args, zoneId));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 4, args, zoneId));
         break;
       case 'TwoColumnRight':
         columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, args, zoneId));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 8, args, zoneId));
         break;
       case 'Vertical':
         columns.push(this.getVerticalColumn(args, zoneId));
         break;
       case 'Flexible':
-        columns.push(this.getFlexibleColumn(zoneIndex, sectionIndex++, args, zoneId));
+        columns.push(this.getFlexibleColumn(zoneIndex, sectionIndex, args, zoneId));
         break;
       case 'OneColumn':
       default:
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12, args, zoneId));
+        columns.push(this.getColumn(zoneIndex, sectionIndex, 12, args, zoneId));
         break;
     }
 

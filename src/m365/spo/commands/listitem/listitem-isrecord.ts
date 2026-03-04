@@ -116,8 +116,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    let formDigestValue: string = '';
-    let listId: string = '';
+    let listId: string;
 
     if (this.debug) {
       await logger.logToStderr(`Retrieving access token for ${resource}...`);
@@ -152,7 +151,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       }
 
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      formDigestValue = reqDigest.FormDigestValue;
+      const formDigestValue = reqDigest.FormDigestValue;
 
       const webIdentityResp = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
 

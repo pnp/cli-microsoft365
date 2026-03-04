@@ -200,8 +200,8 @@ function getBoundedDivMarkup<T>(html: string, boundaryStartPattern: RegExp | str
     // we have one open div counting from the one found above using boundaryStartPattern so we need to ensure we find it's close
     let openCounter = 1;
     let searchIndex = startIndex + 1;
-    let nextDivOpen = -1;
-    let nextCloseDiv = -1;
+    let nextDivOpen;
+    let nextCloseDiv;
 
     // this loop finds the </div> tag that matches the opening of the control
     while (true) {
@@ -373,7 +373,7 @@ export class ClientSidePage {
       // if no control type is present this is a column which we give type 0 to let us process it
       const controlType = ct === null || ct.length < 0 ? -1 : parseInt(ct[1], 10);
 
-      let control: CanvasControl | null = null;
+      let control: CanvasControl | null;
 
       switch (controlType) {
         case -1:
@@ -452,8 +452,8 @@ export class ClientSidePage {
    */
   private mergePartToTree(control: ClientSidePart): void {
 
-    let section: CanvasSection | null = null;
-    let column: CanvasColumn | null = null;
+    let section: CanvasSection | null;
+    let column: CanvasColumn | null;
     let sectionFactor: CanvasColumnFactorType = 12;
     let sectionIndex = 0;
     let zoneIndex = 0;
@@ -504,7 +504,7 @@ export class ClientSidePage {
   private mergeColumnToTree(column: CanvasColumn): void {
 
     const order = column?.controlData?.position.zoneIndex || 0;
-    let section: CanvasSection | null = null;
+    let section: CanvasSection | null;
     const sections = this.sections.filter(s => s.order === order && s.layoutIndex === (column?.controlData?.position.layoutIndex ?? 1));
 
     if (sections.length < 1) {

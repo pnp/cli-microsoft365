@@ -38,11 +38,14 @@ const commands: CommandInfo[] = [];
 /**
  * Command to execute
  */
+// eslint-disable-next-line no-unassigned-vars
 let commandToExecute: CommandInfo | undefined;
 /**
  * Name of the command specified through args
  */
+// eslint-disable-next-line no-unassigned-vars
 let currentCommandName: string | undefined;
+// eslint-disable-next-line no-unassigned-vars
 let optionsFromArgs: { options: yargs.Arguments } | undefined;
 const defaultHelpMode = 'options';
 const defaultHelpTarget = 'console';

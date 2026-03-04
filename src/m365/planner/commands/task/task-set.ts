@@ -313,7 +313,6 @@ class PlannerTaskSetCommand extends GraphCommand {
     // Hitting this section means assignedToUserNames won't be undefined
     const userNames = options.assignedToUserNames as string;
     const userArr: string[] = userNames.split(',').map(o => o.trim());
-    let userIds: string[] = [];
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
       const requestOptions: CliRequestOptions = {
@@ -332,7 +331,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     let userUpns: string[] = [];
 
     userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
-    userIds = usersRes.map(res => res.value[0]?.id as string);
+    const userIds = usersRes.map(res => res.value[0]?.id as string);
 
     // Find the members where no graph response was found
     const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));

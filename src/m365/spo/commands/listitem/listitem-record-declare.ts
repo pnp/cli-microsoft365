@@ -173,7 +173,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   protected getDeclareRecordRequestBody(webIdentity: string, listId: string, id: string, date: string): string {
-    let requestBody: string = '';
+    let requestBody: string;
     if (date.length === 10) {
       requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="DeclareItemAsRecordWithDeclarationDate" Id="48"><Parameters><Parameter ObjectPathId="21" /><Parameter Type="DateTime">${date}</Parameter></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="21" Name="${webIdentity}:list:${listId}:item:${id},1" /></ObjectPaths></Request>`;
     }

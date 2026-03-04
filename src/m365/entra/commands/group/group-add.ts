@@ -159,8 +159,6 @@ class EntraGroupAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let group: Group;
-    let ownerIds: string[] = [];
-    let memberIds: string[] = [];
 
     try {
       const manifest = this.createRequestBody(args.options);
@@ -173,8 +171,8 @@ class EntraGroupAddCommand extends GraphCommand {
         data: manifest
       };
 
-      ownerIds = await this.getUserIds(logger, args.options.ownerIds, args.options.ownerUserNames);
-      memberIds = await this.getUserIds(logger, args.options.memberIds, args.options.memberUserNames);
+      const ownerIds = await this.getUserIds(logger, args.options.ownerIds, args.options.ownerUserNames);
+      const memberIds = await this.getUserIds(logger, args.options.memberIds, args.options.memberUserNames);
 
       group = await request.post<Group>(requestOptions);
 

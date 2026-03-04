@@ -176,7 +176,7 @@ class EntraGroupMemberListCommand extends GraphCommand {
     const selectParam = allSelectProperties.filter(item => !item.includes('/'));
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}?$select=${selectParam}${expandParam}`;
 
-    let users: ExtendedUser[] = [];
+    let users: ExtendedUser[];
 
     if (filter) {
       // While using the filter, we need to specify the ConsistencyLevel header.

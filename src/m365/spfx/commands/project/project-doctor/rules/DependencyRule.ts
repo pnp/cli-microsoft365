@@ -45,13 +45,12 @@ export abstract class DependencyRule extends JsonRule {
     // if the project has no dependencies, then we assume the package is missing
     let packageNotFound = (this.isDevDep && !project.packageJson.devDependencies) ||
       (!this.isDevDep && !project.packageJson.dependencies);
-    let packageVersionFromProject: string | undefined = undefined;
     let minSemVer: SemVer | null = null;
 
     if (!packageNotFound) {
       // try to get the current version of the dependency installed in the
       // project. If not possible, we assume the dependency is missing
-      packageVersionFromProject = this.isDevDep ? project.packageJson.devDependencies![this.packageName] : project.packageJson.dependencies![this.packageName];
+      const packageVersionFromProject = this.isDevDep ? project.packageJson.devDependencies![this.packageName] : project.packageJson.dependencies![this.packageName];
       if (!packageVersionFromProject) {
         packageNotFound = true;
       }

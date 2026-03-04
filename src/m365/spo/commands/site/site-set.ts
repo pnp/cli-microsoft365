@@ -637,7 +637,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
     if (args.options.noScriptSite !== undefined) {
       const noScriptSite: number = args.options.noScriptSite ? 2 : 1;
-      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
+      payload.push(`<SetProperty Id="${propertyId}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
     }
 
     let response;

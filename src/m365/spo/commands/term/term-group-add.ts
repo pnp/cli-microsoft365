@@ -83,13 +83,12 @@ class SpoTermGroupAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let formDigest: string = '';
     let termGroup: TermGroup;
 
     try {
       const webUrl: string = args.options.webUrl || await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(webUrl);
-      formDigest = res.FormDigestValue;
+      const formDigest = res.FormDigestValue;
 
       if (this.verbose) {
         await logger.logToStderr(`Getting taxonomy term store...`);

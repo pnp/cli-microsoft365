@@ -121,7 +121,7 @@ export class Auth {
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _connection: Connection;
-  private clientApplication: Msal.ClientApplication | undefined;
+  private clientApplication: Msal.PublicClientApplication | Msal.ConfidentialClientApplication | undefined;
   private static cloudEndpoints: { [key: string]: any } = {};
 
   // A list of all connections, including the active one
@@ -424,13 +424,13 @@ export class Auth {
     // Asserting identityId because it is expected to be available at this point.
     assert(this.connection.identityId !== undefined);
 
-    const account = await (this.clientApplication as Msal.ClientApplication)
+    const account = await (this.clientApplication as Msal.PublicClientApplication | Msal.ConfidentialClientApplication)
       .getTokenCache().getAccountByLocalId(this.connection.identityId);
 
     // Asserting account because it is expected to be available at this point.
     assert(account !== null);
 
-    return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
+    return (this.clientApplication as Msal.PublicClientApplication | Msal.ConfidentialClientApplication).acquireTokenSilent({
       account: account,
       scopes: [`${resource}/.default`],
       forceRefresh: fetchNew
