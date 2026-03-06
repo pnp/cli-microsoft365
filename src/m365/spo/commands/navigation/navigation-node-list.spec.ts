@@ -11,13 +11,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './navigation-node-list.js';
+import command, { options } from './navigation-node-list.js';
 
 describe(commands.NAVIGATION_NODE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
+
   const navigationNodeResponse = {
     value: [
       {
@@ -27,7 +29,21 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
         "IsVisible": true,
         "ListTemplateType": 0,
         "Title": "Node 1",
-        "Url": "/sites/team-a/SitePages/page1.aspx"
+        "Url": "/sites/team-a/SitePages/page1.aspx",
+        "Children": [
+          {
+            "AudienceIds": null,
+            "CurrentLCID": 1033,
+            "Id": 2005,
+            "IsDocLib": true,
+            "IsExternal": true,
+            "IsVisible": true,
+            "ListTemplateType": 0,
+            "Title": "External site",
+            "Url": "https://externalsite.com",
+            "Children": []
+          }
+        ]
       },
       {
         "Id": 2004,
@@ -46,8 +62,10 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -87,7 +105,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('gets nodes from the top navigation', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar?$expand=Children,Children/Children,Children/Children/Children') {
         return navigationNodeResponse;
       }
 
@@ -95,12 +113,12 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } });
-    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
+    assert(loggerLogSpy.calledOnceWith(navigationNodeResponse.value));
   });
 
   it('gets nodes from the quick launch', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/quicklaunch') {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/quicklaunch?$expand=Children,Children/Children,Children/Children/Children') {
         return navigationNodeResponse;
       }
 
@@ -108,51 +126,38 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' } });
-    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
+    assert(loggerLogSpy.calledOnceWith(navigationNodeResponse.value));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
-        throw 'An error has occurred';
+    sinon.stub(request, 'get').rejects({
+      error: {
+        code: "-2147024891, System.UnauthorizedAccessException",
+        message: "Attempted to perform an unauthorized operation."
       }
-
-      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any),
-      new CommandError('An error has occurred'));
-  });
-
-  it('correctly handles random API error (string error)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
-        throw 'An error has occurred';
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any), new CommandError('An error has occurred'));
+      new CommandError('Attempted to perform an unauthorized operation.'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if specified location is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when location is QuickLaunch and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' });
+    assert.strictEqual(actual.success, true);
   });
 });

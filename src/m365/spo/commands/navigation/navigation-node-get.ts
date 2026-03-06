@@ -1,18 +1,24 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { NavigationNode } from './NavigationNode.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.int().positive()
+});
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id: string;
 }
 
 class SpoNavigationNodeGetCommand extends SpoCommand {
@@ -24,35 +30,8 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
     return 'Retrieve information about a specific navigation node';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id <id>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const id: number = parseInt(args.options.id);
-        if (isNaN(id)) {
-          return `${args.options.id} is not a valid number`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -61,15 +40,19 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})`,
+      url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})?$expand=Children,Children/Children,Children/Children/Children`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
     try {
-      const listInstance = await request.get<NavigationNode>(requestOptions);
+      const listInstance = await request.get<any>(requestOptions);
+      if (listInstance['odata.null']) {
+        throw `No navigation node found with id ${args.options.id}.`;
+      }
+
       await logger.log(listInstance);
     }
     catch (err: any) {
