@@ -1,8 +1,12 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+export const options = globalOptionsZod.strict();
 
 class EntraUserRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
@@ -11,6 +15,10 @@ class EntraUserRecycleBinItemListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists users from the recycle bin in the current tenant';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {

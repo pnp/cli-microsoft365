@@ -2,6 +2,8 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
 import { odata } from '../../../../utils/odata.js';
@@ -9,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-recyclebinitem-list.js';
+import command, { options } from './user-recyclebinitem-list.js';
 
 describe(commands.USER_RECYCLEBINITEM_LIST, () => {
   const deletedUsersResponse = [{ "businessPhones": [], "displayName": "John Doe", "givenName": "John Doe", "jobTitle": "Developer", "mail": "john@contoso.com", "mobilePhone": "0476345130", "officeLocation": "Washington", "preferredLanguage": "nl-BE", "surname": "John", "userPrincipalName": "7e06b56615f340138bf879874d52e68ajohn@contoso.com", "id": "7e06b566-15f3-4013-8bf8-79874d52e68a" }];
@@ -18,6 +20,8 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +29,8 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -66,6 +72,16 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'userPrincipalName']);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves deleted users', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === graphGetUrl) {
@@ -74,7 +90,7 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith(deletedUsersResponse));
   });
 
@@ -90,7 +106,7 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred while processing this request.'));
   });
 });
