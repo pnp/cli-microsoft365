@@ -1303,6 +1303,15 @@ const sidebars: SidebarsConfig = {
     {
       'Outlook (outlook)': [
         {
+          event: [
+            {
+              type: 'doc',
+              label: 'event remove',
+              id: 'cmd/outlook/event/event-remove'
+            }
+          ]
+        },
+        {
           mail: [
             {
               type: 'doc',

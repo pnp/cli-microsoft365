@@ -1,6 +1,7 @@
 const prefix: string = 'outlook';
 
 export default {
+  EVENT_REMOVE: `${prefix} event remove`,
   MAIL_SEARCHFOLDER_ADD: `${prefix} mail searchfolder add`,
   MAIL_SEND: `${prefix} mail send`,
   MAILBOX_SETTINGS_GET: `${prefix} mailbox settings get`,
