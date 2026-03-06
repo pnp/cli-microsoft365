@@ -1,0 +1,85 @@
+import Global from '../../_global.mdx';
+import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
+
+# outlook event cancel
+
+Cancels a calendar event
+
+## Usage
+
+```sh
+m365 outlook event cancel [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id <id>`
+: ID of the event.
+
+`--userId [userId]`
+: ID of the user that owns the calendar. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+
+`--userName [userName]`
+: UPN of the user that owns the calendar. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+
+`--comment [comment]`
+: A comment about the cancellation sent to all the attendees.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  |-----------------|---------------------------|
+  | Microsoft Graph | Calendars.ReadWrite       |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                    |
+  |-----------------|--------------------------------|
+  | Microsoft Graph | Calendars.ReadWrite            |
+
+  </TabItem>
+</Tabs>
+
+## Remarks
+
+:::info
+
+This action is only available to the organizer of the event.
+
+:::
+
+## Examples
+
+Cancel a calendar event from the current logged-in user without a comment
+
+```sh
+m365 outlook event cancel --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAENAAAiIsqMbYjsT5e-T7KzowPTAAAa_WKzAAA=
+```
+
+Cancel a calendar event from a specific user with a comment
+
+```sh
+m365 outlook event cancel --userName "john.doe@contoso.com" --comment "Cancelling for this week due to all hands" --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAENAAAiIsqMbYjsT5e-T7KzowPTAAAa_WKzAAA=
+```
+
+Cancel a calendar event from a specific user specified by user ID
+
+```sh
+m365 outlook event cancel --userId 6799fd1a-723b-4eb7-8e52-41ae530274ca --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAENAAAiIsqMbYjsT5e-T7KzowPTAAAa_WKzAAA=
+```
+
+## Response
+
+The command won't return a response on success.
