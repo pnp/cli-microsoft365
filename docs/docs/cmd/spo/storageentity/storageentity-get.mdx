@@ -17,20 +17,29 @@ m365 spo storageentity get [options]
 ```md definition-list
 `-k, --key <key>`
 : Name of the tenant property to retrieve
+
+`-u, --appCatalogUrl [appCatalogUrl]`
+: URL of the app catalog site. If not specified, the tenant app catalog URL will be used.
 ```
 
 <Global />
 
 ## Remarks
 
-Tenant properties are stored in the app catalog site associated with the site to which you are currently connected. When retrieving the specified tenant property, SharePoint will automatically find the associated app catalog and try to retrieve the property from it.
+Tenant properties are stored in the app catalog site associated with the site to which you are currently connected. When retrieving the specified tenant property, SharePoint will use the specified app catalog URL or automatically resolve the tenant app catalog URL.
 
 ## Examples
 
-Show the value, description and comment of the _AnalyticsId_ tenant property
+Show the value, description and comment of the _AnalyticsId_ tenant property using the tenant app catalog
 
 ```sh
 m365 spo storageentity get -k AnalyticsId
+```
+
+Show the value, description and comment of the _AnalyticsId_ tenant property from a specific app catalog site
+
+```sh
+m365 spo storageentity get -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
 ## Response
