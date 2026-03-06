@@ -42,10 +42,10 @@ m365 spo group get [options]
 
 ### Options
 
-Most commands will have unique options but every command will make use of our global options. This can be achieved by including `<Global />` under the heading options. This will include the global options in the help page. Before we can use the global options tag, we need to import it from `/docs/cmd/_global.mdx`. This can be done by adding the following import at the top of your help file.
+Most commands will have unique options but every command will make use of our global options. This can be achieved by including `<Global />` under the heading options. This will include the global options in the help page. Before we can use the global options tag, we need to import it using a relative path. This can be done by adding the following import at the top of your help file.
 
 ````md title="docs/docs/cmd/spo/group/group-get.mdx"
-import Global from '/docs/cmd/_global.mdx';
+import Global from '../../_global.mdx';
 
 <!-- ... -->
 
