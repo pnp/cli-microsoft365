@@ -43,7 +43,7 @@ module.exports = {
     return {
       'MethodDefinition[key.name = "name"] MemberExpression > Identifier[name != "commands"]': function (node) {
         const actualConstName = node.name;
-        const expectedConstName = getConstNameFromFilePath(context.getFilename());
+        const expectedConstName = getConstNameFromFilePath(context.filename);
 
         if (!expectedConstName) {
           return;

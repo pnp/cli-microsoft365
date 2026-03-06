@@ -98,26 +98,14 @@ export const urlUtil = {
    */
   getWebRelativePath(webUrl: string, folderUrl: string): string {
     let webRelativePath = this.getUrlRelativePath(webUrl);
-    let folderWebRelativePath: string = '';
+    let folderWebRelativePath: string;
 
     // will be used to remove relative path from the folderRelativePath
     // in case the web relative url is included
     let relativePathToRemove: string = webRelativePath;
 
-    // add '/' at 0
-    if (webRelativePath[0] !== '/') {
-      webRelativePath = `/${webRelativePath}`;
-    }
-    else {
+    if (webRelativePath[0] === '/') {
       relativePathToRemove = webRelativePath.substring(1);
-    }
-
-    // remove last '/' of webRelativePath
-    const webPathLastCharPos: number = webRelativePath.length - 1;
-
-    if (webRelativePath.length > 1 &&
-      webRelativePath[webPathLastCharPos] === '/') {
-      webRelativePath = webRelativePath.substring(0, webPathLastCharPos);
     }
 
     // remove the web relative path if it is contained in the folder relative path

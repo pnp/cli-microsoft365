@@ -246,7 +246,8 @@ export default [
       '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
       'mocha/no-identical-title': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-empty-function': 'error'
+      '@typescript-eslint/no-empty-function': 'error',
+      'preserve-caught-error': 'off'
     }
   },
   {

@@ -118,7 +118,7 @@ class SpoFieldGetCommand extends SpoCommand {
       listRestUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
-    let fieldRestUrl: string = '';
+    let fieldRestUrl: string;
     if (args.options.id) {
       fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(args.options.id)}')`;
     }

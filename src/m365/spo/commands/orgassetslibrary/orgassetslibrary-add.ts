@@ -95,14 +95,13 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let spoAdminUrl: string = '';
     const cdnTypeString: string = args.options.cdnType || 'Private';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const thumbnailSchema: string = typeof args.options.thumbnailUrl === 'undefined' ? `<Parameter Type="Null" />` : `<Parameter Type="String">${args.options.thumbnailUrl}</Parameter>`;
 
     try {
       const orgAssetType = this.getOrgAssetType(args.options.orgAssetType);
-      spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       const requestOptions: any = {

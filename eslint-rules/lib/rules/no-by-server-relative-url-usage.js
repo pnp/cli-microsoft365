@@ -22,7 +22,7 @@ module.exports = {
   create: context => {
     return {
       TemplateLiteral(node) {
-        const sourceCodeText = context.getSourceCode().getText(node);
+        const sourceCodeText = context.sourceCode.getText(node);
         const updatedValue = sourceCodeText
           .replace(/GetFileByServerRelativeUrl\(/ig, 'GetFileByServerRelativePath(DecodedUrl=')
           .replace(/GetFolderByServerRelativeUrl\(/ig, 'GetFolderByServerRelativePath(DecodedUrl=');

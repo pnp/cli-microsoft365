@@ -108,7 +108,7 @@ module.exports = {
           return;
         }
 
-        const expectedClassName = getClassNameFromFilePath(context.getFilename(), context.options[0], context.options[1]);
+        const expectedClassName = getClassNameFromFilePath(context.filename, context.options[0], context.options[1]);
         if (!expectedClassName) {
           return;
         }

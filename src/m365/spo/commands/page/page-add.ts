@@ -121,8 +121,6 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestDigest: string = '';
-    let itemId: string = '';
     let pageName: string = args.options.name;
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
@@ -140,7 +138,7 @@ class SpoPageAddCommand extends SpoCommand {
 
     try {
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      requestDigest = reqDigest.FormDigestValue;
+      const requestDigest = reqDigest.FormDigestValue;
 
       let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/sitepages/pages`,
@@ -158,7 +156,7 @@ class SpoPageAddCommand extends SpoCommand {
       };
 
       const template = await request.post<{ UniqueId: string, Id: string }>(requestOptions);
-      itemId = template.UniqueId;
+      const itemId = template.UniqueId;
       const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
       const listItemId = file.Id;
 

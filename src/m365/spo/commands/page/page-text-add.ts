@@ -93,8 +93,6 @@ class SpoPageTextAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestDigest: string = '';
-
     let pageName: string = args.options.pageName;
     if (args.options.pageName.indexOf('.aspx') < 0) {
       pageName += '.aspx';
@@ -107,7 +105,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     try {
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
       // Keep the reference of request digest for subsequent requests
-      requestDigest = reqDigest.FormDigestValue;
+      const requestDigest = reqDigest.FormDigestValue;
 
       if (this.verbose) {
         await logger.logToStderr(`Retrieving modern page ${pageName}...`);

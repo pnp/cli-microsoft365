@@ -97,8 +97,8 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let objectId: string = '';
-    let queryFilter: string = '';
+    let objectId: string;
+    let queryFilter: string;
     if (args.options.appId) {
       queryFilter = `$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
     }

@@ -38,7 +38,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Retrieving list of Microsoft Power Platform environments...`);
     }
 
-    let url: string = '';
+    let url: string;
     if (args.options.asAdmin) {
       url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
     }
