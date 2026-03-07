@@ -28,7 +28,7 @@ function getConstNameFromFilePath(filePath) {
 // unfortunately we can't auto-fix this rule because the
 // const needs to be changed where it's defined rather than
 // where it's used
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {

@@ -4,7 +4,7 @@ import parser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import mocha from 'eslint-plugin-mocha';
 import stylistic from '@stylistic/eslint-plugin';
-import cliM365 from './eslint-rules/lib/index.js';
+import * as cliM365 from './eslint-rules/lib/index.js';
 
 // List of words used in command names used for word breaking
 // Sorted alphabetically for easy maintenance

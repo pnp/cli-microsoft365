@@ -4,6 +4,8 @@
 .github
 .c8rc.json
 coverage
+eslint-rules
+eslint.config.mjs
 docs/**
 !docs/docs/cmd/**
 !docs/docs/_clisettings.mdx

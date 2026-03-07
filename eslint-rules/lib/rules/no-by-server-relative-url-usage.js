@@ -7,7 +7,7 @@ function reportIncorrectEndpoint(context, node, urlEndpoint, pathEndpoint, updat
   });
 }
 
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {
