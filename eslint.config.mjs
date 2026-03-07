@@ -28,6 +28,7 @@ const dictionary = [
   'bin',
   'brand',
   'builder',
+  'calendar',
   'call',
   'card',
   'catalog',
