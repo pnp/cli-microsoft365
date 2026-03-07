@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # entra user remove
 
@@ -33,17 +35,36 @@ If the user with the specified id or user name doesn't exist, you will get a `Re
 
 :::
 
-:::info
-
-To use this command you must be a Global administrator, User administrator or Privileged Authentication administrator.
-
-:::
-
 :::note
 
 After running this command, it may take a minute before the user is effectively moved to the recycle bin.
 
 :::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | User.ReadWrite.All |
+
+  :::info
+
+  To use this command you must be a **Global administrator**, **User administrator**, or **Privileged Authentication administrator**.
+
+  :::
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | User.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
