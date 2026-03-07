@@ -1303,6 +1303,15 @@ const sidebars: SidebarsConfig = {
     {
       'Outlook (outlook)': [
         {
+          calendargroup: [
+            {
+              type: 'doc',
+              label: 'calendargroup list',
+              id: 'cmd/outlook/calendargroup/calendargroup-list'
+            }
+          ]
+        },
+        {
           mail: [
             {
               type: 'doc',

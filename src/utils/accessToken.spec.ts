@@ -167,4 +167,36 @@ describe('utils/accessToken', () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     assert.throws(() => accessToken.assertAccessTokenType('delegated'), new CommandError('This command requires delegated permissions.'));
   });
+
+  it('returns empty array for getScopesFromAccessToken when token is empty', () => {
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken(''), []);
+  });
+
+  it('returns empty array for getScopesFromAccessToken when token has invalid format', () => {
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken('invalid-token'), []);
+  });
+
+  it('returns empty array for getScopesFromAccessToken when token has no scp claim', () => {
+    const payload = Buffer.from(JSON.stringify({ aud: 'https://graph.microsoft.com' })).toString('base64');
+    const token = `header.${payload}.signature`;
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken(token), []);
+  });
+
+  it('returns scopes from access token with single scope', () => {
+    const payload = Buffer.from(JSON.stringify({ scp: 'Calendars.Read' })).toString('base64');
+    const token = `header.${payload}.signature`;
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken(token), ['Calendars.Read']);
+  });
+
+  it('returns scopes from access token with multiple scopes', () => {
+    const payload = Buffer.from(JSON.stringify({ scp: 'Calendars.Read Calendars.Read.Shared Mail.Read' })).toString('base64');
+    const token = `header.${payload}.signature`;
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken(token), ['Calendars.Read', 'Calendars.Read.Shared', 'Mail.Read']);
+  });
+
+  it('returns empty array for getScopesFromAccessToken when token payload is not valid JSON', () => {
+    const payload = Buffer.from('not-json').toString('base64');
+    const token = `header.${payload}.signature`;
+    assert.deepStrictEqual(accessToken.getScopesFromAccessToken(token), []);
+  });
 });
