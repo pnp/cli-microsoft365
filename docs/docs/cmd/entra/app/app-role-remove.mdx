@@ -1,4 +1,6 @@
-import Global from '/docs/cmd/_global.mdx';
+import Global from '../../_global.mdx';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # entra app role remove
 
@@ -52,6 +54,25 @@ If the command finds multiple Entra application registrations with the specified
 If the command finds multiple roles with the specified role name, it will prompt you to disambiguate which role it should use, listing the claim values.
 
 If the role to be removed is 'Enabled', this command will disable the role first and then remove.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions               |
+  | --------------- | ------------------------- |
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions               |
+  | --------------- | ------------------------- |
+  | Microsoft Graph | Application.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
