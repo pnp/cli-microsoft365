@@ -1,11 +1,10 @@
 const mocha = require('mocha');
-const core = import('@actions/core');
 
 const { EVENT_RUN_END, EVENT_TEST_FAIL, EVENT_RUN_BEGIN } =
   mocha.Runner.constants;
 
 class TestSummaryReporter {
-  summary = core.summary;
+  summary;
   testResult = { failedTests: {}, stats: {} };
   suiteIndenter = '&emsp; ';
   destination;
@@ -52,6 +51,9 @@ class TestSummaryReporter {
 
   async writeSummary() {
     try {
+      const core = await import('@actions/core');
+      this.summary = core.summary;
+
       if (this.testResult.stats.failed > 0) {
         this.summary = this.summary.addHeading('Failed tests', 3);
         this.summary = this.summary
