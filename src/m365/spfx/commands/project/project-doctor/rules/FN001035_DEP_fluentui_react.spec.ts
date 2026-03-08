@@ -9,7 +9,7 @@ describe('FN001035_DEP_fluentui_react', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN001035_DEP_fluentui_react('^7.199.1');
+    rule = new FN001035_DEP_fluentui_react({ supportedRange: '^7.199.1' });
   });
 
   it(`returns correct description when unsupported version of @fluentui/react found`, () => {

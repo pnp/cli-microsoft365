@@ -31,37 +31,42 @@ import { FN016002_TS_msgraphclient_instance } from "./rules/FN016002_TS_msgraphc
 import { FN016003_TS_aadhttpclient_instance } from "./rules/FN016003_TS_aadhttpclient_instance.js";
 
 export default [
-  new FN001001_DEP_microsoft_sp_core_library('1.6.0'),
-  new FN001002_DEP_microsoft_sp_lodash_subset('1.6.0'),
-  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.6.0'),
-  new FN001004_DEP_microsoft_sp_webpart_base('1.6.0'),
-  new FN001011_DEP_microsoft_sp_dialog('1.6.0'),
-  new FN001012_DEP_microsoft_sp_application_base('1.6.0'),
-  new FN001013_DEP_microsoft_decorators('1.6.0'),
-  new FN001014_DEP_microsoft_sp_listview_extensibility('1.6.0'),
-  new FN001023_DEP_microsoft_sp_component_base('1.6.0'),
-  new FN001024_DEP_microsoft_sp_diagnostics('1.6.0'),
-  new FN001025_DEP_microsoft_sp_dynamic_data('1.6.0'),
-  new FN001026_DEP_microsoft_sp_extension_base('1.6.0'),
-  new FN001027_DEP_microsoft_sp_http('1.6.0'),
-  new FN001029_DEP_microsoft_sp_loader('1.6.0'),
-  new FN001030_DEP_microsoft_sp_module_interfaces('1.6.0'),
-  new FN001031_DEP_microsoft_sp_odata_types('1.6.0'),
-  new FN001032_DEP_microsoft_sp_page_context('1.6.0'),
-  new FN002001_DEVDEP_microsoft_sp_build_web('1.6.0'),
-  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.6.0'),
-  new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.6.0'),
-  new FN002008_DEVDEP_tslint_microsoft_contrib('5.0.0'),
-  new FN010001_YORC_version('1.6.0'),
-  new FN012011_TSC_outDir('lib'),
-  new FN012012_TSC_include([
-    'src/**/*.ts'
-  ]),
-  new FN012013_TSC_exclude([
-    'node_modules',
-    'lib'
-  ]),
-  new FN015003_FILE_tslint_json(true, `{
+  new FN001001_DEP_microsoft_sp_core_library({ packageVersion: '1.6.0' }),
+  new FN001002_DEP_microsoft_sp_lodash_subset({ packageVersion: '1.6.0' }),
+  new FN001003_DEP_microsoft_sp_office_ui_fabric_core({ packageVersion: '1.6.0' }),
+  new FN001004_DEP_microsoft_sp_webpart_base({ packageVersion: '1.6.0' }),
+  new FN001011_DEP_microsoft_sp_dialog({ packageVersion: '1.6.0' }),
+  new FN001012_DEP_microsoft_sp_application_base({ packageVersion: '1.6.0' }),
+  new FN001013_DEP_microsoft_decorators({ packageVersion: '1.6.0' }),
+  new FN001014_DEP_microsoft_sp_listview_extensibility({ packageVersion: '1.6.0' }),
+  new FN001023_DEP_microsoft_sp_component_base({ packageVersion: '1.6.0' }),
+  new FN001024_DEP_microsoft_sp_diagnostics({ packageVersion: '1.6.0' }),
+  new FN001025_DEP_microsoft_sp_dynamic_data({ packageVersion: '1.6.0' }),
+  new FN001026_DEP_microsoft_sp_extension_base({ packageVersion: '1.6.0' }),
+  new FN001027_DEP_microsoft_sp_http({ packageVersion: '1.6.0' }),
+  new FN001029_DEP_microsoft_sp_loader({ packageVersion: '1.6.0' }),
+  new FN001030_DEP_microsoft_sp_module_interfaces({ packageVersion: '1.6.0' }),
+  new FN001031_DEP_microsoft_sp_odata_types({ packageVersion: '1.6.0' }),
+  new FN001032_DEP_microsoft_sp_page_context({ packageVersion: '1.6.0' }),
+  new FN002001_DEVDEP_microsoft_sp_build_web({ packageVersion: '1.6.0' }),
+  new FN002002_DEVDEP_microsoft_sp_module_interfaces({ packageVersion: '1.6.0' }),
+  new FN002003_DEVDEP_microsoft_sp_webpart_workbench({ packageVersion: '1.6.0' }),
+  new FN002008_DEVDEP_tslint_microsoft_contrib({ packageVersion: '5.0.0' }),
+  new FN010001_YORC_version({ version: '1.6.0' }),
+  new FN012011_TSC_outDir({ outDir: 'lib' }),
+  new FN012012_TSC_include({
+    include: [
+      'src/**/*.ts'
+    ]
+  }),
+  new FN012013_TSC_exclude({
+    exclude: [
+      'node_modules',
+      'lib'
+    ]
+  }),
+  new FN015003_FILE_tslint_json({
+    add: true, contents: `{
   "rulesDirectory": [
     "tslint-microsoft-contrib"
   ],
@@ -92,11 +97,12 @@ export default [
     "variable-name": false,
     "whitespace": false
   }
-}`),
-  new FN015004_FILE_config_tslint_json(false),
-  new FN015005_FILE_src_index_ts(true, `// A file is required to be in the root of the /src directory by the TypeScript compiler
-`),
-  new FN016001_TS_msgraphclient_packageName('@microsoft/sp-http'),
+}` }),
+  new FN015004_FILE_config_tslint_json({ add: false }),
+  new FN015005_FILE_src_index_ts({
+    add: true, contents: `// A file is required to be in the root of the /src directory by the TypeScript compiler
+` }),
+  new FN016001_TS_msgraphclient_packageName({ packageName: '@microsoft/sp-http' }),
   new FN016002_TS_msgraphclient_instance(),
   new FN016003_TS_aadhttpclient_instance()
 ];

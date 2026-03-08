@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN008002_CFG_TSL_removeRule extends JsonRule {
-  constructor(private rule: string) {
+  private rule: string;
+
+  constructor(options: { rule: string }) {
     super();
+    this.rule = options.rule;
   }
 
   get id(): string {
