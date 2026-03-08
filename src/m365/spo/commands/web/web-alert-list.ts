@@ -51,10 +51,18 @@ class SpoWebAlertListCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.listId, options.listUrl, options.listTitle].filter(x => x !== undefined).length <= 1, {
-        error: `Specify either listId, listUrl, or listTitle, but not more than one.`
+        error: `Specify either listId, listUrl, or listTitle, but not more than one.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listUrl', 'listTitle']
+        }
       })
       .refine(options => [options.userName, options.userId].filter(x => x !== undefined).length <= 1, {
-        error: `Specify either userName or userId, but not both.`
+        error: `Specify either userName or userId, but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userName', 'userId']
+        }
       });
   }
 

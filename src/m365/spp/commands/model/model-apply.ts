@@ -52,10 +52,18 @@ class SppModelApplyCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.title].filter(x => x !== undefined).length === 1, {
-        error: `Specify exactly one of the following options: 'id' or 'title'.`
+        error: `Specify exactly one of the following options: 'id' or 'title'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title']
+        }
       })
       .refine(options => [options.listTitle, options.listId, options.listUrl].filter(x => x !== undefined).length === 1, {
-        error: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`
+        error: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listTitle', 'listId', 'listUrl']
+        }
       });
   }
 

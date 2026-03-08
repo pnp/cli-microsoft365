@@ -44,7 +44,11 @@ class OutlookMailSearchFolderAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.userId && options.userName), {
-        error: 'Specify either userId or userName, but not both'
+        error: 'Specify either userId or userName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
   }
 
