@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -20,6 +21,7 @@ describe(commands.M365GROUP_RENEW, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   const groupId = '28beab62-7540-4db1-a23f-29a6018a3848';
 
@@ -32,6 +34,7 @@ describe(commands.M365GROUP_RENEW, () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves(groupId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -80,7 +83,7 @@ describe(commands.M365GROUP_RENEW, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: groupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -93,7 +96,7 @@ describe(commands.M365GROUP_RENEW, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Finance', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Finance', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -106,36 +109,25 @@ describe(commands.M365GROUP_RENEW, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: groupId }) });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'The remote server returned an error: (404) Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) }),
       new CommandError('The remote server returned an error: (404) Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('throws error when the group is not a unified group', async () => {
@@ -144,7 +136,7 @@ describe(commands.M365GROUP_RENEW, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

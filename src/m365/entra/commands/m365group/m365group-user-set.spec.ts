@@ -1,8 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -14,6 +13,8 @@ import commands from '../../commands.js';
 import command from './m365group-user-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { cli } from '../../../../cli/cli.js';
 
 describe(commands.M365GROUP_USER_SET, () => {
   const groupId = '630dfae3-6904-4154-acc2-812e11205351';
@@ -23,6 +24,7 @@ describe(commands.M365GROUP_USER_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,8 +32,9 @@ describe(commands.M365GROUP_USER_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
-    auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    auth.connection.active = true;
   });
 
   beforeEach(() => {
@@ -72,33 +75,33 @@ describe(commands.M365GROUP_USER_SET, () => {
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo', ids: userIds[0], role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo', ids: userIds[0], role: 'Member' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({ options: { teamId: 'foo', ids: userIds[0], role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ teamId: 'foo', ids: userIds[0], role: 'Member' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if ids contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, ids: `${userIds[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, ids: `${userIds[0]},foo`, role: 'Member' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if userNames contains an invalid UPN', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if role is not a valid role', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, ids: userIds.join(','), role: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, ids: userIds.join(','), role: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, ids: userIds.join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, ids: userIds.join(','), role: 'Member' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully updates roles for users to Member for the specified group by ID', async () => {
@@ -144,7 +147,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, ids: userIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, ids: userIds.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -213,7 +216,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -279,7 +282,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: groupId, ids: userIds.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: groupId, ids: userIds.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -348,7 +351,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamName: 'Contoso', ids: userIds.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamName: 'Contoso', ids: userIds.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -398,7 +401,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, ids: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, ids: userIds.join(','), role: 'Member' }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
@@ -439,7 +442,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, ids: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, ids: userIds.join(','), role: 'Member' }) }),
       new CommandError('Service unavailable.'));
   });
 
@@ -498,7 +501,7 @@ describe(commands.M365GROUP_USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, ids: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, ids: userIds.join(','), role: 'Member' }) }),
       new CommandError('Service unavailable.'));
   });
 
@@ -506,7 +509,7 @@ describe(commands.M365GROUP_USER_SET, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userNames: userUpns.join(',') } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userNames: userUpns.join(','), role: 'Member' }) } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });
