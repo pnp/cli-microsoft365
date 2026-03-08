@@ -1,4 +1,5 @@
 import { setTimeout } from 'timers/promises';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -10,6 +11,7 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { DeletedSiteProperties } from './DeletedSiteProperties.js';
 import { SiteProperties } from './SiteProperties.js';
+import { brandCenter } from '../../../../utils/brandCenter.js';
 
 interface CommandArgs {
   options: Options;
@@ -37,6 +39,7 @@ export interface Options extends GlobalOptions {
   removeDeletedSite: boolean;
   withAppCatalog?: boolean;
   wait: boolean;
+  force?: boolean;
 }
 
 interface CreateGroupExResponse {
@@ -86,6 +89,7 @@ class SpoSiteAddCommand extends SpoCommand {
       telemetryProps.lcid = args.options.lcid;
       telemetryProps.owners = typeof args.options.owners !== 'undefined';
       telemetryProps.withAppCatalog = args.options.withAppCatalog || false;
+      telemetryProps.force = args.options.force || false;
 
       if (isCommunicationSite) {
         telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
@@ -110,7 +114,7 @@ class SpoSiteAddCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '--type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
+        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite', 'BrandCenter']
       },
       {
         option: '-t, --title <title>'
@@ -172,6 +176,9 @@ class SpoSiteAddCommand extends SpoCommand {
       },
       {
         option: '--wait'
+      },
+      {
+        option: '--force'
       }
     );
   }
@@ -180,14 +187,15 @@ class SpoSiteAddCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         const isClassicSite: boolean = args.options.type === 'ClassicSite';
-        const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
+        const isCommunicationSite: boolean = args.options.type === 'CommunicationSite' || args.options.type === 'BrandCenter';
         const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
 
         if (args.options.type) {
           if (args.options.type !== 'TeamSite' &&
             args.options.type !== 'CommunicationSite' &&
-            args.options.type !== 'ClassicSite') {
-            return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, and ClassicSite`;
+            args.options.type !== 'ClassicSite' &&
+            args.options.type !== 'BrandCenter') {
+            return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, ClassicSite, and BrandCenter`;
           }
         }
 
@@ -196,7 +204,7 @@ class SpoSiteAddCommand extends SpoCommand {
             return 'Required option alias missing';
           }
 
-          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate || args.options.force) {
             return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
           }
         }
@@ -233,7 +241,7 @@ class SpoSiteAddCommand extends SpoCommand {
           }
 
           if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, siteDesignId, owners, and description";
+            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, siteDesignId, owners, description, and force";
           }
         }
         else {
@@ -300,7 +308,7 @@ class SpoSiteAddCommand extends SpoCommand {
             return `storageQuotaWarningLevel cannot exceed storageQuota`;
           }
 
-          if (args.options.classification || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
+          if (args.options.classification || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic || args.options.force) {
             return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
           }
         }
@@ -339,7 +347,7 @@ class SpoSiteAddCommand extends SpoCommand {
   }
 
   private async createModernSite(logger: Logger, args: CommandArgs): Promise<string | undefined> {
-    const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
+    const isTeamSite: boolean = args.options.type !== 'CommunicationSite' && args.options.type !== 'BrandCenter';
 
     try {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
@@ -432,6 +440,10 @@ class SpoSiteAddCommand extends SpoCommand {
 
         if (args.options.owners) {
           requestOptions.data.request.Owner = args.options.owners;
+        }
+
+        if (args.options.type === 'BrandCenter') {
+          await this.addBrandCenter(requestOptions.data.request, logger, args.options.force || false);
         }
       }
 
@@ -677,6 +689,33 @@ class SpoSiteAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
+  }
+
+  private async addBrandCenter(requestData: any, logger: Logger, force: boolean): Promise<void> {
+    const brandingCenterConfiguration = await brandCenter.getBrandCenterConfiguration(logger, this.debug);
+
+    if (brandingCenterConfiguration.IsBrandCenterSiteFeatureEnabled) {
+      throw Error('Brand center site is already created in the tenant.');
+    }
+
+    const warningMessage = `You agree to activate this site as your official brand center site and turn on the brand center app for use in your organization. Storage locations will be created for uploading files to brand center and managing them. Any uploaded files will be stored in the cloud and managed in a public content delivery network (CDN). The files will be accessible to anyone who is able to extract the URLs that point to them.
+Don't use this feature if your files contain proprietary information, or if you don't have the necessary cloud hosting rights to use them. After creation, that site cannot be deleted.`;
+
+    if (force) {
+      await logger.logToStderr(warningMessage);
+    }
+    else {
+      const result = await cli.promptForConfirmation({
+        message: `${warningMessage}\n\nDo you want to proceed?`
+      });
+
+      if (!result) {
+        throw Error('Operation cancelled by the user.');
+      }
+    }
+
+    const brandCenterFeatureId = '99cd6e8b-189b-4611-ae89-f89105876e43';
+    requestData.AdditionalSiteFeatureIds = [brandCenterFeatureId];
   }
 }
 
