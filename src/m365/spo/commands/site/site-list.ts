@@ -1,23 +1,40 @@
 import { Logger } from '../../../../cli/Logger.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SiteProperties } from './SiteProperties.js';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable.js';
 
-interface CommandArgs {
-  options: Options;
+enum SiteListType {
+  TeamSite = 'TeamSite',
+  CommunicationSite = 'CommunicationSite'
 }
 
-interface Options extends GlobalOptions {
-  type?: string;
-  webTemplate?: string;
-  filter?: string;
-  withOneDriveSites?: boolean;
+enum SiteListState {
+  active = 'active',
+  fullyArchived = 'fullyArchived',
+  recentlyArchived = 'recentlyArchived',
+  archived = 'archived'
+}
+
+const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: zod.coercedEnum(SiteListType).optional().alias('t'),
+  state: zod.coercedEnum(SiteListState).optional(),
+  webTemplate: z.string().optional(),
+  filter: z.string().optional(),
+  withOneDriveSites: z.boolean().optional()
+});
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class SpoSiteListCommand extends SpoCommand {
@@ -35,64 +52,21 @@ class SpoSiteListCommand extends SpoCommand {
     return ['Title', 'Url'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webTemplate: args.options.webTemplate,
-        type: args.options.type,
-        filter: (!(!args.options.filter)).toString(),
-        withOneDriveSites: typeof args.options.withOneDriveSites !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(o => !(o.type && o.webTemplate), {
+        message: 'Specify either type or webTemplate, but not both'
+      })
+      .refine(o => !(o.withOneDriveSites && (o.type !== undefined || o.webTemplate !== undefined)), {
+        message: 'When using withOneDriveSites, don\'t specify the type or webTemplate options'
+      })
+      .refine(o => !(o.withOneDriveSites && o.state !== undefined), {
+        message: 'When using withOneDriveSites, don\'t specify the state option'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite']
-      },
-      {
-        option: '--webTemplate [webTemplate]'
-      },
-      {
-        option: '--filter [filter]'
-      },
-      {
-        option: '--withOneDriveSites'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type && args.options.webTemplate) {
-          return 'Specify either type or webTemplate, but not both';
-        }
-
-        const typeValues = ['TeamSite', 'CommunicationSite'];
-        if (args.options.type &&
-          typeValues.indexOf(args.options.type) < 0) {
-          return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
-        }
-
-        if (args.options.withOneDriveSites
-          && (args.options.type || args.options.webTemplate)) {
-          return 'When using withOneDriveSites, don\'t specify the type or webTemplate options';
-        }
-
-        return true;
-      }
-    );
   }
 
   public alias(): string[] | undefined {
@@ -103,6 +77,7 @@ class SpoSiteListCommand extends SpoCommand {
     const webTemplate: string = this.getWebTemplateId(args.options);
     const includeOneDriveSites: boolean = args.options.withOneDriveSites || false;
     const personalSite: string = includeOneDriveSites === false ? '0' : '1';
+    const effectiveFilter: string = this.buildFilter(args.options);
 
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
@@ -113,7 +88,7 @@ class SpoSiteListCommand extends SpoCommand {
 
       this.allSites = [];
 
-      await this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, logger);
+      await this.getAllSites(spoAdminUrl, formatting.escapeXml(effectiveFilter), '0', personalSite, webTemplate, undefined, logger);
       await logger.log(this.allSites);
     }
     catch (err: any) {
@@ -133,7 +108,7 @@ class SpoSiteListCommand extends SpoCommand {
       data: requestBody
     };
 
-    const response: string = await request.post(requestOptions);
+    const response: string = await request.post<string>(requestOptions);
     const json: ClientSvcResponse = JSON.parse(response);
     const responseContent: ClientSvcResponseContents = json[0];
 
@@ -170,6 +145,33 @@ class SpoSiteListCommand extends SpoCommand {
         return '';
     }
   }
+
+  private buildFilter(options: Options): string {
+    const providedFilter: string = options.filter || '';
+
+    let stateFilter: string = '';
+    switch (options.state) {
+      case 'active':
+        stateFilter = `ArchiveStatus -eq 'NotArchived'`;
+        break;
+      case 'fullyArchived':
+        stateFilter = `ArchiveStatus -eq 'FullyArchived'`;
+        break;
+      case 'recentlyArchived':
+        stateFilter = `ArchiveStatus -eq 'RecentlyArchived'`;
+        break;
+      case 'archived':
+        stateFilter = `ArchiveStatus -ne 'NotArchived'`;
+        break;
+    }
+
+    if (stateFilter && providedFilter) {
+      return `${providedFilter} and ${stateFilter}`;
+    }
+
+    return stateFilter || providedFilter;
+  }
 }
 
 export default new SpoSiteListCommand();
+export { options };
