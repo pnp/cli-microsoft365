@@ -119,7 +119,7 @@ class FlowOwnerRemoveCommand extends PowerAutomateCommand {
       }
 
       const removeFlowOwner = async (): Promise<void> => {
-        let idToRemove = '';
+        let idToRemove: string;
         if (args.options.userId) {
           idToRemove = args.options.userId;
         }

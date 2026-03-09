@@ -43,8 +43,8 @@ export class FN003003_CFG_bundles extends JsonRule {
     }
 
     const resolution: any = { bundles: {} };
-    entries.forEach((e, i) => {
-      resolution.bundles[this.tryGetBundleName(e.entry, i)] = {
+    entries.forEach((e) => {
+      resolution.bundles[this.tryGetBundleName(e.entry)] = {
         components: [{
           entrypoint: e.entry,
           manifest: e.manifest
@@ -64,9 +64,8 @@ export class FN003003_CFG_bundles extends JsonRule {
    * Smart guess on the bundle name.
    * @param entry the entry value
    */
-  private tryGetBundleName(entry: string, index: number): string {
-    let name: string = index.toString();
-    name = entry.substring(entry.lastIndexOf('/') + 1, entry.length);
+  private tryGetBundleName(entry: string): string {
+    let name = entry.substring(entry.lastIndexOf('/') + 1, entry.length);
     name = name.replace('.js', '');
     name = name.replace(/([a-z](?=[A-Z]))/g, '$1-');
     name = name.toLowerCase();

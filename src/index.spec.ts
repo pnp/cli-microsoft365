@@ -111,7 +111,7 @@ describe('Lazy loading commands', () => {
       }
 
       const words: string[] = commandName.split(' ');
-      let commandFilePath: string = '';
+      let commandFilePath: string;
       if (words.length === 1) {
         commandFilePath = path.join('m365', 'commands', `${commandName}.js`);
       }

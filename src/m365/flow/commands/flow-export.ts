@@ -124,7 +124,6 @@ class FlowExportCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let filenameFromApi = '';
     const formatArgument = args.options.format?.toLowerCase() || '';
 
     if (this.verbose) {
@@ -207,7 +206,7 @@ class FlowExportCommand extends PowerPlatformCommand {
 
       const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
       const filenameRegEx: RegExp = /([^/]+\.zip)/i;
-      filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
+      let filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
       // Replace all illegal characters from the file name
       const illegalCharsRegEx = /[\\/:*?"<>|]/g;
       filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');

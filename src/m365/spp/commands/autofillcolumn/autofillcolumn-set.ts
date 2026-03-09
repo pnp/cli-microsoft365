@@ -151,7 +151,7 @@ class SppAutofillColumnSetCommand extends SpoCommand {
   }
 
   private getColumn(siteUrl: string, options: Options, listId: string): Promise<Field> {
-    let fieldRestUrl: string = '';
+    let fieldRestUrl: string;
 
     if (options.columnId) {
       fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(options.columnId)}')`;

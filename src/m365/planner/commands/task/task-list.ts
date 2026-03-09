@@ -130,7 +130,7 @@ class PlannerTaskListCommand extends GraphCommand {
     let bucketId: string | undefined = args.options.bucketId;
     const planTitle: string | undefined = args.options.planTitle;
     let planId: string | undefined = args.options.planId;
-    let taskItems: PlannerTask[] = [];
+    let taskItems: PlannerTask[];
 
     try {
       if (bucketId || bucketName) {

@@ -46,12 +46,11 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestDigest: string = '';
     let webIdentityResp: IdentityResponse;
 
     try {
       const res: ContextInfo = await spo.getRequestDigest(args.options.url);
-      requestDigest = res.FormDigestValue;
+      const requestDigest = res.FormDigestValue;
 
       if (this.debug) {
         await logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);

@@ -113,7 +113,7 @@ class CliConfigSetCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let value: any = undefined;
+    let value: any;
 
     switch (args.options.key) {
       case settingsNames.autoOpenLinksInBrowser:

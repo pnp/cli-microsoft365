@@ -101,7 +101,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       };
     }
 
-    let endpoint: string = "";
+    let endpoint: string;
 
     if (args.options.appId) {
       endpoint = `${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,displayName&$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId as string)}'`;

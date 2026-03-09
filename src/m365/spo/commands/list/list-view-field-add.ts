@@ -147,7 +147,6 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       listSelector = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    let viewSelector: string = '';
     let currentField: { InternalName: string; };
 
     if (this.verbose) {
@@ -163,7 +162,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
 
       currentField = field;
 
-      viewSelector = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
+      const viewSelector = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
       const postRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/addviewfield('${field.InternalName}')`;
 
       const postRequestOptions: CliRequestOptions = {

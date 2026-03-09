@@ -235,7 +235,7 @@ class VivaEngageSearchCommand extends VivaEngageCommand {
       resultGroups.length === 20 ||
       resultTopics.length === 20;
     if (continueProcessing) {
-      await this.getAllItems(logger, args, ++page);
+      await this.getAllItems(logger, args, page + 1);
     }
   }
 
