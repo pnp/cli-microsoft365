@@ -146,7 +146,7 @@ class SpoThemeApplyCommand extends SpoCommand {
   }
 
   private getSharePointTheme(themeName: string): any {
-    let palette: any = "";
+    let palette: string;
 
     switch (themeName) {
       case SharePointThemes.Blue:

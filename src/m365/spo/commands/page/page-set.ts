@@ -168,14 +168,9 @@ class SpoPageSetCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let pageName: string = args.options.name;
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
-    let bannerImageUrl: string = '';
-    let canvasContent1: string = '';
-    let layoutWebpartsContent: string = '';
+
     let pageTitle: string = args.options.title || "";
-    let pageId: number | null = null;
     let pageDescription: string = args.options.description || "";
-    let topicHeader: string = "";
-    let authorByline: string[] = [];
     const pageData: any = {};
 
     if (!pageName.endsWith('.aspx')) {
@@ -195,14 +190,14 @@ class SpoPageSetCommand extends SpoCommand {
       const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.verbose);
 
       pageTitle = pageTitle || page.Title;
-      pageId = page.Id;
+      let pageId: number | null = page.Id;
 
-      bannerImageUrl = page.BannerImageUrl;
-      canvasContent1 = args.options.content || page.CanvasContent1;
-      layoutWebpartsContent = page.LayoutWebpartsContent;
+      const bannerImageUrl = page.BannerImageUrl;
+      const canvasContent1 = args.options.content || page.CanvasContent1;
+      const layoutWebpartsContent = page.LayoutWebpartsContent;
       pageDescription = pageDescription || page.Description;
-      topicHeader = page.TopicHeader;
-      authorByline = page.AuthorByline;
+      const topicHeader = page.TopicHeader;
+      const authorByline = page.AuthorByline;
 
       if (args.options.layoutType) {
         const listItemSetOptions: any = {

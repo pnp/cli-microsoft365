@@ -106,9 +106,6 @@ class SpoWebAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let siteInfo: any = null;
-    let subsiteFullUrl: string = '';
-
     try {
       const res: ContextInfo = await spo.getRequestDigest(args.options.parentWebUrl);
       const requestOptionsPost: any = {
@@ -135,14 +132,14 @@ class SpoWebAddCommand extends SpoCommand {
         await logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
       }
 
-      siteInfo = await request.post(requestOptionsPost);
+      const siteInfo = await request.post(requestOptionsPost);
 
       if (args.options.inheritNavigation) {
         if (this.verbose) {
           await logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
-        subsiteFullUrl = `${args.options.parentWebUrl}/${formatting.encodeQueryParameter(args.options.url)}`;
+        const subsiteFullUrl = `${args.options.parentWebUrl}/${formatting.encodeQueryParameter(args.options.url)}`;
 
         const requestOptionsPer: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,

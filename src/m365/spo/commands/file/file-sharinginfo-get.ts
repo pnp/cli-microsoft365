@@ -177,7 +177,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
   }
 
   private async getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {
-    let requestUrl: string = '';
+    let requestUrl: string;
 
     if (args.options.fileId) {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;

@@ -122,13 +122,12 @@ class SpoTermSetAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let formDigest: string = '';
     let termSet: TermSet;
 
     try {
       const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
-      formDigest = res.FormDigestValue;
+      const formDigest = res.FormDigestValue;
 
       if (this.verbose) {
         await logger.logToStderr(`Adding taxonomy term set...`);

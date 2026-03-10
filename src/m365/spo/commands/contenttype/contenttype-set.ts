@@ -234,9 +234,9 @@ class SpoContentTypeSetCommand extends SpoCommand {
     }
     let baseString = ':list:';
     if (options.listId) {
-      return baseString += options.listId;
+      return baseString + options.listId;
     }
-    return baseString += await spo.getListId(options.webUrl, options.listTitle, options.listUrl, logger, this.verbose);
+    return baseString + await spo.getListId(options.webUrl, options.listTitle, options.listUrl, logger, this.verbose);
   }
 }
 

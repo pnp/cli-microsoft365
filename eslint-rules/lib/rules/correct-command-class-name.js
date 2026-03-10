@@ -59,10 +59,9 @@ function breakWords(longWord, dictionary) {
   return words;
 }
 
-module.exports = {
-  // exported for testing
-  getClassNameFromFilePath: getClassNameFromFilePath,
-  breakWords: breakWords,
+export { getClassNameFromFilePath, breakWords };
+
+export default {
   meta: {
     type: 'problem',
     docs: {
@@ -108,7 +107,7 @@ module.exports = {
           return;
         }
 
-        const expectedClassName = getClassNameFromFilePath(context.getFilename(), context.options[0], context.options[1]);
+        const expectedClassName = getClassNameFromFilePath(context.filename, context.options[0], context.options[1]);
         if (!expectedClassName) {
           return;
         }

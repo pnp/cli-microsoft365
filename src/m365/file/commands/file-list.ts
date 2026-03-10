@@ -75,12 +75,11 @@ class FileListCommand extends GraphCommand {
     }
 
     const folderUrl: URL = new URL(folderUrlValue, webUrl);
-    let driveId: string = '';
 
     try {
       const siteId = await this.getSiteId(args.options.webUrl, logger);
       const drive = await this.getDocumentLibrary(siteId, folderUrl, args.options.folderUrl, logger);
-      driveId = drive.id as string;
+      const driveId = drive.id as string;
 
       const folderId = await this.getStartingFolderId(drive, folderUrl, logger);
       if (this.verbose) {

@@ -28,7 +28,7 @@ function getConstNameFromFilePath(filePath) {
 // unfortunately we can't auto-fix this rule because the
 // const needs to be changed where it's defined rather than
 // where it's used
-module.exports = {
+export default {
   meta: {
     type: 'problem',
     docs: {
@@ -43,7 +43,7 @@ module.exports = {
     return {
       'MethodDefinition[key.name = "name"] MemberExpression > Identifier[name != "commands"]': function (node) {
         const actualConstName = node.name;
-        const expectedConstName = getConstNameFromFilePath(context.getFilename());
+        const expectedConstName = getConstNameFromFilePath(context.filename);
 
         if (!expectedConstName) {
           return;

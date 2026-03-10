@@ -64,7 +64,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       return;
     }
 
-    let content: string = '';
+    let content: string;
     const cleanResponse = this.removeEmptyLines(res);
 
     if (output && output.toLowerCase() === 'json') {

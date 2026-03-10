@@ -161,8 +161,6 @@ class EntraM365GroupAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let group: Group;
-    let ownerIds: string[] = [];
-    let memberIds: string[] = [];
     const resourceBehaviorOptionsCollection: string[] = [];
     const resolvedVisibility = args.options.visibility || 'Public';
 
@@ -207,8 +205,8 @@ class EntraM365GroupAddCommand extends GraphCommand {
     };
 
     try {
-      ownerIds = await this.getUserIds(logger, args.options.owners);
-      memberIds = await this.getUserIds(logger, args.options.members);
+      const ownerIds = await this.getUserIds(logger, args.options.owners);
+      const memberIds = await this.getUserIds(logger, args.options.members);
       group = await request.post<Group>(requestOptions);
 
       if (!args.options.logoPath) {
@@ -279,10 +277,8 @@ class EntraM365GroupAddCommand extends GraphCommand {
     }
 
     const userArr: string[] = users.split(',').map(o => o.trim());
-    let promises: Promise<{ value: User[] }>[] = [];
-    let userIds: string[] = [];
 
-    promises = userArr.map(user => {
+    const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
@@ -298,7 +294,7 @@ class EntraM365GroupAddCommand extends GraphCommand {
     let userUpns: string[] = [];
 
     userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
-    userIds = usersRes.map(res => res.value[0]?.id as string);
+    const userIds = usersRes.map(res => res.value[0]?.id as string);
 
     // Find the members where no graph response was found
     const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));

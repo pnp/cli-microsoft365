@@ -25,8 +25,6 @@ function getAllItems<T>(url: string, metadata: 'none' | 'minimal' | 'full'): Pro
 
 // eslint-disable-next-line no-redeclare
 async function getAllItems<T>(param1: unknown, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
-  let items: T[] = [];
-
   const requestOptions: CliRequestOptions = typeof param1 !== 'string' ? param1 as CliRequestOptions : {
     url: param1 as string,
     headers: {
@@ -37,7 +35,7 @@ async function getAllItems<T>(param1: unknown, metadata?: 'none' | 'minimal' | '
   };
 
   const res = await request.get<ODataResponse<T>>(requestOptions);
-  items = res.value;
+  let items = res.value;
 
   const nextLink = res['@odata.nextLink'] ?? res.nextLink;
   if (nextLink) {

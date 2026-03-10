@@ -102,7 +102,7 @@ class SpoListRemoveCommand extends SpoCommand {
         await logger.logToStderr(`Removing list in site at ${args.options.webUrl}...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl: string;
 
       if (args.options.id) {
         requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;

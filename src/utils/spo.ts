@@ -1084,7 +1084,7 @@ export const spo = {
         await logger.logToStderr(`Creating new site...`);
       }
 
-      let requestOptions: any = {};
+      let requestOptions: CliRequestOptions;
 
       if (isTeamSite) {
         requestOptions = {
@@ -1455,7 +1455,7 @@ export const spo = {
       }
       if (sharingCapability) {
         const sharingCapabilityOption: SharingCapabilities = SharingCapabilities[(sharingCapability as keyof typeof SharingCapabilities)];
-        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapabilityOption}</Parameter></SetProperty>`);
+        payload.push(`<SetProperty Id="${propertyId}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapabilityOption}</Parameter></SetProperty>`);
       }
 
       const pos: number = (tenantId as string).indexOf('|') + 1;
