@@ -110,6 +110,32 @@ export const accessToken = {
     return { header, payload };
   },
 
+  getScopesFromAccessToken(accessToken: string): string[] {
+    let scopes: string[] = [];
+
+    if (!accessToken || accessToken.length === 0) {
+      return scopes;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return scopes;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      if (token.scp?.length > 0) {
+        scopes = token.scp.split(' ');
+      }
+    }
+    catch {
+      // Do nothing
+    }
+
+    return scopes;
+  },
+
   /**
    * Asserts the presence of a delegated or application-only access token.
    * @throws {CommandError} Will throw an error if the access token is not available.
