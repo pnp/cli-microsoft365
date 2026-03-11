@@ -7,6 +7,7 @@ export interface NavigationNode {
   Title: string;
   Url: string;
   AudienceIds: string[];
+  Children?: NavigationNode[];
 }
 
 export interface MenuStateNode {
