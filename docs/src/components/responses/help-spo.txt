@@ -1,0 +1,47 @@
+Commands:
+
+  spo get [options]       Gets the context URL for the root SharePoint site collection and SharePoint tenant admin site
+  spo search [options]    Executes a search query
+  spo set [options]       Sets the URL of the root SharePoint site collection for use in SPO commands
+
+Commands groups:
+
+  spo app *                          11 commands
+  spo applicationcustomizer *         5 commands
+  spo apppage *                       2 commands
+  spo cdn *                           7 commands
+  spo commandset *                    5 commands
+  spo contenttype *                   9 commands
+  spo contenttypehub *                1 command
+  spo customaction *                  6 commands
+  spo eventreceiver *                 3 commands
+  spo externaluser *                  1 command
+  spo feature *                       3 commands
+  spo field *                         5 commands
+  spo file *                         29 commands
+  spo folder *                       19 commands
+  spo group *                         8 commands
+  spo hidedefaultthemes *             2 commands
+  spo homesite *                      5 commands
+  spo hubsite *                      10 commands
+  spo knowledgehub *                  3 commands
+  spo list *                         35 commands
+  spo listitem *                     24 commands
+  spo navigation *                    5 commands
+  spo orgassetslibrary *              3 commands
+  spo orgnewssite *                   3 commands
+  spo page *                         21 commands
+  spo propertybag *                   4 commands
+  spo report *                        9 commands
+  spo roledefinition *                4 commands
+  spo serviceprincipal *              7 commands
+  spo site *                         35 commands
+  spo sitedesign *                   14 commands
+  spo sitescript *                    5 commands
+  spo storageentity *                 4 commands
+  spo tenant *                       17 commands
+  spo term *                          9 commands
+  spo theme *                         5 commands
+  spo user *                          4 commands
+  spo userprofile *                   2 commands
+  spo web *                          15 commands

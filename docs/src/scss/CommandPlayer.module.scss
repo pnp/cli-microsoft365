@@ -1,0 +1,244 @@
+:global {
+
+  :root {
+    --cp-bg: var(--ifm-background-surface-color);
+    --cp-titlebar-bg: var(--ifm-color-emphasis-100);
+    --cp-titlebar-color: var(--ifm-color-emphasis-700);
+    --cp-titlebar-icon: var(--ifm-color-emphasis-600);
+    --cp-body-color: var(--ifm-font-color-base);
+    --cp-border: var(--ifm-color-emphasis-200);
+    --cp-prompt-color: var(--ifm-color-primary);
+    --cp-command-color: var(--ifm-font-color-base);
+    --cp-cursor-bg: var(--ifm-font-color-base);
+    --cp-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    --cp-tok-key: #124994;
+    --cp-tok-str: #A31515;
+    --cp-tok-num: #098658;
+    --cp-tok-bool: #0000FF;
+    --cp-tok-null: #0000FF;
+    --cp-tok-punct: #000000;
+    --cp-scrollbar-thumb: var(--ifm-color-emphasis-300);
+    --cp-scrollbar-track: transparent;
+    --cp-pause-bg: rgba(0, 0, 0, 0.06);
+    --cp-pause-hover-bg: rgba(0, 0, 0, 0.12);
+    --cp-pause-color: var(--ifm-color-emphasis-600);
+    --cp-pause-ring: var(--ifm-color-primary);
+  }
+
+  [data-theme='dark'] {
+    --cp-bg: var(--ifm-background-surface-color);
+    --cp-titlebar-bg: var(--ifm-color-emphasis-100);
+    --cp-titlebar-color: var(--ifm-color-emphasis-400);
+    --cp-titlebar-icon: var(--ifm-color-emphasis-500);
+    --cp-body-color: var(--ifm-font-color-base);
+    --cp-border: var(--ifm-color-emphasis-200);
+    --cp-prompt-color: var(--ifm-color-primary-light);
+    --cp-command-color: var(--ifm-font-color-base);
+    --cp-cursor-bg: var(--ifm-font-color-base);
+    --cp-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    --cp-tok-key: #84BDDA;
+    --cp-tok-str: #CE9178;
+    --cp-tok-num: #B5CEA8;
+    --cp-tok-bool: #569CD6;
+    --cp-tok-null: #569CD6;
+    --cp-tok-punct: #D4D4D4;
+    --cp-scrollbar-thumb: var(--ifm-color-emphasis-400);
+    --cp-scrollbar-track: transparent;
+    --cp-pause-bg: rgba(255, 255, 255, 0.08);
+    --cp-pause-hover-bg: rgba(255, 255, 255, 0.16);
+    --cp-pause-color: var(--ifm-color-emphasis-400);
+    --cp-pause-ring: var(--ifm-color-primary-light);
+  }
+
+  .cp-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    box-shadow: var(--cp-shadow);
+    font-family: var(--ifm-font-family-monospace);
+    background: var(--cp-bg);
+    border: 1px solid var(--cp-border);
+    max-width: 100%;
+  }
+
+  .cp-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--cp-titlebar-bg);
+    user-select: none;
+    border-bottom: 1px solid var(--cp-border);
+    min-height: 32px;
+  }
+
+  .cp-titlebar-icon {
+    display: flex;
+    align-items: center;
+    color: var(--cp-titlebar-icon);
+    flex-shrink: 0;
+  }
+
+  .cp-titlebar-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--cp-titlebar-color);
+    letter-spacing: 0.02em;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .cp-body {
+    padding: 16px;
+    font-size: var(--ifm-code-font-size, 13px);
+    line-height: 1.6;
+    color: var(--cp-body-color);
+    height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: var(--cp-scrollbar-track);
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--cp-scrollbar-thumb);
+      border-radius: 3px;
+    }
+    scrollbar-width: thin;
+    scrollbar-color: var(--cp-scrollbar-thumb) var(--cp-scrollbar-track);
+  }
+
+  .cp-prompt {
+    display: flex;
+    align-items: flex-start;
+    white-space: normal;
+    word-break: break-all;
+  }
+
+  .cp-prompt--next,
+  .cp-prompt--clear {
+    margin-top: 12px;
+  }
+
+  .cp-prompt-symbol {
+    color: var(--cp-prompt-color);
+    margin-right: 8px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .cp-command {
+    color: var(--cp-command-color);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .cp-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.15em;
+    background: var(--cp-cursor-bg);
+    vertical-align: text-bottom;
+    animation: cpBlink 1s step-end infinite;
+  }
+
+  @keyframes cpBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cp-response {
+    margin-top: 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+
+  .cp-response--visible {
+    animation: cpFadeIn 0.4s ease-out;
+  }
+
+  @keyframes cpFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .cp-tok-key   { color: var(--cp-tok-key); }
+  .cp-tok-str   { color: var(--cp-tok-str); }
+  .cp-tok-num   { color: var(--cp-tok-num); }
+  .cp-tok-bool  { color: var(--cp-tok-bool); }
+  .cp-tok-null  { color: var(--cp-tok-null); }
+  .cp-tok-punct { color: var(--cp-tok-punct); }
+
+  .cp-pause-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: var(--cp-pause-bg);
+    color: var(--cp-pause-color);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.15s ease;
+    z-index: 2;
+
+    .cp-container:hover &,
+    &--paused {
+      opacity: 1;
+    }
+
+    &:hover {
+      background: var(--cp-pause-hover-bg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ifm-color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  .cp-pause-ring {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    color: var(--cp-pause-ring);
+  }
+
+  @media (max-width: 600px) {
+    .cp-body {
+      padding: 12px;
+      font-size: 11px;
+      height: 220px;
+    }
+
+    .cp-titlebar {
+      padding: 5px 10px;
+      min-height: 28px;
+    }
+
+    .cp-pause-btn {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cp-cursor {
+      animation: none;
+      opacity: 1;
+    }
+
+    .cp-response--visible {
+      animation: none;
+    }
+  }
+}
