@@ -52,7 +52,11 @@ class SpoListDefaultValueRemoveCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.listId, options.listTitle, options.listUrl].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: listId, listTitle, listUrl.'
+        error: 'Use one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
   }
 

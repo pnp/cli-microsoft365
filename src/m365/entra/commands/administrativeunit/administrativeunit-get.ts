@@ -36,7 +36,11 @@ class EntraAdministrativeUnitGetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.displayName].filter(Boolean).length === 1, {
-        error: 'Specify either id or displayName'
+        error: 'Specify either id or displayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       });
   }
 

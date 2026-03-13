@@ -35,7 +35,11 @@ class FlowEnvironmentGetCommand extends PowerAutomateCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !!options.name !== !!options.default, {
-        error: `Specify either name or default, but not both.`
+        error: `Specify either name or default, but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'default']
+        }
       });
   }
 

@@ -42,7 +42,10 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     return schema
       .refine(options => !options.cardData || options.card, {
         error: 'When you specify cardData, you must also specify card.',
-        path: ['cardData']
+        path: ['cardData'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(options => {
         if (options.card) {

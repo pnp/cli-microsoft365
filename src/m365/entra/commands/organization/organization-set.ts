@@ -49,15 +49,26 @@ class EntraOrganizationSetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !(options.id && options.displayName), {
-        error: 'Specify either id or displayName, but not both'
+        error: 'Specify either id or displayName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => options.id || options.displayName, {
-        error: 'Specify either id or displayName'
+        error: 'Specify either id or displayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => [
         options.contactEmail, options.marketingNotificationEmails, options.securityComplianceNotificationMails, options.securityComplianceNotificationPhones,
         options.statementUrl, options.technicalNotificationMails].filter(o => o !== undefined).length > 0, {
-        error: 'Specify at least one of the following options: contactEmail, marketingNotificationEmails, securityComplianceNotificationMails, securityComplianceNotificationPhones, statementUrl, or technicalNotificationMails'
+        error: 'Specify at least one of the following options: contactEmail, marketingNotificationEmails, securityComplianceNotificationMails, securityComplianceNotificationPhones, statementUrl, or technicalNotificationMails',
+        params: {
+          customCode: 'required'
+        }
       });
   }
 
