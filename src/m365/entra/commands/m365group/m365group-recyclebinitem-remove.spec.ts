@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -60,6 +61,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -69,6 +71,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -122,28 +125,24 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('fails validation when id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validGroupId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: validGroupId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified group when force option not passed with id', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -152,9 +151,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   it('aborts removing the specified group when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
     assert(deleteSpy.notCalled);
   });
@@ -169,10 +168,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname,
         force: true
-      }
+      })
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
@@ -194,10 +193,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname,
         force: true
-      }
+      })
     }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -228,9 +227,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: validGroupDisplayName
-      }
+      })
     });
     assert(removeRequestIssued);
   });
@@ -245,10 +244,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId,
         force: true
-      }
+      })
     });
   });
 
@@ -264,9 +263,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
   });
 
@@ -289,9 +288,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: validGroupDisplayName
-      }
+      })
     });
   });
 
@@ -312,9 +311,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname
-      }
+      })
     });
   });
 
@@ -327,10 +326,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId,
         force: true
-      }
+      })
     }), new CommandError("An error has occurred"));
   });
 }); 
