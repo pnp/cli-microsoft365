@@ -38,7 +38,7 @@ describe('FN006004_CFG_PS_developer', () => {
   });
 
   it('returns versioned mpnId when version specified', () => {
-    rule = new FN006004_CFG_PS_developer('1.13.0-beta.20');
+    rule = new FN006004_CFG_PS_developer({ version: '1.13.0-beta.20' });
     const project: Project = {
       path: '/usr/tmp',
       packageSolutionJson: {
