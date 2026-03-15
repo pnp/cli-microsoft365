@@ -180,8 +180,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       throw `The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`;
     }
 
-    if (channelItem.membershipType !== "private") {
-      throw `The specified channel is not a private channel`;
+    if (channelItem.membershipType !== 'private' && channelItem.membershipType !== 'shared') {
+      throw 'The specified channel is not a private or shared channel';
     }
 
     return channelItem.id!;
