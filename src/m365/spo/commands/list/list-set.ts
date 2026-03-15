@@ -1,7 +1,10 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import config from '../../../../config.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -9,125 +12,104 @@ import commands from '../../commands.js';
 import { DraftVisibilityType } from './DraftVisibilityType.js';
 import { ListExperience } from './ListExperience.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional(),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  newTitle: z.string().optional(),
+  allowDeletion: z.boolean().optional(),
+  allowEveryoneViewItems: z.boolean().optional(),
+  allowMultiResponses: z.boolean().optional(),
+  contentTypesEnabled: z.boolean().optional(),
+  crawlNonDefaultViews: z.boolean().optional(),
+  defaultContentApprovalWorkflowId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} in option defaultContentApprovalWorkflowId is not a valid GUID`
+    })
+    .optional(),
+  defaultDisplayFormUrl: z.string().optional(),
+  defaultEditFormUrl: z.string().optional(),
+  description: z.string().optional(),
+  direction: z.enum(['NONE', 'LTR', 'RTL']).optional(),
+  disableCommenting: z.boolean().optional(),
+  disableGridEditing: z.boolean().optional(),
+  draftVersionVisibility: z.enum(['Reader', 'Author', 'Approver']).optional(),
+  emailAlias: z.string().optional(),
+  enableAssignToEmail: z.boolean().optional(),
+  enableAttachments: z.boolean().optional(),
+  enableDeployWithDependentList: z.boolean().optional(),
+  enableFolderCreation: z.boolean().optional(),
+  enableMinorVersions: z.boolean().optional(),
+  enableModeration: z.boolean().optional(),
+  enablePeopleSelector: z.boolean().optional(),
+  enableResourceSelector: z.boolean().optional(),
+  enableSchemaCaching: z.boolean().optional(),
+  enableSyndication: z.boolean().optional(),
+  enableThrottling: z.boolean().optional(),
+  enableVersioning: z.boolean().optional(),
+  enforceDataValidation: z.boolean().optional(),
+  excludeFromOfflineClient: z.boolean().optional(),
+  fetchPropertyBagForListView: z.boolean().optional(),
+  followable: z.boolean().optional(),
+  forceCheckout: z.boolean().optional(),
+  forceDefaultContentType: z.boolean().optional(),
+  hidden: z.boolean().optional(),
+  includedInMyFilesScope: z.boolean().optional(),
+  irmEnabled: z.boolean().optional(),
+  irmExpire: z.boolean().optional(),
+  irmReject: z.boolean().optional(),
+  isApplicationList: z.boolean().optional(),
+  listExperienceOptions: z.enum(['Auto', 'NewExperience', 'ClassicExperience']).optional(),
+  majorVersionLimit: z.number().int().positive().optional(),
+  majorWithMinorVersionsLimit: z.number().int().positive().optional(),
+  multipleDataList: z.boolean().optional(),
+  navigateForFormsPages: z.boolean().optional(),
+  needUpdateSiteClientTag: z.boolean().optional(),
+  noCrawl: z.boolean().optional(),
+  onQuickLaunch: z.boolean().optional(),
+  ordered: z.boolean().optional(),
+  parserDisabled: z.boolean().optional(),
+  readOnlyUI: z.boolean().optional(),
+  readSecurity: z.number().refine(v => v === 1 || v === 2, {
+    error: e => `${e.input} is not a valid readSecurity value. Allowed values are 1|2`
+  }).optional(),
+  requestAccessEnabled: z.boolean().optional(),
+  restrictUserUpdates: z.boolean().optional(),
+  sendToLocationName: z.string().optional(),
+  sendToLocationUrl: z.string().optional(),
+  showUser: z.boolean().optional(),
+  templateFeatureId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} in option templateFeatureId is not a valid GUID`
+    })
+    .optional(),
+  useFormsForDisplay: z.boolean().optional(),
+  validationFormula: z.string().optional(),
+  validationMessage: z.string().optional(),
+  versionAutoExpireTrim: z.boolean().optional(),
+  versionExpireAfterDays: z.number().int().positive().optional(),
+  writeSecurity: z.number().refine(v => v === 1 || v === 2 || v === 4, {
+    error: e => `${e.input} is not a valid writeSecurity value. Allowed values are 1|2|4`
+  }).optional()
+});
+
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  title?: string;
-  url?: string;
-  newTitle?: string;
-  allowDeletion?: boolean;
-  allowEveryoneViewItems?: boolean;
-  allowMultiResponses?: boolean;
-  contentTypesEnabled?: boolean;
-  crawlNonDefaultViews?: boolean;
-  defaultContentApprovalWorkflowId?: string;
-  defaultDisplayFormUrl?: string;
-  defaultEditFormUrl?: string;
-  description?: string;
-  direction?: string;
-  disableCommenting?: boolean;
-  disableGridEditing?: boolean;
-  draftVersionVisibility?: string;
-  emailAlias?: string;
-  enableAssignToEmail?: boolean;
-  enableAttachments?: boolean;
-  enableDeployWithDependentList?: boolean;
-  enableFolderCreation?: boolean;
-  enableMinorVersions?: boolean;
-  enableModeration?: boolean;
-  enablePeopleSelector?: boolean;
-  enableResourceSelector?: boolean;
-  enableSchemaCaching?: boolean;
-  enableSyndication?: boolean;
-  enableThrottling?: boolean;
-  enableVersioning?: boolean;
-  enforceDataValidation?: boolean;
-  excludeFromOfflineClient?: boolean;
-  fetchPropertyBagForListView?: boolean;
-  followable?: boolean;
-  forceCheckout?: boolean;
-  forceDefaultContentType?: boolean;
-  hidden?: boolean;
-  includedInMyFilesScope?: boolean;
-  irmEnabled?: boolean;
-  irmExpire?: boolean;
-  irmReject?: boolean;
-  isApplicationList?: boolean;
-  listExperienceOptions?: string;
-  majorVersionLimit?: number;
-  majorWithMinorVersionsLimit?: number;
-  multipleDataList?: boolean;
-  navigateForFormsPages?: boolean;
-  needUpdateSiteClientTag?: boolean;
-  noCrawl?: boolean;
-  onQuickLaunch?: boolean;
-  ordered?: boolean;
-  parserDisabled?: boolean;
-  readOnlyUI?: boolean;
-  readSecurity?: number;
-  requestAccessEnabled?: boolean;
-  restrictUserUpdates?: boolean;
-  sendToLocationName?: string;
-  sendToLocationUrl?: string;
-  showUser?: boolean;
-  templateFeatureId?: string;
-  useFormsForDisplay?: boolean;
-  validationFormula?: string;
-  validationMessage?: string;
-  writeSecurity?: number;
-}
-
 class SpoListSetCommand extends SpoCommand {
-  private static booleanOptions: string[] = [
-    'allowDeletion',
-    'allowEveryoneViewItems',
-    'allowMultiResponses',
-    'contentTypesEnabled',
-    'crawlNonDefaultViews',
-    'disableCommenting',
-    'disableGridEditing',
-    'enableAssignToEmail',
-    'enableAttachments',
-    'enableDeployWithDependentList',
-    'enableFolderCreation',
-    'enableMinorVersions',
-    'enableModeration',
-    'enablePeopleSelector',
-    'enableResourceSelector',
-    'enableSchemaCaching',
-    'enableSyndication',
-    'enableThrottling',
-    'enableVersioning',
-    'enforceDataValidation',
-    'excludeFromOfflineClient',
-    'fetchPropertyBagForListView',
-    'followable',
-    'forceCheckout',
-    'forceDefaultContentType',
-    'hidden',
-    'includedInMyFilesScope',
-    'irmEnabled',
-    'irmExpire',
-    'irmReject',
-    'isApplicationList',
-    'multipleDataList',
-    'navigateForFormsPages',
-    'needUpdateSiteClientTag',
-    'noCrawl',
-    'onQuickLaunch',
-    'ordered',
-    'parserDisabled',
-    'readOnlyUI',
-    'requestAccessEnabled',
-    'restrictUserUpdates',
-    'showUser',
-    'useFormsForDisplay'
-  ];
-
   public get name(): string {
     return commands.LIST_SET;
   }
@@ -136,440 +118,45 @@ class SpoListSetCommand extends SpoCommand {
     return 'Updates the settings of the specified list';
   }
 
-  /**
-   * Maps the base DraftVisibilityType enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get draftVisibilityTypeMap(): string[] {
-    const result: string[] = [];
-
-    for (const draftType in DraftVisibilityType) {
-      if (typeof DraftVisibilityType[draftType] === 'number') {
-        result.push(draftType);
-      }
-    }
-    return result;
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  /**
-   * Maps the base ListExperience enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get listExperienceMap(): string[] {
-    const result: string[] = [];
-
-    for (const experience in ListExperience) {
-      if (typeof ListExperience[experience] === 'number') {
-        result.push(experience);
-      }
-    }
-    return result;
-  }
-
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      const telemetryProps: any = {};
-
-      // add properties with identifiable data
-      [
-        'id',
-        'title',
-        'url',
-        'newTitle',
-        'description',
-        'templateFeatureId',
-        'defaultContentApprovalWorkflowId',
-        'defaultDisplayFormUrl',
-        'defaultEditFormUrl',
-        'emailAlias',
-        'sendToLocationName',
-        'sendToLocationUrl',
-        'validationFormula',
-        'validationMessage'
-      ].forEach(o => {
-        const value: any = (args.options as any)[o];
-        if (value) {
-          telemetryProps[o] = (typeof value !== 'undefined').toString();
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(
+        (opts: Options) => [opts.id, opts.title, opts.url].filter(o => o !== undefined).length === 1,
+        {
+          error: 'Use one of the following options: id, title, or url.'
         }
-      });
-
-      // add boolean values
-      SpoListSetCommand.booleanOptions.forEach(o => {
-        const value: boolean = (args.options as any)[o];
-        if (value !== undefined) {
-          telemetryProps[o] = value;
+      )
+      .refine(
+        (opts: Options) => !opts.emailAlias || opts.enableAssignToEmail === true,
+        {
+          error: 'emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.'
         }
-      });
-
-      // add properties with non-identifiable data
-      [
-        'direction',
-        'draftVersionVisibility',
-        'listExperienceOptions',
-        'majorVersionLimit',
-        'majorWithMinorVersionsLimit',
-        'readSecurity',
-        'writeSecurity'
-      ].forEach(o => {
-        const value: any = (args.options as any)[o];
-        if (value) {
-          telemetryProps[o] = value.toString();
+      )
+      .refine(
+        (opts: Options) => opts.majorWithMinorVersionsLimit === undefined || opts.enableMinorVersions === true || opts.enableModeration === true,
+        {
+          error: 'majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.'
         }
-      });
-
-      Object.assign(this.telemetryProperties, telemetryProps);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '--newTitle [newTitle]'
-      },
-      {
-        option: '--allowDeletion [allowDeletion]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowEveryoneViewItems [allowEveryoneViewItems]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowMultiResponses [allowMultiResponses]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--contentTypesEnabled [contentTypesEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--crawlNonDefaultViews [crawlNonDefaultViews]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--defaultContentApprovalWorkflowId [defaultContentApprovalWorkflowId]'
-      },
-      {
-        option: '--defaultDisplayFormUrl [defaultDisplayFormUrl]'
-      },
-      {
-        option: '--defaultEditFormUrl [defaultEditFormUrl]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--direction [direction]',
-        autocomplete: ['NONE', 'LTR', 'RTL']
-      },
-      {
-        option: '--disableCommenting [disableCommenting]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableGridEditing [disableGridEditing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--draftVersionVisibility [draftVersionVisibility]',
-        autocomplete: this.draftVisibilityTypeMap
-      },
-      {
-        option: '--emailAlias [emailAlias]'
-      },
-      {
-        option: '--enableAssignToEmail [enableAssignToEmail]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableAttachments [enableAttachments]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableDeployWithDependentList [enableDeployWithDependentList]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableFolderCreation [enableFolderCreation]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableMinorVersions [enableMinorVersions]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableModeration [enableModeration]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enablePeopleSelector [enablePeopleSelector]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableResourceSelector [enableResourceSelector]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableSchemaCaching [enableSchemaCaching]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableSyndication [enableSyndication]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableThrottling [enableThrottling]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableVersioning [enableVersioning]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enforceDataValidation [enforceDataValidation]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--excludeFromOfflineClient [excludeFromOfflineClient]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--fetchPropertyBagForListView [fetchPropertyBagForListView]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--followable [followable]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--forceCheckout [forceCheckout]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--forceDefaultContentType [forceDefaultContentType]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hidden [hidden]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--includedInMyFilesScope [includedInMyFilesScope]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--irmEnabled [irmEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--irmExpire [irmExpire]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--irmReject [irmReject]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--isApplicationList [isApplicationList]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--listExperienceOptions [listExperienceOptions]',
-        autocomplete: this.listExperienceMap
-      },
-      {
-        option: '--majorVersionLimit [majorVersionLimit]'
-      },
-      {
-        option: '--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]'
-      },
-      {
-        option: '--multipleDataList [multipleDataList]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--navigateForFormsPages [navigateForFormsPages]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--needUpdateSiteClientTag [needUpdateSiteClientTag]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--noCrawl [noCrawl]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--onQuickLaunch [onQuickLaunch]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ordered [ordered]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-parserDisabled [parserDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--readOnlyUI [readOnlyUI]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--readSecurity [readSecurity]',
-        autocomplete: ['1', '2']
-      },
-      {
-        option: '--requestAccessEnabled [requestAccessEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--restrictUserUpdates [restrictUserUpdates]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--sendToLocationName [sendToLocationName]'
-      },
-      {
-        option: '--sendToLocationUrl [sendToLocationUrl]'
-      },
-      {
-        option: '--showUser [showUser]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--templateFeatureId [templateFeatureId]'
-      },
-      {
-        option: '--useFormsForDisplay [useFormsForDisplay]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--validationFormula [validationFormula]'
-      },
-      {
-        option: '--validationMessage [validationMessage]'
-      },
-      {
-        option: '--writeSecurity [writeSecurity]',
-        autocomplete: ['1', '2', '4']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
+      )
+      .refine(
+        (opts: Options) => opts.versionExpireAfterDays === undefined || opts.versionAutoExpireTrim !== true,
+        {
+          error: 'versionExpireAfterDays cannot be used together with versionAutoExpireTrim set to true.'
         }
-
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+      )
+      .refine(
+        (opts: Options) => {
+          const identifierAndGlobalKeys = new Set(['webUrl', 'id', 'title', 'url', 'output', 'query', 'debug', 'verbose']);
+          return Object.entries(opts).some(([key, value]) => !identifierAndGlobalKeys.has(key) && value !== undefined);
+        },
+        {
+          error: 'Specify at least one option to update.'
         }
-
-        if (args.options.templateFeatureId &&
-          !validation.isValidGuid(args.options.templateFeatureId)) {
-          return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
-        }
-
-        if (args.options.defaultContentApprovalWorkflowId &&
-          !validation.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
-          return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
-        }
-
-        if (args.options.direction &&
-          ['NONE', 'LTR', 'RTL'].indexOf(args.options.direction) === -1) {
-          return `${args.options.direction} is not a valid direction value. Allowed values are NONE|LTR|RTL`;
-        }
-
-        if (args.options.draftVersionVisibility) {
-          const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
-
-          if (draftType === undefined) {
-            return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
-          }
-        }
-
-        if (args.options.emailAlias && args.options.enableAssignToEmail !== true) {
-          return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
-        }
-
-        if (args.options.listExperienceOptions) {
-          const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
-
-          if (!experience) {
-            return `${args.options.listExperienceOptions} is not a valid listExperienceOptions value`;
-          }
-        }
-
-        if (args.options.majorVersionLimit && args.options.enableVersioning !== true) {
-          return `majorVersionLimit option is only valid in combination with enableVersioning.`;
-        }
-
-        if (args.options.majorWithMinorVersionsLimit &&
-          args.options.enableMinorVersions !== true &&
-          args.options.enableModeration !== true) {
-          return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
-        }
-
-        if (args.options.readSecurity &&
-          args.options.readSecurity !== 1 &&
-          args.options.readSecurity !== 2) {
-          return `${args.options.readSecurity} is not a valid readSecurity value. Allowed values are 1|2`;
-        }
-
-        if (args.options.writeSecurity &&
-          args.options.writeSecurity !== 1 &&
-          args.options.writeSecurity !== 2 &&
-          args.options.writeSecurity !== 4) {
-          return `${args.options.writeSecurity} is not a valid writeSecurity value. Allowed values are 1|2|4`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push(
-      'webUrl',
-      'templateFeatureId',
-      'defaultContentApprovalWorkflowId',
-      'draftVersionVisibility',
-      'listExperienceOptions'
-    );
-
-    this.types.boolean.push(...SpoListSetCommand.booleanOptions);
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'title', 'url'] }
-    );
+      );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -604,11 +191,90 @@ class SpoListSetCommand extends SpoCommand {
     };
 
     try {
-      await request.post(requestOptions);
-      // REST post call doesn't return anything
+      if (Object.keys(requestBody).length > 0) {
+        await request.post(requestOptions);
+      }
+
+      if (args.options.versionExpireAfterDays !== undefined || args.options.versionAutoExpireTrim !== undefined) {
+        await this.setVersionPolicies(args.options);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async setVersionPolicies(options: Options): Promise<void> {
+    const digest = await spo.getRequestDigest(options.webUrl);
+
+    let objectPaths = '';
+    let actions = '';
+
+    // SPContext.Current
+    objectPaths += `<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />`;
+    actions += `<ObjectPath Id="1" ObjectPathId="0" />`;
+
+    // Web
+    objectPaths += `<Property Id="2" ParentId="0" Name="Web" />`;
+    actions += `<ObjectPath Id="3" ObjectPathId="2" />`;
+
+    let listObjectPathId: number;
+
+    if (options.url) {
+      const listServerRelativeUrl = urlUtil.getServerRelativePath(options.webUrl, options.url);
+      objectPaths += `<Method Id="4" ParentId="2" Name="GetList"><Parameters><Parameter Type="String">${formatting.escapeXml(listServerRelativeUrl)}</Parameter></Parameters></Method>`;
+      listObjectPathId = 4;
+      actions += `<ObjectPath Id="5" ObjectPathId="4" />`;
+    }
+    else if (options.id) {
+      objectPaths += `<Property Id="4" ParentId="2" Name="Lists" />`;
+      actions += `<ObjectPath Id="5" ObjectPathId="4" />`;
+      objectPaths += `<Method Id="6" ParentId="4" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(options.id)}}</Parameter></Parameters></Method>`;
+      listObjectPathId = 6;
+      actions += `<ObjectPath Id="7" ObjectPathId="6" />`;
+    }
+    else {
+      const titleForLookup = options.newTitle ?? options.title!;
+      objectPaths += `<Property Id="4" ParentId="2" Name="Lists" />`;
+      actions += `<ObjectPath Id="5" ObjectPathId="4" />`;
+      objectPaths += `<Method Id="6" ParentId="4" Name="GetByTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(titleForLookup)}</Parameter></Parameters></Method>`;
+      listObjectPathId = 6;
+      actions += `<ObjectPath Id="7" ObjectPathId="6" />`;
+    }
+
+    const versionPoliciesId = listObjectPathId + 10;
+    objectPaths += `<Property Id="${versionPoliciesId}" ParentId="${listObjectPathId}" Name="VersionPolicies" />`;
+    actions += `<ObjectPath Id="${versionPoliciesId + 1}" ObjectPathId="${versionPoliciesId}" />`;
+
+    let nextActionId = versionPoliciesId + 2;
+
+    if (options.versionExpireAfterDays !== undefined) {
+      actions += `<SetProperty Id="${nextActionId++}" ObjectPathId="${versionPoliciesId}" Name="DefaultTrimMode"><Parameter Type="Int32">1</Parameter></SetProperty>`;
+      actions += `<SetProperty Id="${nextActionId++}" ObjectPathId="${versionPoliciesId}" Name="DefaultExpireAfterDays"><Parameter Type="Int32">${options.versionExpireAfterDays}</Parameter></SetProperty>`;
+    }
+    else if (options.versionAutoExpireTrim === true) {
+      actions += `<SetProperty Id="${nextActionId++}" ObjectPathId="${versionPoliciesId}" Name="DefaultTrimMode"><Parameter Type="Int32">2</Parameter></SetProperty>`;
+    }
+    else if (options.versionAutoExpireTrim === false) {
+      actions += `<SetProperty Id="${nextActionId++}" ObjectPathId="${versionPoliciesId}" Name="DefaultTrimMode"><Parameter Type="Int32">0</Parameter></SetProperty>`;
+    }
+
+    actions += `<Method Name="Update" Id="${nextActionId++}" ObjectPathId="${listObjectPathId}" />`;
+
+    const csomRequestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': digest.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${actions}</Actions><ObjectPaths>${objectPaths}</ObjectPaths></Request>`
+    };
+
+    const res = await request.post<string>(csomRequestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
     }
   }
 
@@ -781,6 +447,10 @@ class SpoListSetCommand extends SpoCommand {
 
     if (options.majorVersionLimit) {
       requestBody.MajorVersionLimit = options.majorVersionLimit;
+
+      if (options.enableVersioning === undefined) {
+        requestBody.EnableVersioning = true;
+      }
     }
 
     if (options.majorWithMinorVersionsLimit) {
