@@ -2,9 +2,7 @@ import { visit } from 'unist-util-visit';
 import { Node, Parent } from 'unist';
 import * as fs from 'fs';
 import * as path from 'path';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const acorn = require('acorn');
+import * as acorn from 'acorn';
 
 const COMPONENT_NAME = 'CommandPlayer';
 const ATTR_RESPONSE = 'response';
@@ -12,6 +10,11 @@ const ATTR_COMMANDS = 'commands';
 const ATTR_RESPONSE_FROM = 'responseFrom';
 const ELEMENT_TYPE = 'mdxJsxAttribute';
 const PARSER_OPTIONS = { ecmaVersion: 2024, sourceType: 'module' } as const;
+
+interface VFileLike {
+  history?: string[];
+  message?: (reason: string, node?: Node) => void;
+}
 
 interface MdxJsxAttribute {
   type: 'mdxJsxAttribute';
@@ -49,8 +52,8 @@ interface TextNode extends Node {
   value: string;
 }
 
-const plugin = (): ((root: Node, file?: { history?: string[] }) => void) => {
-  return (root: Node, file?: { history?: string[] }): void => {
+const plugin = (): ((root: Node, file?: VFileLike) => void) => {
+  return (root: Node, file?: VFileLike): void => {
     const currentFilePath = file?.history?.[0];
     const jsonResponse = findFirstJsonInResponseSection(root);
 
@@ -83,7 +86,12 @@ const plugin = (): ((root: Node, file?: { history?: string[] }) => void) => {
             });
           }
           else {
-            console.warn(`[commandPlayer] Could not resolve responseFrom: ${refPath}`);
+            if (file && typeof file.message === 'function') {
+              file.message(`[commandPlayer] Could not resolve responseFrom: ${refPath}`, node);
+            }
+            else {
+              console.warn(`[commandPlayer] Could not resolve responseFrom: ${refPath}`);
+            }
           }
         }
       }
@@ -164,17 +172,30 @@ function replaceResponseFromReferences(expression: string, currentFilePath?: str
       result = result.replace(full, `${ATTR_RESPONSE}: '${escaped}'`);
     }
     else {
-      console.warn(`[commandPlayer] Could not resolve responseFrom: ${refPath}`);
+      console.warn(`[commandPlayer] Could not resolve responseFrom in commands: ${refPath}`);
     }
   }
 
   return result;
 }
 
+function isPathWithinAllowedRoots(filePath: string, roots: string[]): boolean {
+  return roots.some(root => {
+    const relativePath = path.relative(root, filePath);
+    return !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
+  });
+}
+
 function readResponseFromFile(refPath: string, currentFilePath?: string): string | null {
+  if (path.isAbsolute(refPath)) {
+    console.warn(`[commandPlayer] Absolute paths are not allowed in responseFrom: ${refPath}`);
+    return null;
+  }
+
   const cleanRef = refPath.replace(/^\.\//, '');
   const docsRoot = path.resolve(__dirname, '../../docs');
-  const srcRoot = path.resolve(__dirname, '..');
+  const responsesRoot = path.resolve(__dirname, '..', 'components', 'responses');
+  const allowedRoots = [docsRoot, responsesRoot];
   const candidates: string[] = [];
 
   if (currentFilePath) {
@@ -183,22 +204,36 @@ function readResponseFromFile(refPath: string, currentFilePath?: string): string
 
   candidates.push(path.resolve(docsRoot, cleanRef));
   candidates.push(path.resolve(docsRoot, 'cmd', cleanRef));
-  candidates.push(path.resolve(srcRoot, cleanRef));
+  candidates.push(path.resolve(responsesRoot, cleanRef));
 
   for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      if (candidate.endsWith('.txt')) {
-        try {
-          return fs.readFileSync(candidate, 'utf-8');
-        }
-        catch (err) {
-          console.warn(`[commandPlayer] Error reading file: ${candidate}`, err);
-          return null;
-        }
-      }
-
-      return extractJsonFromResponseSection(candidate);
+    if (!isPathWithinAllowedRoots(candidate, allowedRoots)) {
+      continue;
     }
+
+    let realPath: string;
+    try {
+      realPath = fs.realpathSync(candidate);
+    }
+    catch {
+      continue;
+    }
+
+    if (!isPathWithinAllowedRoots(realPath, allowedRoots)) {
+      continue;
+    }
+
+    if (realPath.endsWith('.txt')) {
+      try {
+        return fs.readFileSync(realPath, 'utf-8');
+      }
+      catch (err) {
+        console.warn(`[commandPlayer] Error reading file: ${realPath}`, err);
+        return null;
+      }
+    }
+
+    return extractJsonFromResponseSection(realPath);
   }
 
   return null;

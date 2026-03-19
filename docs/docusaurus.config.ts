@@ -25,14 +25,6 @@ const config: Config = {
   organizationName: 'pnp',
   projectName: 'cli-microsoft365',
 
-  headTags: [
-    {
-      tagName: 'script',
-      attributes: { type: 'text/javascript' },
-      innerHTML: 'window.gtag=window.gtag||function(){(window.dataLayer=window.dataLayer||[]).push(arguments)};'
-    }
-  ],
-
   i18n: {
     defaultLocale: 'en',
     locales: ['en']

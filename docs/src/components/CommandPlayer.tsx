@@ -243,26 +243,30 @@ const CommandPlayer: React.FC<CommandPlayerProps> = ({
       }
     };
 
-    const handleWheel = (): void => {
+    const markUserScrolling = (): void => {
       userScrolling = true;
       if (scrollTimeout) clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => { userScrolling = false; }, SCROLL_DETECT_TIMEOUT);
     };
 
-    const handleTouchMove = (): void => {
-      userScrolling = true;
-      if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => { userScrolling = false; }, SCROLL_DETECT_TIMEOUT);
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+        markUserScrolling();
+      }
     };
 
     el.addEventListener('scroll', handleScroll, { passive: true });
-    el.addEventListener('wheel', handleWheel, { passive: true });
-    el.addEventListener('touchmove', handleTouchMove, { passive: true });
+    el.addEventListener('wheel', markUserScrolling, { passive: true });
+    el.addEventListener('touchmove', markUserScrolling, { passive: true });
+    el.addEventListener('pointerdown', markUserScrolling, { passive: true });
+    el.addEventListener('keydown', handleKeyDown);
 
     return () => {
       el.removeEventListener('scroll', handleScroll);
-      el.removeEventListener('wheel', handleWheel);
-      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('wheel', markUserScrolling);
+      el.removeEventListener('touchmove', markUserScrolling);
+      el.removeEventListener('pointerdown', markUserScrolling);
+      el.removeEventListener('keydown', handleKeyDown);
       if (scrollTimeout) clearTimeout(scrollTimeout);
     };
   }, [mounted, doPause, doResume]);
@@ -440,6 +444,11 @@ const CommandPlayer: React.FC<CommandPlayerProps> = ({
 
   const currentStepIdx = displayedSteps;
 
+  const highlightedResponses = useMemo(
+    () => formattedResponses.map((response) => (response ? highlightJson(response) : null)),
+    [formattedResponses]
+  );
+
   return (
     <div className="cp-container" ref={containerRef}>
       <div className="cp-titlebar">
@@ -458,9 +467,9 @@ const CommandPlayer: React.FC<CommandPlayerProps> = ({
               <span className="cp-prompt-symbol">&gt;</span>
               <span className="cp-command">{step.command}</span>
             </div>
-            {formattedResponses[i] && (
+            {highlightedResponses[i] && (
               <div className="cp-response cp-response--visible">
-                {highlightJson(formattedResponses[i])}
+                {highlightedResponses[i]}
               </div>
             )}
           </div>
@@ -475,9 +484,9 @@ const CommandPlayer: React.FC<CommandPlayerProps> = ({
                 {phase === 'typing-command' && <span className="cp-cursor" />}
               </span>
             </div>
-            {showCurrentResponse && formattedResponses[currentStepIdx] && (
+            {showCurrentResponse && highlightedResponses[currentStepIdx] && (
               <div className="cp-response cp-response--visible">
-                {highlightJson(formattedResponses[currentStepIdx])}
+                {highlightedResponses[currentStepIdx]}
               </div>
             )}
           </div>
@@ -494,7 +503,7 @@ const CommandPlayer: React.FC<CommandPlayerProps> = ({
         )}
       </div>
 
-      {mounted && phase !== 'idle' && (
+      {mounted && !prefersReducedMotion() && phase !== 'idle' && (
         <button
           className={`cp-pause-btn${isPaused ? ' cp-pause-btn--paused' : ''}`}
           onClick={togglePause}
