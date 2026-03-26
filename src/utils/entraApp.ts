@@ -485,8 +485,15 @@ export const entraApp = {
       responseType: 'json'
     };
 
-    const app = await request.get<Application>(requestOptions);
+    try {
+      return await request.get<Application>(requestOptions);
+    }
+    catch (error: any) {
+      if (error?.response?.status === 404) {
+        throw Error(`App with objectId '${objectId}' not found in Microsoft Entra ID.`);
+      }
 
-    return app;
+      throw error;
+    }
   }
 };

@@ -91,6 +91,14 @@ describe('utils/entraApp', () => {
     assert.deepStrictEqual(actual.displayName, appName);
   });
 
+  it('throws error message when no application was found using getAppRegistrationByObjectId', async () => {
+    const error = { response: { status: 404 } };
+    sinon.stub(request, 'get').rejects(error);
+
+    await assert.rejects(entraApp.getAppRegistrationByObjectId(appObjectId),
+      new Error(`App with objectId '${appObjectId}' not found in Microsoft Entra ID.`));
+  });
+
   it('handles selecting single application when multiple applications with the specified name found using getAppRegistrationByAppName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq '${formatting.encodeQueryParameter(appName)}'&$select=id`) {
