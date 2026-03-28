@@ -462,7 +462,7 @@ export class Auth {
       await logger.logToStderr(`🌶️  ${response.message}`);
     }
 
-    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) && response.verificationUri) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) && response.verificationUri != null) {
       await browserUtil.open(response.verificationUri);
     }
 
@@ -475,7 +475,7 @@ export class Auth {
         this._clipboardy = (await import('clipboardy')).default;
       }
 
-      if (response.userCode) {
+      if (response.userCode != null) {
         this._clipboardy.writeSync(response.userCode);
       }
     }
