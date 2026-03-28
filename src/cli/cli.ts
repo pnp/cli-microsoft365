@@ -206,11 +206,11 @@ async function execute(rawArgs: string[]): Promise<void> {
         const otherErrors: z.core.$ZodIssue[] = result.error.issues
           .filter(e => !missingRequiredValuesErrors.includes(e) && !optionSetErrors.includes(e as z.core.$ZodIssueCustom));
 
-        if (otherErrors.some(e => e)) {
+        if (otherErrors.length > 0) {
           return cli.closeWithError(result.error, cli.optionsFromArgs, true);
         }
 
-        if (missingRequiredValuesErrors.some(e => e)) {
+        if (missingRequiredValuesErrors.length > 0) {
           await cli.error('🌶️  Provide values for the following parameters:');
 
           for (const error of missingRequiredValuesErrors) {
@@ -230,7 +230,7 @@ async function execute(rawArgs: string[]): Promise<void> {
           continue;
         }
 
-        if (optionSetErrors.some(e => e)) {
+        if (optionSetErrors.length > 0) {
           for (const error of optionSetErrors) {
             await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
           }
