@@ -357,6 +357,82 @@ class MockCommandWithRefinedSchema extends AnonymousCommand {
   }
 }
 
+const refinedSchemaCoercionOptions = z.strictObject({
+  ...globalOptionsZod.shape,
+  mode: z.string().optional(),
+  optA: z.coerce.number().optional(),
+  optB: z.coerce.number().optional(),
+  optC: z.coerce.boolean().optional(),
+  optD: z.coerce.boolean().optional(),
+  optE: z.string().optional(),
+  optF: z.string().optional()
+});
+
+class MockCommandWithRefinedSchemaCoercion extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema refined coercion';
+  }
+  public get description(): string {
+    return 'Mock command with refined schema for coercion tests';
+  }
+  public get schema(): z.ZodType {
+    return refinedSchemaCoercionOptions;
+  }
+  public getRefinedSchema(schema: typeof refinedSchemaCoercionOptions): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => !(options.optA && options.optB), {
+        error: 'Specify either optA or optB, but not both.',
+        path: ['optA'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optA', 'optB']
+        }
+      })
+      .refine(options => options.mode !== 'number' || options.optA !== undefined || options.optB !== undefined, {
+        error: 'Specify optA or optB.',
+        path: ['optA'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optA', 'optB']
+        }
+      })
+      .refine(options => !(options.optC !== undefined && options.optD !== undefined), {
+        error: 'Specify either optC or optD, but not both.',
+        path: ['optC'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optC', 'optD']
+        }
+      })
+      .refine(options => options.mode !== 'bool' || options.optC !== undefined || options.optD !== undefined, {
+        error: 'Specify optC or optD.',
+        path: ['optC'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optC', 'optD']
+        }
+      })
+      .refine(options => !(options.optE && options.optF), {
+        error: 'Specify either optE or optF, but not both.',
+        path: ['optE'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optE', 'optF']
+        }
+      })
+      .refine(options => options.mode !== 'string' || options.optE || options.optF, {
+        error: 'Specify optE or optF.',
+        path: ['optE'],
+        params: {
+          customCode: 'optionSet',
+          options: ['optE', 'optF']
+        }
+      });
+  }
+  public async commandAction(): Promise<void> {
+  }
+}
+
 describe('cli', () => {
   let rootFolder: string;
   let cliLogStub: sinon.SinonStub;
@@ -374,6 +450,7 @@ describe('cli', () => {
   let mockCommandWithSchemaAndRequiredOptions: Command;
   let mockCommandWithSchemaAndBoolRequiredOption: Command;
   let mockCommandWithRefinedSchema: Command;
+  let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
 
@@ -399,6 +476,7 @@ describe('cli', () => {
     mockCommandWithSchemaAndRequiredOptions = new MockCommandWithSchemaAndRequiredOptions();
     mockCommandWithSchemaAndBoolRequiredOption = new MockCommandWithSchemaAndBoolRequiredOption();
     mockCommandWithRefinedSchema = new MockCommandWithRefinedSchema();
+    mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
@@ -422,6 +500,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithSchemaAndRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndBoolRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
     ];
@@ -1306,6 +1385,74 @@ describe('cli', () => {
       });
   });
 
+  it(`coerces 'true' to boolean true when prompting for option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optC');
+    sinon.stub(prompt, 'forInput').resolves('true');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'bool']);
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optC, true);
+  });
+
+  it(`coerces 'false' to boolean false when prompting for option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optC');
+    sinon.stub(prompt, 'forInput').resolves('false');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'bool']);
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optC, false);
+  });
+
+  it(`coerces numeric string to number when prompting for option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optA');
+    sinon.stub(prompt, 'forInput').resolves('42');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'number']);
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optA, 42);
+  });
+
+  it(`keeps string value as string when prompting for option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optE');
+    sinon.stub(prompt, 'forInput').resolves('hello world');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'hello world');
+  });
+
   it(`executes command when validation passed`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock');
 
@@ -1877,7 +2024,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  12 commands'));
+    assert(cliLogStub.calledWith('  cli *  13 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -1890,7 +2037,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        9 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        10 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -1903,7 +2050,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  12 commands'));
+    assert(cliLogStub.calledWith('  cli *  13 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
