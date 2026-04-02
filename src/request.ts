@@ -1,4 +1,4 @@
-import Axios, { AxiosError, AxiosInstance, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
@@ -186,12 +186,6 @@ class Request {
         }
       }
 
-      const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
-
-      if (proxyUrl) {
-        options.proxy = this.createProxyConfigFromUrl(proxyUrl);
-      }
-
       const res = await this.req(options);
 
       const end = process.hrtime.bigint();
@@ -234,19 +228,6 @@ class Request {
   private removeDoubleSlashes(options: AxiosRequestConfig): void {
     options.url = options.url!.substring(0, 8) +
       options.url!.substring(8).replace('//', '/');
-  }
-
-  private createProxyConfigFromUrl(url: string): AxiosProxyConfig {
-    const parsedUrl = new URL(url);
-    const port = parsedUrl.port || (url.toLowerCase().startsWith('https') ? 443 : 80);
-    let authObject = null;
-    if (parsedUrl.username && parsedUrl.password) {
-      authObject = {
-        username: parsedUrl.username,
-        password: parsedUrl.password
-      };
-    }
-    return { host: parsedUrl.hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
   }
 }
 

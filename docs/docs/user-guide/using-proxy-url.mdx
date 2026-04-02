@@ -15,3 +15,13 @@ When using a proxy, it's important to understand the different parts of a proxy 
 - **username and password**: if the proxy server requires authentication, you will need to provide a username and password
 - **host**: the hostname or IP address of the proxy server
 - **port number**: the port number on which the proxy server is listening. Defaults to 443 for the `HTTPS` protocol, otherwise it defaults to 80 when not provided
+
+## Bypassing the proxy for specific hosts
+
+If you need certain requests to bypass the proxy, you can use the `NO_PROXY` (or `no_proxy`) environment variable. This is a comma-separated list of hostnames or domain patterns that should not be routed through the proxy.
+
+For example, to bypass the proxy for Microsoft authentication endpoints:
+
+```sh
+export NO_PROXY="login.microsoftonline.com,*.microsoft.com,*.azure.net"
+```
