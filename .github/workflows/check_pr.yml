@@ -132,6 +132,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Number of commits to fetch. 0 indicates all history for all branches and tags. Default: 1
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -148,6 +151,9 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         working-directory: docs
+
+      - name: Prepare docs versioning
+        run: node scripts/create-docs-versioning.mjs
         
       - name: Build docs
         run: npm run build

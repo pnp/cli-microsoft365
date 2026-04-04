@@ -1,9 +1,15 @@
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import type { Options as ClientRedirectsOptions } from '@docusaurus/plugin-client-redirects';
+import { existsSync, readFileSync } from 'node:fs';
 import LightCodeTheme from './src/config/lightCodeTheme';
 import DarkCodeTheme from './src/config/darkCodeTheme';
 import definitionList from './src/remark/definitionLists';
+
+const hasStableVersion = existsSync('versions.json');
+const stableVersion = hasStableVersion
+  ? JSON.parse(readFileSync('versions.json', 'utf-8'))[0]
+  : undefined;
 
 const config: Config = {
   title: 'CLI for Microsoft 365',
@@ -68,9 +74,24 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './src/config/sidebars.ts',
-          editUrl: 'https://github.com/pnp/cli-microsoft365/blob/main/docs',
+          editUrl: ({ docPath }) =>
+            `https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/${docPath}`,
           showLastUpdateTime: true,
-          remarkPlugins: [definitionList]
+          remarkPlugins: [definitionList],
+          ...hasStableVersion && {
+            lastVersion: stableVersion,
+            versions: {
+              current: {
+                label: 'Beta',
+                path: 'beta',
+                badge: false,
+                banner: 'unreleased'
+              },
+              [stableVersion!]: {
+                badge: false,
+              },
+            },
+          },
         },
         blog: false,
         theme: {
@@ -138,6 +159,10 @@ const config: Config = {
             label: 'About',
             sidebarId: 'about',
             position: 'left'
+          },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right'
           },
           {
             href: 'https://github.com/pnp/cli-microsoft365',

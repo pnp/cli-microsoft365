@@ -74,6 +74,11 @@ docs/build
 docs/.docusaurus
 docs/.cache-loader
 
+# Generated versioning files
+docs/versioned_docs
+docs/versioned_sidebars
+docs/versions.json
+
 docs/.DS_Store
 docs/.env.local
 docs/.env.development.local

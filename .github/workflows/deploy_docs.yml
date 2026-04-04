@@ -29,7 +29,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         working-directory: docs
-        
+
+      - name: Prepare docs versioning
+        run: node scripts/create-docs-versioning.mjs
+
       - name: Build docs
         run: npm run build
         working-directory: docs
