@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -93,7 +94,7 @@ class EntraUserLicenseListCommand extends GraphCommand {
 
     let requestUrl: string = `${this.resource}/v1.0/`;
     if (args.options.userId || args.options.userName) {
-      requestUrl += `users/${args.options.userId || args.options.userName}`;
+      requestUrl += `users/${formatting.encodeQueryParameter(args.options.userId || args.options.userName as string)}`;
     }
     else {
       requestUrl += 'me';

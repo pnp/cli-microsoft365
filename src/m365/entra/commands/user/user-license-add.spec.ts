@@ -9,6 +9,7 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-license-add.js';
@@ -107,7 +108,7 @@ describe(commands.USER_LICENSE_ADD, () => {
 
   it('adds licenses to a user by userId', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserId)}/assignLicense`)) {
         return userLicenseResponse;
       }
 
@@ -120,7 +121,7 @@ describe(commands.USER_LICENSE_ADD, () => {
 
   it('adds licenses to a user by userName', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserName}/assignLicense`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserName)}/assignLicense`)) {
         return userLicenseResponse;
       }
 

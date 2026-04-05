@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -83,7 +84,7 @@ class EntraUserLicenseAddCommand extends GraphCommand {
     const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/assignLicense`,
+      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userId || args.options.userName)}/assignLicense`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

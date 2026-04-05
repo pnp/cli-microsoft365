@@ -3,6 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 
@@ -111,7 +112,7 @@ class EntraUserLicenseRemoveCommand extends GraphCommand {
     const requestBody = { "addLicenses": [], "removeLicenses": removeLicenses };
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/assignLicense`,
+      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userId || args.options.userName as string)}/assignLicense`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

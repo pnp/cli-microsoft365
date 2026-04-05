@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-license-list.js';
@@ -150,7 +151,7 @@ describe(commands.USER_LICENSE_LIST, () => {
 
   it('retrieves license details of a specific user by its ID', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/licenseDetails`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userId)}/licenseDetails`) {
         return licenseResponse;
       }
 
@@ -163,7 +164,7 @@ describe(commands.USER_LICENSE_LIST, () => {
 
   it('retrieves license details of a specific user by its UPN', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/licenseDetails`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/licenseDetails`) {
         return licenseResponse;
       }
 

@@ -9,6 +9,7 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-license-remove.js';
@@ -140,7 +141,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
   it('removes a single user license by userId without confirmation prompt', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserId)}/assignLicense`)) {
         return;
       }
 
@@ -153,7 +154,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
   it('removes the specified user licenses by userName when prompt confirmed', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUserName}/assignLicense`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserName)}/assignLicense`) {
         return;
       }
 
@@ -173,7 +174,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
   it('removes the specified user licenses by userId without confirmation prompt', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserId)}/assignLicense`) {
         return;
       }
 
@@ -196,7 +197,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     };
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(validUserId)}/assignLicense`)) {
         throw error;
       }
 
