@@ -1,12 +1,10 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import auth from '../../../../Auth.js';
+import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -17,7 +15,7 @@ interface Options extends GlobalOptions {
   userName?: string;
 }
 
-class EntraUserLicenseListCommand extends GraphCommand {
+class EntraUserLicenseListCommand extends GraphDelegatedCommand {
   public get name(): string {
     return commands.USER_LICENSE_LIST;
   }
@@ -83,11 +81,6 @@ class EntraUserLicenseListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.connection.accessTokens[this.resource].accessToken);
-    if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName) {
-      this.handleError(`Specify at least 'userId' or 'userName' when using application permissions.`);
-    }
-
     if (this.verbose) {
       await logger.logToStderr(`Retrieving licenses from user: ${args.options.userId || args.options.userName || 'current user'}.`);
     }

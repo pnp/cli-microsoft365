@@ -52,6 +52,7 @@ describe(commands.USER_LICENSE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let assertAccessTokenTypeStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -80,13 +81,13 @@ describe(commands.USER_LICENSE_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    assertAccessTokenTypeStub = sinon.stub(accessToken, 'assertAccessTokenType').withArgs('delegated').resolves();
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      accessToken.isAppOnlyAccessToken
+      accessToken.assertAccessTokenType
     ]);
   });
 
@@ -127,13 +128,11 @@ describe(commands.USER_LICENSE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('throws an error when using application permissions and no option is specified', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+  it('ensures delegated permissions are enforced', async () => {
+    sinon.stub(request, 'get').resolves(licenseResponse);
 
-    await assert.rejects(command.action(logger, {
-      options: {}
-    }), new CommandError(`Specify at least 'userId' or 'userName' when using application permissions.`));
+    await command.action(logger, { options: { userId: userId } });
+    assert(assertAccessTokenTypeStub.calledOnceWithExactly('delegated'));
   });
 
   it('retrieves license details of the current logged in user', async () => {
