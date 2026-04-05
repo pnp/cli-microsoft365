@@ -63,6 +63,7 @@ export default {
   FIELD_REMOVE: `${prefix} field remove`,
   FIELD_SET: `${prefix} field set`,
   FILE_ADD: `${prefix} file add`,
+  FILE_ARCHIVE: `${prefix} file archive`,
   FILE_CHECKIN: `${prefix} file checkin`,
   FILE_CHECKOUT: `${prefix} file checkout`,
   FILE_CHECKOUT_UNDO: `${prefix} file checkout undo`,

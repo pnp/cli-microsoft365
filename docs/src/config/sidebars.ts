@@ -2703,6 +2703,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file archive',
+              id: 'cmd/spo/file/file-archive'
+            },
+            {
+              type: 'doc',
               label: 'file checkin',
               id: 'cmd/spo/file/file-checkin'
             },

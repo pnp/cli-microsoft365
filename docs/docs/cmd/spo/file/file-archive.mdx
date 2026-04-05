@@ -1,0 +1,106 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo file archive
+
+Archives a file
+
+## Usage
+
+```sh
+m365 spo file archive [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the site where the file is located.
+
+`--url [url]`
+: The server- or site-relative decoded URL of the file to archive. Specify either `url` or `id`, but not both.
+
+`-i, --id [id]`
+: The UniqueId (GUID) of the file to archive. Specify either `url` or `id`, but not both.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Archive a file without prompting for confirmation
+
+```sh
+m365 spo file archive --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7a8c9207-7745-4cda-b0e2-be2618ee3030 --force
+```
+
+Archive a file by URL with prompting for confirmation
+
+```sh
+m365 spo file archive --webUrl https://contoso.sharepoint.com/sites/Marketing --url '/sites/Marketing/shared documents/document.docx'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "value": "fullyArchived"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  value: fullyArchived
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  value
+  fullyArchived
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo file archive --debug "false" --verbose "false" --webUrl "https://afonline.sharepoint.com/sites/M365SOBA" --url "/sites/M365SOBA/shared documents/general/M365 responsibility.pptx" --force "true"
+
+  Date: 4/4/2026
+
+  Property | Value
+  ---------|-------
+  value | fullyArchived
+  ```
+
+  </TabItem>
+</Tabs>
