@@ -271,9 +271,9 @@ paths:
     get:
       parameters:
         - name: filePath
-          in: query
+          in: path
           required: true
-          description: URL-encoded server-relative path to the file (via @f parameter)
+          description: URL-encoded server-relative path to the file
           schema:
             type: string
           example: "'%2Fsites%2FM365SOBA%2Fshared%20documents%2Fgeneral%2Fdocument.docx'"
