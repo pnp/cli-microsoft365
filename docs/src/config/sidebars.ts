@@ -2823,6 +2823,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file unarchive',
+              id: 'cmd/spo/file/file-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'file version clear',
               id: 'cmd/spo/file/file-version-clear'
             },
