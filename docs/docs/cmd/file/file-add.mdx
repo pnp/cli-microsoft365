@@ -1,4 +1,6 @@
 import Global from '../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # file add
 
@@ -30,6 +32,25 @@ m365 file add [options]
 The `folderUrl` must be an absolute URL to the document library where the file should be uploaded. The document library can be located in any site collection in your tenant, including OneDrive for Business. The `folderUrl` can also point to a (sub)folder in the document library.
 
 By default, the `file add` command will automatically lookup the ID of the site where you want to upload the file based on the specified `folderUrl`. It will do this, by breaking the URL into chunks and incrementally calling Microsoft Graph to retrieve site information. This is necessary, because there is no other way looking at the URL to distinguish where the site URL ends and the document library URL starts. If you want to speed up uploading files, or you use resource-specific consent and your Microsoft Entra app only has access to the specific site, you can use the `siteUrl` option to specify the URL of the site yourself.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                      |
+  |-----------------|----------------------------------|
+  | Microsoft Graph | Files.ReadWrite, Sites.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

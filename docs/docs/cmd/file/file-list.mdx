@@ -31,6 +31,25 @@ m365 file list [options]
 
 This command is an improved version of the `spo file list` command. The main difference between the two commands is, that `file list` uses Microsoft Graph and properly supports retrieving files from large folders. Because `file list` uses Microsoft Graph and `spo file list` uses SharePoint REST APIs, the data returned by both commands is different.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                |
+  |-----------------|----------------------------|
+  | Microsoft Graph | Files.Read, Sites.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                    |
+  |-----------------|--------------------------------|
+  | Microsoft Graph | Files.Read.All, Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Return all files from the folder _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_

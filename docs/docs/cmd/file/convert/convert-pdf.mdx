@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # file convert pdf
 
@@ -29,6 +31,25 @@ To convert a local file to PDF, CLI will temporarily upload the file to a docume
 If you choose to store the converted file in a document library, CLI will store the converted PDF file temporarily in the temp folder on your computer. After the PDF file has been uploaded to the location you specified, CLI will remove the temporary file.
 
 If the conversion process fails, CLI will attempt to clean up the temporary files (the source file uploaded to your tenant, if you're converting a local file to PDF, and the converted PDF file on your disk if you chose to upload the converted file to your tenant). If removing the temporary files fails, you will need to clean them up yourself. CLI will list the URL and/or path of the files to remove.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                     |
+  |-----------------|---------------------------------|
+  | Microsoft Graph | Files.ReadWrite, Sites.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                         |
+  |-----------------|-------------------------------------|
+  | Microsoft Graph | Files.ReadWrite.All, Sites.Read.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
