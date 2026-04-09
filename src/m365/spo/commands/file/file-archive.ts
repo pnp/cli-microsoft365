@@ -55,7 +55,7 @@ class SpoFileArchiveCommand extends SpoCommand {
     const { webUrl, url, id, force, verbose } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to archive the file ${url || id} at site ${webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you would like to archive this item? You will be able to reactivate it instantly for the first 7 days. After that, it will take up to 24 hours to reactivate.` });
       if (!result) {
         return;
       }
@@ -66,21 +66,17 @@ class SpoFileArchiveCommand extends SpoCommand {
         await logger.logToStderr(`Archiving file ${url || id} at site ${webUrl}...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl: string = `${webUrl}/_api/web`;
 
       if (id) {
-        requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+        requestUrl += `/GetFileById('${formatting.encodeQueryParameter(id)}')`;
       }
       else if (url) {
-        requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)`;
-      }
-
-      let queryString: string = '?$select=ListId&$expand=ListItemAllFields';
-
-      if (url) {
         const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
-        queryString += `&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+        requestUrl += `/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
+
+      const queryString: string = '?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields';
 
       const fileInfo = await request.get<{ ListId: string; ListItemAllFields: { Id: number } }>({
         url: requestUrl + queryString,
@@ -90,17 +86,15 @@ class SpoFileArchiveCommand extends SpoCommand {
         responseType: 'json'
       });
 
-      const archiveUrl = `${webUrl}/_api/Lists(guid'${fileInfo.ListId}')/items(${fileInfo.ListItemAllFields.Id})/Archive`;
       const requestOptions: CliRequestOptions = {
-        url: archiveUrl,
+        url: `${webUrl}/_api/Lists(guid'${fileInfo.ListId}')/items(${fileInfo.ListItemAllFields.Id})/Archive`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
 
-      const response = await request.post(requestOptions);
-      await logger.log(response);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
