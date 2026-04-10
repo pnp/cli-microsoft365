@@ -17,6 +17,8 @@ updates:
           - "*"
     versioning-strategy: increase
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
 
   # Monthly docs dependency updates
   - package-ecosystem: npm
@@ -35,6 +37,8 @@ updates:
           - "*"
     versioning-strategy: increase
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
 
   # Monthly GitHub Actions dependency updates
   - package-ecosystem: github-actions
@@ -46,6 +50,8 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
 
   # Monthly Docker dependency updates
   - package-ecosystem: docker
@@ -59,3 +65,5 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
