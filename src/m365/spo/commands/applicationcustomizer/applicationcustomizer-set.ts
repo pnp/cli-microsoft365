@@ -107,6 +107,24 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
           return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
+        if (args.options.clientSideComponentProperties) {
+          try {
+            JSON.parse(args.options.clientSideComponentProperties);
+          }
+          catch (e) {
+            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
+          }
+        }
+
+        if (args.options.hostProperties) {
+          try {
+            JSON.parse(args.options.hostProperties);
+          }
+          catch (e) {
+            return `An error has occurred while parsing hostProperties: ${e}`;
+          }
+        }
+
         if (!args.options.newTitle && args.options.description === undefined && !args.options.clientSideComponentProperties && args.options.hostProperties === undefined) {
           return `Please specify an option to be updated`;
         }
@@ -153,9 +171,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
       requestBody.ClientSideComponentProperties = clientSideComponentProperties;
     }
 
-    if (hostProperties !== undefined) {
-      requestBody.HostProperties = hostProperties;
-    }
+    requestBody.HostProperties = hostProperties;
 
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,

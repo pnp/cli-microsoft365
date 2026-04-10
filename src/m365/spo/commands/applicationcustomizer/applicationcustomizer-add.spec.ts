@@ -95,12 +95,8 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('adds the application customizer to a specific site without specifying clientSideComponentProperties', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
-        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
-        && opts.data['ClientSideComponentId'] === clientSideComponentId
-        && opts.data['Name'] === title
-        && opts.data['ClientSideComponentProperties'] === undefined) {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions') {
         return;
       }
 
@@ -108,16 +104,20 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      Title: title,
+      Name: title,
+      Description: undefined,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      ClientSideComponentId: clientSideComponentId,
+      HostProperties: ''
+    });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('adds the application customizer to a specific site while specifying clientSideComponentProperties', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
-        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
-        && opts.data['ClientSideComponentId'] === clientSideComponentId
-        && opts.data['ClientSideComponentProperties'] === clientSideComponentProperties
-        && opts.data['Name'] === title) {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions') {
         return customActionAddResponse;
       }
 
@@ -125,16 +125,21 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      Title: title,
+      Name: title,
+      Description: description,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      ClientSideComponentId: clientSideComponentId,
+      ClientSideComponentProperties: clientSideComponentProperties,
+      HostProperties: ''
+    });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('adds the application customizer to a specific site while specifying hostProperties', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
-        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
-        && opts.data['ClientSideComponentId'] === clientSideComponentId
-        && opts.data['HostProperties'] === clientSideComponentProperties
-        && opts.data['Name'] === title) {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions') {
         return customActionAddResponse;
       }
 
@@ -142,6 +147,14 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, hostProperties: clientSideComponentProperties, verbose: true } });
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      Title: title,
+      Name: title,
+      Description: description,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      ClientSideComponentId: clientSideComponentId,
+      HostProperties: clientSideComponentProperties
+    });
     assert(loggerLogToStderrSpy.called);
   });
 

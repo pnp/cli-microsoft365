@@ -77,6 +77,24 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
+        if (args.options.clientSideComponentProperties) {
+          try {
+            JSON.parse(args.options.clientSideComponentProperties);
+          }
+          catch (e) {
+            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
+          }
+        }
+
+        if (args.options.hostProperties) {
+          try {
+            JSON.parse(args.options.hostProperties);
+          }
+          catch (e) {
+            return `An error has occurred while parsing hostProperties: ${e}`;
+          }
+        }
+
         return true;
       }
     );

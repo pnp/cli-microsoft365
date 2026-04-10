@@ -137,7 +137,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('adds a tenant-wide application customizer including hostProperties', async () => {
-    let executeCommandCalled = false;
+    let actualHostProperties: string | undefined;
     sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
@@ -153,16 +153,16 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommand').callsFake(async (command): Promise<void> => {
+    sinon.stub(cli, 'executeCommand').callsFake(async (command, args): Promise<void> => {
       if (command === spoListItemAddCommand) {
-        executeCommandCalled = true;
+        actualHostProperties = args.options.TenantWideExtensionHostProperties;
         return;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, title: customizerTitle, hostProperties: '{ "preAllocatedApplicationCustomizerTopHeight": "50", "preAllocatedApplicationCustomizerBottomHeight": "50" }', verbose: true } });
-    assert.strictEqual(executeCommandCalled, true);
+    assert.strictEqual(actualHostProperties, '{ "preAllocatedApplicationCustomizerTopHeight": "50", "preAllocatedApplicationCustomizerBottomHeight": "50" }');
   });
 
   it('throws an error when no app catalog is found', async () => {
@@ -280,6 +280,16 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
 
   it('fails validation if clientSideComponentId is not a valid Guid', async () => {
     const actual = await command.validate({ options: { title: customizerTitle, clientSideComponentId: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the hostProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, hostProperties: 'invalid json string' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

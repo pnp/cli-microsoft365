@@ -208,6 +208,16 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { id: id, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the hostProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { id: id, hostProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if clientSideComponentId is valid', async () => {
     const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId, newTitle: newTitle } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -411,7 +421,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
     await command.action(logger, {
       options: {
-        id: id, hostProperties: hostProperties
+        id: id,
+        hostProperties: hostProperties
       }
     });
 

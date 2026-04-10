@@ -134,9 +134,7 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
     }
 
-    if (args.options.hostProperties) {
-      requestBody.HostProperties = args.options.hostProperties;
-    }
+    requestBody.HostProperties = args.options.hostProperties || '';
 
     const scope = args.options.scope || 'Site';
 

@@ -214,6 +214,16 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, id: id, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the hostProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, id: id, hostProperties: 'invalid json string' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('handles error when no application customizer with the specified id found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${id}')`)) {
@@ -377,7 +387,8 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     assert(updateCallsSpy.calledOnce);
     assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
-      Description: ''
+      Description: '',
+      HostProperties: undefined
     });
   });
 
