@@ -609,8 +609,8 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
     },
     sp: SharePointVersion.SPO,
     yo: {
-      range: '^4 || ^5 || ^6',
-      fix: 'npm i -g yo@6'
+      range: '^4 || ^5 || ^6 || ^7',
+      fix: 'npm i -g yo@7'
     }
   },
   '1.22.1': {
@@ -624,8 +624,8 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
     },
     sp: SharePointVersion.SPO,
     yo: {
-      range: '^4 || ^5 || ^6',
-      fix: 'npm i -g yo@6'
+      range: '^4 || ^5 || ^6 || ^7',
+      fix: 'npm i -g yo@7'
     }
   },
   '1.22.2': {
@@ -639,8 +639,23 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
     },
     sp: SharePointVersion.SPO,
     yo: {
-      range: '^4 || ^5 || ^6',
-      fix: 'npm i -g yo@6'
+      range: '^4 || ^5 || ^6 || ^7',
+      fix: 'npm i -g yo@7'
+    }
+  },
+  '1.23.0-rc.0': {
+    heft: {
+      range: '^1',
+      fix: 'npm i -g @rushstack/heft@1'
+    },
+    node: {
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
+    },
+    sp: SharePointVersion.SPO,
+    yo: {
+      range: '^4 || ^5 || ^6 || ^7',
+      fix: 'npm i -g yo@7'
     }
   }
 };

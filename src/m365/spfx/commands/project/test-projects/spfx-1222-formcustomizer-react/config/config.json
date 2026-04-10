@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "hello-world-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/helloWorld/HelloWorldFormCustomizer.js",
+          "manifest": "./src/extensions/helloWorld/HelloWorldFormCustomizer.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "HelloWorldFormCustomizerStrings": "lib/extensions/helloWorld/loc/{locale}.js"
+  }
+}
