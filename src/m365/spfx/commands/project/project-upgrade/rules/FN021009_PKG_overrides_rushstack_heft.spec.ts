@@ -53,21 +53,24 @@ describe('FN021009_PKG_overrides_rushstack_heft', () => {
     assert.strictEqual(findings.length, 1);
   });
 
-  it(`returns correct node when overrides.@rushstack/heft is set to a string`, () => {
+  it(`doesn't return notification if overrides.@rushstack/heft is already set to expected version`, () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
         overrides: {
-          '@rushstack/heft': '0.0.1'
-        },
-        source: JSON.stringify({
-          overrides: {
-            '@rushstack/heft': '0.0.1'
-          }
-        }, null, 2)
+          '@rushstack/heft': '0.7.36'
+        }
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 3);
+    assert.strictEqual(findings.length, 0);
+  });
+
+  it(`returns cmd resolution type`, () => {
+    assert.strictEqual(rule.resolutionType, 'cmd');
+  });
+
+  it(`returns npm pkg set resolution command with version`, () => {
+    assert.strictEqual(rule.resolution, 'npm pkg set overrides.@rushstack/heft="0.7.36"');
   });
 });

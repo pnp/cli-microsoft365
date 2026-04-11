@@ -1,8 +1,8 @@
-import { JsonRule } from "../../JsonRule.js";
+import { Rule } from "../../Rule.js";
 import { Project } from "../../project-model/index.js";
 import { Finding } from "../../report-model/index.js";
 
-export class FN021009_PKG_overrides_rushstack_heft extends JsonRule {
+export class FN021009_PKG_overrides_rushstack_heft extends Rule {
   constructor(private version: string) {
     super();
   }
@@ -20,15 +20,11 @@ export class FN021009_PKG_overrides_rushstack_heft extends JsonRule {
   }
 
   get resolution(): string {
-    return `{
-  "overrides": {
-    "@rushstack/heft": "${this.version}"
-  }
-}`;
+    return `npm pkg set overrides.@rushstack/heft="${this.version}"`;
   }
 
   get resolutionType(): string {
-    return 'json';
+    return 'cmd';
   }
 
   get severity(): string {
@@ -48,8 +44,7 @@ export class FN021009_PKG_overrides_rushstack_heft extends JsonRule {
       typeof project.packageJson.overrides !== 'object' ||
       !project.packageJson.overrides['@rushstack/heft'] ||
       project.packageJson.overrides['@rushstack/heft'] !== this.version) {
-      const node = this.getAstNodeFromFile(project.packageJson, 'overrides.@rushstack/heft');
-      this.addFindingWithPosition(findings, node);
+      this.addFinding(findings);
     }
   }
 }
