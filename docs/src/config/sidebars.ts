@@ -2862,6 +2862,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder archive',
+              id: 'cmd/spo/folder/folder-archive'
+            },
+            {
+              type: 'doc',
               label: 'folder copy',
               id: 'cmd/spo/folder/folder-copy'
             },

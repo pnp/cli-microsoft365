@@ -93,6 +93,7 @@ export default {
   FILE_VERSION_REMOVE: `${prefix} file version remove`,
   FILE_VERSION_RESTORE: `${prefix} file version restore`,
   FOLDER_ADD: `${prefix} folder add`,
+  FOLDER_ARCHIVE: `${prefix} folder archive`,
   FOLDER_COPY: `${prefix} folder copy`,
   FOLDER_GET: `${prefix} folder get`,
   FOLDER_LIST: `${prefix} folder list`,
