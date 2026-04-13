@@ -3,7 +3,7 @@
 import confirm from '@inquirer/confirm';
 import select from '@inquirer/select';
 import input from '@inquirer/input';
-import clipboardy from 'clipboardy';
+import * as clipboard from 'tinyclip';
 
 const RESOURCE_CHOICES = [
   { value: 'Azure Service Management', name: 'Azure Service Management' },
@@ -132,7 +132,7 @@ import TabItem from '@theme/TabItem';
   console.log(output + '\n');
   const copyOutput = await confirm({ message: 'Do you want to copy the output to the clipboard?', default: true });
   if (copyOutput) {
-    await clipboardy.write(output);
+    await clipboard.writeText(output);
     console.log('✅ Copied to clipboard!');
   }
 }

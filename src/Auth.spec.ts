@@ -1,7 +1,7 @@
 import { DeviceCodeResponse } from "@azure/msal-common";
 import * as msal from '@azure/msal-node';
 import assert from 'assert';
-import clipboard from 'clipboardy';
+import * as clipboard from 'tinyclip';
 import fs from 'fs';
 import 'node-forge';
 import sinon from 'sinon';
@@ -115,9 +115,9 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     }) as any);
     loggerSpy = sinon.spy(logger, 'log');
-    (auth as any)._clipboardy = clipboard;
+    (auth as any)._clipboard = clipboard;
     openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
-    clipboardStub = sinon.stub((auth as any)._clipboardy, 'writeSync').callsFake(() => 'clippy');
+    clipboardStub = sinon.stub((auth as any)._clipboard, 'writeText').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
     sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves(activeConnection);
     sinon.stub(auth as any, 'getAllConnectionsFromStorage').resolves([activeConnection]);

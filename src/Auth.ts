@@ -1,7 +1,7 @@
 import { AzureCloudInstance, DeviceCodeResponse } from '@azure/msal-common';
 import * as Msal from '@azure/msal-node';
 import assert from 'assert';
-import type clipboard from 'clipboardy';
+import type * as clipboard from 'tinyclip';
 import type NodeForge from 'node-forge';
 import type { AuthServer } from './AuthServer.js';
 import { CommandError } from './Command.js';
@@ -117,7 +117,7 @@ export enum CertificateType {
 }
 
 export class Auth {
-  private _clipboardy: typeof clipboard | undefined;
+  private _clipboard: typeof clipboard | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _connection: Connection;
@@ -467,15 +467,15 @@ export class Auth {
     }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {
-      // _clipboardy is never set before hitting this line, but this check
+      // _clipboard is never set before hitting this line, but this check
       // is implemented so that we can support lazy loading
       // but also stub it for testing
       /* c8 ignore next 3 */
-      if (!this._clipboardy) {
-        this._clipboardy = (await import('clipboardy')).default;
+      if (!this._clipboard) {
+        this._clipboard = await import('tinyclip');
       }
 
-      this._clipboardy.writeSync(response.userCode);
+      await this._clipboard.writeText(response.userCode);
     }
   }
 
