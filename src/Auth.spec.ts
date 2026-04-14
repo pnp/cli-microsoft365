@@ -115,9 +115,9 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     }) as any);
     loggerSpy = sinon.spy(logger, 'log');
-    (auth as any)._clipboard = clipboard;
+    (auth as any)._clipboardWriteText = clipboard.writeText;
     openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
-    clipboardStub = sinon.stub((auth as any)._clipboard, 'writeText').callsFake(() => 'clippy');
+    clipboardStub = sinon.stub(auth as any, '_clipboardWriteText').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
     sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves(activeConnection);
     sinon.stub(auth as any, 'getAllConnectionsFromStorage').resolves([activeConnection]);

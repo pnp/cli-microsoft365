@@ -117,7 +117,7 @@ export enum CertificateType {
 }
 
 export class Auth {
-  private _clipboard: typeof clipboard | undefined;
+  private _clipboardWriteText: typeof clipboard.writeText | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _connection: Connection;
@@ -467,15 +467,16 @@ export class Auth {
     }
 
     if (cli.getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {
-      // _clipboard is never set before hitting this line, but this check
+      // _clipboardWriteText is never set before hitting this line, but this check
       // is implemented so that we can support lazy loading
       // but also stub it for testing
       /* c8 ignore next 3 */
-      if (!this._clipboard) {
-        this._clipboard = await import('tinyclip');
+      if (!this._clipboardWriteText) {
+      	const _clipboard = await import('tinyclip');
+        this._clipboardWriteText = _clipboard.writeText;
       }
 
-      await this._clipboard.writeText(response.userCode);
+      await this._clipboardWriteText(response.userCode);
     }
   }
 
