@@ -2,7 +2,7 @@
   "extension": ["ts"],
   "spec": "dist/**/*.spec.js",
   "reporter": "scripts/ci-test-summary.cjs",
-  "require": "source-map-support/register",
+  "require": "./test-loader.cjs",
   "watch": "dist/**/*.js",
   "timeout": 10000,
   "logpanel": true
