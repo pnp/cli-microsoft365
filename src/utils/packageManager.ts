@@ -66,9 +66,11 @@ export const packageManager = {
   }): string[] {
     const commandsToExecute: string[] = [];
 
-    // uninstall commands must come first otherwise there is a chance that
-    // whatever we recommended to install, will be immediately uninstalled
-    // overrides should be executed before install/uninstall to ensure that the correct version is installed in case the override is added/removed for a package that is being updated/installed/uninstalled
+    // override commands must come first to ensure that install/uninstall operations
+    // use the correct package version when an override is added or removed for a
+    // package that is being updated, installed, or uninstalled
+    // uninstall commands must come before install commands otherwise there is a
+    // chance that whatever we recommended to install will be immediately uninstalled
     if (packagesOverrideRemove.length > 0) {
       commandsToExecute.push(`${packageManager.getPackageManagerCommand('removeOverride', packageMgr)} ${packagesOverrideRemove.join(' ')}`);
     }
