@@ -158,6 +158,16 @@ describe(commands.WEB_ALERT_LIST, () => {
     assert.strictEqual(command.name, commands.WEB_ALERT_LIST);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.WEB_RULE_LIST) > -1), true);
+  });
+
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });

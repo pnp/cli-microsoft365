@@ -375,5 +375,7 @@ export default {
   WEB_ROLEASSIGNMENT_ADD: `${prefix} web roleassignment add`,
   WEB_ROLEINHERITANCE_BREAK: `${prefix} web roleinheritance break`,
   WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
+  WEB_RULE_LIST: `${prefix} web rule list`,
+  WEB_RULE_REMOVE: `${prefix} web rule remove`,
   WEB_SET: `${prefix} web set`
 };
