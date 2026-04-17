@@ -40,6 +40,10 @@ class SpoWebAlertListCommand extends SpoCommand {
     return 'Lists all SharePoint list alerts';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.WEB_RULE_LIST];
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['ID', 'Title', 'UserPrincipalName'];
   }

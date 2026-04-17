@@ -33,6 +33,10 @@ class SpoWebAlertRemoveCommand extends SpoCommand {
     return 'Removes an alert from a SharePoint list';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.WEB_RULE_REMOVE];
+  }
+
   public get schema(): z.ZodTypeAny | undefined {
     return options;
   }
