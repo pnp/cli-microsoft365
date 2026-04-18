@@ -45,7 +45,7 @@ class DevDepRule2 extends DependencyRule {
 
 class OverrideDepRule extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.0', false, false, true, true);
+    super({ packageName: 'test-package', packageVersion: '1.0.0', isOverride: true });
   }
 
   get id(): string {
@@ -55,7 +55,7 @@ class OverrideDepRule extends DependencyRule {
 
 class OverrideRemoveDepRule extends DependencyRule {
   constructor() {
-    super('test-package', '1.0.0', false, false, false, true);
+    super({ packageName: 'test-package', packageVersion: '1.0.0', add: false, isOverride: true });
   }
 
   get id(): string {
