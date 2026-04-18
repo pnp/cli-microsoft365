@@ -57,14 +57,7 @@ class VivaEngageCommunityUserRemoveCommand extends GraphCommand {
           options: ['communityId', 'communityDisplayName', 'entraGroupId']
         }
       })
-      .refine(options => options.id || options.userName, {
-        error: 'Specify either of id or userName.',
-        params: {
-          customCode: 'optionSet',
-          options: ['id', 'userName']
-        }
-      })
-      .refine(options => typeof options.userName !== 'undefined' || typeof options.id !== 'undefined', {
+      .refine(options => [options.id, options.userName].filter(o => o !== undefined).length === 1, {
         error: 'Specify either id or userName, but not both.',
         params: {
           customCode: 'optionSet',

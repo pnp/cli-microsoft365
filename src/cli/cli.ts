@@ -234,6 +234,8 @@ async function execute(rawArgs: string[]): Promise<void> {
           for (const error of optionSetErrors) {
             await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
           }
+
+          continue;
         }
       }
     }
