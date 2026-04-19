@@ -3,7 +3,7 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 import { FN027001_OVERRIDES_rushstack_heft } from './FN027001_OVERRIDES_rushstack_heft.js';
 
-describe('FN021009_PKG_overrides_rushstack_heft', () => {
+describe('FN027001_OVERRIDES_rushstack_heft', () => {
   let findings: Finding[];
   let rule: FN027001_OVERRIDES_rushstack_heft;
 
