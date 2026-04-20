@@ -4341,6 +4341,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'web alert get',
+              id: 'cmd/spo/web/web-alert-get'
+            },
+            {
+              type: 'doc',
               label: 'web clientsidewebpart list',
               id: 'cmd/spo/web/web-clientsidewebpart-list'
             },
