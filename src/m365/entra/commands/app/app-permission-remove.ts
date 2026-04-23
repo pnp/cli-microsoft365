@@ -162,11 +162,7 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
           this.removePermissionsFromResourceArray(applicationPermissions, entraApp.requiredResourceAccess!);
         }
 
-        for (let i = 0; i < entraApp.requiredResourceAccess!.length; i++) {
-          if (entraApp.requiredResourceAccess![i].resourceAccess?.length === 0) {
-            entraApp.requiredResourceAccess!.splice(i, 1);
-          }
-        }
+        entraApp.requiredResourceAccess = entraApp.requiredResourceAccess!.filter(requiredResourceAccess => requiredResourceAccess.resourceAccess?.length !== 0);
 
         const removePermissionRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/applications/${entraApp.id}`,

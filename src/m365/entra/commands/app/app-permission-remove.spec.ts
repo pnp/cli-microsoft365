@@ -377,6 +377,77 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert(patchStub.calledOnce);
   });
 
+  it('submits empty array when removing last delegated permissions from multiple resources', async () => {
+    const azureManagementAppId = '797f4846-ba00-4fd7-ba43-dac1f8f63013';
+    const azureManagementServicePrincipalId = '1a76348f-5c28-42f1-8e12-95331f4f0876';
+    const azureManagementScopeId = '41094075-9dad-400e-a0bd-54e686782033';
+    const powerAutomateAppId = '7df0a125-d3be-4c96-aa54-591f83ff541c';
+    const powerAutomateServicePrincipalId = '3dd5a6d8-e5b4-4f67-8618-082e7c76b6a0';
+    const powerAutomateScopeId = 'f9219cc8-93bb-4dc2-94bd-c25600f25b0d';
+
+    const appWithMultipleResources: Application = {
+      id: appObjectId,
+      appId: appId,
+      requiredResourceAccess: [
+        {
+          resourceAppId: azureManagementAppId,
+          resourceAccess: [{ id: azureManagementScopeId, type: 'Scope' }]
+        },
+        {
+          resourceAppId: powerAutomateAppId,
+          resourceAccess: [{ id: powerAutomateScopeId, type: 'Scope' }]
+        },
+        {
+          resourceAppId: '00000003-0000-0000-c000-000000000000',
+          resourceAccess: [{ id: 'e4aa47b9-9a69-4109-82ed-36ec70d85ff1', type: 'Scope' }]
+        }
+      ]
+    };
+
+    const servicePrincipalsWithMultipleResources: ServicePrincipal[] = [
+      {
+        appId: azureManagementAppId,
+        id: azureManagementServicePrincipalId,
+        servicePrincipalNames: ['https://management.azure.com/'],
+        oauth2PermissionScopes: [{ id: azureManagementScopeId, value: 'user_impersonation' }]
+      },
+      {
+        appId: powerAutomateAppId,
+        id: powerAutomateServicePrincipalId,
+        servicePrincipalNames: ['https://service.flow.microsoft.com/'],
+        oauth2PermissionScopes: [{ id: powerAutomateScopeId, value: 'Flows.Read.All' }]
+      },
+      {
+        appId: '00000003-0000-0000-c000-000000000000',
+        id: 'fb4be1df-eaa6-4bd0-a068-71f9b2cbe2be',
+        servicePrincipalNames: ['https://graph.microsoft.com/'],
+        oauth2PermissionScopes: [{ id: 'e4aa47b9-9a69-4109-82ed-36ec70d85ff1', value: 'Agreement.Read.All' }]
+      }
+    ];
+
+    sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves(appWithMultipleResources);
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames':
+          return servicePrincipalsWithMultipleResources;
+        default:
+          throw 'Invalid request';
+      }
+    });
+
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/${appObjectId}` &&
+        opts.data.requiredResourceAccess.length === 0) {
+        return;
+      }
+
+      throw 'Invalid request. Expected empty requiredResourceAccess array';
+    });
+
+    await command.action(logger, { options: { appId: appId, delegatedPermissions: 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All', force: true, verbose: true } });
+    assert(patchStub.calledOnce);
+  });
+
   it('submits empty array when removing last application permission', async () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').resolves({ id: appObjectId, appId: appId, requiredResourceAccess: [{ resourceAppId: "00000003-0000-0000-c000-000000000000", resourceAccess: [{ id: "741f803b-c850-494e-b5df-cde7c675a1ca", type: "Role" }] }] });
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
