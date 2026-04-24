@@ -23,7 +23,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v6
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -89,7 +89,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v6
+        uses: actions/cache@v5
         with:
           path: |
             **/node_modules
@@ -100,7 +100,7 @@ jobs:
       - name: Cache .eslintcache
         if: matrix.nodeRun == matrix.nodeBuild
         id: eslintcache
-        uses: actions/cache@v6
+        uses: actions/cache@v5
         with:
           path: |
             .eslintcache
@@ -141,7 +141,7 @@ jobs:
 
       - name: Cache node modules
         id: cache
-        uses: actions/cache@v6
+        uses: actions/cache@v5
         with:
           path: |
             **/docs/node_modules
