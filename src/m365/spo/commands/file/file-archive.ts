@@ -75,11 +75,10 @@ class SpoFileArchiveCommand extends SpoCommand {
         const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
         requestUrl += `/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
-
-      const queryString: string = '?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields';
+      requestUrl += '?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields';
 
       const fileInfo = await request.get<{ ListId: string; ListItemAllFields: { Id: number } }>({
-        url: requestUrl + queryString,
+        url: requestUrl,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
