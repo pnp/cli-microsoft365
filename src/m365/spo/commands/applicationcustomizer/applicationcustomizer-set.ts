@@ -157,7 +157,9 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
       await logger.logToStderr(`Updating application customizer with ID '${appCustomizer.Id}' on the site '${webUrl}'...`);
     }
 
-    const requestBody: any = {};
+    const requestBody: any = {
+      HostProperties: hostProperties
+    };
 
     if (newTitle) {
       requestBody.Title = newTitle;
@@ -170,8 +172,6 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
     if (clientSideComponentProperties !== undefined) {
       requestBody.ClientSideComponentProperties = clientSideComponentProperties;
     }
-
-    requestBody.HostProperties = hostProperties;
 
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,

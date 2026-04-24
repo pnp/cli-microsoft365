@@ -127,14 +127,13 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       Name: args.options.title,
       Description: args.options.description,
       Location: 'ClientSideExtension.ApplicationCustomizer',
-      ClientSideComponentId: args.options.clientSideComponentId
+      ClientSideComponentId: args.options.clientSideComponentId,
+      HostProperties: args.options.hostProperties || ''
     };
 
     if (args.options.clientSideComponentProperties) {
       requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
     }
-
-    requestBody.HostProperties = args.options.hostProperties || '';
 
     const scope = args.options.scope || 'Site';
 
