@@ -206,7 +206,7 @@ jobs:
         with:
           name: build-ubuntu-latest-${{ env.NODE_VERSION }}
           path: build.tar
-          overwrite: true
+          overwrite: 
   deploy_docs:
     if: github.repository_owner == 'pnp'
     needs: publish_next
@@ -258,14 +258,14 @@ jobs:
       - name: Build and push ${{ steps.package_version.outputs.version }}
         uses: docker/build-push-action@v7
         with:
-          push: true
+          push: 
           tags: m365pnp/cli-microsoft365:${{ steps.package_version.outputs.version }}
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
       - name: Build and push next
         uses: docker/build-push-action@v7
         with:
-          push: true
+          push: 
           tags: m365pnp/cli-microsoft365:next
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
