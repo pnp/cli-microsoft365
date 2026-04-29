@@ -55,7 +55,7 @@ class SpoFileUnarchiveCommand extends SpoCommand {
     const { webUrl, url, id, force, verbose } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to unarchive the file ${url || id} at site ${webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `This item is archived. Reactivation could take up to 24 hours. Are you sure you would like to unarchive this item?` });
       if (!result) {
         return;
       }
@@ -63,36 +63,30 @@ class SpoFileUnarchiveCommand extends SpoCommand {
 
     try {
       if (verbose) {
-        await logger.logToStderr(`Unarchiving file ${url || id} at site ${webUrl}...`);
+        await logger.logToStderr(`Unarchiving file '${url || id}' at site '${webUrl}'...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl: string = `${webUrl}/_api/web`;
 
       if (id) {
-        requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+        requestUrl += `/GetFileById('${formatting.encodeQueryParameter(id)}')`;
       }
       else if (url) {
-        requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)`;
-      }
-
-      let queryString: string = '?$select=ListId&$expand=ListItemAllFields';
-
-      if (url) {
         const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
-        queryString += `&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+        requestUrl += `/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
+      requestUrl += '?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields';
 
       const fileInfo = await request.get<{ ListId: string; ListItemAllFields: { Id: number } }>({
-        url: requestUrl + queryString,
+        url: requestUrl,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       });
 
-      const unarchiveUrl = `${webUrl}/_api/Lists(guid'${fileInfo.ListId}')/items(${fileInfo.ListItemAllFields.Id})/UnArchive`;
       const requestOptions: CliRequestOptions = {
-        url: unarchiveUrl,
+        url: `${webUrl}/_api/Lists(guid'${fileInfo.ListId}')/items(${fileInfo.ListItemAllFields.Id})/UnArchive`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },

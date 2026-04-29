@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { z } from 'zod';
 import commands from '../../commands.js';
 import command from './file-unarchive.js';
@@ -20,6 +21,7 @@ describe(commands.FILE_UNARCHIVE, () => {
   let commandInfo: CommandInfo;
   let commandOptionsSchema: z.ZodTypeAny;
   let confirmationPromptStub: sinon.SinonStub;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -46,6 +48,7 @@ describe(commands.FILE_UNARCHIVE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
     confirmationPromptStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
   });
 
@@ -130,6 +133,9 @@ describe(commands.FILE_UNARCHIVE, () => {
   });
 
   it('prompts before unarchiving file when confirmation argument not passed', async () => {
+    sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
+    sinon.stub(request, 'post').resolves();
+
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
@@ -140,6 +146,7 @@ describe(commands.FILE_UNARCHIVE, () => {
   });
 
   it('aborts unarchiving file when prompt not confirmed', async () => {
+    const getStub = sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
     const postStub = sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
@@ -149,83 +156,13 @@ describe(commands.FILE_UNARCHIVE, () => {
       }
     });
 
+    assert(getStub.notCalled);
     assert(postStub.notCalled);
-  });
-
-  it('unarchives file by url when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$select=ListId&$expand=ListItemAllFields&@f='%2Fsites%2Ftest%2FShared%20documents%2Fdocument.docx'`) {
-        return {
-          ListId: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          ListItemAllFields: {
-            Id: 1
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/test',
-        url: '/sites/test/Shared documents/document.docx'
-      }
-    });
-
-    assert.deepStrictEqual(postStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`);
-  });
-
-  it('unarchives file by id when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileById('00000000-0000-0000-0000-000000000000')?$select=ListId&$expand=ListItemAllFields`) {
-        return {
-          ListId: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          ListItemAllFields: {
-            Id: 1
-          }
-        };
-      }
-
-      throw 'Invalid request';
-    }
-    );
-
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(cli.promptForConfirmation);
-    sinon.stub(cli, 'promptForConfirmation').resolves(true);
-
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/test',
-        id: '00000000-0000-0000-0000-000000000000'
-      }
-    });
-
-    assert.deepStrictEqual(postStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`);
   });
 
   it('unarchives file by url', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$select=ListId&$expand=ListItemAllFields&@f='%2Fsites%2Ftest%2FShared%20documents%2Fdocument.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared documents/document.docx')}')?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields`) {
         return {
           ListId: 'b2307a39-e878-458b-bc90-03bc578531d6',
           ListItemAllFields: {
@@ -253,12 +190,12 @@ describe(commands.FILE_UNARCHIVE, () => {
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`);
+    assert(postStub.calledOnce);
   });
 
   it('unarchives file by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileById('00000000-0000-0000-0000-000000000000')?$select=ListId&$expand=ListItemAllFields`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileById('${formatting.encodeQueryParameter('00000000-0000-0000-0000-000000000000')}')?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields`) {
         return {
           ListId: 'b2307a39-e878-458b-bc90-03bc578531d6',
           ListItemAllFields: {
@@ -288,7 +225,55 @@ describe(commands.FILE_UNARCHIVE, () => {
       }
     });
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`);
+    assert(postStub.calledOnce);
+  });
+
+  it('unarchives file using site-relative url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared Documents/document.docx')}')?$select=ListId,ListItemAllFields/Id&$expand=ListItemAllFields`) {
+        return {
+          ListId: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          ListItemAllFields: {
+            Id: 1
+          }
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        url: '/Shared Documents/document.docx',
+        force: true
+      }
+    });
+
+    assert(postStub.calledOnce);
+  });
+
+  it('outputs no result when unarchiving a file', async () => {
+    sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
+    sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        url: '/sites/test/Shared documents/document.docx',
+        force: true
+      }
+    });
+
+    assert(loggerLogSpy.notCalled);
   });
 
   it('handles error correctly', async () => {

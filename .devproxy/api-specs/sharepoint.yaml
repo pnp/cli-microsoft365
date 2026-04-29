@@ -246,6 +246,30 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web/GetFileById({fileId}):
+    get:
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          description: file unique ID
+          schema:
+            type: string
+          example: "'7a8c9207-7745-4cda-b0e2-be2618ee3030'"
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/web/GetFileById({fileId})/versions:
     get:
       parameters:
