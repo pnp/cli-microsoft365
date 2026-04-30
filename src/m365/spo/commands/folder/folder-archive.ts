@@ -47,11 +47,15 @@ class SpoFolderArchiveCommand extends SpoCommand {
       });
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { webUrl, url, id, force, verbose } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to archive the folder ${url || id} at site ${webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you would like to archive this item? You will be able to reactivate it instantly for the first 7 days. After that, it will take up to 24 hours to reactivate.` });
       if (!result) {
         return;
       }
@@ -63,27 +67,26 @@ class SpoFolderArchiveCommand extends SpoCommand {
       }
 
       let requestUrl: string = `${webUrl}/_api/web`;
+
       if (id) {
         requestUrl += `/GetFolderById('${formatting.encodeQueryParameter(id)}')`;
       }
       else if (url) {
         const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
-        requestUrl += `/GetFolderByServerRelativePath(DecodedUrl='${serverRelativePath}')`;
+        requestUrl += `/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
-
-      const queryString: string = '?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList';
+      requestUrl += '?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList';
 
       const folderInfo = await request.get<{ ListItemAllFields: { Id: number; ParentList: { Id: string } } }>({
-        url: requestUrl + queryString,
+        url: requestUrl,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       });
 
-      const archiveUrl = `${webUrl}/_api/Lists(guid'${folderInfo.ListItemAllFields.ParentList.Id}')/items(${folderInfo.ListItemAllFields.Id})/Archive`;
       const requestOptions: CliRequestOptions = {
-        url: archiveUrl,
+        url: `${webUrl}/_api/Lists(guid'${folderInfo.ListItemAllFields.ParentList.Id}')/items(${folderInfo.ListItemAllFields.Id})/Archive`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },

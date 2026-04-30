@@ -310,6 +310,30 @@ paths:
       responses:
         200:
           description: OK
+  /_api/web/GetFolderById({folderId}):
+    get:
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          description: folder unique ID
+          schema:
+            type: string
+          example: "'b2307a39-e878-458b-bc90-03bc578531d6'"
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/web/GetFolderByServerRelativePath(DecodedUrl={folderPath}):
     get:
       parameters:
@@ -326,6 +350,11 @@ paths:
           - AllSites.Write
           - AllSites.Manage
           - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
       responses:
         200:
           description: OK
