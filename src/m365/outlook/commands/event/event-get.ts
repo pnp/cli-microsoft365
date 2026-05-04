@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { calendar } from '../../../../utils/calendar.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -46,7 +47,7 @@ class OutlookEventGetCommand extends GraphCommand {
       .refine(options => [options.userId, options.userName].filter(x => x !== undefined).length === 1, {
         error: 'Specify either userId or userName, but not both'
       })
-      .refine(options => !(options.calendarId && options.calendarName), {
+      .refine(options => [options.calendarId, options.calendarName].filter(x => x !== undefined).length === 1, {
         error: 'Specify either calendarId or calendarName, but not both.'
       });
   }
@@ -62,7 +63,7 @@ class OutlookEventGetCommand extends GraphCommand {
       calendarId = (await calendar.getUserCalendarByName(userIdentifier!, args.options.calendarName))!.id;
     }
 
-    let requestUrl = `${this.resource}/v1.0/users/${userIdentifier}/calendars/${calendarId}/events/${args.options.id}`;
+    const requestUrl = `${this.resource}/v1.0/users('${formatting.encodeQueryParameter(userIdentifier!)}')/calendars/${calendarId}/events/${args.options.id}`;
 
     const requestOptions: CliRequestOptions = {
       url: requestUrl,

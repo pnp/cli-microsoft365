@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command, { options } from './event-get.js';
 import { calendar } from '../../../../utils/calendar.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.EVENT_GET, () => {
   const id = "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAADMN-7V4K8g0q_adetip1DygcAxMBBaLl1lk_dAn8KkjfXKQAAAgENAAAAxMBBaLl1lk_dAn8KkjfXKQAGMVCCQQAAAA==";
@@ -209,7 +210,7 @@ describe(commands.EVENT_GET, () => {
 
   it('retrieves event by id for the user specified with userId and calendarId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/calendars/${calendarId}/events/${id}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/calendars/${calendarId}/events/${id}`) {
         return eventResponse;
       }
 
@@ -231,7 +232,7 @@ describe(commands.EVENT_GET, () => {
     sinon.stub(calendar, 'getUserCalendarByName').resolves({ id: calendarId });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/calendars/${calendarId}/events/${id}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/calendars/${calendarId}/events/${id}`) {
         return eventResponse;
       }
 
