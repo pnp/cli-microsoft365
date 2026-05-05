@@ -1,0 +1,91 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# outlook calendargroup remove
+
+Removes a calendar group.
+
+## Usage
+
+```sh
+m365 outlook calendargroup remove [options]
+```
+
+## Options
+
+```md definition-list
+`--id [id]`
+: ID of the calendar group to remove. Specify either `id` or `name`, but not both.
+
+`--name [name]`
+: Name of the calendar group to remove. Specify either `id` or `name`, but not both.
+
+`--userId [userId]`
+: ID of the user. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+
+`--userName [userName]`
+: UPN of the user. Specify either `userId` or `userName`, but not both. This option is required when using application permissions.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | Calendars.ReadWrite  |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | Calendars.ReadWrite  |
+
+  </TabItem>
+</Tabs>
+
+## Remarks
+
+:::warning
+
+The calendar group must be empty before it can be removed. Make sure to delete all calendars in the group first.
+
+:::
+
+## Examples
+
+Remove a calendar group specified by id for the signed-in user.
+
+```sh
+m365 outlook calendargroup remove --id "AAMkAGE0MGM1Y2M5LWEzMmUtNGVlNy05MjRlLTk0YmYyY2I5NTM3ZAAuAAAAAAC_0WfqSjt_SqLtNkuO-bj1AQAbfYq5lmBxQ6a4t1fGbeYAAAAAAEOAAA="
+```
+
+Remove a calendar group specified by name for the signed-in user.
+
+```sh
+m365 outlook calendargroup remove --name "Personal Events"
+```
+
+Remove a calendar group specified by id for a user specified by id.
+
+```sh
+m365 outlook calendargroup remove --id "AAMkADIxYjJiYm" --userId "44288f7d-7710-4293-8c8e-36f310ed2e6a"
+```
+
+Remove a calendar group specified by name for a user specified by UPN without prompting for confirmation.
+
+```sh
+m365 outlook calendargroup remove --name "Personal Events" --userName "john.doe@contoso.com" --force
+```
+
+## Response
+
+The command won't return a response on success.
