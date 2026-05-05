@@ -137,7 +137,7 @@ describe(commands.FOLDER_ARCHIVE, () => {
   });
 
   it('prompts before archiving folder when confirmation argument not passed', async () => {
-    sinon.stub(request, 'get').resolves({ ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
+    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
     sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
@@ -150,7 +150,7 @@ describe(commands.FOLDER_ARCHIVE, () => {
   });
 
   it('aborts archiving folder when prompt not confirmed', async () => {
-    const getStub = sinon.stub(request, 'get').resolves({ ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
+    const getStub = sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
     const postStub = sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
@@ -166,8 +166,9 @@ describe(commands.FOLDER_ARCHIVE, () => {
 
   it('archives folder by url', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared documents/folder')}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared documents/folder')}')?$select=Exists,ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
         return {
+          Exists: true,
           ListItemAllFields: {
             Id: 1,
             ParentList: {
@@ -201,8 +202,9 @@ describe(commands.FOLDER_ARCHIVE, () => {
 
   it('archives folder by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderById('${formatting.encodeQueryParameter('00000000-0000-0000-0000-000000000000')}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderById('${formatting.encodeQueryParameter('00000000-0000-0000-0000-000000000000')}')?$select=Exists,ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
         return {
+          Exists: true,
           ListItemAllFields: {
             Id: 1,
             ParentList: {
@@ -237,8 +239,9 @@ describe(commands.FOLDER_ARCHIVE, () => {
 
   it('archives folder using site-relative url', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared Documents/folder')}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared Documents/folder')}')?$select=Exists,ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
         return {
+          Exists: true,
           ListItemAllFields: {
             Id: 1,
             ParentList: {
@@ -271,7 +274,7 @@ describe(commands.FOLDER_ARCHIVE, () => {
   });
 
   it('outputs no result when archiving a folder', async () => {
-    sinon.stub(request, 'get').resolves({ ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
+    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
     sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
@@ -283,6 +286,54 @@ describe(commands.FOLDER_ARCHIVE, () => {
     });
 
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('throws an error when trying to archive the root folder of a document library by url', async () => {
+    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: {} });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        url: '/Shared Documents',
+        force: true
+      }
+    }), new CommandError(`The folder '/Shared Documents' is the root folder of a document library and cannot be archived. Archive a subfolder instead.`));
+  });
+
+  it('throws an error when trying to archive the root folder of a document library by id', async () => {
+    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: {} });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        id: '00000000-0000-0000-0000-000000000000',
+        force: true
+      }
+    }), new CommandError(`The folder '00000000-0000-0000-0000-000000000000' is the root folder of a document library and cannot be archived. Archive a subfolder instead.`));
+  });
+
+  it('throws an error when the folder does not exist by url', async () => {
+    sinon.stub(request, 'get').resolves({});
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        url: '/Shared Documents/temp1',
+        force: true
+      }
+    }), new CommandError(`The folder '/Shared Documents/temp1' does not exist.`));
+  });
+
+  it('throws an error when the folder does not exist by id', async () => {
+    sinon.stub(request, 'get').resolves({});
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/test',
+        id: '00000000-0000-0000-0000-000000000000',
+        force: true
+      }
+    }), new CommandError(`The folder '00000000-0000-0000-0000-000000000000' does not exist.`));
   });
 
   it('handles error correctly', async () => {

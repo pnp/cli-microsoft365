@@ -52,7 +52,7 @@ class SpoFolderArchiveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const { webUrl, url, id, force, verbose } = args.options;
+    const { webUrl, url, id, force } = args.options;
 
     if (!force) {
       const result = await cli.promptForConfirmation({ message: `Are you sure you would like to archive this item? You will be able to reactivate it instantly for the first 7 days. After that, it will take up to 24 hours to reactivate.` });
@@ -62,7 +62,7 @@ class SpoFolderArchiveCommand extends SpoCommand {
     }
 
     try {
-      if (verbose) {
+      if (this.verbose) {
         await logger.logToStderr(`Archiving folder ${url || id} at site ${webUrl}...`);
       }
 
@@ -75,15 +75,23 @@ class SpoFolderArchiveCommand extends SpoCommand {
         const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
         requestUrl += `/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
-      requestUrl += '?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList';
+      requestUrl += '?$select=Exists,ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList';
 
-      const folderInfo = await request.get<{ ListItemAllFields: { Id: number; ParentList: { Id: string } } }>({
+      const folderInfo = await request.get<{ Exists?: boolean; ListItemAllFields?: { Id: number; ParentList: { Id: string } } }>({
         url: requestUrl,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       });
+
+      if (!folderInfo.Exists) {
+        throw `The folder '${url || id}' does not exist.`;
+      }
+
+      if (!folderInfo.ListItemAllFields?.ParentList) {
+        throw `The folder '${url || id}' is the root folder of a document library and cannot be archived. Archive a subfolder instead.`;
+      }
 
       const requestOptions: CliRequestOptions = {
         url: `${webUrl}/_api/Lists(guid'${folderInfo.ListItemAllFields.ParentList.Id}')/items(${folderInfo.ListItemAllFields.Id})/Archive`,
