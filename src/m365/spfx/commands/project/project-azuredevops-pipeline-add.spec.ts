@@ -69,7 +69,13 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
         return true;
       }
 
@@ -79,6 +85,9 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake((fakePath, options) => {
       if (fakePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
       throw `Invalid path: ${fakePath}`;
@@ -135,7 +144,13 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
   it('creates a default workflow (debug)', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
@@ -148,6 +163,9 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
       throw `Invalid path: ${filePath}`;
@@ -168,12 +186,21 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
@@ -198,12 +225,21 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
@@ -228,12 +264,21 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
-      if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {

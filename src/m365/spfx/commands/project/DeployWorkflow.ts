@@ -19,11 +19,11 @@ export const workflow: GitHubWorkflow = {
       steps: [
         {
           name: "Checkout",
-          uses: "actions/checkout@v4"
+          uses: "actions/checkout@v6"
         },
         {
           name: "Use Node.js",
-          uses: "actions/setup-node@v4",
+          uses: "actions/setup-node@v6",
           with: {
             "node-version": "${{ env.NodeVersion }}"
           }
@@ -38,7 +38,7 @@ export const workflow: GitHubWorkflow = {
         },
         {
           name: "CLI for Microsoft 365 Login",
-          uses: "pnp/action-cli-login@v2.2.4",
+          uses: "pnp/action-cli-login@v4",
           with: {
             "CERTIFICATE_ENCODED": "${{ secrets.CERTIFICATE_ENCODED }}",
             "CERTIFICATE_PASSWORD": "${{ secrets.CERTIFICATE_PASSWORD }}",
@@ -48,9 +48,9 @@ export const workflow: GitHubWorkflow = {
         },
         {
           name: "CLI for Microsoft 365 Deploy App",
-          uses: "pnp/action-cli-deploy@v4.0.0",
+          uses: "pnp/action-cli-deploy@v6",
           with: {
-            "APP_FILE_PATH": "sharepoint/solution/{{ solutionName }}.sppkg",
+            "APP_FILE_PATH": "sharepoint/{{ sppkgPath }}",
             "SKIP_FEATURE_DEPLOYMENT": false,
             "OVERWRITE": true
           }
@@ -107,6 +107,10 @@ export const pipeline: AzureDevOpsPipeline = {
     },
     {
       name: "PackageName",
+      value: ""
+    },
+    {
+      name: "SppkgPath",
       value: ""
     },
     {

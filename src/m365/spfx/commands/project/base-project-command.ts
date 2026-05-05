@@ -152,7 +152,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     return undefined;
   }
 
-  private readAndParseJsonFile(filePath: string, project: Project, keyPath: string): Project {
+  protected readAndParseJsonFile(filePath: string, project: Project, keyPath: string): Project {
     if (fs.existsSync(filePath)) {
       try {
         const source = formatting.removeSingleLineComments(fs.readFileSync(filePath, 'utf-8'));

@@ -107,6 +107,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
         return true;
       }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
 
       throw `Invalid path: ${fakePath}`;
     });
@@ -114,6 +120,9 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
       throw `Invalid path: ${filePath}`;
@@ -134,6 +143,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
         return true;
       }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
 
       return false;
     });
@@ -141,6 +156,9 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
       throw `Invalid path: ${filePath}`;
@@ -169,6 +187,9 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
@@ -178,6 +199,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
         return true;
       }
 
@@ -199,6 +226,9 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
@@ -208,6 +238,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
         return true;
       }
 
@@ -228,6 +264,9 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
         return '{"name": "test"}';
       }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
 
       throw `Invalid path: ${filePath}`;
     });
@@ -237,6 +276,12 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
         return true;
       }
       else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
         return true;
       }
 
