@@ -10,6 +10,7 @@ import commands from '../../commands.js';
 import { workflow } from './DeployWorkflow.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import { GitHubWorkflow, GitHubWorkflowStep } from './project-github-workflow-model.js';
+import { Project } from './project-model/index.js';
 import { versions } from '../SpfxCompatibilityMatrix.js';
 import { spfx } from '../../../../utils/spfx.js';
 
@@ -122,16 +123,19 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       throw new CommandError(`Couldn't find project root folder`, SpfxProjectGithubWorkflowAddCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
-    const solutionPackageJsonFile: string = path.join(this.projectRootPath, 'package.json');
-    const packageJson: string = fs.readFileSync(solutionPackageJsonFile, 'utf-8');
-    const solutionName = JSON.parse(packageJson).name;
-
-    if (this.debug) {
-      await logger.logToStderr(`Adding GitHub workflow in the current SPFx project`);
-    }
-
     try {
-      this.updateWorkflow(solutionName, workflow, args.options);
+      const project: Project = { path: this.projectRootPath };
+      this.readAndParseJsonFile(path.join(this.projectRootPath, 'package.json'), project, 'packageJson');
+      this.readAndParseJsonFile(path.join(this.projectRootPath, 'config', 'package-solution.json'), project, 'packageSolutionJson');
+
+      const solutionName = project.packageJson!.name!;
+      const sppkgPath = (project.packageSolutionJson as any)?.paths?.zippedPackage;
+
+      if (this.debug) {
+        await logger.logToStderr(`Adding GitHub workflow in the current SPFx project`);
+      }
+
+      this.updateWorkflow(solutionName, sppkgPath, workflow, args.options);
       this.saveWorkflow(workflow);
     }
     catch (error: any) {
@@ -150,7 +154,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     fs.writeFileSync(path.resolve(workflowFile), yaml.stringify(workflow), 'utf-8');
   }
 
-  private updateWorkflow(solutionName: string, workflow: GitHubWorkflow, options: GlobalOptions): void {
+  private updateWorkflow(solutionName: string, sppkgPath: string | undefined, workflow: GitHubWorkflow, options: GlobalOptions): void {
     workflow.name = options.name ? options.name : workflow.name.replace('{{ name }}', solutionName);
 
     if (options.branchName) {
@@ -196,9 +200,9 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       deployAction.with!.SITE_COLLECTION_URL = options.siteUrl;
     }
 
-    if (solutionName) {
+    if (sppkgPath) {
       const deployAction = this.getDeployAction(workflow);
-      deployAction.with!.APP_FILE_PATH = deployAction.with!.APP_FILE_PATH!.replace('{{ solutionName }}', solutionName);
+      deployAction.with!.APP_FILE_PATH = deployAction.with!.APP_FILE_PATH!.replace('{{ sppkgPath }}', sppkgPath);
     }
   }
 
