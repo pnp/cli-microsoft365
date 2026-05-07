@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import LightCodeTheme from './src/config/lightCodeTheme';
 import DarkCodeTheme from './src/config/darkCodeTheme';
 import definitionList from './src/remark/definitionLists';
+import commandPlayer from './src/remark/commandPlayer';
 
 const hasStableVersion = existsSync('versions.json');
 const stableVersion = hasStableVersion
@@ -77,7 +78,7 @@ const config: Config = {
           editUrl: ({ docPath }) =>
             `https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/${docPath}`,
           showLastUpdateTime: true,
-          remarkPlugins: [definitionList],
+          remarkPlugins: [definitionList, commandPlayer],
           ...hasStableVersion && {
             lastVersion: stableVersion,
             versions: {
@@ -95,7 +96,7 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          customCss: ['./src/scss/Global.module.scss']
+          customCss: ['./src/scss/Global.module.scss', './src/scss/CommandPlayer.module.scss']
         },
         gtag: {
           trackingID: 'G-DH3T88LK5K',

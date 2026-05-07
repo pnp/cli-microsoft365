@@ -3,8 +3,7 @@ title: Log in to Microsoft 365
 sidebar_position: 3
 ---
 
-import AsciinemaPlayer from '@site/src/components/AsciinemaPlayer';
-import 'asciinema-player/dist/bundle/asciinema-player.css';
+import CommandPlayer from '@site/src/components/CommandPlayer';
 
 # Log in to Microsoft 365
 
@@ -188,7 +187,7 @@ If you're logged in to Microsoft 365 using a certificate, the `status` command w
 
 To log out from Microsoft 365, use the `logout` command. Executing the `logout` command removes all connection information such as user name, refresh or access tokens stored on your computer.
 
-<AsciinemaPlayer src="/casts/logout.cast" rows={15} idleTimeLimit={3} preload={true} loop autoplay/>
+<CommandPlayer command="m365 logout" response='Logged out from Microsoft 365' />
 
 ### Working with SharePoint Online
 

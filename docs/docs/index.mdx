@@ -1,11 +1,16 @@
-import AsciinemaPlayer from '@site/src/components/AsciinemaPlayer';
-import 'asciinema-player/dist/bundle/asciinema-player.css';
+import CommandPlayer from '@site/src/components/CommandPlayer';
 
 # CLI for Microsoft 365
 
 Using the CLI for Microsoft 365, you can manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the CLI for Microsoft 365 you can configure Microsoft 365, manage SharePoint Framework projects and build automation scripts.
 
-<AsciinemaPlayer src="/casts/home.cast" rows={15} idleTimeLimit={3} preload={true} loop autoplay/>
+<CommandPlayer commands={[
+  { command: "m365 login", response: "To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code RB2RUD56D to authenticate." },
+  { command: "m365 status", responseFrom: "./cmd/status.mdx" },
+  { command: "m365 tenant serviceannouncement health list", responseFrom: "./cmd/tenant/serviceannouncement/serviceannouncement-health-list.mdx" },
+  { command: "m365 entra user list", responseFrom: "./cmd/entra/user/user-list.mdx" },
+  { command: "m365 todo task add --title \"New task\" --listName \"Tasks\"", responseFrom: "./cmd/todo/task/task-add.mdx" }
+]} />
 
 ## Installation
 
