@@ -46,7 +46,7 @@ class Request {
           await this._logger.logToStderr('Response:');
           const properties: string[] = ['status', 'statusText', 'headers'];
           if (response.headers['content-type'] &&
-            response.headers['content-type'].indexOf('json') > -1) {
+            response.headers['content-type'].toString().indexOf('json') > -1) {
             properties.push('data');
           }
           await this._logger.logToStderr(JSON.stringify({
