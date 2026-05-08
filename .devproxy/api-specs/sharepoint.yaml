@@ -82,7 +82,7 @@ paths:
           description: list GUID
           schema:
             type: string
-          example: "'b2307a39-e878-458b-bc90-03bc578531d6'"
+          example: b2307a39-e878-458b-bc90-03bc578531d6
         - name: itemId
           in: path
           required: true

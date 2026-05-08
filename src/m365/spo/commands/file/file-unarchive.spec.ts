@@ -23,6 +23,10 @@ describe(commands.FILE_UNARCHIVE, () => {
   let confirmationPromptStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
 
+  const unarchiveResponse = {
+    value: 'reactivating'
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -134,7 +138,7 @@ describe(commands.FILE_UNARCHIVE, () => {
 
   it('prompts before unarchiving file when confirmation argument not passed', async () => {
     sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
-    sinon.stub(request, 'post').resolves();
+    sinon.stub(request, 'post').resolves(unarchiveResponse);
 
     await command.action(logger, {
       options: {
@@ -147,7 +151,7 @@ describe(commands.FILE_UNARCHIVE, () => {
 
   it('aborts unarchiving file when prompt not confirmed', async () => {
     const getStub = sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
-    const postStub = sinon.stub(request, 'post').resolves();
+    const postStub = sinon.stub(request, 'post').resolves(unarchiveResponse);
 
     await command.action(logger, {
       options: {
@@ -176,7 +180,7 @@ describe(commands.FILE_UNARCHIVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
-        return;
+        return unarchiveResponse;
       }
 
       throw 'Invalid request';
@@ -191,6 +195,7 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
+    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
   it('unarchives file by id', async () => {
@@ -210,7 +215,7 @@ describe(commands.FILE_UNARCHIVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
-        return;
+        return unarchiveResponse;
       }
 
       throw 'Invalid request';
@@ -226,6 +231,7 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
+    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
   it('unarchives file using site-relative url', async () => {
@@ -244,7 +250,7 @@ describe(commands.FILE_UNARCHIVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/Lists(guid'b2307a39-e878-458b-bc90-03bc578531d6')/items(1)/UnArchive`) {
-        return;
+        return unarchiveResponse;
       }
 
       throw 'Invalid request';
@@ -259,11 +265,12 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
+    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
-  it('outputs no result when unarchiving a file', async () => {
+  it('outputs the API response when unarchiving a file', async () => {
     sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
-    sinon.stub(request, 'post').resolves();
+    sinon.stub(request, 'post').resolves(unarchiveResponse);
 
     await command.action(logger, {
       options: {
@@ -273,7 +280,7 @@ describe(commands.FILE_UNARCHIVE, () => {
       }
     });
 
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWith(unarchiveResponse));
   });
 
   it('handles error correctly', async () => {

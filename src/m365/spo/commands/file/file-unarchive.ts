@@ -55,7 +55,7 @@ class SpoFileUnarchiveCommand extends SpoCommand {
     const { webUrl, url, id, force, verbose } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `This item is archived. Reactivation could take up to 24 hours. Are you sure you would like to unarchive this item?` });
+      const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Files that are reactivated cannot be archived again for 30 days. Are you sure you would like to unarchive this item?` });
       if (!result) {
         return;
       }
@@ -93,7 +93,8 @@ class SpoFileUnarchiveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      await request.post(requestOptions);
+      const res = await request.post(requestOptions);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
