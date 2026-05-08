@@ -2253,6 +2253,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container permission add',
+              id: 'cmd/spe/container/container-permission-add'
+            },
+            {
+              type: 'doc',
               label: 'container permission list',
               id: 'cmd/spe/container/container-permission-list'
             },
