@@ -19,7 +19,7 @@ import { Rule } from './Rule.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  packageManager: z.enum(['npm', 'pnpm', 'yarn']).default('npm'),
+  packageManager: z.enum(['npm', 'pnpm']).default('npm'),
   preview: z.boolean().optional(),
   toVersion: z.string().optional().alias('v'),
   shell: z.enum(['bash', 'powershell', 'cmd']).default('powershell'),
@@ -243,7 +243,15 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     // replace package operation tokens with command for the specific package manager
     findingsToReport.forEach(f => {
       // matches must be in this particular order to avoid false matches, eg.
-      // uninstallDev contains install
+      // uninstallDev contains install, removeOverride contains override
+      if (f.resolution.startsWith('removeOverride')) {
+        f.resolution = f.resolution.replace('removeOverride', packageManager.getPackageManagerCommand('removeOverride', this.packageManager));
+        return;
+      }
+      if (f.resolution.startsWith('override')) {
+        f.resolution = f.resolution.replace('override', packageManager.getPackageManagerCommand('override', this.packageManager));
+        return;
+      }
       if (f.resolution.startsWith('uninstallDev')) {
         f.resolution = f.resolution.replace('uninstallDev', packageManager.getPackageManagerCommand('uninstallDev', this.packageManager));
         return;
@@ -348,7 +356,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
             command.indexOf(packageManager.getPackageManagerCommand('install', this.packageManager)) === -1 &&
             command.indexOf(packageManager.getPackageManagerCommand('installDev', this.packageManager)) === -1 &&
             command.indexOf(packageManager.getPackageManagerCommand('uninstall', this.packageManager)) === -1 &&
-            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1))).join(os.EOL), os.EOL,
+            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('override', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('removeOverride', this.packageManager)) === -1
+          ))).join(os.EOL), os.EOL,
       os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
@@ -423,7 +434,10 @@ ${f.resolution}
             command.indexOf(packageManager.getPackageManagerCommand('install', this.packageManager)) === -1 &&
             command.indexOf(packageManager.getPackageManagerCommand('installDev', this.packageManager)) === -1 &&
             command.indexOf(packageManager.getPackageManagerCommand('uninstall', this.packageManager)) === -1 &&
-            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1))).join(os.EOL), os.EOL,
+            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('override', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('removeOverride', this.packageManager)) === -1
+          ))).join(os.EOL), os.EOL,
       '```', os.EOL,
       os.EOL,
       '### Modify files', os.EOL,
@@ -514,17 +528,20 @@ ${f.resolution}
     const packagesDepExact: string[] = [];
     const packagesDepUn: string[] = [];
     const packagesDevUn: string[] = [];
+    const packagesOverride: string[] = [];
+    const packagesOverrideRemove: string[] = [];
 
     findings.forEach(f => {
       if (f.resolutionType === 'cmd') {
-        if (f.resolution.indexOf('npm') > -1 ||
-          f.resolution.indexOf('yarn') > -1) {
+        if (f.resolution.indexOf('npm') > -1) {
           packageManager.mapPackageManagerCommand({
             command: f.resolution,
             packagesDevExact,
             packagesDepExact,
             packagesDepUn,
             packagesDevUn,
+            packagesOverride,
+            packagesOverrideRemove,
             packageMgr: this.packageManager
           });
         }
@@ -552,6 +569,8 @@ ${f.resolution}
       packagesDevExact,
       packagesDepUn,
       packagesDevUn,
+      packagesOverride,
+      packagesOverrideRemove,
       packageMgr: this.packageManager
     });
 

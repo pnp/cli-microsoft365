@@ -31,7 +31,7 @@ import { FN002034_DEVDEP_microsoft_spfx_heft_plugins } from './rules/FN002034_DE
 import { FN010001_YORC_version } from './rules/FN010001_YORC_version.js';
 import { FN015008_FILE_eslintrc_js } from './rules/FN015008_FILE_eslintrc_js.js';
 import { FN015016_FILE_eslint_config_js } from './rules/FN015016_FILE_eslint_config_js.js';
-import { FN021009_PKG_overrides_rushstack_heft } from './rules/FN021009_PKG_overrides_rushstack_heft.js';
+import { FN027001_OVERRIDES_rushstack_heft } from './rules/FN027001_OVERRIDES_rushstack_heft.js';
 
 export default [
   new FN001001_DEP_microsoft_sp_core_library('1.23.0-rc.0'),
@@ -61,7 +61,7 @@ export default [
   new FN002034_DEVDEP_microsoft_spfx_heft_plugins('1.23.0-rc.0'),
   new FN010001_YORC_version('1.23.0-rc.0'),
   new FN002031_DEVDEP_rushstack_heft('1.2.7'),
-  new FN021009_PKG_overrides_rushstack_heft('1.2.7'),
+  new FN027001_OVERRIDES_rushstack_heft('1.2.7'),
   new FN002025_DEVDEP_eslint_plugin_react_hooks('5.2.0'),
   new FN002024_DEVDEP_eslint('9.37.0'),
   new FN015016_FILE_eslint_config_js(true, `const spfxProfile = require('@microsoft/eslint-config-spfx/lib/flat-profiles/react');

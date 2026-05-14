@@ -43,6 +43,26 @@ class DevDepRule2 extends DependencyRule {
   }
 }
 
+class OverrideDepRule extends DependencyRule {
+  constructor() {
+    super('test-package', '1.0.0', false, false, true, true);
+  }
+
+  get id(): string {
+    return 'FN000000';
+  }
+}
+
+class OverrideRemoveDepRule extends DependencyRule {
+  constructor() {
+    super('test-package', '1.0.0', false, false, false, true);
+  }
+
+  get id(): string {
+    return 'FN000000';
+  }
+}
+
 describe('DependencyRule', () => {
   let depRule: DepRule;
   let devDepRule: DevDepRule;
@@ -270,5 +290,32 @@ describe('DependencyRule', () => {
   it('returns uninstall resolution for uninstall a dev dependency', () => {
     const rule: DependencyRule = new DevDepRule2();
     assert.strictEqual(rule.resolution, 'uninstallDev test-package');
+  });
+
+  it('returns correct description for override dependency', () => {
+    const rule: DependencyRule = new OverrideDepRule();
+    assert.strictEqual(rule.description, 'Upgrade SharePoint Framework override dependency package test-package');
+  });
+
+  it('returns notification when override dependency needs to be removed', () => {
+    const rule: DependencyRule = new OverrideRemoveDepRule();
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        overrides: {
+          'test-package': '0.9.0'
+        },
+        dependencies: {},
+        source: JSON.stringify({
+          overrides: {
+            'test-package': '0.9.0'
+          },
+          dependencies: {}
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 });
