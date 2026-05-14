@@ -48,7 +48,7 @@ import { FN021005_PKG_scripts_test } from './rules/FN021005_PKG_scripts_test.js'
 import { FN021006_PKG_scripts_clean } from './rules/FN021006_PKG_scripts_clean.js';
 import { FN021007_PKG_scripts_start } from './rules/FN021007_PKG_scripts_start.js';
 import { FN021008_PKG_scripts_eject_webpack } from './rules/FN021008_PKG_scripts_eject_webpack.js';
-import { FN021009_PKG_overrides_rushstack_heft } from './rules/FN021009_PKG_overrides_rushstack_heft.js';
+import { FN027001_OVERRIDES_rushstack_heft } from './rules/FN027001_OVERRIDES_rushstack_heft.js';
 import { FN023003_GITIGNORE_libdts } from './rules/FN023003_GITIGNORE_libdts.js';
 import { FN023004_GITIGNORE_libcommonjs } from './rules/FN023004_GITIGNORE_libcommonjs.js';
 import { FN023005_GITIGNORE_libesm } from './rules/FN023005_GITIGNORE_libesm.js';
@@ -152,7 +152,7 @@ export default [
   new FN021006_PKG_scripts_clean('heft clean'),
   new FN021007_PKG_scripts_start('heft start --clean'),
   new FN021008_PKG_scripts_eject_webpack('heft eject-webpack'),
-  new FN021009_PKG_overrides_rushstack_heft('1.1.2'),
+  new FN027001_OVERRIDES_rushstack_heft('1.1.2'),
   new FN023003_GITIGNORE_libdts(),
   new FN023004_GITIGNORE_libcommonjs(),
   new FN023005_GITIGNORE_libesm(),
