@@ -111,6 +111,13 @@ describe(commands.CALENDAR_GET, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation if neither userId nor userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: calendarId
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       id: calendarId,
