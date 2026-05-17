@@ -28,40 +28,44 @@ import { FN002030_DEVDEP_microsoft_spfx_web_build_rig } from './rules/FN002030_D
 import { FN002031_DEVDEP_rushstack_heft } from './rules/FN002031_DEVDEP_rushstack_heft.js';
 import { FN002032_DEVDEP_typescript_eslint_parser } from './rules/FN002032_DEVDEP_typescript_eslint_parser.js';
 import { FN002034_DEVDEP_microsoft_spfx_heft_plugins } from './rules/FN002034_DEVDEP_microsoft_spfx_heft_plugins.js';
+import { FN002035_DEVDEP_types_heft_jest } from './rules/FN002035_DEVDEP_types_heft_jest.js';
+import { FN002036_DEVDEP_types_jest } from './rules/FN002036_DEVDEP_types_jest.js';
 import { FN010001_YORC_version } from './rules/FN010001_YORC_version.js';
 import { FN015008_FILE_eslintrc_js } from './rules/FN015008_FILE_eslintrc_js.js';
 import { FN015016_FILE_eslint_config_js } from './rules/FN015016_FILE_eslint_config_js.js';
+import { FN022001_SCSS_remove_fabric_react } from './rules/FN022001_SCSS_remove_fabric_react.js';
+import { FN022002_SCSS_add_fabric_react } from './rules/FN022002_SCSS_add_fabric_react.js';
 import { FN027001_OVERRIDES_rushstack_heft } from './rules/FN027001_OVERRIDES_rushstack_heft.js';
 
 export default [
-  new FN001001_DEP_microsoft_sp_core_library('1.23.0-rc.0'),
-  new FN001002_DEP_microsoft_sp_lodash_subset('1.23.0-rc.0'),
-  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.23.0-rc.0'),
-  new FN001004_DEP_microsoft_sp_webpart_base('1.23.0-rc.0'),
-  new FN001011_DEP_microsoft_sp_dialog('1.23.0-rc.0'),
-  new FN001012_DEP_microsoft_sp_application_base('1.23.0-rc.0'),
-  new FN001014_DEP_microsoft_sp_listview_extensibility('1.23.0-rc.0'),
-  new FN001021_DEP_microsoft_sp_property_pane('1.23.0-rc.0'),
-  new FN001023_DEP_microsoft_sp_component_base('1.23.0-rc.0'),
-  new FN001024_DEP_microsoft_sp_diagnostics('1.23.0-rc.0'),
-  new FN001025_DEP_microsoft_sp_dynamic_data('1.23.0-rc.0'),
-  new FN001026_DEP_microsoft_sp_extension_base('1.23.0-rc.0'),
-  new FN001027_DEP_microsoft_sp_http('1.23.0-rc.0'),
-  new FN001028_DEP_microsoft_sp_list_subscription('1.23.0-rc.0'),
-  new FN001029_DEP_microsoft_sp_loader('1.23.0-rc.0'),
-  new FN001030_DEP_microsoft_sp_module_interfaces('1.23.0-rc.0'),
-  new FN001031_DEP_microsoft_sp_odata_types('1.23.0-rc.0'),
-  new FN001032_DEP_microsoft_sp_page_context('1.23.0-rc.0'),
-  new FN001013_DEP_microsoft_decorators('1.23.0-rc.0'),
-  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.23.0-rc.0'),
-  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.23.0-rc.0'),
-  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.23.0-rc.0'),
-  new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.23.0-rc.0'),
-  new FN002030_DEVDEP_microsoft_spfx_web_build_rig('1.23.0-rc.0'),
-  new FN002034_DEVDEP_microsoft_spfx_heft_plugins('1.23.0-rc.0'),
-  new FN010001_YORC_version('1.23.0-rc.0'),
-  new FN002031_DEVDEP_rushstack_heft('1.2.7'),
-  new FN027001_OVERRIDES_rushstack_heft('1.2.7'),
+  new FN001001_DEP_microsoft_sp_core_library('1.23.0'),
+  new FN001002_DEP_microsoft_sp_lodash_subset('1.23.0'),
+  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.23.0'),
+  new FN001004_DEP_microsoft_sp_webpart_base('1.23.0'),
+  new FN001011_DEP_microsoft_sp_dialog('1.23.0'),
+  new FN001012_DEP_microsoft_sp_application_base('1.23.0'),
+  new FN001014_DEP_microsoft_sp_listview_extensibility('1.23.0'),
+  new FN001021_DEP_microsoft_sp_property_pane('1.23.0'),
+  new FN001023_DEP_microsoft_sp_component_base('1.23.0'),
+  new FN001024_DEP_microsoft_sp_diagnostics('1.23.0'),
+  new FN001025_DEP_microsoft_sp_dynamic_data('1.23.0'),
+  new FN001026_DEP_microsoft_sp_extension_base('1.23.0'),
+  new FN001027_DEP_microsoft_sp_http('1.23.0'),
+  new FN001028_DEP_microsoft_sp_list_subscription('1.23.0'),
+  new FN001029_DEP_microsoft_sp_loader('1.23.0'),
+  new FN001030_DEP_microsoft_sp_module_interfaces('1.23.0'),
+  new FN001031_DEP_microsoft_sp_odata_types('1.23.0'),
+  new FN001032_DEP_microsoft_sp_page_context('1.23.0'),
+  new FN001013_DEP_microsoft_decorators('1.23.0'),
+  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.23.0'),
+  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.23.0'),
+  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.23.0'),
+  new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.23.0'),
+  new FN002030_DEVDEP_microsoft_spfx_web_build_rig('1.23.0'),
+  new FN002034_DEVDEP_microsoft_spfx_heft_plugins('1.23.0'),
+  new FN010001_YORC_version('1.23.0'),
+  new FN002031_DEVDEP_rushstack_heft('1.2.17'),
+  new FN027001_OVERRIDES_rushstack_heft('1.2.17'),
   new FN002025_DEVDEP_eslint_plugin_react_hooks('5.2.0'),
   new FN002024_DEVDEP_eslint('9.37.0'),
   new FN015016_FILE_eslint_config_js(true, `const spfxProfile = require('@microsoft/eslint-config-spfx/lib/flat-profiles/react');
@@ -80,5 +84,9 @@ module.exports = [
 ];`),
   new FN015008_FILE_eslintrc_js(false),
   new FN002021_DEVDEP_rushstack_eslint_config('4.5.2', false),
-  new FN002032_DEVDEP_typescript_eslint_parser('8.46.2', false)
+  new FN002032_DEVDEP_typescript_eslint_parser('8.46.2', false),
+  new FN002035_DEVDEP_types_heft_jest('1.0.2', false),
+  new FN002036_DEVDEP_types_jest('30.0.0'),
+  new FN022001_SCSS_remove_fabric_react('~@fluentui/react/dist/sass/References.scss'),
+  new FN022002_SCSS_add_fabric_react('pkg:@fluentui/react/dist/sass/References.scss')
 ];

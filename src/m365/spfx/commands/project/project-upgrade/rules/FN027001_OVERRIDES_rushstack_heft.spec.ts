@@ -40,7 +40,7 @@ describe('FN027001_OVERRIDES_rushstack_heft', () => {
     assert.strictEqual(findings.length, 1);
   });
 
-  it(`returns notification if overrides.@rushstack/heft property is different than expected`, () => {
+  it(`returns notification and extra remove notification if overrides.@rushstack/heft property is different than expected`, () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -50,7 +50,23 @@ describe('FN027001_OVERRIDES_rushstack_heft', () => {
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 2);
+    assert.strictEqual(findings[0].id, 'FN027001_REMOVE');
+    assert.strictEqual(findings[0].occurrences[0].resolution, 'removeOverride overrides.@rushstack/heft');
+    assert.strictEqual(findings[1].id, 'FN027001');
+  });
+
+  it(`returns no remove notification when overrides.@rushstack/heft is already at the target version`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        overrides: {
+          '@rushstack/heft': '0.7.36'
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 0);
   });
 
   it(`returns correct node when overrides.@rushstack/heft is set to a string`, () => {
@@ -68,6 +84,7 @@ describe('FN027001_OVERRIDES_rushstack_heft', () => {
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 3);
+    const updateFinding = findings.find(f => f.id === 'FN027001');
+    assert.strictEqual(updateFinding!.occurrences[0].position?.line, 3);
   });
 });
