@@ -78,7 +78,8 @@ describe(commands.CALENDAR_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      calendarGroup.getUserCalendarGroupByName
     ]);
   });
 
