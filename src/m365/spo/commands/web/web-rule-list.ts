@@ -31,9 +31,9 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoWebAlertListCommand extends SpoCommand {
+class SpoWebRuleListCommand extends SpoCommand {
   public get name(): string {
-    return commands.WEB_ALERT_LIST;
+    return commands.WEB_RULE_LIST;
   }
 
   public get description(): string {
@@ -41,7 +41,7 @@ class SpoWebAlertListCommand extends SpoCommand {
   }
 
   public alias(): string[] | undefined {
-    return [commands.WEB_RULE_LIST];
+    return [commands.WEB_ALERT_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -127,4 +127,4 @@ class SpoWebAlertListCommand extends SpoCommand {
   }
 }
 
-export default new SpoWebAlertListCommand();
+export default new SpoWebRuleListCommand();
