@@ -24,9 +24,9 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoWebAlertRemoveCommand extends SpoCommand {
+class SpoWebRuleRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.WEB_ALERT_REMOVE;
+    return commands.WEB_RULE_REMOVE;
   }
 
   public get description(): string {
@@ -34,7 +34,7 @@ class SpoWebAlertRemoveCommand extends SpoCommand {
   }
 
   public alias(): string[] | undefined {
-    return [commands.WEB_RULE_REMOVE];
+    return [commands.WEB_ALERT_REMOVE];
   }
 
   public get schema(): z.ZodTypeAny | undefined {
@@ -71,4 +71,4 @@ class SpoWebAlertRemoveCommand extends SpoCommand {
   }
 }
 
-export default new SpoWebAlertRemoveCommand();
+export default new SpoWebRuleRemoveCommand();

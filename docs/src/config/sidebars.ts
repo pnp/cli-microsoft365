@@ -4317,13 +4317,13 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web alert list',
-              id: 'cmd/spo/web/web-alert-list'
+              label: 'web rule list',
+              id: 'cmd/spo/web/web-rule-list'
             },
             {
               type: 'doc',
-              label: 'web alert remove',
-              id: 'cmd/spo/web/web-alert-remove'
+              label: 'web rule remove',
+              id: 'cmd/spo/web/web-rule-remove'
             },
             {
               type: 'doc',

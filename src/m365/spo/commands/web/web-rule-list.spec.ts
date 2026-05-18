@@ -15,9 +15,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './web-alert-list.js';
+import command from './web-rule-list.js';
 
-describe(commands.WEB_ALERT_LIST, () => {
+describe(commands.WEB_RULE_LIST, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -155,7 +155,7 @@ describe(commands.WEB_ALERT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.WEB_ALERT_LIST);
+    assert.strictEqual(command.name, commands.WEB_RULE_LIST);
   });
 
   it('defines alias', () => {
@@ -165,7 +165,7 @@ describe(commands.WEB_ALERT_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.WEB_RULE_LIST) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(commands.WEB_ALERT_LIST) > -1), true);
   });
 
   it('has a description', () => {
