@@ -643,7 +643,7 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
       fix: 'npm i -g yo@7'
     }
   },
-  '1.23.0-rc.0': {
+  '1.23.0': {
     heft: {
       range: '^1',
       fix: 'npm i -g @rushstack/heft@1'

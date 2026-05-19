@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "spfx-client-side-solution",
-    "id": "1e7b8432-97db-429f-a6d0-d13c35dda17a",
+    "id": "085ba3b6-ddf7-4608-9c34-674570fa5de1",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -12,7 +12,7 @@
       "websiteUrl": "",
       "privacyUrl": "",
       "termsOfUseUrl": "",
-      "mpnId": "Undefined-1.23.0-rc.0"
+      "mpnId": "Undefined-1.23.0"
     },
     "metadata": {
       "shortDescription": {
@@ -29,7 +29,7 @@
       {
         "title": "spfx Feature",
         "description": "The feature that activates elements of the spfx solution.",
-        "id": "1fa09a53-cbc5-4fbc-8263-ef6cafeea36d",
+        "id": "4e07e9e3-4570-48ab-8b72-75f39273f3d1",
         "version": "1.0.0.0"
       }
     ]

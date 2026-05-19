@@ -2,6 +2,7 @@ const packageCommands = {
   npm: {
     install: 'npm i -SE',
     installDev: 'npm i -DE',
+    installLockFile: 'npm i',
     uninstall: 'npm un -S',
     uninstallDev: 'npm un -D',
     override: 'npm pkg set',
@@ -10,6 +11,7 @@ const packageCommands = {
   pnpm: {
     install: 'pnpm i -E',
     installDev: 'pnpm i -DE',
+    installLockFile: 'pnpm i',
     uninstall: 'pnpm un',
     uninstallDev: 'pnpm un',
     override: 'pnpm pkg set',
@@ -66,17 +68,18 @@ export const packageManager = {
   }): string[] {
     const commandsToExecute: string[] = [];
 
-    // override commands must come first to ensure that install/uninstall operations
-    // use the correct package version when an override is added or removed for a
-    // package that is being updated, installed, or uninstalled
+    // removeOverride comes first to clear stale overrides before any install/uninstall
     // uninstall commands must come before install commands otherwise there is a
     // chance that whatever we recommended to install will be immediately uninstalled
+    // override (add) comes last so it is applied after all
+    // install/uninstall operations have completed
     if (packagesOverrideRemove.length > 0) {
       commandsToExecute.push(`${packageManager.getPackageManagerCommand('removeOverride', packageMgr)} ${packagesOverrideRemove.join(' ')}`);
-    }
-
-    if (packagesOverride.length > 0) {
-      commandsToExecute.push(`${packageManager.getPackageManagerCommand('override', packageMgr)} ${packagesOverride.join(' ')}`);
+      // removeOverride only updates package.json; run a plain install to update the lock file
+      // only needed when no other install/uninstall commands will already update the lock file
+      if (packagesDepUn.length === 0 && packagesDevUn.length === 0 && packagesDepExact.length === 0 && packagesDevExact.length === 0 && packagesOverride.length === 0) {
+        commandsToExecute.push(packageManager.getPackageManagerCommand('installLockFile', packageMgr));
+      }
     }
 
     if (packagesDepUn.length > 0) {
@@ -93,6 +96,12 @@ export const packageManager = {
 
     if (packagesDevExact.length > 0) {
       commandsToExecute.push(`${packageManager.getPackageManagerCommand('installDev', packageMgr)} ${packagesDevExact.join(' ')}`);
+    }
+
+    if (packagesOverride.length > 0) {
+      commandsToExecute.push(`${packageManager.getPackageManagerCommand('override', packageMgr)} ${packagesOverride.join(' ')}`);
+      // override only updates package.json; run a plain install to update the lock file
+      commandsToExecute.push(packageManager.getPackageManagerCommand('installLockFile', packageMgr));
     }
 
     return commandsToExecute;
