@@ -413,6 +413,8 @@ ${f.resolution}
     const packagesDepExact: string[] = [];
     const packagesDepUn: string[] = [];
     const packagesDevUn: string[] = [];
+    const packagesOverride: string[] = [];
+    const packagesOverrideRemove: string[] = [];
 
     findings.forEach(f => {
       packageManager.mapPackageManagerCommand({
@@ -421,6 +423,8 @@ ${f.resolution}
         packagesDepExact,
         packagesDepUn,
         packagesDevUn,
+        packagesOverride,
+        packagesOverrideRemove,
         packageMgr: this.packageManager
       });
     });
@@ -430,6 +434,8 @@ ${f.resolution}
       packagesDevExact,
       packagesDepUn,
       packagesDevUn,
+      packagesOverride,
+      packagesOverrideRemove,
       packageMgr: this.packageManager
     });
 

@@ -46,9 +46,12 @@ const config: Config = {
   future: {
     v4: {
       removeLegacyPostBuildHeadAttribute: true,
-      useCssCascadeLayers: true
+      useCssCascadeLayers: true,
+      fasterByDefault: true,
+      mdx1CompatDisabledByDefault: true,
+      siteStorageNamespacing: true
     },
-    experimental_faster: true
+    faster: true
   },
 
   plugins: [

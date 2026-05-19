@@ -5,7 +5,7 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export abstract class DependencyRule extends JsonRule {
-  constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {
+  constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true, protected isOverride: boolean = false) {
     super();
   }
 
@@ -14,10 +14,16 @@ export abstract class DependencyRule extends JsonRule {
   }
 
   get description(): string {
-    return `${(this.add ? 'Upgrade' : 'Remove')} SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`;
+    return `${(this.add ? 'Upgrade' : 'Remove')} SharePoint Framework ${(this.isOverride ? 'override ' : this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`;
   }
 
   get resolution(): string {
+    if (this.isOverride) {
+      return this.add ?
+        `override overrides.${this.packageName}=${this.packageVersion}` :
+        `removeOverride overrides.${this.packageName}`;
+    }
+
     return this.add ?
       `${(this.isDevDep ? 'installDev' : 'install')} ${this.packageName}@${this.packageVersion}` :
       `${(this.isDevDep ? 'uninstallDev' : 'uninstall')} ${this.packageName}`;
@@ -45,10 +51,10 @@ export abstract class DependencyRule extends JsonRule {
       return;
     }
 
-    const projectDependencies: Hash | undefined = this.isDevDep ? project.packageJson.devDependencies : project.packageJson.dependencies;
+    const projectDependencies: Hash | undefined = this.isOverride ? project.packageJson.overrides : this.isDevDep ? project.packageJson.devDependencies : project.packageJson.dependencies;
     const versionEntry: string | null = projectDependencies ? projectDependencies[this.packageName] : '';
     if (this.add) {
-      let jsonProperty: string = this.isDevDep ? 'devDependencies' : 'dependencies';
+      let jsonProperty: string = this.isOverride ? 'overrides' : this.isDevDep ? 'devDependencies' : 'dependencies';
 
       if (versionEntry) {
         jsonProperty += `.${this.packageName}`;
@@ -70,7 +76,7 @@ export abstract class DependencyRule extends JsonRule {
       }
     }
     else {
-      const jsonProperty: string = `${(this.isDevDep ? 'devDependencies' : 'dependencies')}.${this.packageName}`;
+      const jsonProperty: string = `${(this.isOverride ? 'overrides' : this.isDevDep ? 'devDependencies' : 'dependencies')}.${this.packageName}`;
 
       if (versionEntry) {
         const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);

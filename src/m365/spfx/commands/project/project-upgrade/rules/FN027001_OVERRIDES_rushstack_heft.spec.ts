@@ -1,15 +1,15 @@
 import assert from 'assert';
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
-import { FN021009_PKG_overrides_rushstack_heft } from './FN021009_PKG_overrides_rushstack_heft.js';
+import { FN027001_OVERRIDES_rushstack_heft } from './FN027001_OVERRIDES_rushstack_heft.js';
 
-describe('FN021009_PKG_overrides_rushstack_heft', () => {
+describe('FN027001_OVERRIDES_rushstack_heft', () => {
   let findings: Finding[];
-  let rule: FN021009_PKG_overrides_rushstack_heft;
+  let rule: FN027001_OVERRIDES_rushstack_heft;
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021009_PKG_overrides_rushstack_heft('0.7.36');
+    rule = new FN027001_OVERRIDES_rushstack_heft('0.7.36');
   });
 
   it(`doesn't return notification if package.json is not available`, () => {
