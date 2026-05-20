@@ -13,9 +13,9 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './web-alert-remove.js';
+import command from './web-rule-remove.js';
 
-describe(commands.WEB_ALERT_REMOVE, () => {
+describe(commands.WEB_RULE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -64,7 +64,17 @@ describe(commands.WEB_ALERT_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.WEB_ALERT_REMOVE);
+    assert.strictEqual(command.name, commands.WEB_RULE_REMOVE);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.WEB_ALERT_REMOVE) > -1), true);
   });
 
   it('has a description', () => {
