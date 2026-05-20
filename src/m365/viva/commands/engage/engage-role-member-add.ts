@@ -10,9 +10,13 @@ import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  roleId: z.uuid().optional(),
+  roleId: z.uuid().optional().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }),
   roleName: z.string().optional(),
-  userId: z.uuid().optional(),
+  userId: z.uuid().optional().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }),
   userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
     error: e => `'${e.input}' is not a valid UPN.`
   }).optional()
@@ -82,7 +86,8 @@ class VivaEngageRoleMemberAddCommand extends GraphCommand {
         }
       };
 
-      await request.post(requestOptions);
+      const response = await request.post(requestOptions);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
