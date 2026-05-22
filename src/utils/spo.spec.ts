@@ -961,7 +961,7 @@ describe('utils/spo', () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { menuState: topNavigation });
   });
 
-  it(`retrieves spo group by name sucessfully`, async () => {
+  it(`retrieves spo group by name successfully`, async () => {
     const groupResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -989,7 +989,7 @@ describe('utils/spo', () => {
     assert.deepEqual(group, groupResponse);
   });
 
-  it(`retrieves roledefinition by name sucessfully`, async () => {
+  it(`retrieves roledefinition by name successfully`, async () => {
     const roledefinitionResponse: RoleDefinition = {
       BasePermissions: {
         High: 176,
@@ -1927,7 +1927,7 @@ describe('utils/spo', () => {
   });
 
 
-  it(`retrieves spo group by name sucessfully`, async () => {
+  it(`retrieves spo group by name successfully`, async () => {
     const groupResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -1955,7 +1955,7 @@ describe('utils/spo', () => {
     assert.deepEqual(group, groupResponse);
   });
 
-  it(`retrieves spo user by email sucessfully`, async () => {
+  it(`retrieves spo user by email successfully`, async () => {
     const userResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -2714,7 +2714,7 @@ describe('utils/spo', () => {
     assert.strictEqual(result, primaryAdminLoginName);
   });
 
-  it(`retrieves a file by id with its properties sucessfully`, async () => {
+  it(`retrieves a file by id with its properties successfully`, async () => {
     const id = 'b2307a39-e878-458b-bc90-03bc578531d6';
     const fileResponse = {
       ListItemAllFields: {
@@ -2770,7 +2770,7 @@ describe('utils/spo', () => {
     assert.deepEqual(file, fileResponse);
   });
 
-  it(`retrieves a file by url with its properties sucessfully`, async () => {
+  it(`retrieves a file by url with its properties successfully`, async () => {
     const serverRelativeUrl = '/sites/sales/Documents/Test1.docx';
     const fileResponse = {
       ListItemAllFields: {
@@ -2827,7 +2827,7 @@ describe('utils/spo', () => {
   });
 
   it(`retrieves file role assignments`, async () => {
-    const fileUrl = 'https://contoso.sharepoint.com/sites/sales/Shared Documents/Test.docx';
+    const serverRelativeUrl = '/sites/sales/Documents/Test1.docx';
     const roleAssignmentsResponse = {
       value: [
         {
@@ -2837,8 +2837,16 @@ describe('utils/spo', () => {
           },
           RoleDefinitionBindings: [
             {
-              Id: 1073741826,
-              Name: 'Read'
+              BasePermissions: {
+                High: "2147483647",
+                Low: "4294967295"
+              },
+              Description: "Has full control.",
+              Hidden: false,
+              Id: 1073741829,
+              Name: "Full Control",
+              Order: 1,
+              RoleTypeKind: 5
             }
           ]
         }
@@ -2846,15 +2854,15 @@ describe('utils/spo', () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/sales/_api/web/GetFileByServerRelativePath(decodedUrl='https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fsales%2FShared%20Documents%2FTest.docx')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings") {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`) {
         return roleAssignmentsResponse;
       }
 
       throw 'Invalid request';
     });
 
-    const roleAssignments = await spo.getFileRoleAssignments(webUrl, fileUrl, logger, true);
-    assert.deepEqual(roleAssignments, roleAssignmentsResponse);
+    const roleAssignments = await spo.getFileRoleAssignments(webUrl, serverRelativeUrl, logger, true);
+    assert.deepEqual(roleAssignments, roleAssignmentsResponse.value);
   });
 
   it('correctly outputs result when calling createFileCopyJob', async () => {

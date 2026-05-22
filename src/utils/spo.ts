@@ -2475,15 +2475,19 @@ export const spo = {
    * Retrieves the role assignments for a file.
    * Returns an array of role assignments
    * @param webUrl The web url
-   * @param serverRelativeUrl The server relative url of the file
+   * @param url the url of the file
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns An array of role assignments for the file
    */
-  async getFileRoleAssignments(webUrl: string, serverRelativeUrl: string, logger?: Logger, verbose?: boolean): Promise<any> {
+  async getFileRoleAssignments(webUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
-      await logger.logToStderr(`Retrieving the role assignments for the file ${serverRelativeUrl}`);
+      await logger.logToStderr(`Retrieving the role assignments for the file ${url}`);
     }
 
+    const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, url);
     const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`,
+      url: `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`,
       headers: { accept: 'application/json;odata=nometadata' },
       responseType: 'json'
     };
@@ -2493,6 +2497,6 @@ export const spo = {
       r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
     });
 
-    return response;
+    return response.value;
   }
 };
