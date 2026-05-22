@@ -1,26 +1,39 @@
+# Unified release workflow for both @latest and @next.
+# npm Trusted Publishing only allows one workflow per package,
+# so both release types must live in the same file.
+#
+# Tag push (v*) → publishes @latest
+# workflow_dispatch → publishes @next (beta)
 name: Release
 
 on:
   push:
-    branches:
-      - "!*"
     tags:
       - "v*"
+  workflow_dispatch:
 
 env:
+  # YAML anchor lets us reference this in matrix arrays.
+  # If you change this value, also update the hardcoded nodeBuild
+  # values in the test job's fromJSON include entries.
   NODE_VERSION: &node_version 24
 
 jobs:
   build:
     if: github.repository_owner == 'pnp'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # @latest (tag push): ubuntu only. @next (dispatch): all OSes
+        os: ${{ github.event_name == 'push' && fromJSON('["ubuntu-latest"]') || fromJSON('["macos-latest", "windows-latest", "ubuntu-latest"]') }}
+        node: [*node_version]
 
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -28,70 +41,109 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-${{ matrix.os }}-${{ matrix.node }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Compress output
+      - name: Compress output (non-Windows)
+        if: matrix.os != 'windows-latest'
         run: tar -cvf build.tar --exclude node_modules ./
+      - name: Compress output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: build
+          name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
   test:
     if: github.repository_owner == 'pnp'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # @latest (tag push): ubuntu + build node only. @next (dispatch): all OSes + compat node versions
+        os: ${{ github.event_name == 'push' && fromJSON('["ubuntu-latest"]') || fromJSON('["macos-latest", "windows-latest", "ubuntu-latest"]') }}
+        nodeRun: [*node_version]
+        nodeBuild: [*node_version]
+        # nodeBuild values in include entries must match the node_version anchor above
+        include: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[{"os":"ubuntu-latest","nodeRun":20,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":22,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":25,"nodeBuild":24}]') || fromJSON('[]') }}
 
     steps:
+      # Windows runners run out of memory during tests without extra pagefile
+      - name: Configure pagefile
+        if: matrix.os == 'windows-latest'
+        uses: al-cheb/configure-pagefile-action@v1.5
+        with:
+          minimum-size: 16GB
+          disk-root: "C:"
       - uses: actions/download-artifact@v8
         with:
-          name: build
-      - name: Unpack build artifact
+          name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
+      - name: Unpack build artifact (non-Windows)
+        if: matrix.os != 'windows-latest'
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Unpack build artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z x build.tar && del build.tar
+      - name: Use Node.js ${{ matrix.nodeRun }}
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.nodeRun }}
           registry-url: 'https://registry.npmjs.org'
+      # Cache key uses nodeBuild (not nodeRun) so compat-test runs
+      # (Node 20/22/25) reuse the same node_modules as the primary build
       - name: Cache node modules
         id: cache
         uses: actions/cache@v5
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-${{ matrix.os }}-${{ matrix.nodeBuild }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Cache .eslintcache
+        if: matrix.nodeRun == matrix.nodeBuild
         id: eslintcache
         uses: actions/cache@v5
         with:
           path: |
             .eslintcache
-          key: eslintcache-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('npm-shrinkwrap.json', 'eslint.config.mjs') }}
-      - name: Test
+          key: eslintcache-${{ matrix.os }}-${{ hashFiles('npm-shrinkwrap.json', 'eslint.config.mjs') }}
+      # Full test suite (lint + coverage) only on the primary Node version.
+      # Compat runs (nodeRun != nodeBuild) skip coverage/lint to save time;
+      # they only verify runtime compatibility.
+      - name: Test with coverage
+        if: matrix.nodeRun == matrix.nodeBuild
         run: npm test
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
-      - name: Compress output
-        if: always()
+      - name: Test without coverage
+        if: matrix.nodeRun != matrix.nodeBuild
+        run: npm run test:test
+      - name: Compress output (non-Windows)
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
+      - name: Compress output (Windows)
+        if: matrix.nodeRun == matrix.nodeBuild && matrix.os == 'windows-latest' && always()
+        run: 7z a -ttar -r coverage.tar coverage
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: matrix.nodeRun == matrix.nodeBuild && always()
         with:
-          name: coverage
+          name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
-  test_docs:
+  build_docs:
     if: github.repository_owner == 'pnp'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          # @next needs full history for docs versioning
+          fetch-depth: ${{ github.event_name == 'workflow_dispatch' && 0 || 1 }}
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -108,22 +160,34 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         working-directory: docs
+
+      - name: Prepare docs versioning
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/create-docs-versioning.mjs
         
       - name: Build docs
         run: npm run build
         working-directory: docs
+        
+      - name: Upload artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/build
   publish:
     if: github.repository_owner == 'pnp'
-    needs: [test, test_docs]
+    needs: [test, build_docs]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required for npm Trusted Publishing (OIDC token exchange).
+      # No NPM_PUBLISH_TOKEN needed; provenance is generated automatically.
       id-token: write
 
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: build
+          name: build-ubuntu-latest-${{ env.NODE_VERSION }}
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ env.NODE_VERSION }}
@@ -141,10 +205,45 @@ jobs:
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Stamp beta to package version
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/update-package-version.js $GITHUB_SHA
       - name: Publish @latest
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        if: github.event_name == 'push'
+        run: npm publish --access public
+      - name: Publish @next
+        if: github.event_name == 'workflow_dispatch'
+        run: npm publish --tag next --access public
+      # Re-upload the build artifact after version stamping so that
+      # deploy_docker picks up the beta version from package.json
+      - name: Compress output
+        if: github.event_name == 'workflow_dispatch'
+        run: tar -cvf build.tar --exclude node_modules ./
+      - name: Upload build artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-ubuntu-latest-${{ env.NODE_VERSION }}
+          path: build.tar
+          overwrite: true
+  # Docs are only deployed for @next; @latest docs are static on the website
+  deploy_docs:
+    if: github.repository_owner == 'pnp' && github.event_name == 'workflow_dispatch'
+    needs: publish
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
   deploy_docker:
     if: github.repository_owner == 'pnp'
     needs: publish
@@ -153,7 +252,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: build
+          name: build-ubuntu-latest-${{ env.NODE_VERSION }}
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ env.NODE_VERSION }}
@@ -175,7 +274,7 @@ jobs:
         run: |
           echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
       - name: Wait for npm publish
-        run: node scripts/wait-npm-publish.js latest ${{ steps.package_version.outputs.version }}
+        run: node scripts/wait-npm-publish.js ${{ github.event_name == 'push' && 'latest' || 'next' }} ${{ steps.package_version.outputs.version }}
       - name: Build and push ${{ steps.package_version.outputs.version }}
         uses: docker/build-push-action@v7
         with:
@@ -183,10 +282,10 @@ jobs:
           tags: m365pnp/cli-microsoft365:${{ steps.package_version.outputs.version }}
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
-      - name: Build and push latest
+      - name: Build and push ${{ github.event_name == 'push' && 'latest' || 'next' }}
         uses: docker/build-push-action@v7
         with:
           push: true
-          tags: m365pnp/cli-microsoft365:latest
+          tags: m365pnp/cli-microsoft365:${{ github.event_name == 'push' && 'latest' || 'next' }}
           build-args: |
             CLI_VERSION=${{ steps.package_version.outputs.version }}
