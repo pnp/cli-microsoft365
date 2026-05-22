@@ -1,0 +1,71 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo file roleassignment list
+
+Lists all role assignments from a specific file
+
+## Usage
+
+```sh
+m365 spo file roleassignment list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the file is located.
+
+`--fileUrl [fileUrl]`
+: The server- or site-relative decoded URL of the file. Specify either `fileUrl` or `fileId` but not both.
+
+`-i, --fileId [fileId]`
+: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
+```
+
+<Global />
+
+## Examples
+
+List all role assignments of a file specified by URL.
+
+```sh
+m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --fileUrl "/Branding/Logos/Contoso.jpg"
+```
+
+List all role assignments of a file specified by ID.
+
+```sh
+m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --fileId "04796e10-cb5f-4aa3-a438-bc06028a9073"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  ```
+
+  </TabItem>
+</Tabs>

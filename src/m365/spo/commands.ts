@@ -76,6 +76,7 @@ export default {
   FILE_RETENTIONLABEL_ENSURE: `${prefix} file retentionlabel ensure`,
   FILE_RETENTIONLABEL_REMOVE: `${prefix} file retentionlabel remove`,
   FILE_ROLEASSIGNMENT_ADD: `${prefix} file roleassignment add`,
+  FILE_ROLEASSIGNMENT_LIST: `${prefix} file roleassignment list`,
   FILE_ROLEASSIGNMENT_REMOVE: `${prefix} file roleassignment remove`,
   FILE_ROLEINHERITANCE_BREAK: `${prefix} file roleinheritance break`,
   FILE_ROLEINHERITANCE_RESET: `${prefix} file roleinheritance reset`,
