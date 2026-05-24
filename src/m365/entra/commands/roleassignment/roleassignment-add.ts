@@ -57,12 +57,20 @@ class EntraRoleAssignmentAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.roleDefinitionId, options.roleDefinitionName].filter(o => o !== undefined).length === 1, {
-        error: 'Specify either roleDefinitionId or roleDefinitionName'
+        error: 'Specify either roleDefinitionId or roleDefinitionName',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
       })
       .refine(options => Object.values([
         options.userId, options.userName, options.administrativeUnitId, options.administrativeUnitName, options.applicationId, options.applicationObjectId, options.applicationName,
         options.servicePrincipalId, options.servicePrincipalName, options.groupId, options.groupName]).filter(v => typeof v !== 'undefined').length < 2, {
-        message: 'Provide value for only one of the following parameters: userId, userName, administrativeUnitId, administrativeUnitName, applicationId, applicationObjectId, applicationName, servicePrincipalId, servicePrincipalName, groupId or groupName'
+        message: 'Provide value for only one of the following parameters: userId, userName, administrativeUnitId, administrativeUnitName, applicationId, applicationObjectId, applicationName, servicePrincipalId, servicePrincipalName, groupId or groupName',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'administrativeUnitId', 'administrativeUnitName', 'applicationId', 'applicationObjectId', 'applicationName', 'servicePrincipalId', 'servicePrincipalName', 'groupId', 'groupName']
+        }
       });
   }
 

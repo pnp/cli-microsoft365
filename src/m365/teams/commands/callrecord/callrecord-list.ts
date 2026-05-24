@@ -69,7 +69,11 @@ class TeamsCallRecordListCommand extends GraphApplicationCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.userId, options.userName].filter(o => o !== undefined).length <= 1, {
-        error: 'Use one of the following options: userId or userName but not both.'
+        error: 'Use one of the following options: userId or userName but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       })
       .refine((options: Options) => [options.startDateTime, options.endDateTime].filter(o => o !== undefined).length <= 1 || new Date(options.startDateTime!) < new Date(options.endDateTime!), {
         message: 'Value of startDateTime, must be before endDateTime.'

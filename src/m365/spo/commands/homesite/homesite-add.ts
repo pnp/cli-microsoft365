@@ -50,7 +50,11 @@ class SpoHomeSiteAddCommand extends SpoCommand {
       .refine(
         (options: Options) => [options.audienceIds, options.audienceNames].filter(o => o !== undefined).length <= 1,
         {
-          message: 'You must specify either audienceIds or audienceNames but not both.'
+          message: 'You must specify either audienceIds or audienceNames but not both.',
+          params: {
+            customCode: 'optionSet',
+            options: ['audienceIds', 'audienceNames']
+          }
         }
       );
   }

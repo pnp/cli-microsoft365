@@ -36,7 +36,11 @@ class EntraUserSessionRevokeCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
-        error: `Specify either 'userId' or 'userName'.`
+        error: `Specify either 'userId' or 'userName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
   }
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

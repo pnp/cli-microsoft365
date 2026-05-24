@@ -49,7 +49,10 @@ class AppPermissionAddCommand extends AppCommand {
     return schema
       .refine(options => options.applicationPermissions || options.delegatedPermissions, {
         error: 'Specify at least one of applicationPermissions or delegatedPermissions, or both.',
-        path: ['delegatedPermissions']
+        path: ['delegatedPermissions'],
+        params: {
+          customCode: 'required'
+        }
       });
   }
 

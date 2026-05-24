@@ -42,10 +42,18 @@ class VivaEngageCommunityUserListCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.communityId, options.communityDisplayName, options.entraGroupId].filter(x => x !== undefined).length === 1, {
-        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.'
+        error: 'Specify either communityId, communityDisplayName, or entraGroupId, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['communityId', 'communityDisplayName', 'entraGroupId']
+        }
       })
       .refine(options => options.communityId || options.communityDisplayName || options.entraGroupId, {
-        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.'
+        error: 'Specify at least one of communityId, communityDisplayName, or entraGroupId.',
+        params: {
+          customCode: 'optionSet',
+          options: ['communityId', 'communityDisplayName', 'entraGroupId']
+        }
       });
   }
 

@@ -83,10 +83,18 @@ class SppAutofillColumnSetCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.columnId, options.columnTitle, options.columnInternalName].filter(Boolean).length === 1, {
-        message: `Specify exactly one of the following options: 'columnId', 'columnTitle' or 'columnInternalName'.`
+        message: `Specify exactly one of the following options: 'columnId', 'columnTitle' or 'columnInternalName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['columnId', 'columnTitle', 'columnInternalName']
+        }
       })
       .refine(options => [options.listTitle, options.listId, options.listUrl].filter(Boolean).length === 1, {
-        message: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`
+        message: `Specify exactly one of the following options: 'listTitle', 'listId' or 'listUrl'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listTitle', 'listId', 'listUrl']
+        }
       });
   }
 

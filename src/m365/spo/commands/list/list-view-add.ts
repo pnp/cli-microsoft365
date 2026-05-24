@@ -69,25 +69,38 @@ class SpoListViewAddCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.listId, options.listTitle, options.listUrl].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: listId, listTitle, or listUrl.'
+        error: 'Use one of the following options: listId, listTitle, or listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       })
       .refine((options: Options) => !options.personal || !options.default, {
         error: 'Default view cannot be a personal view.'
       })
       .refine((options: Options) => options.type !== 'calendar' || [options.calendarStartDateField, options.calendarEndDateField, options.calendarTitleField].filter(o => o === undefined).length === 0, {
-        error: 'When type is calendar, do specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
+        error: 'When type is calendar, do specify calendarStartDateField, calendarEndDateField, and calendarTitleField.',
+        params: {
+          customCode: 'required'
+        }
       })
       .refine((options: Options) => options.type === 'calendar' || [options.calendarStartDateField, options.calendarEndDateField, options.calendarTitleField].filter(o => o === undefined).length === 3, {
         error: 'When type is not calendar, do not specify calendarStartDateField, calendarEndDateField, and calendarTitleField.'
       })
       .refine((options: Options) => options.type !== 'kanban' || options.kanbanBucketField !== undefined, {
-        error: 'When type is kanban, do specify kanbanBucketField.'
+        error: 'When type is kanban, do specify kanbanBucketField.',
+        params: {
+          customCode: 'required'
+        }
       })
       .refine((options: Options) => options.type === 'kanban' || options.kanbanBucketField === undefined, {
         error: 'When type is not kanban, do not specify kanbanBucketField.'
       })
       .refine((options: Options) => options.type === 'calendar' || options.fields !== undefined, {
-        error: 'When type is not calendar, do specify fields.'
+        error: 'When type is not calendar, do specify fields.',
+        params: {
+          customCode: 'required'
+        }
       });
   }
 

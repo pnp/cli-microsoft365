@@ -36,7 +36,11 @@ class BookingBusinessGetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => options.id || options.name, {
-        error: 'Specify either id or name'
+        error: 'Specify either id or name',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       });
   }
 

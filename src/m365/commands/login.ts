@@ -55,19 +55,32 @@ class LoginCommand extends Command {
     return schema
       .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity' || options.authType === 'federatedIdentity', {
         error: `appId is required. TIP: use the "m365 setup" command to configure the default appId.`,
-        path: ['appId']
+        path: ['appId'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(options => options.authType !== 'password' || options.userName, {
         error: 'Username is required when using password authentication.',
-        path: ['userName']
+        path: ['userName'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(options => options.authType !== 'password' || options.password, {
         error: 'Password is required when using password authentication.',
-        path: ['password']
+        path: ['password'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(options => options.authType !== 'certificate' || !(options.certificateFile && options.certificateBase64Encoded), {
         error: 'Specify either certificateFile or certificateBase64Encoded, but not both.',
-        path: ['certificateBase64Encoded']
+        path: ['certificateBase64Encoded'],
+        params: {
+          customCode: 'optionSet',
+          options: ['certificateFile', 'certificateBase64Encoded']
+        }
       })
       .refine(options => options.authType !== 'certificate' ||
         options.certificateFile ||
@@ -75,13 +88,20 @@ class LoginCommand extends Command {
         cli.getConfig().get(settingsNames.clientCertificateFile) ||
         cli.getConfig().get(settingsNames.clientCertificateBase64Encoded), {
         error: 'Specify either certificateFile or certificateBase64Encoded.',
-        path: ['certificateFile']
+        path: ['certificateFile'],
+        params: {
+          customCode: 'optionSet',
+          options: ['certificateFile', 'certificateBase64Encoded']
+        }
       })
       .refine(options => options.authType !== 'secret' ||
         options.secret ||
         cli.getConfig().get(settingsNames.clientSecret), {
         error: 'Secret is required when using secret authentication.',
-        path: ['secret']
+        path: ['secret'],
+        params: {
+          customCode: 'required'
+        }
       });
   }
 

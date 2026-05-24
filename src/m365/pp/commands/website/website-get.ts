@@ -39,7 +39,11 @@ class PpWebSiteGetCommand extends PowerPlatformCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.url, options.id, options.name].filter(x => x !== undefined).length === 1, {
-        error: `Specify either url, id or name, but not multiple.`
+        error: `Specify either url, id or name, but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['url', 'id', 'name']
+        }
       });
   }
 

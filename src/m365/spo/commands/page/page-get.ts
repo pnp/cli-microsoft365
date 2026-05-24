@@ -41,7 +41,11 @@ class SpoPageGetCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.name, options.default].filter(x => x !== undefined).length === 1, {
-        error: `Specify either name or default, but not both.`
+        error: `Specify either name or default, but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'default']
+        }
       });
   }
 

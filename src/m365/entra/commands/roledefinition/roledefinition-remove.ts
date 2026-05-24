@@ -37,10 +37,18 @@ class EntraRoleDefinitionRemoveCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.id !== !options.displayName, {
-        error: 'Specify either id or displayName, but not both'
+        error: 'Specify either id or displayName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => options.id || options.displayName, {
-        error: 'Specify either id or displayName'
+        error: 'Specify either id or displayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => (!options.id && !options.displayName) || options.displayName || (options.id && validation.isValidGuid(options.id)), {
         error: e => `The '${e.input}' must be a valid GUID`,

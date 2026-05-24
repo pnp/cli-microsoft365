@@ -42,7 +42,11 @@ class GraphDirectoryExtensionListCommand extends GraphCommand {
     return schema
       .refine(options =>
         ([options.appId, options.appObjectId, options.appName].filter(x => x !== undefined).length <= 1), {
-        error: 'Specify either appId, appObjectId, or appName, but not multiple.'
+        error: 'Specify either appId, appObjectId, or appName, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appName']
+        }
       });
   }
 
