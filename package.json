@@ -286,15 +286,16 @@
       "follow-redirects": "1.16.0"
     },
     "@grpc/proto-loader": {
-      "protobufjs": "7.5.6"
+      "protobufjs": "7.6.0"
     },
     "@opentelemetry/otlp-transformer": {
-      "protobufjs": "7.5.6"
+      "protobufjs": "7.6.0"
     },
     "@azure/monitor-opentelemetry": {
       "@opentelemetry/sdk-node": "0.217.0",
       "@opentelemetry/exporter-prometheus": "0.217.0"
-    }
+    },
+    "protobufjs": "7.6.0"
   },
   "dependencies": {
     "@azure/msal-common": "^16.5.2",
