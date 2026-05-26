@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002029_DEVDEP_microsoft_rush_stack_compiler_5_3 extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
-    super('@microsoft/rush-stack-compiler-5.3', packageVersion, true, false, add);
+  constructor(options: { packageVersion: string; add?: boolean }) {
+    super({ ...options, packageName: '@microsoft/rush-stack-compiler-5.3', isDevDep: true, add: options.add ?? true });
   }
 
   get id(): string {

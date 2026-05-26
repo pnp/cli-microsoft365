@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001028_DEP_microsoft_sp_list_subscription extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-list-subscription', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-list-subscription', isOptional: true });
   }
 
   get id(): string {

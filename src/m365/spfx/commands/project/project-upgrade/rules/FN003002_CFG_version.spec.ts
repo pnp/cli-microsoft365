@@ -9,7 +9,7 @@ describe('FN003002_CFG_version', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN003002_CFG_version('2.0');
+    rule = new FN003002_CFG_version({ version: '2.0' });
   });
 
   it('doesn\'t return notification if version is already up-to-date', () => {

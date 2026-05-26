@@ -9,7 +9,7 @@ describe('FN021013_PKG_spfx_devdeps_match_version', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN021013_PKG_spfx_devdeps_match_version('1.0.0');
+    rule = new FN021013_PKG_spfx_devdeps_match_version({ version: '1.0.0' });
   });
 
   it('returns correct ID', () => {

@@ -9,7 +9,7 @@ describe('FN011004_MAN_fieldCustomizer_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011004_MAN_fieldCustomizer_schema('test-schema');
+    rule = new FN011004_MAN_fieldCustomizer_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {

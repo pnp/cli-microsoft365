@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001025_DEP_microsoft_sp_dynamic_data extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@microsoft/sp-dynamic-data', packageVersion, false, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@microsoft/sp-dynamic-data', isOptional: true });
   }
 
   get id(): string {

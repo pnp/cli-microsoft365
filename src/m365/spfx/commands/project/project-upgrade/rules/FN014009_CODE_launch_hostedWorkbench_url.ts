@@ -4,8 +4,11 @@ import { Project } from '../../project-model';
 import { Finding, Occurrence } from '../../report-model';
 
 export class FN014009_CODE_launch_hostedWorkbench_url extends JsonRule {
-  constructor(private url: string) {
+  private url: string;
+
+  constructor(options: { url: string }) {
     super();
+    this.url = options.url;
   }
 
   get id(): string {

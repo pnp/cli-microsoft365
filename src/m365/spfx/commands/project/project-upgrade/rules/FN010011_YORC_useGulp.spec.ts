@@ -9,7 +9,7 @@ describe('FN010011_YORC_useGulp', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010011_YORC_useGulp(false);
+    rule = new FN010011_YORC_useGulp({ useGulp: false });
   });
 
   it(`doesn't return notification if .yo-rc.json is not available`, () => {

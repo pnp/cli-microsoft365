@@ -4,8 +4,11 @@ import { Finding, Occurrence } from '../../report-model/index.js';
 import { TsRule } from "./TsRule.js";
 
 export class FN016001_TS_msgraphclient_packageName extends TsRule {
-  constructor(private packageName: string) {
+  private packageName: string;
+
+  constructor(options: { packageName: string }) {
     super();
+    this.packageName = options.packageName;
   }
 
   get id(): string {

@@ -3,8 +3,13 @@ import { Project } from "../../project-model/index.js";
 import { Finding } from "../../report-model/index.js";
 
 export class FN021005_PKG_scripts_test extends JsonRule {
-  constructor(private script: string, private add: boolean = true) {
+  private script: string;
+  private add: boolean;
+
+  constructor(options: { script: string; add?: boolean }) {
     super();
+    this.script = options.script;
+    this.add = options.add ?? true;
   }
 
   get id(): string {
