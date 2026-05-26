@@ -23,10 +23,13 @@ m365 spo page control set [options]
 : URL of the site where the page is located.
 
 `--webPartData [webPartData]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `webPartProperties` or `webPartData` but not both.
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `innerHtml`, `webPartProperties` or `webPartData` but not more than one.
 
 `--webPartProperties [webPartProperties]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `webPartProperties` or `webPartData` but not both.
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `innerHtml`, `webPartProperties` or `webPartData` but not more than one.
+
+`--innerHtml [innerHtml]`
+: Inner HTML to set on the control. Specify either `innerHtml`, `webPartProperties` or `webPartData` but not more than one.
 ```
 
 <Global />
@@ -37,7 +40,13 @@ If the specified `pageName` doesn't refer to an existing modern page, you will g
 
 :::warning[Escaping JSON in PowerShell]
 
-When using the `--webPartProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+When using the `webPartProperties` or `webPartData` options it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+
+:::
+
+:::note
+
+When using `webPartProperties` or `webPartData`, only the properties you specify will be updated. Any properties not included in the JSON string will remain unchanged.
 
 :::
 
@@ -53,6 +62,12 @@ Update web part properties for the control, placed on a modern page
 
 ```sh
 m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --webPartProperties '{"description": "New description"}'
+```
+
+Update the text of a text web part
+
+```sh
+m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --innerHtml '<p>This text was updated by <a href="https://aka.ms/cli-m365">CLI for Microsoft 365</a></p>'
 ```
 
 ## Response

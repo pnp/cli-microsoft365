@@ -221,4 +221,33 @@ export const mockPageDataFail = {
   }])
 };
 
+export const TextWebPartCanvasContent = {
+  "position": {
+    "layoutIndex": 1,
+    "zoneIndex": 2,
+    "zoneId": "f5aebb48-f9df-49c9-ad0a-e48768df1f81",
+    "sectionIndex": 1,
+    "sectionFactor": 12,
+    "controlIndex": 4
+  },
+  "id": "c932377a-cd45-4a3f-8645-16c6d06b3b21",
+  "controlType": 4,
+  "isFromSectionTemplate": false,
+  "addedFromPersistedData": true,
+  "contentVersion": 5,
+  "innerHTML": "<p class=\"noSpacingAbove spacingBelow\" data-text-type=\"withSpacing\">Lorem ipsum <a href=\"https://google.be\">dolor</a> sit amet.</p><p class=\"noSpacingAbove spacingBelow\" data-text-type=\"withSpacing\">Test case, <a href=\"https://bing.be\">another</a> test.</p>"
+};
+
+export const mockTextWebPartCanvasContentStringified = JSON.stringify([TextWebPartCanvasContent]);
+
+export const mockTextWebPartPageData = {
+  "AuthorByline": "value",
+  "BannerImageUrl": "value",
+  "Description": "value",
+  "Title": "value",
+  "TopicHeader": "value",
+  "LayoutWebpartsContent": "value",
+  "CanvasContent1": mockTextWebPartCanvasContentStringified
+};
+
 export const mockCanvasContent = "<div>just some test content</div>";

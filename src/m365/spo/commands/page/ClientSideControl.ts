@@ -8,6 +8,7 @@ export interface ClientSideControl {
   reservedHeight: number;
   reservedWidth: number;
   webPartData: WebPartData;
+  innerHTML?: string;
 }
 
 interface WebPartData {

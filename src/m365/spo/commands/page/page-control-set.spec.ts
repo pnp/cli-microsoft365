@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-control-set.js';
-import { mockCanvasContentStringified, mockPageData, mockPageDataFail } from './page-control-set.mock.js';
+import { mockCanvasContentStringified, mockPageData, mockPageDataFail, TextWebPartCanvasContent, mockTextWebPartCanvasContentStringified, mockTextWebPartPageData } from './page-control-set.mock.js';
 
 describe(commands.PAGE_CONTROL_SET, () => {
   let log: string[];
@@ -71,7 +71,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control not found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -83,7 +83,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control page with no Canvas Control content', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return {};
       }
 
@@ -95,7 +95,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control found and handles error on page checkout error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -111,7 +111,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control found and handles page checkout correctly when no data is provided', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -119,9 +119,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return null;
       }
 
@@ -133,7 +131,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control not found after the page has been checked out', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -141,9 +139,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return mockPageDataFail;
       }
 
@@ -155,7 +151,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control found and handles page checkout', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -163,13 +159,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return mockPageData;
       }
 
-      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) {
         return '';
       }
 
@@ -181,7 +175,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly page save with webPartData', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -189,18 +183,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return mockPageData;
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return {};
-      }
-
-      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) {
         return '';
       }
 
@@ -212,7 +199,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly page save with webPartProperties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -220,18 +207,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return mockPageData;
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return {};
-      }
-
-      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) {
         return '';
       }
 
@@ -243,7 +223,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly page save when page extension is not provided', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
         return { CanvasContent1: mockCanvasContentStringified };
       }
 
@@ -251,18 +231,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
-
-      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
         return mockPageData;
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return {};
-      }
-
-      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) {
         return '';
       }
 
@@ -303,6 +276,16 @@ describe(commands.PAGE_CONTROL_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the innerHtml and webPartProperties options are provided', async () => {
+    const actual = await command.validate({ options: { webPartProperties: "{}", innerHtml: "<p>test</p>", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', pageName: 'home.aspx' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the innerHtml and webPartData options are provided', async () => {
+    const actual = await command.validate({ options: { webPartData: "{}", innerHtml: "<p>test</p>", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', pageName: 'home.aspx' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', pageName: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -316,5 +299,66 @@ describe(commands.PAGE_CONTROL_SET, () => {
   it('passes validation when right properties with webPartProperties are provided', async () => {
     const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartProperties: "{}", webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when right properties with innerHtml are provided', async () => {
+    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', innerHtml: "<p>test</p>", webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('throws an error when innerHtml is used on a non-text web part', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
+        return { CanvasContent1: mockCanvasContentStringified };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
+        return mockPageData;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(
+      command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', innerHtml: '<p>test</p>' } }),
+      new CommandError('The innerHtml option can only be used with text web parts.')
+    );
+  });
+
+  it('correctly page save with innerHtml', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) {
+        return { CanvasContent1: mockTextWebPartCanvasContentStringified };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) {
+        return mockTextWebPartPageData;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'c932377a-cd45-4a3f-8645-16c6d06b3b21', innerHtml: '<p>test</p>' } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      AuthorByline: mockTextWebPartPageData.AuthorByline,
+      BannerImageUrl: mockTextWebPartPageData.BannerImageUrl,
+      Description: mockTextWebPartPageData.Description,
+      Title: mockTextWebPartPageData.Title,
+      TopicHeader: mockTextWebPartPageData.TopicHeader,
+      LayoutWebpartsContent: mockTextWebPartPageData.LayoutWebpartsContent,
+      CanvasContent1: JSON.stringify([{ ...TextWebPartCanvasContent, innerHTML: '<p>test</p>' }])
+    });
   });
 });
