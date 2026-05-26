@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   webPartData?: string;
   webPartProperties?: string;
+  innerHtml?: string;
 }
 
 class SpoPageControlSetCommand extends SpoCommand {
@@ -43,7 +44,8 @@ class SpoPageControlSetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         webPartData: typeof args.options.webPartData !== 'undefined',
-        webPartProperties: typeof args.options.webPartProperties !== 'undefined'
+        webPartProperties: typeof args.options.webPartProperties !== 'undefined',
+        innerHtml: typeof args.options.innerHtml !== 'undefined'
       });
     });
   }
@@ -64,6 +66,9 @@ class SpoPageControlSetCommand extends SpoCommand {
       },
       {
         option: '--webPartProperties [webPartProperties]'
+      },
+      {
+        option: '--innerHtml [innerHtml]'
       }
     );
   }
@@ -75,8 +80,8 @@ class SpoPageControlSetCommand extends SpoCommand {
           return `${args.options.id} is not a valid GUID`;
         }
 
-        if (args.options.webPartData && args.options.webPartProperties) {
-          return 'Specify webPartProperties or webPartData but not both';
+        if ([args.options.webPartData, args.options.webPartProperties, args.options.innerHtml].filter(Boolean).length > 1) {
+          return 'Specify webPartProperties, webPartData, or innerHtml but not more than one';
         }
 
         if (args.options.webPartProperties) {
@@ -84,7 +89,7 @@ class SpoPageControlSetCommand extends SpoCommand {
             JSON.parse(args.options.webPartProperties);
           }
           catch (e) {
-            return `Specified webPartProperties is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
+            return `Specified webPartProperties is not a valid JSON string. Input: ${args.options.webPartProperties}. Error: ${e}`;
           }
         }
 
@@ -167,8 +172,7 @@ class SpoPageControlSetCommand extends SpoCommand {
           await logger.logToStderr('');
         }
       }
-
-      if (args.options.webPartProperties) {
+      else if (args.options.webPartProperties) {
         if (this.verbose) {
           await logger.logToStderr('web part properties data:');
           await logger.logToStderr(args.options.webPartProperties);
@@ -186,6 +190,13 @@ class SpoPageControlSetCommand extends SpoCommand {
           await logger.logToStderr(canvasControl.webPartData.properties);
           await logger.logToStderr('');
         }
+      }
+      else if (args.options.innerHtml) {
+        if (canvasControl.controlType !== 4 && !canvasControl.innerHTML) {
+          throw 'The innerHtml option can only be used with text web parts.';
+        }
+
+        canvasControl.innerHTML = args.options.innerHtml;
       }
 
       const pageData: any = {};
