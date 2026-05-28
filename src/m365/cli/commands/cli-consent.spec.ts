@@ -7,7 +7,7 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-import command from './cli-consent.js';
+import command, { options } from './cli-consent.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 
 describe(commands.CONSENT, () => {
@@ -15,12 +15,14 @@ describe(commands.CONSENT, () => {
   let logger: Logger;
   let loggerLogSpy: any;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,17 +64,17 @@ describe(commands.CONSENT, () => {
   it('shows consent URL for VivaEngage permissions for a custom single-tenant app', async () => {
     sinon.stub(cli, 'getTenant').returns('fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89');
     sinon.stub(cli, 'getClientId').returns('2587b55d-a41e-436d-bb1d-6223eb185dd4');
-    await command.action(logger, { options: { service: 'VivaEngage' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ service: 'VivaEngage' }) });
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=2587b55d-a41e-436d-bb1d-6223eb185dd4&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
   });
 
-  it('fails validation if specified service is invalid ', async () => {
-    const actual = await command.validate({ options: { service: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified service is invalid ', () => {
+    const actual = commandOptionsSchema.safeParse({ service: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if service is set to VivaEngage ', async () => {
-    const actual = await command.validate({ options: { service: 'VivaEngage' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if service is set to VivaEngage ', () => {
+    const actual = commandOptionsSchema.safeParse({ service: 'VivaEngage' });
+    assert.strictEqual(actual.success, true);
   });
 });
