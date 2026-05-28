@@ -1,8 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -16,7 +14,6 @@ import command from './siteclassification-set.js';
 describe(commands.SITECLASSIFICATION_SET, () => {
   let log: string[];
   let logger: Logger;
-  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,7 +21,6 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,30 +58,24 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if none of the options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if none of the options are specified', () => {
+    const schema = command.getSchemaToParse()!;
+    const result = schema.safeParse({});
+    assert.notStrictEqual(result.success, true);
   });
 
-  it('passes validation if at least one option is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        classifications: "Confidential"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if at least one option is specified', () => {
+    const schema = command.getSchemaToParse()!;
+    const result = schema.safeParse({ classifications: "Confidential" });
+    assert.strictEqual(result.success, true);
   });
 
-  it('passes validation if all options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are passed', () => {
+    const schema = command.getSchemaToParse()!;
+    const result = schema.safeParse({
+      classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
+    });
+    assert.strictEqual(result.success, true);
   });
 
   it('handles Microsoft 365 Tenant siteclassification has not been enabled', async () => {

@@ -1,19 +1,22 @@
 import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  classifications: z.string().optional().alias('c'),
+  defaultClassification: z.string().optional().alias('d'),
+  usageGuidelinesUrl: z.string().optional().alias('u'),
+  guestUsageGuidelinesUrl: z.string().optional().alias('g')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  classifications?: string;
-  defaultClassification?: string;
-  usageGuidelinesUrl?: string;
-  guestUsageGuidelinesUrl?: string;
 }
 
 class EntraSiteClassificationSetCommand extends GraphCommand {
@@ -25,54 +28,18 @@ class EntraSiteClassificationSetCommand extends GraphCommand {
     return 'Updates site classification configuration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        classifications: typeof args.options.classifications !== 'undefined',
-        defaultClassification: typeof args.options.defaultClassification !== 'undefined',
-        usageGuidelinesUrl: typeof args.options.usageGuidelinesUrl !== 'undefined',
-        guestUsageGuidelinesUrl: typeof args.options.guestUsageGuidelinesUrl !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-c, --classifications [classifications]'
-      },
-      {
-        option: '-d, --defaultClassification [defaultClassification]'
-      },
-      {
-        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
-      },
-      {
-        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.classifications &&
-          !args.options.defaultClassification &&
-          !args.options.usageGuidelinesUrl &&
-          !args.options.guestUsageGuidelinesUrl) {
-          return 'Specify at least one property to update';
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.classifications || options.defaultClassification || options.usageGuidelinesUrl || options.guestUsageGuidelinesUrl, {
+        error: 'Specify at least one property to update',
+        params: {
+          customCode: 'required'
         }
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

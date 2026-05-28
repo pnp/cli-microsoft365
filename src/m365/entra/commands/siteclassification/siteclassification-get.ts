@@ -1,9 +1,13 @@
 import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { SiteClassificationSettings } from './SiteClassificationSettings.js';
+
+export const options = globalOptionsZod;
 
 class EntraSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
@@ -12,6 +16,10 @@ class EntraSiteClassificationGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets site classification configuration';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

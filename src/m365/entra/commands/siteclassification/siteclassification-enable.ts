@@ -1,19 +1,22 @@
 import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  classifications: z.string().alias('c'),
+  defaultClassification: z.string().alias('d'),
+  usageGuidelinesUrl: z.string().optional().alias('u'),
+  guestUsageGuidelinesUrl: z.string().optional().alias('g')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  classifications: string;
-  defaultClassification: string;
-  usageGuidelinesUrl?: string;
-  guestUsageGuidelinesUrl?: string;
 }
 
 class EntraSiteClassificationEnableCommand extends GraphCommand {
@@ -25,37 +28,8 @@ class EntraSiteClassificationEnableCommand extends GraphCommand {
     return 'Enables site classification configuration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        usageGuidelinesUrl: typeof args.options.usageGuidelinesUrl !== 'undefined',
-        guestUsageGuidelinesUrl: typeof args.options.guestUsageGuidelinesUrl !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-c, --classifications <classifications>'
-      },
-      {
-        option: '-d, --defaultClassification <defaultClassification>'
-      },
-      {
-        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
-      },
-      {
-        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
