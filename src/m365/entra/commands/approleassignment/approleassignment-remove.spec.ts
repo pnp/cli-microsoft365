@@ -12,13 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './approleassignment-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './approleassignment-remove.js';
 
 describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
 
@@ -29,6 +29,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -243,104 +244,39 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId, appObjectId nor appDisplayName are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, appObjectId nor appDisplayName are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '123', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appObjectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appObjectId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appObjectId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appObjectId, appId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '123', appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appObjectId, appId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appObjectId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the appId option specified', async () => {
-    const actual = await command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying appId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying appDisplayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appDisplayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying confirmation flag', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--force') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when the appId option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, true);
   });
 });
 

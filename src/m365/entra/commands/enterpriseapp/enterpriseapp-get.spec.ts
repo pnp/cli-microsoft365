@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './enterpriseapp-get.js';
+import command, { options } from './enterpriseapp-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.ENTERPRISEAPP_GET, () => {
@@ -19,6 +19,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const spAppInfo = {
     "value": [
@@ -43,6 +44,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -270,97 +272,43 @@ describe(commands.ENTERPRISEAPP_GET, () => {
     }), new CommandError(`The specified Entra app does not exist`));
   });
 
-  it('fails validation if neither the id nor the displayName option specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the id nor the displayName option specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id option specified', async () => {
-    const actual = await command.validate({ options: { id: '6a7b1395-d313-4682-8ed4-65a6265a6320' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '6a7b1395-d313-4682-8ed4-65a6265a6320' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the displayName option specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Microsoft Graph' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the displayName option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Microsoft Graph' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when both the id and displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '6a7b1395-d313-4682-8ed4-65a6265a6320', displayName: 'Microsoft Graph' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both the id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '6a7b1395-d313-4682-8ed4-65a6265a6320', displayName: 'Microsoft Graph' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the objectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '123', displayName: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '6a7b1395-d313-4682-8ed4-65a6265a6320', displayName: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if objectId and displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { displayName: 'abc', objectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying displayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if objectId and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'abc', objectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' });
+    assert.strictEqual(actual.success, false);
   });
 });
