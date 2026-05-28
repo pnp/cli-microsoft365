@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Logger } from '../../../../cli/Logger.js';
@@ -12,6 +14,10 @@ import { browserUtil } from '../../../../utils/browserUtil.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape
+});
+
 class CliAppReconsentCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_RECONSENT;
@@ -19,6 +25,10 @@ class CliAppReconsentCommand extends GraphCommand {
 
   public get description(): string {
     return 'Reconsent all permission scopes used in CLI for Microsoft 365';
+  }
+
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
