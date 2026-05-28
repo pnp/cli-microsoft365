@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-schema-add.js';
+import command, { options } from './connection-schema-add.js';
 
 describe(commands.CONNECTION_SCHEMA_ADD, () => {
   const externalConnectionId = 'TestConnectionForCLI';
@@ -21,6 +21,7 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +30,7 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -184,67 +186,55 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
       new CommandError(errorMessage));
   });
 
-  it('fails validation if id is less than 3 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: 'T',
-        schema: schema
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if id is less than 3 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: 'T',
+      schema: schema
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is more than 32 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId + 'zzzzzzzzzzzzzzzzzz',
-        schema: schema
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if id is more than 32 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId + 'zzzzzzzzzzzzzzzzzz',
+      schema: schema
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not alphanumeric', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId + '!',
-        schema: schema
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if id is not alphanumeric', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId + '!',
+      schema: schema
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id starts with Microsoft', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: 'Microsoft' + externalConnectionId,
-        schema: schema
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if id starts with Microsoft', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: 'Microsoft' + externalConnectionId,
+      schema: schema
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if schema does not contain baseType', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId,
-        schema: '{"properties": [{"name": "ticketTitle","type": "String"}]}'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if schema does not contain baseType', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId,
+      schema: '{"properties": [{"name": "ticketTitle","type": "String"}]}'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if schema does not contain properties', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId,
-        schema: '{"baseType": "microsoft.graph.externalItem"}'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if schema does not contain properties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId,
+      schema: '{"baseType": "microsoft.graph.externalItem"}'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if schema does contain more than 128 properties', async () => {
+  it('fails validation if schema does contain more than 128 properties', () => {
     const schemaObject = JSON.parse(schema);
     for (let i = 0; i < 128; i++) {
       schemaObject.properties.push({
@@ -252,22 +242,26 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
         type: 'String'
       });
     }
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId,
-        schema: JSON.stringify(schemaObject)
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId,
+      schema: JSON.stringify(schemaObject)
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation with a correct schema and external connection id', async () => {
-    const actual = await command.validate({
-      options: {
-        externalConnectionId: externalConnectionId,
-        schema: schema
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with a correct schema and external connection id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId,
+      schema: schema
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if schema is not valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: externalConnectionId,
+      schema: 'not valid json'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

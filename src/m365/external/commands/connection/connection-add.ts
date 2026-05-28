@@ -1,19 +1,53 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types/microsoft-graph';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const invalidIds: string[] = ['None',
+  'Directory',
+  'Exchange',
+  'ExchangeArchive',
+  'LinkedIn',
+  'Mailbox',
+  'OneDriveBusiness',
+  'SharePoint',
+  'Teams',
+  'Yammer',
+  'Connectors',
+  'TaskFabric',
+  'PowerBI',
+  'Assistant',
+  'TopicEngine',
+  'MSFT_All_Connectors'
+];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .min(3, 'ID must be between 3 and 32 characters in length.')
+    .max(32, 'ID must be between 3 and 32 characters in length.')
+    .refine(id => !/[^\w]|_/g.test(id), {
+      message: 'ID must only contain alphanumeric characters.'
+    })
+    .refine(id => !(id.length > 9 && id.startsWith('Microsoft')), {
+      message: 'ID cannot begin with Microsoft'
+    })
+    .refine(id => !invalidIds.includes(id), {
+      error: () => `ID cannot be one of the following values: ${invalidIds.join(', ')}.`
+    })
+    .alias('i'),
+  name: z.string().alias('n'),
+  description: z.string().alias('d'),
+  authorizedAppIds: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  name: string;
-  description: string;
-  authorizedAppIds?: string;
 }
 
 class ExternalConnectionAddCommand extends GraphCommand {
@@ -29,83 +63,8 @@ class ExternalConnectionAddCommand extends GraphCommand {
     return [commands.EXTERNALCONNECTION_ADD];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        authorizedAppIds: typeof args.options.authorizedAppIds !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --description <description>'
-      },
-      {
-        option: '--authorizedAppIds [authorizedAppIds]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const id = args.options.id;
-        if (id.length < 3 || id.length > 32) {
-          return 'ID must be between 3 and 32 characters in length.';
-        }
-
-        const alphaNumericRegEx = /[^\w]|_/g;
-
-        if (alphaNumericRegEx.test(id)) {
-          return 'ID must only contain alphanumeric characters.';
-        }
-
-        if (id.length > 9 &&
-          id.startsWith('Microsoft')) {
-          return 'ID cannot begin with Microsoft';
-        }
-
-        const invalidIds: string[] = ['None',
-          'Directory',
-          'Exchange',
-          'ExchangeArchive',
-          'LinkedIn',
-          'Mailbox',
-          'OneDriveBusiness',
-          'SharePoint',
-          'Teams',
-          'Yammer',
-          'Connectors',
-          'TaskFabric',
-          'PowerBI',
-          'Assistant',
-          'TopicEngine',
-          'MSFT_All_Connectors'
-        ];
-
-        if (invalidIds.indexOf(id) > -1) {
-          return `ID cannot be one of the following values: ${invalidIds.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

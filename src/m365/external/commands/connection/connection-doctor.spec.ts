@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-doctor.js';
+import command, { options } from './connection-doctor.js';
 
 describe(commands.CONNECTION_DOCTOR, () => {
   const logger: Logger = {
@@ -22,6 +22,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
   };
   let commandInfo: CommandInfo;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
 
   const externalConnection: ExternalConnectors.ExternalConnection = {
     "id": "msgraphdocs",
@@ -237,6 +238,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     loggerLogSpy = sinon.spy(logger, 'log');
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   afterEach(() => {
@@ -2256,63 +2258,50 @@ describe(commands.CONNECTION_DOCTOR, () => {
     assert(output.indexOf('Check|Type|Status|Error message') > -1);
   });
 
-  it('fails validation if an invalid ux is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'msgraphdocs',
-        ux: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('passes validation for ux copilot', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'msgraphdocs',
-        ux: 'copilot'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation for ux search', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'msgraphdocs',
-        ux: 'search'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation for ux all', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'msgraphdocs',
-        ux: 'all'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when no ux specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'msgraphdocs'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying ux', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--ux') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if an invalid ux is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs',
+      ux: 'invalid'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation for ux copilot', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs',
+      ux: 'copilot'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation for ux search', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs',
+      ux: 'search'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation for ux all', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs',
+      ux: 'all'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when no ux specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'msgraphdocs',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

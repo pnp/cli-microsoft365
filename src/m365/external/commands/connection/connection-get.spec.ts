@@ -1,7 +1,10 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -16,6 +19,8 @@ describe(commands.CONNECTION_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: ReturnType<typeof command.getSchemaToParse>;
 
   const externalConnection: ExternalConnectors.ExternalConnection = {
     "id": "contosohr",
@@ -35,6 +40,8 @@ describe(commands.CONNECTION_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse();
   });
 
   beforeEach(() => {
@@ -154,5 +161,30 @@ describe(commands.CONNECTION_GET, () => {
         name: 'Contoso HR'
       }
     }), new CommandError(`External connection with name 'Contoso HR' not found`));
+  });
+
+  it('passes validation with id specified', () => {
+    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with name specified', () => {
+    const actual = (commandOptionsSchema as z.ZodType).safeParse({ name: 'Contoso HR' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with both id and name specified', () => {
+    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', name: 'Contoso HR' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with neither id nor name specified', () => {
+    const actual = (commandOptionsSchema as z.ZodType).safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
