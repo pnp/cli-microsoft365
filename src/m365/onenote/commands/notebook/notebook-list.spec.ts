@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './notebook-list.js';
+import command, { options } from './notebook-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -20,6 +20,7 @@ describe(commands.NOTEBOOK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let accessTokenStub: sinon.SinonStub;
 
   before(() => {
@@ -29,6 +30,7 @@ describe(commands.NOTEBOOK_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,29 +74,24 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'displayName', 'id']);
   });
 
-  it('fails validation if webUrl is not a valid webUrl', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid webUrl', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if no option specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no option specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('enforces the user to use delegated permissions', async () => {

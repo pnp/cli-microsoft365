@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { validation } from '../../../../utils/validation.js';
@@ -8,17 +9,32 @@ import { spo } from '../../../../utils/spo.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string()
+    .refine(name => name.length <= 128, {
+      error: 'The specified name is too long. It should be less than 128 characters.'
+    })
+    .refine(name => !/[?*/:<>|'"]/.test(name), {
+      error: `The specified name contains invalid characters. It cannot contain ?*/:<>|'". Please remove them and try again.`
+    }).alias('n'),
+  userId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
+  userName: z.string().optional(),
+  groupId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
+  groupName: z.string().optional(),
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).optional().alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  webUrl?: string;
 }
 
 class OneNoteNotebookAddCommand extends GraphDelegatedCommand {
@@ -30,87 +46,19 @@ class OneNoteNotebookAddCommand extends GraphDelegatedCommand {
     return 'Create a new OneNote notebook';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        webUrl: typeof args.options.webUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => {
+        const opts = [options.userId, options.userName, options.groupId, options.groupName, options.webUrl];
+        const defined = opts.filter(item => item !== undefined);
+        return defined.length <= 1;
+      }, {
+        error: 'Specify userId, userName, groupId, groupName, or webUrl, but not multiple.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '-u, --webUrl [webUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        // check name for invalid characters
-        if (args.options.name.length > 128) {
-          return 'The specified name is too long. It should be less than 128 characters';
-        }
-
-        if (/[?*/:<>|'"]/.test(args.options.name)) {
-          return `The specified name contains invalid characters. It cannot contain ?*/:<>|'". Please remove them and try again.`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.webUrl) {
-          return validation.isValidSharePointUrl(args.options.webUrl);
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['userId', 'userName', 'groupId', 'groupName', 'webUrl'],
-      runsWhen: (args) => {
-        const options = [args.options.userId, args.options.userName, args.options.groupId, args.options.groupName, args.options.webUrl];
-        return options.some(item => item !== undefined);
-      }
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './notebook-add.js';
+import command, { options } from './notebook-add.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -56,6 +56,7 @@ describe(commands.NOTEBOOK_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let accessTokenStub: sinon.SinonStub;
 
   before(() => {
@@ -65,6 +66,7 @@ describe(commands.NOTEBOOK_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,35 +106,35 @@ describe(commands.NOTEBOOK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if name contains invalid characters', async () => {
-    const actual = await command.validate({ options: { name: 'My notebook /' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if name contains invalid characters', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My notebook /' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if name is longer than 128 characters', async () => {
+  it('fails validation if name is longer than 128 characters', () => {
     const longString = 'x'.repeat(129);
-    const actual = await command.validate({ options: { name: longString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: longString });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not a valid webUrl', async () => {
-    const actual = await command.validate({ options: { name: name, webUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid webUrl', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if no option but name specified', async () => {
-    const actual = await command.validate({ options: { name: name } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no option but name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name });
+    assert.strictEqual(actual.success, true);
   });
 
   it('enforces the user to use delegated permissions', async () => {
