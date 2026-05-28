@@ -2,7 +2,6 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,14 +10,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './oauth2grant-add.js';
+import command, { options } from './oauth2grant-add.js';
 
 describe(commands.OAUTH2GRANT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,7 +25,8 @@ describe(commands.OAUTH2GRANT_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,7 +81,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -101,7 +101,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -117,55 +117,22 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' }) }),
       new CommandError('An error has occurred'));
   });
 
   it('fails validation if the clientId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientId: '123', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ clientId: '123', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' });
+    assert.strictEqual(parseResult.success, false);
   });
 
   it('fails validation if the resourceId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '123', scope: 'user_impersonation' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '123', scope: 'user_impersonation' });
+    assert.strictEqual(parseResult.success, false);
   });
 
   it('passes validation when clientId, resourceId and scope are specified', async () => {
-    const actual = await command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying clientId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--clientId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying resourceId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--resourceId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--scope') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    const parseResult = commandOptionsSchema.safeParse({ clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' });
+    assert.strictEqual(parseResult.success, true);
   });
 });

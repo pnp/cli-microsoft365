@@ -1,17 +1,20 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = globalOptionsZod
+  .extend({
+    grantId: z.string().alias('i'),
+    scope: z.string().alias('s')
+  }).strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  grantId: string;
-  scope: string;
 }
 
 class EntraOAuth2GrantSetCommand extends GraphCommand {
@@ -23,21 +26,8 @@ class EntraOAuth2GrantSetCommand extends GraphCommand {
     return 'Update OAuth2 permissions for the service principal';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --grantId <grantId>'
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

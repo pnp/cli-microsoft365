@@ -2,7 +2,6 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,13 +10,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './oauth2grant-list.js';
+import command, { options } from './oauth2grant-list.js';
 
 describe(commands.OAUTH2GRANT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,7 +24,8 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,7 +92,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' }) });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -139,7 +139,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' }) });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -192,7 +192,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' }) });
     assert(loggerLogSpy.calledOnceWithExactly([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -224,7 +224,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' }) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
@@ -240,28 +240,17 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if the spObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { spObjectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ spObjectId: '123' });
+    assert.strictEqual(parseResult.success, false);
   });
 
   it('passes validation when the spObjectId option specified', async () => {
-    const actual = await command.validate({ options: { spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying spObjectId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--spObjectId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    const parseResult = commandOptionsSchema.safeParse({ spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' });
+    assert.strictEqual(parseResult.success, true);
   });
 });

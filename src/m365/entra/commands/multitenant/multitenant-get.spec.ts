@@ -1,20 +1,22 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import request from '../../../../request.js';
+import { cli } from '../../../../cli/cli.js';
+import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
+import command, { options } from './multitenant-get.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import command from './multitenant-get.js';
 import { CommandError } from '../../../../Command.js';
 
 describe(commands.MULTITENANT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
   const response = {
     "id": "ab217953-e37f-4691-97b8-dbb8a0a3bcaf",
     "createdDateTime": "2024-05-05T05:05:05",
@@ -29,6 +31,8 @@ describe(commands.MULTITENANT_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -75,7 +79,7 @@ describe(commands.MULTITENANT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
@@ -93,6 +97,6 @@ describe(commands.MULTITENANT_GET, () => {
     };
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(error.error.message));
   });
 });

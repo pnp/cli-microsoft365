@@ -1,18 +1,20 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = globalOptionsZod
+  .extend({
+    clientId: z.uuid().alias('i'),
+    resourceId: z.uuid().alias('r'),
+    scope: z.string().alias('s')
+  }).strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  clientId: string;
-  resourceId: string;
-  scope: string;
 }
 
 class EntraOAuth2GrantAddCommand extends GraphCommand {
@@ -24,41 +26,8 @@ class EntraOAuth2GrantAddCommand extends GraphCommand {
     return 'Grant the specified service principal OAuth2 permissions to the specified resource';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --clientId <clientId>'
-      },
-      {
-        option: '-r, --resourceId <resourceId>'
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.clientId)) {
-          return `${args.options.clientId} is not a valid GUID`;
-        }
-
-        if (!validation.isValidGuid(args.options.resourceId)) {
-          return `${args.options.resourceId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
