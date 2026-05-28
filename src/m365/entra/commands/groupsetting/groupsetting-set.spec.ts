@@ -12,12 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './groupsetting-set.js';
+import { options } from './groupsetting-get.js';
 
 describe(commands.GROUPSETTING_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +28,7 @@ describe(commands.GROUPSETTING_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -383,14 +386,14 @@ describe(commands.GROUPSETTING_SET, () => {
       new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('allows unknown properties', () => {

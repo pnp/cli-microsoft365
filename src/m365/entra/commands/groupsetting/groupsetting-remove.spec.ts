@@ -1,5 +1,4 @@
 import assert from 'assert';
-import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
@@ -12,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './groupsetting-remove.js';
+import command, { options } from './groupsetting-remove.js';
 
 describe(commands.GROUPSETTING_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -25,9 +25,9 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(fs, 'readFileSync').returns('abc');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -153,35 +153,13 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       new CommandError('File Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying confirmation flag', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--force') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 });

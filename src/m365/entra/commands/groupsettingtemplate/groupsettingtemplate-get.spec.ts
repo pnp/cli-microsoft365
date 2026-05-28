@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './groupsettingtemplate-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './groupsettingtemplate-get.js';
 
 describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -48,8 +49,7 @@ describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -125,44 +125,28 @@ describe(commands.GROUPSETTINGTEMPLATE_GET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if neither the id nor the displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the id nor the displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both the id and the displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22', displayName: 'Group.Unified' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both the id and the displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '68be84bf-a585-4776-80b3-30aa5207aa22', displayName: 'Group.Unified' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the displayName is specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Group.Unified' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Group.Unified' });
+    assert.strictEqual(actual.success, true);
   });
 });

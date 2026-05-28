@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './groupsetting-get.js';
+import command, { options } from './groupsetting-get.js';
 
 describe(commands.GROUPSETTING_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.GROUPSETTING_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -153,24 +155,13 @@ describe(commands.GROUPSETTING_GET, () => {
       new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' });
+    assert.strictEqual(actual.success, true);
   });
 });

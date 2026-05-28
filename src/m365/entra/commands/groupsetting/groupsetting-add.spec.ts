@@ -12,12 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './groupsetting-add.js';
+import { options } from './groupsetting-get.js';
 
 describe(commands.GROUPSETTING_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +28,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -481,14 +484,14 @@ describe(commands.GROUPSETTING_ADD, () => {
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 
-  it('fails validation if the templateId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { templateId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the templateId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ templateId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the templateId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the templateId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('allows unknown properties', () => {
