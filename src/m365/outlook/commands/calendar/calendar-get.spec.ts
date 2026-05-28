@@ -78,7 +78,8 @@ describe(commands.CALENDAR_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      calendarGroup.getUserCalendarGroupByName
     ]);
   });
 
@@ -107,6 +108,13 @@ describe(commands.CALENDAR_GET, () => {
       id: calendarId,
       name: calendarName,
       userId: userId
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if neither userId nor userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: calendarId
     });
     assert.notStrictEqual(actual.success, true);
   });
