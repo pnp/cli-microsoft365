@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-get.js';
+import command, { options } from './message-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_GET, () => {
@@ -77,6 +77,7 @@ describe(commands.MESSAGE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -89,6 +90,7 @@ describe(commands.MESSAGE_GET, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -258,6 +260,16 @@ describe(commands.MESSAGE_GET, () => {
   it('passes validation if id is filled in', async () => {
     const actual = await command.validate({ options: { id: messageId } }, commandInfo);
     assert.equal(actual, true);
+  });
+
+  it('fails validation if both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId, userName: userName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if only userId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('throws an error when the upn or userName is not defined when signed in using app only authentication', async () => {
