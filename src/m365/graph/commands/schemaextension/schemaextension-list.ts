@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  status: z.enum(['Available', 'InDevelopment', 'Deprecated']).optional().alias('s'),
+  owner: z.string().optional(),
+  pageSize: z.string().optional().alias('p'),
+  pageNumber: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  status?: string;
-  owner?: string;
-  pageNumber?: string;
-  pageSize?: string;
 }
 
 class GraphSchemaExtensionListCommand extends GraphCommand {
@@ -25,66 +29,24 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
     return 'Get a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        status: typeof args.options.status !== 'undefined',
-        owner: typeof args.options.owner !== 'undefined',
-        pageNumber: typeof args.options.pageNumber !== 'undefined',
-        pageSize: typeof args.options.pageSize !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => !options.owner || validation.isValidGuid(options.owner), {
+        error: e => `${(e.input as Options).owner} is not a valid GUID`,
+        path: ['owner']
+      })
+      .refine(options => !options.pageNumber || parseInt(options.pageNumber) >= 1, {
+        error: 'pageNumber must be a positive number',
+        path: ['pageNumber']
+      })
+      .refine(options => !options.pageSize || parseInt(options.pageSize) >= 1, {
+        error: 'pageSize must be a positive number',
+        path: ['pageSize']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --status [status]',
-        autocomplete: ['Available', 'InDevelopment', 'Deprecated']
-      },
-      {
-        option: '--owner [owner]'
-      },
-      {
-        option: '-p, --pageSize [pageSize]'
-      },
-      {
-        option: '-n, --pageNumber [pageNumber]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
-          return `${args.options.owner} is not a valid GUID`;
-        }
-
-        if (args.options.pageNumber && parseInt(args.options.pageNumber) < 1) {
-          return 'pageNumber must be a positive number';
-        }
-
-        if (args.options.pageSize && parseInt(args.options.pageSize) < 1) {
-          return 'pageSize must be a positive number';
-        }
-
-        if (args.options.status &&
-          ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
-          return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

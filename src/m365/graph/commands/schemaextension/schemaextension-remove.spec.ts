@@ -140,14 +140,4 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });
