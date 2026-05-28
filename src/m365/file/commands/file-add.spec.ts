@@ -950,6 +950,12 @@ describe(commands.ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it(`fails validation if the specified folderUrl is invalid`, async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: '/' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it(`fails validation if the specified siteUrl is invalid`, async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     const actual = commandOptionsSchema.safeParse({
