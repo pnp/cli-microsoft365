@@ -11,6 +11,7 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { z } from 'zod';
 import commands from '../commands.js';
 import command from './file-add.js';
 
@@ -18,6 +19,7 @@ describe(commands.ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +28,7 @@ describe(commands.ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -943,25 +946,23 @@ describe(commands.ADD, () => {
 
   it(`fails validation if the specified local source file doesn't exist`, async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`fails validation if the specified siteUrl is invalid`, async () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({
-      options: {
-        filePath: 'file.pdf',
-        folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
-        siteUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      filePath: 'file.pdf',
+      folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
+      siteUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`passes validation if the target file is a URL`, async () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' });
+    assert.strictEqual(actual.success, true);
   });
 });

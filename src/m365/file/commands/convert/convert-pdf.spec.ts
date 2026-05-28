@@ -12,6 +12,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { z } from 'zod';
 import commands from '../../commands.js';
 import command from './convert-pdf.js';
 
@@ -19,6 +20,7 @@ describe(commands.CONVERT_PDF, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
   let unlinkSyncStub: sinon.SinonStub;
   const mockPdfFile = 'pdf';
   let pdfConvertResponseStream: PassThrough;
@@ -32,6 +34,7 @@ describe(commands.CONVERT_PDF, () => {
     auth.connection.active = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').returns();
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -1749,25 +1752,25 @@ describe(commands.CONVERT_PDF, () => {
 
   it(`fails validation if the specified local source file doesn't exist`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ sourceFile: 'file.docx', targetFile: 'file.pdf' });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`fails validation if another file exists at the path specified in the target file`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ sourceFile: 'file.docx', targetFile: 'file.pdf' });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`passes validation if the source file is a URL`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx', targetFile: 'file.pdf' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx', targetFile: 'file.pdf' });
+    assert.strictEqual(actual.success, true);
   });
 
   it(`passes validation if the target file is a URL`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' });
+    assert.strictEqual(actual.success, true);
   });
 });

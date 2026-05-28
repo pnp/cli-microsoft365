@@ -11,6 +11,7 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { z } from 'zod';
 import commands from '../commands.js';
 import command from './file-copy.js';
 
@@ -18,6 +19,7 @@ describe(commands.COPY, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   const defaultPostStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -123,6 +125,7 @@ describe(commands.COPY, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -165,39 +168,33 @@ describe(commands.COPY, () => {
   });
 
   it('fails validation if nameConflictBehavior is not a valid option', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: '/Shared Documents/file.pdf',
-        targetUrl: '/teams/finance/Shared Documents',
-        nameConflictBehavior: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      sourceUrl: '/Shared Documents/file.pdf',
+      targetUrl: '/teams/finance/Shared Documents',
+      nameConflictBehavior: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'foo',
-        sourceUrl: '/Shared Documents/file.pdf',
-        targetUrl: '/teams/finance/Shared Documents'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      sourceUrl: '/Shared Documents/file.pdf',
+      targetUrl: '/teams/finance/Shared Documents'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation with valid options', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: '/Shared Documents/file.pdf',
-        targetUrl: '/teams/finance/Shared Documents',
-        newName: 'file1',
-        nameConflictBehavior: 'rename'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      sourceUrl: '/Shared Documents/file.pdf',
+      targetUrl: '/teams/finance/Shared Documents',
+      newName: 'file1',
+      nameConflictBehavior: 'rename'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('copies file from source to target', async () => {

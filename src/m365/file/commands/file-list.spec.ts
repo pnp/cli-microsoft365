@@ -10,6 +10,7 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { z } from 'zod';
 import commands from '../commands.js';
 import command from './file-list.js';
 
@@ -18,6 +19,7 @@ describe(commands.LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +28,7 @@ describe(commands.LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
   });
 
   beforeEach(() => {
@@ -9778,22 +9781,18 @@ describe(commands.LIST, () => {
   });
 
   it(`fails validation if the specified webUrl is invalid`, async () => {
-    const actual = await command.validate({
-      options: {
-        folderUrl: '/Shared Documents',
-        webUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      folderUrl: '/Shared Documents',
+      webUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`passes validation if the target file is a URL`, async () => {
-    const actual = await command.validate({
-      options: {
-        folderUrl: 'Shared Documents',
-        webUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      folderUrl: 'Shared Documents',
+      webUrl: 'https://contoso.sharepoint.com/Shared Documents'
+    });
+    assert.strictEqual(actual.success, true);
   });
 });
