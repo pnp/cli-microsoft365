@@ -12,7 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-remove.js';
+import command, { options } from './group-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -23,6 +23,7 @@ describe(commands.GROUP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +32,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -226,12 +228,12 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: groupId });
+    assert.strictEqual(actual.success, true);
   });
 });

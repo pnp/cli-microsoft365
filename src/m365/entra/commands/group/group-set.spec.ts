@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-set.js';
+import command, { options } from './group-set.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { CommandError } from '../../../../Command.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
@@ -23,6 +23,7 @@ describe(commands.GROUP_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.GROUP_SET, () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').withArgs('Microsoft 365 Group').resolves(groupId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,74 +79,74 @@ describe(commands.GROUP_SET, () => {
 
   it('fails validation if the length of newDisplayName is more than 256 characters', async () => {
     const displayName = 'lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
-    const actual = await command.validate({ options: { id: groupId, newDisplayName: displayName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: groupId, newDisplayName: displayName });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the length of mailNickname is more than 64 characters', async () => {
     const mailNickname = 'loremipsumloremipsumloremipsumloremipsumloremipsumloremipsumloremipsumlorem';
-    const actual = await command.validate({ options: { displayName: 'Cli group', mailNickname: mailNickname } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', mailNickname: mailNickname });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if mailNickname is not valid', async () => {
     const mailNickname = 'lorem ipsum';
-    const actual = await command.validate({ options: { displayName: 'Cli group', mailNickname: mailNickname } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', mailNickname: mailNickname });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if ownerIds contains invalid GUID', async () => {
     const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: ownerIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerIds: ownerIds.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if ownerUserNames contains invalid user principal name', async () => {
     const ownerUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerUserNames: ownerUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerUserNames: ownerUserNames.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if memberIds contains invalid GUID', async () => {
     const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', memberIds: memberIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberIds: memberIds.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if memberUserNames contains invalid user principal name', async () => {
     const memberUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', memberUserNames: memberUserNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberUserNames: memberUserNames.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if visibility contains invalid value', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', visibility: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', visibility: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation if id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: groupId, newDisplayName: 'Cli group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: groupId, newDisplayName: 'Cli group' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'foo', newDisplayName: 'Cli group' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'foo', newDisplayName: 'Cli group' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: userIds.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerIds: userIds.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with user names', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', memberUserNames: userUpns.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberUserNames: userUpns.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if no options to be updated are specified', async () => {
-    const actual = await command.validate({ options: { id: groupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: groupId });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('successfully updates group specified by id', async () => {

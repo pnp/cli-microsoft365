@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-add.js';
+import command, { options } from './group-add.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { CommandError } from '../../../../Command.js';
 
@@ -180,6 +180,7 @@ describe(commands.GROUP_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -188,6 +189,7 @@ describe(commands.GROUP_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -232,69 +234,69 @@ describe(commands.GROUP_ADD, () => {
 
   it('fails validation if the length of displayName is more than 256 characters', async () => {
     const displayName = 'lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
-    const actual = await command.validate({ options: { displayName: displayName, type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the length of mailNickname is more than 64 characters', async () => {
     const mailNickname = 'loremipsumloremipsumloremipsumloremipsumloremipsumloremipsumloremipsumlorem';
-    const actual = await command.validate({ options: { displayName: 'Cli group', mailNickname: mailNickname, type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', mailNickname: mailNickname, type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if mailNickname is not valid', async () => {
     const mailNickname = 'lorem ipsum';
-    const actual = await command.validate({ options: { displayName: 'Cli group', mailNickname: mailNickname, type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', mailNickname: mailNickname, type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if ownerIds contains invalid GUID', async () => {
     const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: ownerIds.join(','), type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerIds: ownerIds.join(','), type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if ownerUserNames contains invalid user principal name', async () => {
     const ownerUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerUserNames: ownerUserNames.join(','), type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerUserNames: ownerUserNames.join(','), type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if memberIds contains invalid GUID', async () => {
     const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', memberIds: memberIds.join(','), type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberIds: memberIds.join(','), type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if memberUserNames contains invalid user principal name', async () => {
     const memberUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { displayName: 'Cli group', memberUserNames: memberUserNames.join(','), type: 'security' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberUserNames: memberUserNames.join(','), type: 'security' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if visibility contains invalid value', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', visibility: 'foo', type: 'microsoft365' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', visibility: 'foo', type: 'microsoft365' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if type contains invalid value', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', visibility: 'Public', type: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', visibility: 'Public', type: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if type is microsoft365 but visibility is not specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', type: 'microsoft365' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', type: 'microsoft365' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerIds: userIds.join(','), memberIds: userIds.join(','), type: 'security' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerIds: userIds.join(','), memberIds: userIds.join(','), type: 'security' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with user names', async () => {
-    const actual = await command.validate({ options: { displayName: 'Cli group', ownerUserNames: userUpns.join(','), memberUserNames: userUpns.join(','), type: 'security' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerUserNames: userUpns.join(','), memberUserNames: userUpns.join(','), type: 'security' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully creates Microsoft 365 group without owners and members', async () => {

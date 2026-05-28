@@ -9,7 +9,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-member-remove.js';
+import command, { options } from './group-member-remove.js';
 import request from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -25,6 +25,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +34,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,58 +75,58 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo', userIds: userIds[0] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo', userIds: userIds[0] });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if userIds contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: `${userIds[0]},foo` } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: `${userIds[0]},foo` });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if userNames contains an invalid UPN', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userNames: `${upns[0]},foo` } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userNames: `${upns[0]},foo` });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroupIds contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: `${groupIds[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: `${groupIds[0]},foo`, role: 'Member' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if role is not a valid role', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.join(','), role: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.join(','), role: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroupIds is specified without role option', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: groupIds[0] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: groupIds[0] });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroupNames is specified with owner role', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: groupIds[0], role: 'Owner' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: groupIds[0], role: 'Owner' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with ids with leading spaces', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.map(i => ' ' + i).join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.map(i => ' ' + i).join(','), role: 'Member' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with names', async () => {
-    const actual = await command.validate({ options: { groupName: 'IT department', userNames: upns.join(',') } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupName: 'IT department', userNames: upns.join(',') });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupName: 'IT department', userNames: upns.map(u => u + ' ').join(','), role: 'Owner' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupName: 'IT department', userNames: upns.map(u => u + ' ').join(','), role: 'Owner' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified users when confirm option not passed', async () => {

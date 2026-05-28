@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-get.js';
+import command, { options } from './group-get.js';
 
 describe(commands.GROUP_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const groupResponse = {
     value: [{
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
@@ -60,6 +61,7 @@ describe(commands.GROUP_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -134,17 +136,17 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if required options specified (displayName)', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ displayName: validDisplayName });
+    assert.strictEqual(actual.success, true);
   });
 });

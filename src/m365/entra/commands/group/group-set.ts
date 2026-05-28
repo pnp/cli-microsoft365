@@ -1,35 +1,62 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
-import GraphCommand from '../../../base/GraphCommand.js';
-import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
-import request, { CliRequestOptions } from '../../../../request.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import { User } from '@microsoft/microsoft-graph-types';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+
+const VisibilityEnum = {
+  Public: 'Public',
+  Private: 'Private'
+} as const;
+
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  newDisplayName: z.string().max(256, `The maximum amount of characters for 'newDisplayName' is 256.`).optional(),
+  description: z.string().optional(),
+  mailNickname: z.string()
+    .refine(val => validation.isValidMailNickname(val), {
+      error: e => `Value '${e.input}' for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`
+    })
+    .refine(val => val.length <= 64, {
+      error: `The maximum amount of characters for 'mailNickname' is 64.`
+    })
+    .optional(),
+  ownerIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for option 'ownerIds': ${e.input}.`
+    }).optional(),
+  ownerUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for option 'ownerUserNames': ${e.input}.`
+    }).optional(),
+  memberIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for option 'memberIds': ${e.input}.`
+    }).optional(),
+  memberUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for option 'memberUserNames': ${e.input}.`
+    }).optional(),
+  visibility: zod.coercedEnum(VisibilityEnum).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  newDisplayName?: string;
-  description?: string;
-  mailNickname?: string;
-  ownerIds?: string;
-  ownerUserNames?: string;
-  memberIds?: string;
-  memberUserNames?: string;
-  visibility?: string;
-}
-
 class EntraGroupSetCommand extends GraphCommand {
-  private readonly allowedVisibility: string[] = ['Public', 'Private'];
-
   public get name(): string {
     return commands.GROUP_SET;
   }
@@ -42,150 +69,38 @@ class EntraGroupSetCommand extends GraphCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        newDisplayName: typeof args.options.newDisplayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined',
-        ownerIds: typeof args.options.ownerIds !== 'undefined',
-        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
-        memberIds: typeof args.options.memberIds !== 'undefined',
-        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
-        visibility: typeof args.options.visibility !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.displayName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: id or displayName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
+      })
+      .refine(options => !(options.ownerIds && options.ownerUserNames), {
+        error: 'Use one of the following options: ownerIds or ownerUserNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerIds', 'ownerUserNames']
+        }
+      })
+      .refine(options => !(options.memberIds && options.memberUserNames), {
+        error: 'Use one of the following options: memberIds or memberUserNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['memberIds', 'memberUserNames']
+        }
+      })
+      .refine(options => options.newDisplayName !== undefined || options.description !== undefined || options.visibility !== undefined
+        || options.ownerIds !== undefined || options.ownerUserNames !== undefined || options.memberIds !== undefined
+        || options.memberUserNames !== undefined || options.mailNickname !== undefined, {
+        error: `Specify at least one of the following options: 'newDisplayName', 'description', 'visibility', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'mailNickname'.`
       });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--mailNickname [mailNickname]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--newDisplayName [newDisplayName]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--ownerIds [ownerIds]'
-      },
-      {
-        option: '--ownerUserNames [ownerUserNames]'
-      },
-      {
-        option: '--memberIds [memberIds]'
-      },
-      {
-        option: '--memberUserNames [memberUserNames]'
-      },
-      {
-        option: '--visibility [visibility]',
-        autocomplete: this.allowedVisibility
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `Value '${args.options.id}' is not a valid GUID for option 'id'.`;
-        }
-
-        if (args.options.newDisplayName && args.options.newDisplayName.length > 256) {
-          return `The maximum amount of characters for 'newDisplayName' is 256.`;
-        }
-
-        if (args.options.mailNickname) {
-          if (!validation.isValidMailNickname(args.options.mailNickname)) {
-            return `Value '${args.options.mailNickname}' for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`;
-          }
-
-          if (args.options.mailNickname.length > 64) {
-            return `The maximum amount of characters for 'mailNickname' is 64.`;
-          }
-        }
-
-        if (args.options.ownerIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for option 'ownerIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.ownerUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for option 'ownerUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for option 'memberIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for option 'memberUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.visibility && !this.allowedVisibility.includes(args.options.visibility)) {
-          return `Option 'visibility' must be one of the following values: ${this.allowedVisibility.join(', ')}.`;
-        }
-
-        if (args.options.newDisplayName === undefined && args.options.description === undefined && args.options.visibility === undefined
-          && args.options.ownerIds === undefined && args.options.ownerUserNames === undefined && args.options.memberIds === undefined
-          && args.options.memberUserNames === undefined && args.options.mailNickname === undefined) {
-          return `Specify at least one of the following options: 'newDisplayName', 'description', 'visibility', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'mailNickname'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'displayName'] },
-      {
-        options: ['ownerIds', 'ownerUserNames'],
-        runsWhen: (args) => args.options.ownerIds || args.options.ownerUserNames
-      },
-      {
-        options: ['memberIds', 'memberUserNames'],
-        runsWhen: (args) => args.options.memberIds || args.options.memberUserNames
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'mailNickname', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'visibility');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -207,7 +122,7 @@ class EntraGroupSetCommand extends GraphCommand {
         visibility: args.options.visibility
       };
 
-      this.addUnknownOptionsToPayload(requestBody, args.options);
+      this.addUnknownOptionsToPayloadZod(requestBody, args.options);
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${groupId}`,
