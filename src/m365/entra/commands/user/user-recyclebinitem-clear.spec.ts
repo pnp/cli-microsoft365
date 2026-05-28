@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,12 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-recyclebinitem-clear.js';
+import command, { options } from './user-recyclebinitem-clear.js';
 
 describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean = false;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const deletedUsersResponse = [{ id: '4c099956-ca9a-4e60-ad5f-3f8447122706' }];
   const graphGetUrl = 'https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.user?$select=id';
@@ -28,6 +31,8 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,7 +99,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(amountOfBatches, 1);
   });
 
@@ -119,12 +124,12 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ force: true, verbose: true }) });
     assert.strictEqual(amountOfBatches, 3);
   });
 
   it('prompts before removing users', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(promptIssued);
   });
 
@@ -135,7 +140,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       return;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(postStub.notCalled);
   });
 
@@ -153,7 +158,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true }) }),
       new CommandError('An error has occurred while processing this request.'));
   });
 });

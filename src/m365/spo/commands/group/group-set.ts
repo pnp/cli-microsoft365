@@ -192,8 +192,8 @@ class SpoGroupSetCommand extends SpoCommand {
       userName: options.ownerUserName,
       email: options.ownerEmail,
       output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
+      debug: options.debug as boolean,
+      verbose: options.verbose as boolean
     };
 
     const output: CommandOutput = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });

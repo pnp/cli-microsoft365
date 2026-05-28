@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-guest-add.js';
+import command, { options } from './user-guest-add.js';
 
 describe(commands.USER_GUEST_ADD, () => {
   const emailAddress = 'john.doe@contoso.com';
@@ -40,6 +42,8 @@ describe(commands.USER_GUEST_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -47,6 +51,8 @@ describe(commands.USER_GUEST_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -95,10 +101,10 @@ describe(commands.USER_GUEST_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         emailAddress: emailAddress,
         displayName: displayName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(requestResponse));
@@ -118,7 +124,7 @@ describe(commands.USER_GUEST_ADD, () => {
     const ccRecipient = 'Maria.Jones@contoso.com';
     const languageCode = 'nl-BE';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         emailAddress: emailAddress,
         displayName: displayName,
         inviteRedirectUrl: redirectUrl,
@@ -126,7 +132,7 @@ describe(commands.USER_GUEST_ADD, () => {
         ccRecipients: ccRecipient,
         messageLanguage: languageCode,
         sendInvitationMessage: true
-      }
+      })
     });
 
     const requestBody = {
@@ -154,9 +160,9 @@ describe(commands.USER_GUEST_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         emailAddress: emailAddress
-      }
+      })
     });
 
     assert.strictEqual(postRequestStub.lastCall.args[0].data.inviteRedirectUrl, 'https://myapplications.microsoft.com');
@@ -174,10 +180,10 @@ describe(commands.USER_GUEST_ADD, () => {
 
     const ccRecipient = 'Maria.Jones@contoso.com';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         emailAddress: emailAddress,
         ccRecipients: ccRecipient
-      }
+      })
     });
 
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data.invitedUserMessageInfo.ccRecipients, [{ emailAddress: { address: ccRecipient } }]);
@@ -188,9 +194,9 @@ describe(commands.USER_GUEST_ADD, () => {
     sinon.stub(request, 'post').rejects({ error: { message: errorMessage } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         emailAddress: emailAddress
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

@@ -12,10 +12,11 @@ import { session } from '../../../../utils/session.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-license-remove.js';
+import command, { options } from './user-license-remove.js';
 
 describe(commands.USER_LICENSE_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validUserId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validUserName = 'John.Doe@contoso.com';
@@ -34,6 +35,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,64 +79,58 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if ids is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        ids: 'Invalid GUID', userId: validUserId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ids: 'Invalid GUID', userId: validUserId
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        ids: validIds, userId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ids: validIds, userId: 'Invalid GUID'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when userName is not a valid upn', async () => {
-    const actual = await command.validate({
-      options: {
-        ids: validIds, userName: 'Invalid upn'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when userName is not a valid upn', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ids: validIds, userName: 'Invalid upn'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (userId)', async () => {
-    const actual = await command.validate({ options: { ids: validIds, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (userId)', () => {
+    const actual = commandOptionsSchema.safeParse({ ids: validIds, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (userName)', async () => {
-    const actual = await command.validate({ options: { ids: validIds, userName: validUserName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (userName)', () => {
+    const actual = commandOptionsSchema.safeParse({ ids: validIds, userName: validUserName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified user licenses when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         ids: validIds,
         userId: validUserId
-      }
+      })
     });
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified user licenses when force option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
+    const postSpy = sinon.stub(request, 'post').resolves();
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         ids: validIds,
         userId: validUserId
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -148,7 +144,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { userId: validUserId, ids: validIdsSingle, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: validUserId, ids: validIdsSingle, force: true }) });
     assert(postSpy.called);
   });
 
@@ -165,9 +161,9 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, userName: validUserName, ids: validIds
-      }
+      })
     });
     assert(postSpy.called);
   });
@@ -182,9 +178,9 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, userId: validUserId, ids: validIds, force: true
-      }
+      })
     });
     assert(postSpy.called);
   });
@@ -205,9 +201,9 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, userId: validUserId, ids: validIdsSingle, force: true
-      }
+      })
     }), new CommandError(error.error.message));
   });
 
@@ -220,9 +216,9 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: validUserName, ids: validIds, force: true
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });

@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-recyclebinitem-remove.js';
+import command, { options } from './user-recyclebinitem-remove.js';
 
 describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
   const validUserId = 'd839826a-81bf-4c38-8f80-f150d11ce6c7';
@@ -20,6 +20,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -83,7 +85,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validUserId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validUserId, verbose: true }) });
     assert(deleteStub.called);
   });
 
@@ -95,12 +97,12 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validUserId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validUserId, force: true, verbose: true }) });
     assert(deleteStub.called);
   });
 
   it('prompts before removing user', async () => {
-    await command.action(logger, { options: { id: validUserId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validUserId }) });
     assert(promptIssued);
   });
 
@@ -109,7 +111,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: validUserId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validUserId }) });
     assert(deleteStub.notCalled);
   });
 
@@ -127,17 +129,17 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { force: true, id: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true, id: validUserId }) }),
       new CommandError(`Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 });

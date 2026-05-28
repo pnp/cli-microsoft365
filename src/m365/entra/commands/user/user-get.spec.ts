@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './user-get.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -30,6 +29,7 @@ describe(commands.USER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -44,6 +44,7 @@ describe(commands.USER_GET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -67,7 +68,6 @@ describe(commands.USER_GET, () => {
       request.get,
       accessToken.getUserIdFromAccessToken,
       accessToken.getUserNameFromAccessToken,
-      cli.getSettingWithDefaultValue,
       entraUser.getUserIdByEmail
     ]);
   });
@@ -94,7 +94,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: userId }) });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -109,7 +109,7 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });
 
-    await command.action(logger, { options: { id: '@meid' } });
+    await command.action(logger, { options: { id: '@meid' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -122,7 +122,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: userId }) });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -135,7 +135,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -148,7 +148,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: externalUserName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: externalUserName }) });
     assert(loggerLogSpy.calledWith(externalUserResponse));
   });
 
@@ -161,7 +161,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userNameWithDollar } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userNameWithDollar }) });
     assert(loggerLogSpy.calledWith(userNameWithDollarResponse));
   });
 
@@ -181,7 +181,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, withManager: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, withManager: true }) });
     assert(loggerLogSpy.calledWith(resultValueWithManger));
   });
 
@@ -196,7 +196,7 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });
 
-    await command.action(logger, { options: { userName: '@meusername' } });
+    await command.action(logger, { options: { userName: '@meusername' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -210,7 +210,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { email: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ email: userName }) });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -223,14 +223,14 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, properties: 'id,mail' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, properties: 'id,mail' }) });
     assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
   });
 
   it('fails to get user when user with provided email does not exists', async () => {
     sinon.stub(entraUser, 'getUserIdByEmail').withArgs(userName).throws(Error(`The specified user with email ${userName} does not exist`));
 
-    await assert.rejects(command.action(logger, { options: { email: userName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ email: userName }) }),
       new CommandError(`The specified user with email ${userName} does not exist`));
   });
 
@@ -246,7 +246,7 @@ describe(commands.USER_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '68be84bf-a585-4776-80b3-30aa5207aa22' }) }),
       new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -262,97 +262,57 @@ describe(commands.USER_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) }),
       new CommandError(`Resource '${userName}' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('fails validation if id or email or userName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id or email or userName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if id, email, and userName options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com", userName: "i:0#.f|membership|john.doe@contoso.onmicrosoft.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id, email, and userName options are passed (multiple options)', () => {
+    const actual = commandOptionsSchema.safeParse({ id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com", userName: "i:0#.f|membership|john.doe@contoso.onmicrosoft.com" });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and email options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and email options are passed (multiple options)', () => {
+    const actual = commandOptionsSchema.safeParse({ id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com" });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and userName options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and userName options are passed (multiple options)', () => {
+    const actual = commandOptionsSchema.safeParse({ id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", userName: "john.doe@contoso.onmicrosoft.com" });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both email and userName options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { email: "jonh.deo@contoso.com", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both email and userName options are passed (multiple options)', () => {
+    const actual = commandOptionsSchema.safeParse({ email: "jonh.deo@contoso.com", userName: "john.doe@contoso.onmicrosoft.com" });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when userName has an invalid value', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when userName has an invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the userName is specified', async () => {
-    const actual = await command.validate({ options: { userName: 'john.doe@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'john.doe@contoso.onmicrosoft.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the email is specified', async () => {
-    const actual = await command.validate({ options: { email: 'john.doe@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the email is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ email: 'john.doe@contoso.onmicrosoft.com' });
+    assert.strictEqual(actual.success, true);
   });
 });

@@ -12,10 +12,11 @@ import { session } from '../../../../utils/session.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-license-add.js';
+import command, { options } from './user-license-add.js';
 
 describe(commands.USER_LICENSE_ADD, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validIds = '45715bb8-13f9-4bf6-927f-ef96c102d394,0118A350-71FC-4EC3-8F0C-6A1CB8867561';
   const validUserId = 'eb77fbcf-6fe8-458b-985d-1747284793bc';
@@ -46,6 +47,7 @@ describe(commands.USER_LICENSE_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -83,27 +85,23 @@ describe(commands.USER_LICENSE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if ids is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        ids: 'Invalid GUID', userId: validUserId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ids: 'Invalid GUID', userId: validUserId
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        ids: validIds, userId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ids: validIds, userId: 'Invalid GUID'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (ids)', async () => {
-    const actual = await command.validate({ options: { ids: validIds, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (ids)', () => {
+    const actual = commandOptionsSchema.safeParse({ ids: validIds, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds licenses to a user by userId', async () => {
@@ -115,7 +113,7 @@ describe(commands.USER_LICENSE_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, userId: validUserId, ids: validIds } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: validUserId, ids: validIds }) });
     assert(loggerLogSpy.calledWith(userLicenseResponse));
   });
 
@@ -128,7 +126,7 @@ describe(commands.USER_LICENSE_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, userName: validUserName, ids: validIds } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: validUserName, ids: validIds }) });
     assert(loggerLogSpy.calledWith(userLicenseResponse));
   });
 
@@ -141,9 +139,9 @@ describe(commands.USER_LICENSE_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: validUserName, ids: validIds
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });
