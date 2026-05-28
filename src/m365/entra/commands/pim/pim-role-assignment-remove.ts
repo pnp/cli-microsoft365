@@ -1,32 +1,35 @@
 import { UnifiedRoleAssignmentScheduleRequest } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
-import { validation } from '../../../../utils/validation.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  roleDefinitionName: z.string().optional().alias('n'),
+  roleDefinitionId: z.uuid().optional().alias('i'),
+  userId: z.uuid().optional(),
+  userName: z.string().optional(),
+  groupId: z.uuid().optional(),
+  groupName: z.string().optional(),
+  administrativeUnitId: z.uuid().optional(),
+  applicationId: z.uuid().optional(),
+  justification: z.string().optional().alias('j'),
+  ticketNumber: z.string().optional(),
+  ticketSystem: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  roleDefinitionName?: string;
-  roleDefinitionId?: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  administrativeUnitId?: string;
-  applicationId?: string;
-  justification?: string,
-  ticketNumber?: string;
-  ticketSystem?: string;
 }
 
 class EntraPimRoleAssignmentRemoveCommand extends GraphCommand {
@@ -38,118 +41,39 @@ class EntraPimRoleAssignmentRemoveCommand extends GraphCommand {
     return 'Request deactivation of an Entra role assignment for a user or group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        roleDefinitionName: typeof args.options.roleDefinitionName !== 'undefined',
-        roleDefinitionId: typeof args.options.roleDefinitionId !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
-        applicationId: typeof args.options.applicationId !== 'undefined',
-        justification: typeof args.options.justification !== 'undefined',
-        ticketNumber: typeof args.options.ticketNumber !== 'undefined',
-        ticketSystem: typeof args.options.ticketSystem !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(options => [options.roleDefinitionId, options.roleDefinitionName].filter(o => o !== undefined).length === 1, {
+        message: 'Specify either roleDefinitionId or roleDefinitionName',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
+      })
+      .refine(options => {
+        const specified = [options.userId, options.userName, options.groupId, options.groupName].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: userId, userName, groupId, groupName',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName']
+        }
+      })
+      .refine(options => {
+        const specified = [options.administrativeUnitId, options.applicationId].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: administrativeUnitId, applicationId',
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'applicationId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --roleDefinitionName [roleDefinitionName]'
-      },
-      {
-        option: '-i, --roleDefinitionId [roleDefinitionId]'
-      },
-      {
-        option: "--userId [userId]"
-      },
-      {
-        option: "--userName [userName]"
-      },
-      {
-        option: "--groupId [groupId]"
-      },
-      {
-        option: "--groupName [groupName]"
-      },
-      {
-        option: "--administrativeUnitId [administrativeUnitId]"
-      },
-      {
-        option: "--applicationId [applicationId]"
-      },
-      {
-        option: "-j, --justification [justification]"
-      },
-      {
-        option: "--ticketNumber [ticketNumber]"
-      },
-      {
-        option: "--ticketSystem [ticketSystem]"
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.roleDefinitionId && !validation.isValidGuid(args.options.roleDefinitionId)) {
-          return `${args.options.roleDefinitionId} is not a valid GUID`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
-          return `${args.options.administrativeUnitId} is not a valid GUID`;
-        }
-
-        if (args.options.applicationId && !validation.isValidGuid(args.options.applicationId)) {
-          return `${args.options.applicationId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['roleDefinitionName', 'roleDefinitionId'] });
-    this.optionSets.push({
-      options: ['userId', 'userName', 'groupId', 'groupName'],
-      runsWhen: (args) => {
-        return args.options.userId !== undefined || args.options.userName !== undefined || args.options.groupId !== undefined || args.options.groupName !== undefined;
-      }
-    });
-    this.optionSets.push({
-      options: ['administrativeUnitId', 'applicationId'],
-      runsWhen: (args) => {
-        return args.options.administrativeUnitId !== undefined || args.options.applicationId !== undefined;
-      }
-    });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('userId', 'userName', 'groupId', 'groupName', 'administrativeUnitId', 'applicationId', 'roleDefinitionName', 'roleDefinitionId', 'justification', 'ticketNumber', 'ticketSystem');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

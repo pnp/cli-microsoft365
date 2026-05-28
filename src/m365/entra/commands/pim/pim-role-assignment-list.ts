@@ -1,5 +1,6 @@
 import { UnifiedRoleAssignmentScheduleInstance } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -8,17 +9,22 @@ import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional(),
+  userName: z.string().optional(),
+  groupId: z.uuid().optional(),
+  groupName: z.string().optional(),
+  startDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
+    error: e => `'${e.input}' is not a valid ISO 8601 date time string.`
+  }).optional().alias('s'),
+  withPrincipalDetails: z.boolean().default(false)
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  startDateTime?: string;
-  withPrincipalDetails?: boolean;
 }
 
 class EntraPimRoleAssignmentListCommand extends GraphCommand {
@@ -30,76 +36,22 @@ class EntraPimRoleAssignmentListCommand extends GraphCommand {
     return 'Retrieves a list of Entra role assignments for a user or group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        startDateTime: typeof args.options.startDateTime !== 'undefined',
-        withPrincipalDetails: !!args.options.withPrincipalDetails
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(options => {
+        const specified = [options.userId, options.userName, options.groupId, options.groupName].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: userId, userName, groupId, groupName',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: "--userId [userId]"
-      },
-      {
-        option: "--userName [userName]"
-      },
-      {
-        option: "--groupId [groupId]"
-      },
-      {
-        option: "--groupName [groupName]"
-      },
-      {
-        option: "-s, --startDateTime [startDateTime]"
-      },
-      {
-        option: "--withPrincipalDetails"
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-          return `${args.options.startDateTime} is not a valid ISO 8601 date time string`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['userId', 'userName', 'groupId', 'groupName'],
-      runsWhen: (args) => args.options.userId || args.options.userName || args.options.groupId || args.options.groupName
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

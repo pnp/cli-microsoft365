@@ -1,5 +1,6 @@
 import { UnifiedRoleAssignmentScheduleRequest } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -11,26 +12,35 @@ import { entraGroup } from '../../../../utils/entraGroup.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  roleDefinitionName: z.string().optional().alias('n'),
+  roleDefinitionId: z.uuid().optional().alias('i'),
+  userId: z.uuid().optional(),
+  userName: z.string().optional(),
+  groupId: z.uuid().optional(),
+  groupName: z.string().optional(),
+  administrativeUnitId: z.uuid().optional(),
+  applicationId: z.uuid().optional(),
+  justification: z.string().optional().alias('j'),
+  startDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
+    error: e => `'${e.input}' is not a valid ISO 8601 date time string.`
+  }).optional().alias('s'),
+  endDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
+    error: e => `'${e.input}' is not a valid ISO 8601 date time string.`
+  }).optional().alias('e'),
+  duration: z.string().refine(dur => validation.isValidISODuration(dur), {
+    error: e => `'${e.input}' is not a valid ISO 8601 duration.`
+  }).optional().alias('d'),
+  ticketNumber: z.string().optional(),
+  ticketSystem: z.string().optional(),
+  expiration: z.boolean().default(true)
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  roleDefinitionName?: string;
-  roleDefinitionId?: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  administrativeUnitId?: string;
-  applicationId?: string;
-  justification?: string;
-  startDateTime?: string;
-  endDateTime?: string;
-  duration?: string;
-  ticketNumber?: string;
-  ticketSystem?: string;
-  noExpiration?: boolean;
 }
 
 class EntraPimRoleAssignmentAddCommand extends GraphCommand {
@@ -42,147 +52,49 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
     return 'Request activation of an Entra role assignment for a user or group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        roleDefinitionName: typeof args.options.roleDefinitionName !== 'undefined',
-        roleDefinitionId: typeof args.options.roleDefinitionId !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
-        applicationId: typeof args.options.applicationId !== 'undefined',
-        justification: typeof args.options.justification !== 'undefined',
-        startDateTime: typeof args.options.startDateTime !== 'undefined',
-        endDateTime: typeof args.options.endDateTime !== 'undefined',
-        duration: typeof args.options.duration !== 'undefined',
-        ticketNumber: typeof args.options.ticketNumber !== 'undefined',
-        ticketSystem: typeof args.options.ticketSystem !== 'undefined',
-        noExpiration: !!args.options.noExpiration
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(options => [options.roleDefinitionId, options.roleDefinitionName].filter(o => o !== undefined).length === 1, {
+        message: 'Specify either roleDefinitionId or roleDefinitionName',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
+      })
+      .refine(options => {
+        const specified = [!options.expiration ? true : undefined, options.endDateTime, options.duration].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: no-expiration, endDateTime, duration',
+        params: {
+          customCode: 'optionSet',
+          options: ['no-expiration', 'endDateTime', 'duration']
+        }
+      })
+      .refine(options => {
+        const specified = [options.userId, options.userName, options.groupId, options.groupName].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: userId, userName, groupId, groupName',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName']
+        }
+      })
+      .refine(options => {
+        const specified = [options.administrativeUnitId, options.applicationId].filter(o => o !== undefined).length;
+        return specified <= 1;
+      }, {
+        message: 'Specify only one of the following options: administrativeUnitId, applicationId',
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'applicationId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --roleDefinitionName [roleDefinitionName]'
-      },
-      {
-        option: '-i, --roleDefinitionId [roleDefinitionId]'
-      },
-      {
-        option: "--userId [userId]"
-      },
-      {
-        option: "--userName [userName]"
-      },
-      {
-        option: "--groupId [groupId]"
-      },
-      {
-        option: "--groupName [groupName]"
-      },
-      {
-        option: "--administrativeUnitId [administrativeUnitId]"
-      },
-      {
-        option: "--applicationId [applicationId]"
-      },
-      {
-        option: "-j, --justification [justification]"
-      },
-      {
-        option: "-s, --startDateTime [startDateTime]"
-      },
-      {
-        option: "-e, --endDateTime [endDateTime]"
-      },
-      {
-        option: "-d, --duration [duration]"
-      },
-      {
-        option: "--ticketNumber [ticketNumber]"
-      },
-      {
-        option: "--ticketSystem [ticketSystem]"
-      },
-      {
-        option: "--no-expiration"
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.roleDefinitionId && !validation.isValidGuid(args.options.roleDefinitionId)) {
-          return `${args.options.roleDefinitionId} is not a valid GUID`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-          return `${args.options.startDateTime} is not a valid ISO 8601 date time string`;
-        }
-
-        if (args.options.endDateTime && !validation.isValidISODateTime(args.options.endDateTime)) {
-          return `${args.options.endDateTime} is not a valid ISO 8601 date time string`;
-        }
-
-        if (args.options.duration && !validation.isValidISODuration(args.options.duration)) {
-          return `${args.options.duration} is not a valid ISO 8601 duration`;
-        }
-
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
-          return `${args.options.administrativeUnitId} is not a valid GUID`;
-        }
-
-        if (args.options.applicationId && !validation.isValidGuid(args.options.applicationId)) {
-          return `${args.options.applicationId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['roleDefinitionName', 'roleDefinitionId'] });
-    this.optionSets.push({
-      options: ['noExpiration', 'endDateTime', 'duration'],
-      runsWhen: (args) => {
-        return !!args.options.noExpiration || args.options.endDateTime !== undefined || args.options.duration !== undefined;
-      }
-    });
-    this.optionSets.push({
-      options: ['userId', 'userName', 'groupId', 'groupName'],
-      runsWhen: (args) => {
-        return args.options.userId !== undefined || args.options.userName !== undefined || args.options.groupId !== undefined || args.options.groupName !== undefined;
-      }
-    });
-    this.optionSets.push({
-      options: ['administrativeUnitId', 'applicationId'],
-      runsWhen: (args) => {
-        return args.options.administrativeUnitId !== undefined || args.options.applicationId !== undefined;
-      }
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -280,7 +192,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
       return 'afterDateTime';
     }
 
-    if (options.noExpiration) {
+    if (!options.expiration) {
       return 'noExpiration';
     }
 
@@ -288,7 +200,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   private getDuration(options: Options): string | undefined {
-    if (!options.duration && !options.endDateTime && !options.noExpiration) {
+    if (!options.duration && !options.endDateTime && options.expiration) {
       return 'PT8H';
     }
 

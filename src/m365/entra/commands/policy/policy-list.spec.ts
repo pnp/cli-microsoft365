@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './policy-list.js';
+import command, { options } from './policy-list.js';
 
 describe(commands.POLICY_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.POLICY_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -96,11 +98,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        type: "authorization"
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({
+      type: "authorization"
+    }).data! });
     assert(loggerLogSpy.calledWith({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
       "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
@@ -145,11 +145,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        type: "tokenLifetime"
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({
+      type: "tokenLifetime"
+    }).data! });
     assert(loggerLogSpy.calledWith([
       {
         id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
@@ -844,10 +842,8 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    }).data! });
     assert(loggerLogSpy.calledWith([
       {
         "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/adminConsentRequestPolicy/$entity",
@@ -1458,11 +1454,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        type: "roleManagement"
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.safeParse({
+      type: "roleManagement"
+    }).data! });
     assert(loggerLogSpy.calledWith([
       {
         "id": "DirectoryRole_a457c42c-0f2e-4a25-be2a-545e840add1f_7ace6474-d11c-4a14-bc8f-3c9fdfc34930",
@@ -1496,202 +1490,146 @@ describe(commands.POLICY_LIST, () => {
   it('correctly handles API OData error for specified policies', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: { type: "foo" } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ type: "activityBasedTimeout" }).data! }), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
     sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({}).data! }), new CommandError("An error has occurred."));
   });
 
   it('accepts type to be activityBasedTimeout', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "activityBasedTimeout"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "activityBasedTimeout"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be authorization', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "authorization"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "authorization"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be claimsMapping', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "claimsMapping"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "claimsMapping"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be homeRealmDiscovery', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "homeRealmDiscovery"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "homeRealmDiscovery"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be identitySecurityDefaultsEnforcement', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "identitySecurityDefaultsEnforcement"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "identitySecurityDefaultsEnforcement"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be tokenLifetime', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "tokenLifetime"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "tokenLifetime"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be tokenIssuance', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "tokenIssuance"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "tokenIssuance"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be adminConsentRequest', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "adminConsentRequest"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "adminConsentRequest"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be appManagement', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "appManagement"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "appManagement"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be authenticationFlows', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "authenticationFlows"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "authenticationFlows"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be authenticationMethods', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "authenticationMethods"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "authenticationMethods"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be authenticationStrength', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "authenticationStrength"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "authenticationStrength"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be conditionalAccess', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "conditionalAccess"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "conditionalAccess"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be crossTenantAccess', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "crossTenantAccess"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "crossTenantAccess"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be defaultAppManagement', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "defaultAppManagement"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "defaultAppManagement"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be deviceRegistration', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "deviceRegistration"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "deviceRegistration"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be permissionGrant', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "permissionGrant"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "permissionGrant"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('accepts type to be roleManagement', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        type: "roleManagement"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: "roleManagement"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('rejects invalid type', async () => {
     const type = 'foo';
-    const actual = await command.validate({
-      options: {
-        type: type
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: type
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 });
