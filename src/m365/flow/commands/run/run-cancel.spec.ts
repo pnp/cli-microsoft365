@@ -9,15 +9,17 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './run-cancel.js';
+import command, { options } from './run-cancel.js';
 
 describe(commands.RUN_CANCEL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -25,8 +27,10 @@ describe(commands.RUN_CANCEL, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,26 +75,22 @@ describe(commands.RUN_CANCEL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the flowName is not valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flowName: 'invalid',
-        name: '08585981115186985105550762687CU161'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the flowName is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+      flowName: 'invalid',
+      name: '08585981115186985105550762687CU161'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the name, environmentName and flowName specified', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the name, environmentName and flowName specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+      flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+      name: '08585981115186985105550762687CU161'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before cancelling the specified Microsoft FlowName when force option not passed', async () => {
@@ -284,36 +284,4 @@ describe(commands.RUN_CANCEL, () => {
     } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
   });
 
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying flow', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--flow') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

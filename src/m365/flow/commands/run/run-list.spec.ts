@@ -9,9 +9,10 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './run-list.js';
+import command, { options } from './run-list.js';
 
 describe(commands.RUN_LIST, () => {
   const environmentName = 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c';
@@ -113,14 +114,17 @@ describe(commands.RUN_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -294,33 +298,33 @@ describe(commands.RUN_LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the flowName is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the status is not a valid status', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, status: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the status is not a valid status', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, status: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the triggerStartTime is not a valid ISO datetime', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, triggerStartTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the triggerStartTime is not a valid ISO datetime', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, triggerStartTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the triggerEndTime is not a valid ISO datetime', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, triggerEndTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the triggerEndTime is not a valid ISO datetime', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, triggerEndTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the output is not json and withTrigger is specified', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, output: 'text', withTrigger: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the output is not json and withTrigger is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, output: 'text', withTrigger: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all options are passed properly', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, status: status, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are passed properly', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, status: status, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime });
+    assert.strictEqual(actual.success, true);
   });
 });

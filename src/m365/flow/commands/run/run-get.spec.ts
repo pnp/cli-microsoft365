@@ -7,11 +7,12 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
-import command from './run-get.js';
+import command, { options } from './run-get.js';
 
 describe(commands.RUN_GET, () => {
   const flowName = '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30';
@@ -216,14 +217,17 @@ describe(commands.RUN_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -400,18 +404,18 @@ describe(commands.RUN_GET, () => {
       new CommandError(`Could not find flow '${flowName}'.`));
   });
 
-  it('fails validation if the flowName is not valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid', name: runName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the flowName is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: 'invalid', name: runName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the withActions parameter is not valid boolean or string', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, name: runName, withActions: -1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the withActions parameter is not valid boolean or string', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, name: runName, withActions: -1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the flowName is not valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, name: runName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the flowName is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, name: runName });
+    assert.strictEqual(actual.success, true);
   });
 });
