@@ -101,7 +101,7 @@ export default new <Service><Noun><Verb>Command();
 - Class name: `<Service><Noun><Verb>Command` in PascalCase.
 - Options: use `z.strictObject` spreading `globalOptionsZod.shape`.
 - Aliases: `.alias('x')` on the Zod property.
-- Enums: `zod.coercedEnum(MyEnum)` for case-insensitive matching. Import `{ zod }` from `../../utils/zod.js`.
+- Enums: `zod.coercedEnum(MyEnum)` for case-insensitive matching. Import `{ zod }` from `../../../../utils/zod.js`.
 - Validation: Zod refinements on properties (`.refine()`), not custom validate methods.
 - URL validation for SharePoint: `.refine(url => validation.isValidSharePointUrl(url) === true, { error: '...' })`.
 - Option sets: implement `getRefinedSchema(schema)` returning `schema.refine(...)`.
