@@ -1,22 +1,26 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
 import { cli } from '../../../../cli/cli.js';
 import DelegatedGraphCommand from '../../../base/GraphDelegatedCommand.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string(),
+  sourceFolderId: z.string().optional(),
+  sourceFolderName: z.string().optional(),
+  targetFolderId: z.string().optional(),
+  targetFolderName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  sourceFolderId?: string;
-  sourceFolderName?: string;
-  targetFolderId?: string;
-  targetFolderName?: string;
 }
 
 class OutlookMessageMoveCommand extends DelegatedGraphCommand {
@@ -28,54 +32,40 @@ class OutlookMessageMoveCommand extends DelegatedGraphCommand {
     return 'Moves message to the specified folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        sourceFolderId: typeof args.options.sourceFolderId !== 'undefined',
-        sourceFolderName: typeof args.options.sourceFolderName !== 'undefined',
-        targetFolderId: typeof args.options.targetFolderId !== 'undefined',
-        targetFolderName: typeof args.options.targetFolderName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.sourceFolderId || options.sourceFolderName, {
+        error: 'Specify either sourceFolderId or sourceFolderName',
+        params: {
+          customCode: 'optionSet',
+          options: ['sourceFolderId', 'sourceFolderName']
+        }
+      })
+      .refine(options => !(options.sourceFolderId && options.sourceFolderName), {
+        error: 'Specify either sourceFolderId or sourceFolderName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['sourceFolderId', 'sourceFolderName']
+        }
+      })
+      .refine(options => options.targetFolderId || options.targetFolderName, {
+        error: 'Specify either targetFolderId or targetFolderName',
+        params: {
+          customCode: 'optionSet',
+          options: ['targetFolderId', 'targetFolderName']
+        }
+      })
+      .refine(options => !(options.targetFolderId && options.targetFolderName), {
+        error: 'Specify either targetFolderId or targetFolderName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['targetFolderId', 'targetFolderName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--sourceFolderName [sourceFolderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--sourceFolderId [sourceFolderId]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--targetFolderName [targetFolderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--targetFolderId [targetFolderId]',
-        autocomplete: Outlook.wellKnownFolderNames
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['sourceFolderId', 'sourceFolderName'] },
-      { options: ['targetFolderId', 'targetFolderName'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -2,29 +2,33 @@ import fs from 'fs';
 import path from 'path';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  subject: z.string().alias('s'),
+  to: z.string().alias('t'),
+  cc: z.string().optional(),
+  bcc: z.string().optional(),
+  sender: z.string().optional(),
+  mailbox: z.string().optional().alias('m'),
+  bodyContents: z.string(),
+  bodyContentType: z.enum(['Text', 'HTML']).optional(),
+  importance: z.enum(['low', 'normal', 'high']).optional(),
+  attachment: z.union([z.string(), z.string().array()]).optional(),
+  saveToSentItems: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  subject: string;
-  to: string;
-  cc?: string;
-  bcc?: string;
-  sender?: string;
-  mailbox?: string;
-  bodyContents: string;
-  bodyContentType?: string;
-  importance?: string;
-  attachment?: string | string[];
-  saveToSentItems?: boolean;
 }
 
 class OutlookMailSendCommand extends GraphCommand {
@@ -36,88 +40,19 @@ class OutlookMailSendCommand extends GraphCommand {
     return 'Sends an email';
   }
 
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
   constructor() {
     super();
 
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
     this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        cc: typeof args.options.cc !== 'undefined',
-        bcc: typeof args.options.bcc !== 'undefined',
-        bodyContentType: args.options.bodyContentType,
-        saveToSentItems: args.options.saveToSentItems,
-        importance: args.options.importance,
-        mailbox: typeof args.options.mailbox !== 'undefined',
-        sender: typeof args.options.sender !== 'undefined',
-        attachment: typeof args.options.attachment !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --subject <subject>'
-      },
-      {
-        option: '-t, --to <to>'
-      },
-      {
-        option: '--cc [cc]'
-      },
-      {
-        option: '--bcc [bcc]'
-      },
-      {
-        option: '--sender [sender]'
-      },
-      {
-        option: '-m, --mailbox [mailbox]'
-      },
-      {
-        option: '--bodyContents <bodyContents>'
-      },
-      {
-        option: '--bodyContentType [bodyContentType]',
-        autocomplete: ['Text', 'HTML']
-      },
-      {
-        option: '--importance [importance]',
-        autocomplete: ['low', 'normal', 'high']
-      },
-      {
-        option: '--attachment [attachment]'
-      },
-      {
-        option: '--saveToSentItems [saveToSentItems]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('saveToSentItems');
   }
 
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.bodyContentType &&
-          args.options.bodyContentType !== 'Text' &&
-          args.options.bodyContentType !== 'HTML') {
-          return `${args.options.bodyContentType} is not a valid value for the bodyContentType option. Allowed values are Text|HTML`;
-        }
-
-        if (args.options.importance && ['low', 'normal', 'high'].indexOf(args.options.importance) === -1) {
-          return `'${args.options.importance}' is not a valid value for the importance option. Allowed values are low|normal|high`;
-        }
-
         if (args.options.attachment) {
           const attachments: string[] = typeof args.options.attachment === 'string' ? [args.options.attachment] : args.options.attachment;
 
