@@ -1,21 +1,24 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { validation } from '../../../../utils/validation.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().alias('i'),
+  administrativeUnitId: z.uuid().optional().alias('u'),
+  administrativeUnitName: z.string().optional().alias('n'),
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  id: string;
-  administrativeUnitId?: string;
-  administrativeUnitName?: string;
-  properties?: string;
 }
 
 interface DirectoryObjectEx extends DirectoryObject {
@@ -33,60 +36,19 @@ class EntraAdministrativeUnitMemberGetCommand extends GraphCommand {
     return 'Retrieve a specific member (user, group, or device) of an administrative unit';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
-        administrativeUnitName: typeof args.options.administrativeUnitName !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.administrativeUnitId, options.administrativeUnitName].filter(Boolean).length === 1, {
+        error: 'Specify either administrativeUnitId or administrativeUnitName',
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'administrativeUnitName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-u, --administrativeUnitId [administrativeUnitId]'
-      },
-      {
-        option: '-n, --administrativeUnitName [administrativeUnitName]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId)) {
-          return `${args.options.administrativeUnitId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['administrativeUnitId', 'administrativeUnitName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

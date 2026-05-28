@@ -4,7 +4,7 @@ import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './administrativeunit-roleassignment-add.js';
+import command, { options } from './administrativeunit-roleassignment-add.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -15,7 +15,6 @@ import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUn
 import { entraUser } from '../../../../utils/entraUser.js';
 import { roleAssignment } from '../../../../utils/roleAssignment.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import request from '../../../../request.js';
 
 describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
@@ -36,6 +35,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -44,6 +44,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -68,7 +69,6 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
       entraUser.getUserIdByUpn,
       roleAssignment.createRoleAssignmentWithAdministrativeUnitScope,
       roleDefinition.getRoleDefinitionByDisplayName,
-      cli.getSettingWithDefaultValue,
       request.post
     ]);
   });
@@ -86,173 +86,103 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if administrative unit id, role definition id and user id are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: roleDefinitionId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if administrative unit name, role definition name and user name are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        administrativeUnitName: administrativeUnitName,
-        roleDefinitionName: roleDefinitionName,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if both user id and user name are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation if administrative unit id, role definition id and user id are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: roleDefinitionId,
+      userId: userId
     });
-
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: roleDefinitionId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both user id and user name are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation if administrative unit name, role definition name and user name are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitName: administrativeUnitName,
+      roleDefinitionName: roleDefinitionName,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: roleDefinitionId,
-        userId: userId,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both role definition id and role definition name are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both user id and user name are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: roleDefinitionId
     });
-
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both role definition id and role definition name are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both user id and user name are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: roleDefinitionId,
+      userId: userId,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: roleDefinitionId,
-        roleDefinitionName: roleDefinitionName,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both administrative unit id and administrative unit name are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both role definition id and role definition name are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      userId: userId
     });
-
-    const actual = await command.validate({
-      options: {
-        roleDefinitionId: roleDefinitionId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both administrative unit id and administrative unit name are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both role definition id and role definition name are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: roleDefinitionId,
+      roleDefinitionName: roleDefinitionName,
+      userId: userId
     });
-
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        administrativeUnitName: administrativeUnitName,
-        roleDefinitionId: roleDefinitionId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if administrative unit id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: '123',
-        roleDefinitionId: roleDefinitionId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both administrative unit id and administrative unit name are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      roleDefinitionId: roleDefinitionId,
+      userId: userId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if role definition id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: '123',
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both administrative unit id and administrative unit name are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      administrativeUnitName: administrativeUnitName,
+      roleDefinitionId: roleDefinitionId,
+      userId: userId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if user id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        administrativeUnitId: administrativeUnitId,
-        roleDefinitionId: roleDefinitionId,
-        userId: '123'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if administrative unit id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: '123',
+      roleDefinitionId: roleDefinitionId,
+      userId: userId
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if role definition id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: '123',
+      userId: userId
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if user id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      administrativeUnitId: administrativeUnitId,
+      roleDefinitionId: roleDefinitionId,
+      userId: '123'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly assigns a role specified by id to and administrative unit specified by id and to a user specified by id', async () => {
