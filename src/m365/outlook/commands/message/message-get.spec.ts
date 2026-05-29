@@ -262,6 +262,24 @@ describe(commands.MESSAGE_GET, () => {
     assert.equal(actual, true);
   });
 
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
+  });
+
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid-guid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userName: 'invalid-upn' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if both userId and userName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId, userName: userName });
     assert.strictEqual(actual.success, false);

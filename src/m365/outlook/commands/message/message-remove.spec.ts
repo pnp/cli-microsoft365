@@ -93,6 +93,10 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid' });
     assert.notStrictEqual(actual.success, true);

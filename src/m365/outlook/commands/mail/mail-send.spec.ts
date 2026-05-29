@@ -313,6 +313,10 @@ describe(commands.MAIL_SEND, () => {
       new CommandError(`An error has occurred`));
   });
 
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
   it('fails validation if bodyContentType is invalid', () => {
     const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' });
     assert.notStrictEqual(actual.success, true);
