@@ -486,6 +486,14 @@ describe(commands.MESSAGE_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
+  });
+
   it('fails validation if startTime is not a valid ISO datetime', () => {
     const actual = commandOptionsSchema.safeParse({ startTime: 'invalid' });
     assert.notStrictEqual(actual.success, true);

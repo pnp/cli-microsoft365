@@ -380,6 +380,14 @@ describe(commands.MESSAGE_MOVE, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
+  });
+
   it('fails validation if neither sourceFolderId nor sourceFolderName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', targetFolderId: 'archive' });
     assert.notStrictEqual(actual.success, true);
