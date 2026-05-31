@@ -39,6 +39,25 @@ If you try to download Teams app package for an SPFx solution that doesn't suppo
 
 For maximum performance, specify the URL of the tenant app catalog, the item ID (`appItemId`) of the SPFx package for which you want to download the Teams app package and the name of the file where you want to save the downloaded package to (`fileName`).
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Downloads the Teams app package for the SPFx solution deployed to the tenant app catalog with the specified ID to a file with .zip extension named after the .sppkg file.
