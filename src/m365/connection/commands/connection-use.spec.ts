@@ -136,6 +136,16 @@ describe(commands.USE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it(`fails with error if the connection cannot be found`, async () => {
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'Non-existent connection' }) }),
       new CommandError(`The connection 'Non-existent connection' cannot be found.`));
