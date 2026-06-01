@@ -1,17 +1,20 @@
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
 import auth from '../../../Auth.js';
 import commands from '../commands.js';
-import Command, { CommandError } from '../../../Command.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  force?: boolean;
 }
 
 class ConnectionRemoveCommand extends Command {
@@ -23,37 +26,8 @@ class ConnectionRemoveCommand extends Command {
     return 'Remove the specified connection';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('name');
-    this.types.boolean.push('force');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
