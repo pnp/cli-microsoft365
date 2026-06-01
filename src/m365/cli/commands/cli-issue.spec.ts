@@ -57,6 +57,16 @@ describe(commands.ISSUE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'bug', unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('accepts Bug issue Type', () => {
     const actual = commandOptionsSchema.safeParse({ type: 'bug' });
     assert.strictEqual(actual.success, true);

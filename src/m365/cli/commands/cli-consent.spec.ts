@@ -68,6 +68,16 @@ describe(commands.CONSENT, () => {
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=2587b55d-a41e-436d-bb1d-6223eb185dd4&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
   });
 
+  it('fails validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ service: 'VivaEngage', unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if specified service is invalid ', () => {
     const actual = commandOptionsSchema.safeParse({ service: 'invalid' });
     assert.notStrictEqual(actual.success, true);

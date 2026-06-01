@@ -70,6 +70,16 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('retrieves scopes in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       aud: 'https://graph.microsoft.com',
