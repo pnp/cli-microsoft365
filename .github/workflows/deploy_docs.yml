@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags. Default: 1
           fetch-depth: 0
