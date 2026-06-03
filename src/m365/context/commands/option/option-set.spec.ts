@@ -1,19 +1,25 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './option-set.js';
+import command, { options } from './option-set.js';
 
 describe(commands.OPTION_SET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -51,11 +57,42 @@ describe(commands.OPTION_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation when name and value are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'listName',
+      value: 'testList'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when name is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      value: 'testList'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when value is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'listName'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'listName',
+      value: 'testList',
+      unknown: 'option'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('handles an error when reading file contents fails', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', value: 'testList' } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please add listName to .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'listName', value: 'testList' }) }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please add listName to .m365rc.json manually.`));
   });
 
   it('handles an error when writing file contents fails', async () => {
@@ -71,7 +108,7 @@ describe(commands.OPTION_SET, () => {
     }));
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', value: 'testList' } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please add listName to .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'listName', value: 'testList' }) }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please add listName to .m365rc.json manually.`));
   });
 
   it('adds a new key with value when context is present', async () => {
@@ -85,7 +122,7 @@ describe(commands.OPTION_SET, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, { options: { verbose: true, name: 'listName', value: 'testList' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: 'listName', value: 'testList' }) });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
       context: { listName: 'testList' }
@@ -101,7 +138,7 @@ describe(commands.OPTION_SET, () => {
       filePath = _.toString();
       fileContents = contents as string;
     });
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'listName', value: 'testList' } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'listName', value: 'testList' }) }));
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
       context: { listName: 'testList' }
@@ -129,7 +166,7 @@ describe(commands.OPTION_SET, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, { options: { verbose: true, name: 'listName', value: 'testList' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: 'listName', value: 'testList' }) });
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
       "apps": [
