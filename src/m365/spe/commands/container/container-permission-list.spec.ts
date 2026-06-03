@@ -22,6 +22,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
 
   const containerId = "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z";
   const containerName = 'My Application Storage Container';
+  const containerTypeId = 'b2e2cef4-9ac1-4b3b-b4a5-2a2e3a2e2a2e';
   const containerPermissionResponse = {
     "value": [
       {
@@ -94,6 +95,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       spe.getContainerIdByName,
+      spe.getContainerTypeIdByName,
       odata.getAllItems,
       cli.handleMultipleResultsFound
     ]);
@@ -156,6 +158,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
     await command.action(logger, {
       options: {
         containerName,
+        containerTypeId,
         debug: true
       }
     });
@@ -174,6 +177,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
     await command.action(logger, {
       options: {
         containerName,
+        containerTypeId,
         verbose: true
       }
     });
@@ -187,7 +191,8 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
     await assert.rejects(
       command.action(logger, {
         options: {
-          containerName
+          containerName,
+          containerTypeId
         }
       }),
       new CommandError(`The specified container '${containerName}' does not exist.`)
@@ -211,7 +216,8 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
 
     await command.action(logger, {
       options: {
-        containerName
+        containerName,
+        containerTypeId
       }
     });
 
@@ -231,9 +237,20 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        containerName
+        containerName,
+        containerTypeId
       }
     }), new CommandError('unexpected error'));
+  });
+
+  it('rethrows CommandError thrown during command execution', async () => {
+    sinon.stub(odata, 'getAllItems').rejects(new CommandError('command error'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        containerId
+      }
+    }), new CommandError('command error'));
   });
 
   it('correctly handles error when SharePoint Embedded Container is not found', async () => {
@@ -259,7 +276,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
   it('fails validation when neither containerId nor containerName is specified', () => {
     const result = schema.safeParse({});
     assert.strictEqual(result.success, false);
-    assert(result.error?.issues.some(issue => issue.message.includes('Specify either containerId or containerName')));
+    assert(result.error?.issues.some(issue => issue.message.includes('Specify either id or name')));
   });
 
   it('fails validation when both containerId and containerName are specified', () => {
@@ -268,7 +285,7 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
       containerName
     });
     assert.strictEqual(result.success, false);
-    assert(result.error?.issues.some(issue => issue.message.includes('Specify either containerId or containerName')));
+    assert(result.error?.issues.some(issue => issue.message.includes('Specify either id or name')));
   });
 
   it('passes validation when only containerId is specified', () => {
@@ -276,8 +293,49 @@ describe(commands.CONTAINER_PERMISSION_LIST, () => {
     assert.strictEqual(result.success, true);
   });
 
-  it('passes validation when only containerName is specified', () => {
-    const result = schema.safeParse({ containerName });
+  it('passes validation when containerName and containerTypeId are specified', () => {
+    const result = schema.safeParse({ containerName, containerTypeId });
     assert.strictEqual(result.success, true);
+  });
+
+  it('correctly lists permissions of a SharePoint Embedded Container by containerTypeName', async () => {
+    const containerTypeName = 'My Container Type';
+    sinon.stub(spe, 'getContainerTypeIdByName').resolves(containerTypeId);
+    sinon.stub(odata, 'getAllItems').onFirstCall().resolves([
+      {
+        id: containerId,
+        displayName: containerName
+      }
+    ]).onSecondCall().resolves(containerPermissionResponse.value);
+
+    await command.action(logger, {
+      options: {
+        containerName,
+        containerTypeName
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(containerPermissionResponse.value));
+  });
+
+  it('logs progress when getting container type by name in verbose mode', async () => {
+    const containerTypeName = 'My Container Type';
+    sinon.stub(spe, 'getContainerTypeIdByName').resolves(containerTypeId);
+    sinon.stub(odata, 'getAllItems').onFirstCall().resolves([
+      {
+        id: containerId,
+        displayName: containerName
+      }
+    ]).onSecondCall().resolves(containerPermissionResponse.value);
+
+    await command.action(logger, {
+      options: {
+        containerName,
+        containerTypeName,
+        verbose: true
+      }
+    });
+
+    assert(loggerLogToStderrSpy.calledWith(`Getting container type with name '${containerTypeName}'...`));
   });
 });

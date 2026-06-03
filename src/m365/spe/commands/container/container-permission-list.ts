@@ -6,11 +6,14 @@ import commands from '../../commands.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spe } from '../../../../utils/spe.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   containerId: z.string().alias('i').optional(),
-  containerName: z.string().alias('n').optional()
+  containerName: z.string().alias('n').optional(),
+  containerTypeId: z.uuid().optional(),
+  containerTypeName: z.string().optional()
 });
 
 declare type Options = z.infer<typeof options>;
@@ -39,7 +42,13 @@ class SpeContainerPermissionListCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((opts: Options) => [opts.containerId, opts.containerName].filter(value => value !== undefined).length === 1, {
-        message: 'Specify either containerId or containerName, but not both.'
+        message: 'Specify either id or name, but not both.'
+      })
+      .refine((options: Options) => !options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
+      })
+      .refine((options: Options) => options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
+        error: 'Options containerTypeId and containerTypeName are only required when retrieving a container by name.'
       });
   }
 
@@ -83,20 +92,20 @@ class SpeContainerPermissionListCommand extends GraphCommand {
       await logger.logToStderr(`Resolving container id from name '${options.containerName}'...`);
     }
 
-    const containers = await odata.getAllItems<{ id: string; displayName: string }>(`${this.resource}/v1.0/storage/fileStorage/containers?$select=id,displayName`);
-    const matchingContainers = containers.filter(c => c.displayName.toLowerCase() === options.containerName!.toLowerCase());
+    const containerTypeId = await this.getContainerTypeId(options, logger);
+    return spe.getContainerIdByName(containerTypeId, options.containerName!);
+  }
 
-    if (matchingContainers.length === 0) {
-      throw new CommandError(`The specified container '${options.containerName}' does not exist.`);
+  private async getContainerTypeId(options: Options, logger: Logger): Promise<string> {
+    if (options.containerTypeId) {
+      return options.containerTypeId;
     }
 
-    if (matchingContainers.length > 1) {
-      const containerKeyValuePair = formatting.convertArrayToHashTable('id', matchingContainers);
-      const container = await cli.handleMultipleResultsFound<{ id: string; displayName: string }>(`Multiple containers with name '${options.containerName}' found.`, containerKeyValuePair);
-      return container.id;
+    if (this.verbose) {
+      await logger.logToStderr(`Getting container type with name '${options.containerTypeName}'...`);
     }
 
-    return matchingContainers[0].id;
+    return spe.getContainerTypeIdByName(options.containerTypeName!);
   }
 }
 
