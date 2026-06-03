@@ -2,8 +2,9 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "lib": ["es2020", "dom"],
+    "types": ["mocha", "node"],
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "./dist",
