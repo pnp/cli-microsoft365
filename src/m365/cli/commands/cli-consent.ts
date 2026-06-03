@@ -1,15 +1,18 @@
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  service: z.enum(['VivaEngage']).alias('s')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  service: string;
 }
 
 class CliConsentCommand extends AnonymousCommand {
@@ -21,41 +24,8 @@ class CliConsentCommand extends AnonymousCommand {
     return 'Consent additional permissions for the Microsoft Entra application used by the CLI for Microsoft 365';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        service: args.options.service
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --service <service>',
-        autocomplete: ['VivaEngage']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.service !== 'VivaEngage') {
-          return `${args.options.service} is not a valid value for the service option. Allowed values: VivaEngage`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

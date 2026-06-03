@@ -1,11 +1,14 @@
 import os from 'os';
+import { z } from 'zod';
 import auth from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import Command from '../../../Command.js';
+import Command, { globalOptionsZod } from '../../../Command.js';
 import { app } from '../../../utils/app.js';
 import { validation } from '../../../utils/validation.js';
 import commands from '../commands.js';
+
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 interface CliDiagnosticInfo {
   os: {
@@ -31,6 +34,10 @@ class CliDoctorCommand extends Command {
 
   public get description(): string {
     return 'Retrieves diagnostic information about the current environment';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
