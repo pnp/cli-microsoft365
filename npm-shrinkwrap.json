@@ -36,7 +36,7 @@
         "strip-json-comments": "^5.0.3",
         "typescript": "^5.9.3",
         "update-notifier": "^7.3.1",
-        "uuid": "^13.0.2",
+        "uuid": "^14.0.0",
         "yaml": "^2.9.0",
         "yargs-parser": "^22.0.0",
         "zod": "^4.4.3"
@@ -73,7 +73,7 @@
         "globals": "^17.6.0",
         "mocha": "^11.7.6",
         "rimraf": "^6.1.3",
-        "sinon": "^21.1.2",
+        "sinon": "^22.0.0",
         "source-map-support": "^0.5.21",
         "tsc-watch": "^7.2.0"
       }
@@ -5576,18 +5576,30 @@
       }
     },
     "node_modules/sinon": {
-      "version": "21.1.2",
+      "version": "22.0.0",
+      "resolved": "https://registry.npmjs.org/sinon/-/sinon-22.0.0.tgz",
+      "integrity": "sha512-sq/6DpdXOrLyfbKlXLg/Usc7xu8YXPeLkOFZRvA3bNUSA2lhbrZ06yuXbH1fkzBPCbz9O10+7hznzUsjaYNm0Q==",
       "dev": true,
       "license": "BSD-3-Clause",
       "dependencies": {
         "@sinonjs/commons": "^3.0.1",
-        "@sinonjs/fake-timers": "^15.3.2",
+        "@sinonjs/fake-timers": "^15.4.0",
         "@sinonjs/samsam": "^10.0.2",
-        "diff": "^8.0.4"
+        "diff": "^9.0.0"
       },
       "funding": {
         "type": "opencollective",
         "url": "https://opencollective.com/sinon"
+      }
+    },
+    "node_modules/sinon/node_modules/diff": {
+      "version": "9.0.0",
+      "resolved": "https://registry.npmjs.org/diff/-/diff-9.0.0.tgz",
+      "integrity": "sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==",
+      "dev": true,
+      "license": "BSD-3-Clause",
+      "engines": {
+        "node": ">=0.3.1"
       }
     },
     "node_modules/source-map": {
@@ -6024,6 +6036,8 @@
     },
     "node_modules/typescript": {
       "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
       "license": "Apache-2.0",
       "bin": {
         "tsc": "bin/tsc",
@@ -6204,9 +6218,9 @@
       "license": "MIT"
     },
     "node_modules/uuid": {
-      "version": "13.0.2",
-      "resolved": "https://registry.npmjs.org/uuid/-/uuid-13.0.2.tgz",
-      "integrity": "sha512-vzi9uRZ926x4XV73S/4qQaTwPXM2JBj6/6lI/byHH1jOpCzb0zDbfytgA9LcN/hzb2l7WQSQnxITOVx5un/wGw==",
+      "version": "14.0.0",
+      "resolved": "https://registry.npmjs.org/uuid/-/uuid-14.0.0.tgz",
+      "integrity": "sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==",
       "funding": [
         "https://github.com/sponsors/broofa",
         "https://github.com/sponsors/ctavan"
