@@ -2,9 +2,8 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './multitenant-set.js';
+import command, { options } from './multitenant-set.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -16,7 +15,7 @@ import { CommandError } from '../../../../Command.js';
 describe(commands.MULTITENANT_SET, () => {
   let log: string[];
   let logger: Logger;
-  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -24,7 +23,8 @@ describe(commands.MULTITENANT_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -63,23 +63,23 @@ describe(commands.MULTITENANT_SET, () => {
   });
 
   it('passes validation when only displayName is specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Contoso organization' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization' });
+    assert.strictEqual(parseResult.success, true);
   });
 
   it('passes validation when only description is specified', async () => {
-    const actual = await command.validate({ options: { description: 'Contoso and partners' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ description: 'Contoso and partners' });
+    assert.strictEqual(parseResult.success, true);
   });
 
   it('passes validation when the displayName and description are specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Contoso organization', description: 'Contoso and partners' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({ displayName: 'Contoso organization', description: 'Contoso and partners' });
+    assert.strictEqual(parseResult.success, true);
   });
 
   it('fails validation when no option is specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const parseResult = commandOptionsSchema.safeParse({});
+    assert.strictEqual(parseResult.success, false);
   });
 
   it('updates a displayName of a multitenant organization', async () => {
@@ -91,7 +91,7 @@ describe(commands.MULTITENANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Contoso organization' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization' }) });
     assert(patchRequestStub.called);
   });
 
@@ -104,7 +104,7 @@ describe(commands.MULTITENANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { description: 'Contoso and partners', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ description: 'Contoso and partners', verbose: true }) });
     assert(patchRequestStub.called);
   });
 
@@ -117,7 +117,7 @@ describe(commands.MULTITENANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Contoso organization', description: 'Contoso and partners' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Contoso organization', description: 'Contoso and partners' }) });
     assert(patchRequestStub.called);
   });
 
@@ -133,6 +133,6 @@ describe(commands.MULTITENANT_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'test' }) }), new CommandError('Invalid request'));
   });
 });

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,13 +10,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './oauth2grant-set.js';
+import command, { options } from './oauth2grant-set.js';
 
 describe(commands.OAUTH2GRANT_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,6 +25,8 @@ describe(commands.OAUTH2GRANT_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -75,7 +79,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -93,7 +97,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', scope: 'user_impersonation' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -109,29 +113,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ grantId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' }) }),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying grantId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--grantId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--scope') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
