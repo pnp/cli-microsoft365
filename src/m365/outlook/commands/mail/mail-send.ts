@@ -47,47 +47,46 @@ class OutlookMailSendCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
     return schema
       .refine(options => {
-        if (options.attachment) {
-          const attachments: string[] = typeof options.attachment === 'string' ? [options.attachment] : options.attachment;
-
-          for (const attachment of attachments) {
-            if (!fs.existsSync(attachment)) {
-              return false;
-            }
-          }
+        if (!options.attachment) {
+          return true;
         }
 
-        return true;
-      }, {
-        error: 'One or more attachment files were not found.'
-      })
-      .refine(options => {
-        if (options.attachment) {
-          const attachments: string[] = typeof options.attachment === 'string' ? [options.attachment] : options.attachment;
+        const attachments: string[] = typeof options.attachment === 'string' ? [options.attachment] : options.attachment;
 
-          for (const attachment of attachments) {
-            if (fs.existsSync(attachment) && !fs.lstatSync(attachment).isFile()) {
-              return false;
-            }
+        for (const attachment of attachments) {
+          if (!fs.existsSync(attachment)) {
+            return false;
           }
-        }
 
-        return true;
-      }, {
-        error: 'One or more attachments is not a file.'
-      })
-      .refine(options => {
-        if (options.attachment) {
-          const requestBody = this.getRequestBody(options);
-          // The max body size of the request is 4 194 304 chars before getting a 413 response
-          if (JSON.stringify(requestBody).length > 4_194_304) {
+          if (!fs.lstatSync(attachment).isFile()) {
             return false;
           }
         }
 
+        const requestBody = this.getRequestBody(options);
+        // The max body size of the request is 4 194 304 chars before getting a 413 response
+        if (JSON.stringify(requestBody).length > 4_194_304) {
+          return false;
+        }
+
         return true;
       }, {
-        error: 'Exceeded the max total size of attachments which is 3MB.'
+        error: (ctx: { input: unknown }) => {
+          const opts = ctx.input as Options;
+          const attachments: string[] = typeof opts.attachment === 'string' ? [opts.attachment!] : opts.attachment!;
+
+          for (const attachment of attachments) {
+            if (!fs.existsSync(attachment)) {
+              return `File with path '${attachment}' was not found.`;
+            }
+
+            if (!fs.lstatSync(attachment).isFile()) {
+              return `'${attachment}' is not a file.`;
+            }
+          }
+
+          return 'Exceeded the max total size of attachments which is 3MB.';
+        }
       });
   }
 
