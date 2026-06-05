@@ -17,7 +17,7 @@ export const options = z.strictObject({
       error: e => {
         const scopes = (e.input as string).split(',').map(x => x.trim());
         const invalidScope = scopes.find(scope => !(allowedScopes as readonly string[]).includes(scope));
-        return `'${invalidScope}'' is not a valid scope. Allowed scopes are ${allowedScopes.join(', ')}.`;
+        return `'${invalidScope}' is not a valid scope. Allowed scopes are ${allowedScopes.join(', ')}.`;
       }
     }).alias('s'),
   startIndex: z.number()
