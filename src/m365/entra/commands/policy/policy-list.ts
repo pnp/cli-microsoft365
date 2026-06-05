@@ -8,7 +8,7 @@ import commands from '../../commands.js';
 const policyEndPoints: any = {
   activitybasedtimeout: "activityBasedTimeoutPolicies",
   adminconsentrequest: "adminConsentRequestPolicy",
-  appManagement: "appManagementPolicies",
+  appmanagement: "appManagementPolicies",
   authenticationflows: "authenticationFlowsPolicy",
   authenticationmethods: "authenticationMethodsPolicy",
   authenticationstrength: "authenticationStrengthPolicies",
@@ -31,7 +31,10 @@ const supportedPolicyTypes = ['activityBasedTimeout', 'adminConsentRequest', 'ap
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  type: z.enum(supportedPolicyTypes).optional().alias('t')
+  type: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return supportedPolicyTypes.find(t => t.toLowerCase() === target) ?? val;
+  }, z.enum(supportedPolicyTypes)).optional().alias('t')
 });
 
 declare type Options = z.infer<typeof options>;

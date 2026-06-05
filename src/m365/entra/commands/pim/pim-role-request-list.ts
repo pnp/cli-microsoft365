@@ -22,7 +22,10 @@ export const options = z.strictObject({
   createdDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
     error: e => `'${e.input}' is not a valid ISO 8601 date time string for option 'createdDateTime'.`
   }).optional().alias('c'),
-  status: z.enum(allowedStatuses).optional().alias('s'),
+  status: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return allowedStatuses.find(s => s.toLowerCase() === target) ?? val;
+  }, z.enum(allowedStatuses)).optional().alias('s'),
   withPrincipalDetails: z.boolean().default(false)
 });
 

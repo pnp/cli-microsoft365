@@ -386,6 +386,14 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('accepts status case-insensitively', async () => {
+    const actual = commandOptionsSchema.safeParse({ status: 'granted' });
+    assert.strictEqual(actual.success, true);
+    if (actual.success) {
+      assert.strictEqual(actual.data.status, 'Granted');
+    }
+  });
+
   it('should get a list of PIM requests', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests?$expand=roleDefinition($select=displayName)') {

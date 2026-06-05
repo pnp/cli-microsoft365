@@ -902,6 +902,7 @@
     "node_modules/@opentelemetry/api": {
       "version": "1.9.1",
       "license": "Apache-2.0",
+      "peer": true,
       "engines": {
         "node": ">=8.0.0"
       }
@@ -1750,6 +1751,7 @@
     "node_modules/@types/node": {
       "version": "24.12.2",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "undici-types": "~7.16.0"
       }
@@ -1859,6 +1861,7 @@
       "version": "8.59.2",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "8.59.2",
         "@typescript-eslint/types": "8.59.2",
@@ -2388,6 +2391,7 @@
     "node_modules/acorn": {
       "version": "8.16.0",
       "license": "MIT",
+      "peer": true,
       "bin": {
         "acorn": "bin/acorn"
       },
@@ -3144,6 +3148,7 @@
     "node_modules/diagnostic-channel": {
       "version": "1.1.1",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "semver": "^7.5.3"
       }
@@ -3302,6 +3307,7 @@
       "version": "10.2.1",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.8.0",
         "@eslint-community/regexpp": "^4.12.2",
@@ -5900,6 +5906,7 @@
     "node_modules/typescript": {
       "version": "5.9.3",
       "license": "Apache-2.0",
+      "peer": true,
       "bin": {
         "tsc": "bin/tsc",
         "tsserver": "bin/tsserver"

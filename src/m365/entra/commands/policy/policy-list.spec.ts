@@ -1625,6 +1625,16 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('accepts type case-insensitively', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: "ACTIVITYBASEDTIMEOUT"
+    });
+    assert.strictEqual(actual.success, true);
+    if (actual.success) {
+      assert.strictEqual(actual.data.type, 'activityBasedTimeout');
+    }
+  });
+
   it('rejects invalid type', async () => {
     const type = 'foo';
     const actual = commandOptionsSchema.safeParse({

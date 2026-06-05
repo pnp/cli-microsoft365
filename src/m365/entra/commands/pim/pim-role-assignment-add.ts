@@ -69,10 +69,10 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         const specified = [!options.expiration ? true : undefined, options.endDateTime, options.duration].filter(o => o !== undefined).length;
         return specified <= 1;
       }, {
-        message: 'Specify only one of the following options: no-expiration, endDateTime, duration',
+        message: 'Specify only one of the following options: expiration, endDateTime, duration',
         params: {
           customCode: 'optionSet',
-          options: ['no-expiration', 'endDateTime', 'duration']
+          options: ['expiration', 'endDateTime', 'duration']
         }
       })
       .refine(options => {
