@@ -36,7 +36,7 @@ export const options = z.strictObject({
       message: 'ID cannot begin with Microsoft'
     })
     .refine(id => !invalidIds.includes(id), {
-      error: () => `ID cannot be one of the following values: ${invalidIds.join(', ')}.`
+      message: `ID cannot be one of the following values: ${invalidIds.join(', ')}.`
     })
     .alias('i'),
   name: z.string().alias('n'),

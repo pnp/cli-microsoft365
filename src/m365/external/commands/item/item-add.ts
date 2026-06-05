@@ -38,7 +38,7 @@ export const options = z.object({
     }, {
       message: 'The type value for option acls is not valid. Allowed values are user, group, everyone, everyoneExceptGuests, externalGroup'
     })
-});
+}).passthrough();
 
 declare type Options = z.infer<typeof options>;
 

@@ -22,11 +22,22 @@ export const options = z.strictObject({
   schema: z.string()
     .refine(val => {
       try {
+        JSON.parse(val);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      message: 'The schema is not a valid JSON string'
+    })
+    .refine(val => {
+      try {
         const obj = JSON.parse(val);
         return obj.baseType === 'microsoft.graph.externalItem';
       }
       catch {
-        return false;
+        return true;
       }
     }, {
       message: `The schema needs a required property 'baseType' with value 'microsoft.graph.externalItem'`
@@ -37,7 +48,7 @@ export const options = z.strictObject({
         return obj.properties && obj.properties.length > 0 && obj.properties.length <= 128;
       }
       catch {
-        return false;
+        return true;
       }
     }, {
       message: 'We need at least one property and a maximum of 128 properties in the schema object'
