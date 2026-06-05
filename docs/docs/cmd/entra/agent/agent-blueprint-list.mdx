@@ -1,0 +1,164 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra agent blueprint list
+
+Retrieves a list of templates defining the agent identity type
+
+## Usage
+
+```sh
+m365 entra agent blueprint list [options]
+```
+
+## Options
+
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
+<Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of agent blueprint properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                     |
+  |-----------------|---------------------------------|
+  | Microsoft Graph | AgentIdentityBlueprint.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                     |
+  |-----------------|---------------------------------|
+  | Microsoft Graph | AgentIdentityBlueprint.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve all agent blueprint templates
+
+```sh
+m365 entra agent blueprint list
+```
+
+Retrieve id and name of agent blueprint templates
+
+```sh
+m365 entra agent blueprint list --properties 'id,displayName'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "appId": "0e81af7f-b058-470a-84be-3a4f5a8014ca",
+      "createdByAppId": "14d82eec-204b-4c2f-b7e8-296a70dab67e",
+      "createdDateTime": "2025-11-20T07:47:39Z",
+      "defaultRedirectUri": null,
+      "description": null,
+      "disabledByMicrosoftStatus": null,
+      "displayName": "OcnAgentBluePrint02",
+      "groupMembershipClaims": null,
+      "identifierUris": [],
+      "managerApplications": [],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "serviceManagementReference": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null,
+      "uniqueName": null,
+      "id": "0e81af7f-b058-470a-84be-3a4f5a8014ca",
+      "certification": null,
+      "optionalClaims": null,
+      "api": {
+        "acceptMappedClaims": null,
+        "knownClientApplications": [],
+        "requestedAccessTokenVersion": 2,
+        "oauth2PermissionScopes": [],
+        "preAuthorizedApplications": []
+      },
+      "appRoles": [],
+      "info": {
+        "logoUrl": null,
+        "marketingUrl": null,
+        "privacyStatementUrl": null,
+        "supportUrl": null,
+        "termsOfServiceUrl": null
+      },
+      "keyCredentials": [],
+      "passwordCredentials": [],
+      "requiredResourceAccess": [],
+      "verifiedPublisher": {
+        "displayName": null,
+        "verifiedPublisherId": null,
+        "addedDateTime": null
+      },
+      "web": {
+        "homePageUrl": null,
+        "logoutUrl": null,
+        "redirectUris": [],
+        "implicitGrantSettings": {
+          "enableAccessTokenIssuance": false,
+          "enableIdTokenIssuance": false
+        },
+        "redirectUriSettings": []
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appId      : 0e81af7f-b058-470a-84be-3a4f5a8014ca
+  displayName: OcnAgentBluePrint02
+  id         : 0e81af7f-b058-470a-84be-3a4f5a8014ca
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appId,createdByAppId,createdDateTime,defaultRedirectUri,description,disabledByMicrosoftStatus,displayName,groupMembershipClaims,publisherDomain,serviceManagementReference,signInAudience,tokenEncryptionKeyId,uniqueName,id,certification,optionalClaims
+  0e81af7f-b058-470a-84be-3a4f5a8014ca,14d82eec-204b-4c2f-b7e8-296a70dab67e,2025-11-20T07:47:39Z,,,,OcnAgentBluePrint02,,contoso.onmicrosoft.com,,AzureADMyOrg,,,0e81af7f-b058-470a-84be-3a4f5a8014ca,,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra agent blueprint list --debug "false" --verbose "false"
+
+  Date: 6/5/2026
+
+  ## OcnAgentBluePrint02 (0e81af7f-b058-470a-84be-3a4f5a8014ca)
+
+  Property | Value
+  ---------|-------
+  appId | 0e81af7f-b058-470a-84be-3a4f5a8014ca
+  createdByAppId | 14d82eec-204b-4c2f-b7e8-296a70dab67e
+  createdDateTime | 2025-11-20T07:47:39Z
+  displayName | OcnAgentBluePrint02
+  publisherDomain | contoso.onmicrosoft.com
+  signInAudience | AzureADMyOrg
+  id | 0e81af7f-b058-470a-84be-3a4f5a8014ca
+  ```
+
+  </TabItem>
+</Tabs>
