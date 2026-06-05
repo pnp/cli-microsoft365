@@ -514,7 +514,7 @@ export const spo = {
       const folderServerRelativeUrl = urlUtil.getServerRelativePath(webFullUrl, nextFolder);
 
       const requestOptions: CliRequestOptions = {
-        url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
+        url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         }
@@ -528,7 +528,7 @@ export const spo = {
       catch {
         const prevFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(webFullUrl, prevFolder);
         const requestOptions: CliRequestOptions = {
-          url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${formatting.encodeQueryParameter(prevFolderServerRelativeUrl)}%27&@a2=%27${formatting.encodeQueryParameter(folders[folderIndex])}%27`,
+          url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27${formatting.encodeQueryParameter(prevFolderServerRelativeUrl)}%27&@a2=%27${formatting.encodeQueryParameter(folders[folderIndex])}%27`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -1686,7 +1686,7 @@ export const spo = {
     }
 
     const serverRelativePath = urlUtil.getServerRelativePath(absoluteListUrl, url);
-    const requestUrl = `${absoluteListUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+    const requestUrl = `${absoluteListUrl}/_api/web/GetFileByServerRelativePath(decodedUrl=@f)?$expand=ListItemAllFields&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
 
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
@@ -2179,6 +2179,35 @@ export const spo = {
   },
 
   /**
+  * Retrieves the file by url.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param url the url of the file
+  * @param logger the Logger object
+  * @param verbose set for verbose logging 
+  */
+  async getFileByUrl(webUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the file with url ${url}`);
+    }
+
+    const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, url);
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
+  },
+
+  /**
    * Create a SharePoint copy job to copy a file to another location.
    * @param webUrl Absolute web URL where the source file is located.
    * @param sourceUrl Absolute URL of the source file.
@@ -2440,5 +2469,34 @@ export const spo = {
       }
     }
     return results;
+  },
+
+  /**
+   * Retrieves the role assignments for a file.
+   * Returns an array of role assignments
+   * @param webUrl The web url
+   * @param url the url of the file
+   * @param logger The logger object
+   * @param verbose If in verbose mode
+   * @returns An array of role assignments for the file
+   */
+  async getFileRoleAssignments(webUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the role assignments for the file ${url}`);
+    }
+
+    const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, url);
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`,
+      headers: { accept: 'application/json;odata=nometadata' },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: any[] }>(requestOptions);
+    response.value.forEach(r => {
+      r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+    });
+
+    return response.value;
   }
 };
