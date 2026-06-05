@@ -414,7 +414,7 @@ describe(commands.RUN_GET, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the flowName is not valid GUID', () => {
+  it('passes validation when all options are correct', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, name: runName });
     assert.strictEqual(actual.success, true);
   });

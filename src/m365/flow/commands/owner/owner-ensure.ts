@@ -14,11 +14,15 @@ export const options = z.strictObject({
   flowName: z.uuid(),
   environmentName: z.string().alias('e'),
   roleName: z.enum(['CanView', 'CanEdit']),
-  userId: z.uuid().optional(),
+  userId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid userName.`
   }).optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
   groupName: z.string().optional(),
   asAdmin: z.boolean().optional()
 });
