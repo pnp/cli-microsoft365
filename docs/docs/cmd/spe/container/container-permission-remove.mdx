@@ -1,0 +1,72 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spe container permission remove
+
+Removes permissions from a SharePoint Embedded Container
+
+## Usage
+
+```sh
+m365 spe container permission remove [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id <id>`
+: ID of the permission to remove.
+
+`--containerId [containerId]`
+: ID of a SharePoint Embedded container. Specify either `containerId` or `containerName` but not both.
+
+`-n, --containerName [containerName]`
+: Display name of the Container. Specify either `containerId` or `containerName` but not both.
+
+`--containerTypeId [containerTypeId]`
+: The ID of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`--containerTypeName [containerTypeName]`
+: The name of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`-f, --force [force]`
+: Don't prompt for confirmation.
+```
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Removes the specified permission from a container
+
+```sh
+m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --Id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ"
+```
+
+Removes the specified permission from a container and doesn't prompt for confirmation
+
+```sh
+m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --Id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ" --force
+```
+
+## Response
+
+The command won't return a response on success.

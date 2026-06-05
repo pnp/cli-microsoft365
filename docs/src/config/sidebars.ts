@@ -2228,6 +2228,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container permission remove',
+              id: 'cmd/spe/container/container-permission-remove'
+            },
+            {
+              type: 'doc',
               label: 'container recyclebinitem list',
               id: 'cmd/spe/container/container-recyclebinitem-list'
             },
