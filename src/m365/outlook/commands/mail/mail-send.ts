@@ -44,38 +44,51 @@ class OutlookMailSendCommand extends GraphCommand {
     return options;
   }
 
-  constructor() {
-    super();
-
-    this.#initValidators();
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.attachment) {
-          const attachments: string[] = typeof args.options.attachment === 'string' ? [args.options.attachment] : args.options.attachment;
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(options => {
+        if (options.attachment) {
+          const attachments: string[] = typeof options.attachment === 'string' ? [options.attachment] : options.attachment;
 
           for (const attachment of attachments) {
             if (!fs.existsSync(attachment)) {
-              return `File with path '${attachment}' was not found.`;
+              return false;
             }
-
-            if (!fs.lstatSync(attachment).isFile()) {
-              return `'${attachment}' is not a file.`;
-            }
-          }
-
-          const requestBody = this.getRequestBody(args.options);
-          // The max body size of the request is 4 194 304 chars before getting a 413 response
-          if (JSON.stringify(requestBody).length > 4_194_304) {
-            return 'Exceeded the max total size of attachments which is 3MB.';
           }
         }
 
         return true;
-      }
-    );
+      }, {
+        error: 'One or more attachment files were not found.'
+      })
+      .refine(options => {
+        if (options.attachment) {
+          const attachments: string[] = typeof options.attachment === 'string' ? [options.attachment] : options.attachment;
+
+          for (const attachment of attachments) {
+            if (fs.existsSync(attachment) && !fs.lstatSync(attachment).isFile()) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }, {
+        error: 'One or more attachments is not a file.'
+      })
+      .refine(options => {
+        if (options.attachment) {
+          const requestBody = this.getRequestBody(options);
+          // The max body size of the request is 4 194 304 chars before getting a 413 response
+          if (JSON.stringify(requestBody).length > 4_194_304) {
+            return false;
+          }
+        }
+
+        return true;
+      }, {
+        error: 'Exceeded the max total size of attachments which is 3MB.'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

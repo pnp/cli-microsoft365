@@ -317,6 +317,10 @@ describe(commands.MAIL_SEND, () => {
     assert.notStrictEqual(command.schema, undefined);
   });
 
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
+  });
+
   it('fails validation if bodyContentType is invalid', () => {
     const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' });
     assert.notStrictEqual(actual.success, true);
@@ -327,7 +331,7 @@ describe(commands.MAIL_SEND, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if file doesn\'t exist', async () => {
+  it('fails validation if file doesn\'t exist', () => {
     sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString() === 'C:/File2.txt') {
@@ -337,11 +341,11 @@ describe(commands.MAIL_SEND, () => {
       return true;
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if attachment is not a file', async () => {
+  it('fails validation if attachment is not a file', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').callsFake(path => {
       if (path.toString() === 'C:/File2.txt') {
@@ -351,11 +355,11 @@ describe(commands.MAIL_SEND, () => {
       return { isFile: () => true } as any;
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if attachments are too large', async () => {
+  it('fails validation if attachments are too large', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'readFileSync').callsFake(path => {
@@ -366,17 +370,17 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid read request';
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid attachments are specified', async () => {
+  it('passes validation when valid attachments are specified', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'readFileSync').returns('file content');
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when subject, to and bodyContents are specified', () => {
