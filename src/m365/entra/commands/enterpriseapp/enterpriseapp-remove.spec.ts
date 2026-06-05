@@ -128,7 +128,7 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
     }), new CommandError(`The specified enterprise application does not exist.`));
   });
 
-  it('fails validation if neither the id nor the displayName option is specified', () => {
+  it('fails validation if neither the id, displayName, nor objectId option is specified', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });

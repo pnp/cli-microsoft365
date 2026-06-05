@@ -547,7 +547,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     await assert.rejects(command.action(logger, { options: { appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId nor appDisplayName are not specified', () => {
+  it('fails validation if neither appId, appObjectId, nor appDisplayName are specified', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });

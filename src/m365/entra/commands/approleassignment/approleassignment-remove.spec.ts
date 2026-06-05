@@ -244,7 +244,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId, appObjectId nor appDisplayName are not specified', () => {
+  it('fails validation if neither appId, appObjectId, nor appDisplayName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ resource: 'abc', scopes: 'abc' });
     assert.strictEqual(actual.success, false);
   });

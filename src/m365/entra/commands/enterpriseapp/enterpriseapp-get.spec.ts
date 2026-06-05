@@ -272,7 +272,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
     }), new CommandError(`The specified Entra app does not exist`));
   });
 
-  it('fails validation if neither the id nor the displayName option specified', () => {
+  it('fails validation if neither the id, displayName, nor objectId option specified', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });
