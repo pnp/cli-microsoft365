@@ -6,12 +6,18 @@ import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { md } from '../../../../utils/md.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import { Changelog, ChangelogItem } from '../../Changelog.js';
 import commands from '../../commands.js';
 
 const allowedVersions = ['beta', 'v1.0'];
-const allowedChangeTypes = ['Addition', 'Change', 'Deletion', 'Deprecation'];
+enum ChangeType {
+  Addition = 'Addition',
+  Change = 'Change',
+  Deletion = 'Deletion',
+  Deprecation = 'Deprecation'
+}
 const allowedServices = [
   'Applications', 'Calendar', 'Change notifications', 'Cloud communications',
   'Compliance', 'Cross-device experiences', 'Customer booking', 'Device and app management',
@@ -25,7 +31,7 @@ const allowedServices = [
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   versions: z.string().optional().alias('v'),
-  changeType: z.string().optional().alias('c'),
+  changeType: zod.coercedEnum(ChangeType).optional().alias('c'),
   services: z.string().optional().alias('s'),
   startDate: z.string().optional(),
   endDate: z.string().optional()
@@ -62,17 +68,8 @@ class GraphChangelogListCommand extends AnonymousCommand {
         }
         return !options.versions.toLocaleLowerCase().split(',').some(x => !allowedVersions.map(y => y.toLocaleLowerCase()).includes(x));
       }, {
-        error: `The verions contains an invalid value. Specify either ${allowedVersions.join(', ')} as properties`,
+        error: `The versions contains an invalid value. Specify either ${allowedVersions.join(', ')} as properties`,
         path: ['versions']
-      })
-      .refine(options => {
-        if (!options.changeType) {
-          return true;
-        }
-        return allowedChangeTypes.map(x => x.toLocaleLowerCase()).includes(options.changeType.toLocaleLowerCase());
-      }, {
-        error: `The change type contain an invalid value. Specify either ${allowedChangeTypes.join(', ')} as properties`,
-        path: ['changeType']
       })
       .refine(options => {
         if (!options.services) {
@@ -99,8 +96,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const allowedChangeType = args.options.changeType && allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
-      const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
+      const searchParam = args.options.changeType ? `/?filterBy=${args.options.changeType}` : '';
 
       const requestOptions: CliRequestOptions = {
         url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
