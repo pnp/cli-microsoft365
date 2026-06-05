@@ -1,0 +1,103 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo site accessrequest list
+
+Lists all access requests for a specific site.
+
+## Usage
+
+```sh
+m365 spo site accessrequest list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: URL of the site collection.
+
+`--state [state]`
+: Only show access requests with a specific state. Valid values are: `approved`, `declined`, `pending`. All requests are returned by default.
+```
+
+<Global />
+
+## Examples
+
+List all access requests of a specific site.
+
+```sh
+m365 spo site accessrequest list --siteUrl https://contoso.sharepoint.com/sites/Marketing
+```
+
+List all pending access requests of a specific site.
+
+```sh
+m365 spo site accessrequest list --siteUrl https://contoso.sharepoint.com/sites/Marketing --state pending
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Id": 1,
+      "Title": null,
+      "RequestDate": "2024-09-03T22:07:04Z",
+      "Status": 0,
+      "PermissionLevelRequested": 5,
+      "PermissionType": null,
+      "IsInvitation": false,
+      "Conversation": null,
+      "RequestedObjectUrl": null,
+      "RequestedObjectTitle": null,
+      "RequestedByDisplayName": null,
+      "RequestedForDisplayName": "John Doe",
+      "StatusLabel": "pending"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Id  RequestDate           RequestedForDisplayName  PermissionLevelRequested  StatusLabel
+  --  --------------------  ----------------------  ------------------------  -----------
+  1   2024-09-03T22:07:04Z  John Doe                5                         pending
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Id,RequestDate,RequestedForDisplayName,PermissionLevelRequested,StatusLabel
+  1,2024-09-03T22:07:04Z,John Doe,5,pending
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site accessrequest list --siteUrl "https://contoso.sharepoint.com/sites/Marketing"
+
+  Date: 03/09/2024
+
+  ## 1
+
+  Property | Value
+  ---------|-------
+  Id | 1
+  RequestDate | 2024-09-03T22:07:04Z
+  RequestedForDisplayName | John Doe
+  PermissionLevelRequested | 5
+  StatusLabel | pending
+  ```
+
+  </TabItem>
+</Tabs>
