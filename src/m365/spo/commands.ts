@@ -364,6 +364,7 @@ export default {
   USERPROFILE_GET: `${prefix} userprofile get`,
   USERPROFILE_SET: `${prefix} userprofile set`,
   WEB_ADD: `${prefix} web add`,
+  WEB_ALERT_GET: `${prefix} web alert get`,
   WEB_ALERT_LIST: `${prefix} web alert list`,
   WEB_ALERT_REMOVE: `${prefix} web alert remove`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
