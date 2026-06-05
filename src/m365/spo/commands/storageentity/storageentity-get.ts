@@ -1,18 +1,28 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { TenantProperty } from './TenantProperty.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  key: z.string().alias('k'),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  key: string;
 }
 
 class SpoStorageEntityGetCommand extends SpoCommand {
@@ -24,25 +34,24 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     return 'Get details for the specified tenant property';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-k, --key <key>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
-      const requestOptions: any = {
-        url: `${spoUrl}/_api/web/GetStorageEntity('${formatting.encodeQueryParameter(args.options.key)}')`,
+      let appCatalogUrl = args.options.appCatalogUrl;
+
+      if (!appCatalogUrl) {
+        appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug) as string;
+
+        if (!appCatalogUrl) {
+          throw 'Tenant app catalog URL not found. Specify the URL of the app catalog site using the appCatalogUrl option.';
+        }
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${appCatalogUrl}/_api/web/GetStorageEntity('${formatting.encodeQueryParameter(args.options.key)}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
