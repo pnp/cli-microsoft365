@@ -208,6 +208,19 @@ describe(commands.EVENT_GET, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('retrieves event by id for the user specified with userId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/events/${id}`) {
+        return eventResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id, userId: userId, verbose: true }) });
+    assert(loggerLogSpy.calledOnceWith(eventResponse));
+  });
+
   it('retrieves event by id for the user specified with userId and calendarId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/calendars/${calendarId}/events/${id}`) {
