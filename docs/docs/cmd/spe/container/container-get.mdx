@@ -20,6 +20,12 @@ m365 spe container get [options]
 
 `-n, --name [name]`
 : Display name of the container. Specify either `id` or `name` but not both.
+
+`--containerTypeId [containerTypeId]`
+: The container type ID of the container instance. Specify either `containerTypeId` or `containerTypeName` when using `name` but not both.
+
+`--containerTypeName [containerTypeName]`
+: The container type name of the container instance. Specify either `containerTypeId` or `containerTypeName` when using `name` but not both.
 ```
 
 <Global />
@@ -54,7 +60,13 @@ m365 spe container get --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDE
 Gets a container of a specific type by display name.
 
 ```sh
-m365 spe container get --name "My Application Storage Container"
+m365 spe container get --name "My Application Storage Container" --containerTypeId "91710488-5756-407f-9046-fbe5f0b4de73"
+```
+
+Gets container by using its name and container type name.
+
+```sh
+m365 spe container get --name "Invoices" --containerTypeName "My container type name"
 ```
 
 ## Response
