@@ -305,7 +305,7 @@
     "@azure/msal-common": "^16.6.2",
     "@azure/msal-node": "^5.2.2",
     "@inquirer/confirm": "^6.1.1",
-    "@inquirer/input": "^5.1.0",
+    "@inquirer/input": "^5.1.1",
     "@inquirer/select": "^5.2.1",
     "@xmldom/xmldom": "^0.9.10",
     "adaptive-expressions": "^4.23.3",
