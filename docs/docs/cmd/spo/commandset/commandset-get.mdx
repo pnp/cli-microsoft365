@@ -42,6 +42,25 @@ If the command finds multiple command sets with the specified title, it will pro
 
 This command can be used for retrieving a ListView Command Set from a specific site. To retrieve a ListView Command Set that's installed tenant-wide, view our dedicated [spo tenant commandset get](../tenant/tenant-commandset-get.mdx) command.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieves a ListView Command Set by title.
