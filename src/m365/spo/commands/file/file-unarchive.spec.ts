@@ -195,7 +195,6 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
-    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
   it('unarchives file by id', async () => {
@@ -231,7 +230,6 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
-    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
   it('unarchives file using site-relative url', async () => {
@@ -265,10 +263,9 @@ describe(commands.FILE_UNARCHIVE, () => {
     });
 
     assert(postStub.calledOnce);
-    assert(loggerLogSpy.calledWith(unarchiveResponse));
   });
 
-  it('outputs the API response when unarchiving a file', async () => {
+  it('does not output response when unarchiving a file', async () => {
     sinon.stub(request, 'get').resolves({ ListId: 'b2307a39-e878-458b-bc90-03bc578531d6', ListItemAllFields: { Id: 1 } });
     sinon.stub(request, 'post').resolves(unarchiveResponse);
 
@@ -280,7 +277,7 @@ describe(commands.FILE_UNARCHIVE, () => {
       }
     });
 
-    assert(loggerLogSpy.calledOnceWith(unarchiveResponse));
+    assert(loggerLogSpy.notCalled);
   });
 
   it('handles error correctly', async () => {

@@ -93,8 +93,7 @@ class SpoFileUnarchiveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const res = await request.post(requestOptions);
-      await logger.log(res);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
