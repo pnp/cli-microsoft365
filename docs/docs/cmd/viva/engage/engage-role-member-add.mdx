@@ -1,0 +1,76 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# viva engage role member add
+
+Assign a Viva Engage role to a user
+
+## Usage
+
+```sh
+m365 viva engage role member add [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --roleId [roleId]`
+: The id of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+
+`-n, --roleName [roleName]`
+: The name of the Viva Engage role. Specify either `roleId` or `roleName`, but not both.
+
+`--userId [userId]`
+: The id of the user to be assigned to the role. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: The UPN of the user to be assigned to the role. Specify either `userId` or `userName`, but not both.
+```
+
+<Global />
+
+## Remarks
+
+:::warning
+
+This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reaches general availability.
+
+:::
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                  |
+  |-----------------|------------------------------|
+  | Microsoft Graph | EngagementRole.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                  |
+  |-----------------|------------------------------|
+  | Microsoft Graph | EngagementRole.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Assign a user specified by id to the role specified by name.
+
+```sh
+m365 viva engage role member add --userId 7a2ca997-9461-402e-9882-58088a370889 --roleName 'Verified Admin'
+```
+
+Assign a user specified by UPN to the role specified by id.
+
+```sh
+m365 viva engage role member add --userName john.doe@contoso.com --roleId 77aa47ad-96fe-4ecc-8024-fd1ac5e28f17
+```
+
+## Response
+
+The command won't return a response on success.

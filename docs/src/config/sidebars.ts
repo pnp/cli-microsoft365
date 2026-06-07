@@ -5031,6 +5031,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'engage role member add',
+              id: 'cmd/viva/engage/engage-role-member-add'
+            },
+            {
+              type: 'doc',
               label: 'engage role member list',
               id: 'cmd/viva/engage/engage-role-member-list'
             },
