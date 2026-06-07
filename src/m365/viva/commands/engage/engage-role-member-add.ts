@@ -86,8 +86,7 @@ class VivaEngageRoleMemberAddCommand extends GraphCommand {
         }
       };
 
-      const response = await request.post(requestOptions);
-      await logger.log(response);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

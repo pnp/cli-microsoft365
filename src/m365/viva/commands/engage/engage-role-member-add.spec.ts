@@ -15,21 +15,15 @@ import { cli } from '../../../../cli/cli.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 
+
 describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
   const roleId = 'ec759127-089f-4f91-8dfc-03a30b51cb38';
   const roleName = 'Network Admin';
   const userId = 'a1b2c3d4-e5f6-4789-9012-3456789abcde';
   const userName = 'john.doe@contoso.com';
-  const addRoleMemberResponse = {
-    "@odata.type": "#microsoft.graph.engagementRoleMember",
-    "id": "a40473a5-0fb4-a250-e029-f6fe33d07733",
-    "userId": userId,
-    "createdDateTime": "2026-04-15T14:03:00Z"
-  };
 
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
 
@@ -56,7 +50,6 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -169,32 +162,32 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
   });
 
   it('adds the user specified by id to Viva Engage role specified by id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles/${roleId}/members`) {
-        return addRoleMemberResponse;
+        return;
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, roleId: roleId, userId: userId }) });
-    assert(loggerLogSpy.calledWith(addRoleMemberResponse));
+    assert(postStub.called);
   });
 
   it('adds the user specified by name to Viva Engage role specified by name', async () => {
     sinon.stub(entraUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(vivaEngage, 'getRoleIdByName').withArgs(roleName).resolves(roleId);
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles/${roleId}/members`) {
-        return addRoleMemberResponse;
+        return;
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, roleName: roleName, userName: userName }) });
-    assert(loggerLogSpy.calledWith(addRoleMemberResponse));
+    assert(postStub.called);
   });
 
   it('handles error when adding a user to a Viva Engage role failed', async () => {
