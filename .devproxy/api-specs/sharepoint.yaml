@@ -73,6 +73,35 @@ paths:
       responses:
         200:
           description: OK
+  /_api/Lists(guid'{listId}')/items({itemId})/UnArchive:
+    post:
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          description: list GUID
+          schema:
+            type: string
+          example: b2307a39-e878-458b-bc90-03bc578531d6
+        - name: itemId
+          in: path
+          required: true
+          description: list item ID
+          schema:
+            type: integer
+          example: 1
+      security:
+        - delegated:
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/contextinfo:
     post:
       security:
@@ -214,6 +243,30 @@ paths:
           - AllSites.Write
           - AllSites.Manage
           - AllSites.FullControl
+      responses:
+        200:
+          description: OK
+  /_api/web/GetFileById({fileId}):
+    get:
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          description: file unique ID
+          schema:
+            type: string
+          example: "'7a8c9207-7745-4cda-b0e2-be2618ee3030'"
+      security:
+        - delegated:
+          - AllSites.Read
+          - AllSites.Write
+          - AllSites.Manage
+          - AllSites.FullControl
+        - application:
+          - Sites.Read.All
+          - Sites.ReadWrite.All
+          - Sites.Manage.All
+          - Sites.FullControl.All
       responses:
         200:
           description: OK

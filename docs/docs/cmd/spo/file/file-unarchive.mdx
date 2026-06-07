@@ -1,0 +1,68 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo file unarchive
+
+Unarchives a file
+
+## Usage
+
+```sh
+m365 spo file unarchive [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the site where the file is located.
+
+`--url [url]`
+: The server- or site-relative decoded URL of the file to unarchive. Specify either `url` or `id`, but not both.
+
+`-i, --id [id]`
+: The UniqueId (GUID) of the file to unarchive. Specify either `url` or `id`, but not both.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Unarchive a file by id without prompting for confirmation
+
+```sh
+m365 spo file unarchive --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7a8c9207-7745-4cda-b0e2-be2618ee3030 --force
+```
+
+Unarchive a file by URL with prompting for confirmation
+
+```sh
+m365 spo file unarchive --webUrl https://contoso.sharepoint.com/sites/Marketing --url '/sites/Marketing/shared documents/document.docx'
+```
+
+## Response
+
+The command won't return a response on success.
