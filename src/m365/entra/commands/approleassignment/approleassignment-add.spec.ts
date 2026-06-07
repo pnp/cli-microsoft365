@@ -49,7 +49,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,7 +94,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -104,7 +104,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appObjectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.ReadWrite.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.ReadWrite.All' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -117,7 +117,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -130,28 +130,28 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles intune alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles exchange alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles appId for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' }) });
   });
 
   it('rejects if app roles are not found for the specified resource option value', async () => {
@@ -168,7 +168,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError(`The resource 'SharePoint' does not have any application permissions available.`));
   });
 
@@ -186,7 +186,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
@@ -204,7 +204,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError("The specified service principal doesn't exist"));
   });
 
@@ -230,7 +230,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError("Multiple service principal found. Found: 24448e9c-d0fa-43d1-a1dd-e279720969a0."));
   });
 
@@ -250,7 +250,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '24448e9c-d0fa-43d1-a1dd-e279720969a0' });
 
-    await command.action(logger, { options: { debug: true, appDisplayName: 'test', resource: 'SharePoint', scopes: 'Scope1' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appDisplayName: 'test', resource: 'SharePoint', scopes: 'Scope1' }) });
     assert.deepEqual(loggerLogSpy.lastCall.args[0][0], {
       objectId: 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw',
       principalDisplayName: 'myapp',

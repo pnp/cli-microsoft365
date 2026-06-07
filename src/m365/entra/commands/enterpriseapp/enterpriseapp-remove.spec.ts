@@ -56,7 +56,7 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
@@ -169,14 +169,14 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
   });
 
   it('prompts before removing the enterprise application when force option not passed', async () => {
-    await command.action(logger, { options: { id: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '65415bb1-9267-4313-bbf5-ae259732ee12' }) });
 
     assert(promptIssued);
   });
 
   it('aborts removing the enterprise application when prompt not confirmed', async () => {
     const deleteCallsSpy = sinon.stub(request, 'delete').resolves();
-    await command.action(logger, { options: { id: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '65415bb1-9267-4313-bbf5-ae259732ee12' }) });
     assert(deleteCallsSpy.notCalled);
   });
 
@@ -190,13 +190,13 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = deleteRequestStub();
-    await command.action(logger, { options: { verbose: true, displayName: 'foo', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: 'foo', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
   it('deletes the specified enterprise application using its id', async () => {
     const deleteCallsSpy: sinon.SinonStub = deleteRequestStub();
-    await command.action(logger, { options: { id: '65415bb1-9267-4313-bbf5-ae259732ee12', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '65415bb1-9267-4313-bbf5-ae259732ee12', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -205,7 +205,7 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const deleteCallsSpy: sinon.SinonStub = deleteRequestStub();
-    await command.action(logger, { options: { objectId: '59e617e5-e447-4adc-8b88-00af644d7c92', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ objectId: '59e617e5-e447-4adc-8b88-00af644d7c92', verbose: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -221,7 +221,7 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'foo', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'foo', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -304,7 +304,7 @@ describe(commands.ENTERPRISEAPP_REMOVE, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(spAppInfo.value[0]);
     const deleteCallsSpy: sinon.SinonStub = deleteRequestStub();
-    await command.action(logger, { options: { verbose: true, displayName: 'foo', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: 'foo', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 });

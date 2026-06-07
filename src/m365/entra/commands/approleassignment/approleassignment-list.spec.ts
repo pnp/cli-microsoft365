@@ -443,7 +443,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -489,28 +489,28 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified appDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'json', appDisplayName: CommandActionParameters.appNameWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', appDisplayName: CommandActionParameters.appNameWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appId', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appId and outputs text', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appObjectId and outputs text', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'text', appObjectId: CommandActionParameters.objectIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text', appObjectId: CommandActionParameters.objectIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
@@ -523,13 +523,13 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('correctly handles a service principal that does not have any app role assignments', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: CommandActionParameters.objectIdNoRoleAssignments } } as any), new CommandError('no app role assignments found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: CommandActionParameters.objectIdNoRoleAssignments }) }), new CommandError('no app role assignments found'));
   });
 
   it('correctly handles no app role assignments for the specified app', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await assert.rejects(command.action(logger, { options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } } as any), new CommandError('app registration not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: CommandActionParameters.appIdWithNoRoleAssignments }) }), new CommandError('app registration not found'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -544,7 +544,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: '021d971f-779d-439b-8006-9f084423f344' }) }), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if neither appId, appObjectId, nor appDisplayName are specified', () => {

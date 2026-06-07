@@ -22,7 +22,7 @@ export const options = z.strictObject({
   appObjectId: z.uuid().optional(),
   appDisplayName: z.string().optional(),
   resource: z.string().alias('r'),
-  scopes: z.string().alias('s')
+  scopes: z.string().transform((value) => value.split(',').map(String)).alias('s')
 });
 
 declare type Options = z.infer<typeof options>;
@@ -144,7 +144,7 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
       }
 
       // search for match between the found app roles and the specified scopes option value
-      for (const scope of args.options.scopes.split(',')) {
+      for (const scope of args.options.scopes) {
         const existingRoles = appRolesFound.filter((role: AppRole) => {
           return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
         });

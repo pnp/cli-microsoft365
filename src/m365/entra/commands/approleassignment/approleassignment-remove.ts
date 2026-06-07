@@ -16,7 +16,7 @@ export const options = z.strictObject({
   appObjectId: z.uuid().optional(),
   appDisplayName: z.string().optional(),
   resource: z.string().alias('r'),
-  scopes: z.string().alias('s'),
+  scopes: z.string().transform((value) => value.split(',').map(String)).alias('s'),
   force: z.boolean().optional().alias('f')
 });
 
@@ -115,7 +115,7 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
           throw `The resource '${args.options.resource}' does not have any application permissions available.`;
         }
 
-        for (const scope of args.options.scopes.split(',')) {
+        for (const scope of args.options.scopes) {
           const existingRoles = appRolesFound.filter((role: AppRole) => {
             return role.value!.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
           });

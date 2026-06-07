@@ -44,7 +44,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,7 +102,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'foo' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'foo' }) });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -119,7 +119,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '65415bb1-9267-4313-bbf5-ae259732ee12' }) });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -136,7 +136,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' }) });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -152,7 +152,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6' }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -248,7 +248,7 @@ describe(commands.ENTERPRISEAPP_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(spAppInfo.value[0]);
 
-    await command.action(logger, { options: { debug: true, displayName: 'foo' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, displayName: 'foo' }) });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -309,6 +309,11 @@ describe(commands.ENTERPRISEAPP_GET, () => {
 
   it('fails validation if objectId and displayName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: 'abc', objectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both id and objectId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '6a7b1395-d313-4682-8ed4-65a6265a6320', objectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' });
     assert.strictEqual(actual.success, false);
   });
 });

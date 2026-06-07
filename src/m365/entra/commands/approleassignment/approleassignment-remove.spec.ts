@@ -29,7 +29,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,13 +93,13 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('prompts before removing the app role assignment when force option not passed', async () => {
-    await command.action(logger, { options: { appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the app role assignment when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
 
     assert(promptIssued);
   });
@@ -108,7 +108,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
     assert(deleteRequestStub.notCalled);
   });
 
@@ -116,37 +116,37 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app role assignments for service principal with specified displayName', async () => {
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app role assignments for service principal with specified objectId and multiple scopes', async () => {
-    await command.action(logger, { options: { appObjectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.FullControl.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.FullControl.All', force: true }) });
     assert(deleteRequestStub.calledTwice);
   });
 
   it('deletes app role assignments for service principal with specified appId (debug)', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) });
     assert(deleteRequestStub.called);
   });
 
   it('handles intune alias for the resource option value', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scopes: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scopes: 'Sites.Read.All', force: true }) });
     assert(deleteRequestStub.called);
   });
 
   it('handles exchange alias for the resource option value', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'exchange', scopes: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'exchange', scopes: 'Sites.Read.All', force: true }) });
     assert(deleteRequestStub.called);
   });
 
   it('handles appId for the resource option value', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All', force: true }) });
     assert(deleteRequestStub.called);
   });
 
@@ -164,7 +164,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) }),
       new CommandError(`Resource not found`));
   });
 
@@ -182,7 +182,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) }),
       new CommandError(`The resource 'SharePoint' does not have any application permissions available.`));
   });
 
@@ -200,7 +200,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) }),
       new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
@@ -218,12 +218,12 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.Read.All', force: true }) }),
       new CommandError("app registration not found"));
   });
 
   it('rejects if app role assignment is not found', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.ReadWrite.All', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scopes: 'Sites.ReadWrite.All', force: true }) }),
       new CommandError("App role assignment not found"));
   });
 
