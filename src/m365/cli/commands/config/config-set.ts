@@ -1,24 +1,27 @@
+import { z } from 'zod';
 import { AuthType } from "../../../../Auth.js";
 import { cli } from "../../../../cli/cli.js";
 import { Logger } from "../../../../cli/Logger.js";
-import GlobalOptions from "../../../../GlobalOptions.js";
+import { globalOptionsZod } from "../../../../Command.js";
 import { settingsNames } from "../../../../settingsNames.js";
 import { validation } from "../../../../utils/validation.js";
 import AnonymousCommand from "../../../base/AnonymousCommand.js";
 import commands from "../../commands.js";
 
+const settingNameValues = Object.getOwnPropertyNames(settingsNames) as [string, ...string[]];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  key: z.enum(settingNameValues).alias('k'),
+  value: z.string().alias('v')
+});
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  key: string;
-  value: string;
-}
-
 class CliConfigSetCommand extends AnonymousCommand {
-  private static readonly optionNames: string[] = Object.getOwnPropertyNames(settingsNames);
-
   public get name(): string {
     return commands.CONFIG_SET;
   }
@@ -27,89 +30,85 @@ class CliConfigSetCommand extends AnonymousCommand {
     return 'Manage global configuration settings about the CLI for Microsoft 365';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      this.telemetryProperties[args.options.key] = args.options.value;
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-k, --key <key>',
-        autocomplete: CliConfigSetCommand.optionNames
-      },
-      {
-        option: '-v, --value <value>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (CliConfigSetCommand.optionNames.indexOf(args.options.key) < 0) {
-          return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigSetCommand.optionNames.join(', ')}`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.key === settingsNames.output) {
+          return ['text', 'json', 'csv', 'md', 'none'].includes(opts.value);
         }
-
-        const allowedOutputs = ['text', 'json', 'csv', 'md', 'none'];
-        if (args.options.key === settingsNames.output &&
-          allowedOutputs.indexOf(args.options.value) === -1) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;
-        }
-
-        const allowedErrorOutputs = ['stdout', 'stderr'];
-        if (args.options.key === settingsNames.errorOutput &&
-          allowedErrorOutputs.indexOf(args.options.value) === -1) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedErrorOutputs.join(', ')}`;
-        }
-
-        if (args.options.key === settingsNames.promptListPageSize &&
-          typeof args.options.value !== 'number') {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. The value has to be a number.`;
-        }
-
-        if (args.options.key === settingsNames.promptListPageSize &&
-          (args.options.value as unknown as number) <= 0) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. The number has to be higher than 0.`;
-        }
-
-        if (args.options.key === settingsNames.helpMode &&
-          cli.helpModes.indexOf(args.options.value) === -1) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${cli.helpModes.join(', ')}`;
-        }
-
-        if (args.options.key === settingsNames.authType &&
-          !Object.values(AuthType).map(String).includes(args.options.value)) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${Object.values(AuthType).join(', ')}`;
-        }
-
-        if (args.options.key === settingsNames.helpTarget &&
-          !cli.helpTargets.includes(args.options.value)) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${cli.helpTargets.join(', ')}`;
-        }
-
-        if (args.options.key === settingsNames.clientId &&
-          !validation.isValidGuid(args.options.value)) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. The value has to be a valid GUID.`;
-        }
-
-        if (args.options.key === settingsNames.tenantId &&
-          !(args.options.value === 'common' || validation.isValidGuid(args.options.value))) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. The value has to be a valid GUID or 'common'.`;
-        }
-
         return true;
-      }
-    );
+      }, {
+        error: `The value is not valid for the option ${settingsNames.output}. Allowed values: text, json, csv, md, none`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.errorOutput) {
+          return ['stdout', 'stderr'].includes(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.errorOutput}. Allowed values: stdout, stderr`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.promptListPageSize) {
+          const num = Number(opts.value);
+          return !isNaN(num) && num > 0;
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.promptListPageSize}. The value has to be a number higher than 0.`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.helpMode) {
+          return cli.helpModes.includes(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.helpMode}. Allowed values: ${cli.helpModes.join(', ')}`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.authType) {
+          return Object.values(AuthType).map(String).includes(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.authType}. Allowed values: ${Object.values(AuthType).join(', ')}`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.helpTarget) {
+          return cli.helpTargets.includes(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.helpTarget}. Allowed values: ${cli.helpTargets.join(', ')}`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.clientId) {
+          return validation.isValidGuid(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.clientId}. The value has to be a valid GUID.`,
+        path: ['value']
+      })
+      .refine(opts => {
+        if (opts.key === settingsNames.tenantId) {
+          return opts.value === 'common' || validation.isValidGuid(opts.value);
+        }
+        return true;
+      }, {
+        error: `The value is not valid for the option ${settingsNames.tenantId}. The value has to be a valid GUID or 'common'.`,
+        path: ['value']
+      }) as any;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
