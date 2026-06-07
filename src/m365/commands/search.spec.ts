@@ -1,7 +1,7 @@
 ﻿import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../Auth.js';
-import command from './search.js';
+import command, { options } from './search.js';
 import { telemetry } from '../../telemetry.js';
 import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
@@ -369,6 +369,7 @@ describe(commands.SEARCH, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -377,6 +378,7 @@ describe(commands.SEARCH, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -416,161 +418,137 @@ describe(commands.SEARCH, () => {
   });
 
   it('passes validation if scopes contains allowed values', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'chatMessage,message,event,drive,driveItem,list,listItem,site,bookmark,acronym,person'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'chatMessage,message,event,drive,driveItem,list,listItem,site,bookmark,acronym,person'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if startIndex equals 0', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        startIndex: 0
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      startIndex: 0
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if startIndex is greater than 0', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        startIndex: 50
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      startIndex: 50
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if pageSize is in allowed range', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        pageSize: 50
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      pageSize: 50
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if enableTopResults is specified for message scope', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      enableTopResults: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if enableTopResults is specified for chatMessage scope', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'chatMessage',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'chatMessage',
+      enableTopResults: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if enableTopResults is specified for message and chatMessage scope', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message, chatMessage',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message, chatMessage',
+      enableTopResults: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if scopes contains not allowed value', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'chatMessage,message,event,drive,driveItem,list,listItem,site,bookmarks,acronyms,person,foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'chatMessage,message,event,drive,driveItem,list,listItem,site,bookmarks,acronyms,person,foo'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if startIndex is less than 0', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        startIndex: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      startIndex: -1
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if pageSize is less than 1', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        pageSize: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      pageSize: -1
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if pageSize is greater than 500', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        pageSize: 501
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      pageSize: 501
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if enableTopResults is specified together with scope other than message or chatMessage', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'event',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'event',
+      enableTopResults: true
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if enableTopResults is specified together with multiple scopes, but only one is message', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message,event',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message,event',
+      enableTopResults: true
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if enableTopResults is specified together with multiple scopes, but only one is chatMessage', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'chatMessage,event',
-        enableTopResults: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'chatMessage,event',
+      enableTopResults: true
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if enableTopResults is specified together with more than two scopes', async () => {
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message,chatMessage,event',
+      enableTopResults: true
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if sortBy is specified for message scope', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'message',
-        sortBy: 'subject'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'message',
+      sortBy: 'subject'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if sortBy is specified for event scope', async () => {
-    const actual = await command.validate({
-      options: {
-        scopes: 'event',
-        sortBy: 'subject'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scopes: 'event',
+      sortBy: 'subject'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('successfully returns search response when queryText is not specified', async () => {
@@ -597,7 +575,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message' }) });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -625,7 +603,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso' }) });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -653,7 +631,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', resultsOnly: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso', resultsOnly: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(resultsOnlySearchResponse));
   });
 
@@ -681,7 +659,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', pageSize: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso', pageSize: 1 }) });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -709,7 +687,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', startIndex: 10 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso', startIndex: 10 }) });
     assert(loggerLogSpy.calledOnceWithExactly(fullSearchResponse));
   });
 
@@ -741,7 +719,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', select: 'subject,importance' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso', select: 'subject,importance' }) });
     assert(loggerLogSpy.calledOnceWithExactly(selectedPropertiesSearchResponse));
   });
 
@@ -779,7 +757,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'driveItem', queryText: 'contoso', sortBy: 'name:desc,createdDateTime' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'driveItem', queryText: 'contoso', sortBy: 'name:desc,createdDateTime' }) });
     assert(loggerLogSpy.calledOnceWithExactly(selectedPropertiesSearchResponse));
   });
 
@@ -810,7 +788,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'driveItem', queryText: 'contoso', enableSpellingModification: true, enableSpellingSuggestion: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'driveItem', queryText: 'contoso', enableSpellingModification: true, enableSpellingSuggestion: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(spellingCorrectionSearchResponse));
   });
 
@@ -857,7 +835,7 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { scopes: 'message', queryText: 'contoso', allResults: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: 'contoso', allResults: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(allResults));
   });
 
@@ -919,6 +897,6 @@ describe(commands.SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { scopes: 'message', queryText: '' } }), new CommandError('SearchRequest Invalid (EntityRequest Invalid (searchRequest -> query is invalid (queryString required)))'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ scopes: 'message', queryText: '' }) }), new CommandError('SearchRequest Invalid (EntityRequest Invalid (searchRequest -> query is invalid (queryString required)))'));
   });
 });

@@ -16,7 +16,7 @@ import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import commands from './commands.js';
-import command, { CliExperience, CliUsageMode, EntraAppConfig, HelpMode, NewEntraAppScopes, Preferences, SettingNames } from './setup.js';
+import command, { CliExperience, CliUsageMode, EntraAppConfig, HelpMode, NewEntraAppScopes, Preferences, SettingNames, options } from './setup.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
 
 describe(commands.SETUP, () => {
@@ -24,6 +24,7 @@ describe(commands.SETUP, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let config: Configstore;
   let configSetSpy: sinon.SinonSpy;
   let configDeleteSpy: sinon.SinonSpy;
@@ -33,6 +34,7 @@ describe(commands.SETUP, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     config = cli.getConfig();
     configDeleteSpy = sinon.stub(config, 'delete').returns();
     configSetSpy = sinon.stub(config, 'set').returns();
@@ -112,7 +114,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
     Object.keys(interactivePreset).forEach(setting => {
@@ -140,7 +142,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
     Object.keys(interactivePreset).forEach(setting => {
@@ -168,7 +170,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
     Object.keys(scriptingPreset).forEach(setting => {
@@ -196,7 +198,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Full), 'Incorrect help mode');
     Object.keys(scriptingPreset).forEach(setting => {
@@ -227,7 +229,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
     Object.keys(scriptingPreset).forEach(setting => {
@@ -255,7 +257,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configSetSpy.calledWith(settingsNames.helpMode, HelpMode.Options), 'Incorrect help mode');
     Object.keys(scriptingPreset).forEach(setting => {
@@ -287,7 +289,7 @@ describe(commands.SETUP, () => {
     });
     const configureSettingsStub = sinon.stub(command as any, 'configureSettings').callsFake(() => { });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(configureSettingsStub.notCalled);
   });
@@ -295,7 +297,7 @@ describe(commands.SETUP, () => {
   it('sets correct settings for interactive, non-PowerShell via option', async () => {
     sinon.stub(pid, 'isPowerShell').returns(false);
 
-    await command.action(logger, { options: { interactive: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ interactive: true }) });
 
     Object.keys(interactivePreset).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
@@ -305,7 +307,7 @@ describe(commands.SETUP, () => {
   it('sets correct settings for scripting, non-PowerShell via option', async () => {
     sinon.stub(pid, 'isPowerShell').returns(false);
 
-    await command.action(logger, { options: { scripting: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scripting: true }) });
 
     Object.keys(scriptingPreset).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
@@ -315,7 +317,7 @@ describe(commands.SETUP, () => {
   it('sets correct settings for interactive, PowerShell via option', async () => {
     sinon.stub(pid, 'isPowerShell').returns(true);
 
-    await command.action(logger, { options: { interactive: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ interactive: true }) });
 
     Object.keys(interactivePreset).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (interactivePreset as any)[setting]), `Incorrect setting for ${setting}`);
@@ -328,7 +330,7 @@ describe(commands.SETUP, () => {
   it('sets correct settings for scripting, PowerShell via option', async () => {
     sinon.stub(pid, 'isPowerShell').returns(true);
 
-    await command.action(logger, { options: { scripting: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ scripting: true }) });
 
     Object.keys(scriptingPreset).forEach(setting => {
       assert(configSetSpy.calledWith(setting, (scriptingPreset as any)[setting]), `Incorrect setting for ${setting}`);
@@ -358,7 +360,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: { skipApp: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ skipApp: true }) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -404,7 +406,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -452,7 +454,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -498,7 +500,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -546,7 +548,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -595,7 +597,7 @@ describe(commands.SETUP, () => {
       }
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000000',
@@ -659,7 +661,7 @@ describe(commands.SETUP, () => {
       expiresOn: new Date().toString()
     };
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000001',
@@ -745,7 +747,7 @@ describe(commands.SETUP, () => {
       expiresOn: new Date().toString()
     };
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     const expected: SettingNames = {
       clientId: '00000000-0000-0000-0000-000000000001',
@@ -808,7 +810,7 @@ describe(commands.SETUP, () => {
     });
     const clearConnectionInfoSpy = sinon.stub(auth, 'clearConnectionInfo').resolves();
 
-    await assert.rejects(async () => await command.action(logger, { options: {} }));
+    await assert.rejects(async () => await command.action(logger, { options: commandOptionsSchema.parse({}) }));
     assert(clearConnectionInfoSpy.notCalled);
   });
 
@@ -836,7 +838,7 @@ describe(commands.SETUP, () => {
     Object.assign(expected, interactivePreset);
     expected.helpMode = HelpMode.Full;
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
 
     assert(loggerLogToStderrSpy.calledWith(JSON.stringify(expected, null, 2)));
   });
@@ -865,7 +867,7 @@ describe(commands.SETUP, () => {
     Object.assign(expected, interactivePreset);
     expected.helpMode = HelpMode.Full;
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     for (const [key, value] of Object.entries(expected)) {
       assert(loggerLogToStderrSpy.calledWith(formatting.getStatus(CheckStatus.Success, `${key}: ${value}`)), `Expected ${key} to be set to ${value}`);
@@ -887,37 +889,29 @@ describe(commands.SETUP, () => {
   });
 
   it('fails validation when both interactive and scripting options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        interactive: true,
-        scripting: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      interactive: true,
+      scripting: true
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when no options specified', async () => {
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when interactive option specified', async () => {
-    const actual = await command.validate({
-      options: {
-        interactive: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      interactive: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when scripting option specified', async () => {
-    const actual = await command.validate({
-      options: {
-        scripting: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      scripting: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 });
