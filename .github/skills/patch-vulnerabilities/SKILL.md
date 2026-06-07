@@ -131,16 +131,31 @@ age_days = (now - publish_date) / 86400
 ```
 
 **If `age_days >= 7`**: the package is eligible for patching.
-**If `age_days < 7`**: skip this package for now and report it as "cooling down"
-with the date it becomes eligible.
+**If `age_days < 7`**: the latest target is in cooldown. Before skipping,
+check for **eligible intermediate versions** — an older version between
+`current` and `target` that passes the 7-day rule.
+
+Use the `time` JSON (already fetched) to find all versions where:
+1. `version > current` (newer than what is installed)
+2. `version <= target` (at or below the wanted version)
+3. `age_days >= 7` (passes cooldown)
+4. The version is a stable release (skip pre-release tags like `-alpha`,
+   `-beta`, `-rc`)
+
+If eligible intermediate versions exist, use the **highest** one as the
+patching target instead.
+
+If no intermediate version is eligible either, report the package as
+"cooling down" with the date the latest target becomes eligible.
 
 Report cooldown status to the user:
 
 | Package | Source | Target version | Published | Age | Eligible | Eligible date |
 |---------|--------|---------------|-----------|-----|----------|---------------|
 
-If no packages are eligible, stop — all remaining items are in cooldown or
-have no fix. Report the earliest eligibility date.
+If no packages are eligible (including via intermediate versions), stop —
+all remaining items are in cooldown or have no fix. Report the earliest
+eligibility date.
 
 ---
 
