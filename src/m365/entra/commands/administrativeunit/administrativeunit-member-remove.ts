@@ -1,30 +1,33 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { entraDevice } from '../../../../utils/entraDevice.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { cli } from '../../../../cli/cli.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  userId: z.uuid().optional(),
+  userName: z.string().optional(),
+  groupId: z.uuid().optional(),
+  groupName: z.string().optional(),
+  deviceId: z.uuid().optional(),
+  deviceName: z.string().optional(),
+  administrativeUnitId: z.uuid().optional(),
+  administrativeUnitName: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  id?: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  deviceId?: string;
-  deviceName?: string;
-  administrativeUnitId?: string;
-  administrativeUnitName?: string;
-  force?: boolean;
 }
 
 class EntraAdministrativeUnitMemberRemoveCommand extends GraphCommand {
@@ -36,98 +39,26 @@ class EntraAdministrativeUnitMemberRemoveCommand extends GraphCommand {
     return 'Remove a specific member (user, group, or device) from an administrative unit';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTelemetry();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        deviceId: typeof args.options.deviceId !== 'undefined',
-        deviceName: typeof args.options.deviceName !== 'undefined',
-        administrativeUnitId: typeof args.options.administrativeUnitId !== 'undefined',
-        administrativeUnitName: typeof args.options.administrativeUnitName !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.administrativeUnitId, options.administrativeUnitName].filter(Boolean).length === 1, {
+        error: 'Specify either administrativeUnitId or administrativeUnitName',
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'administrativeUnitName']
+        }
+      })
+      .refine(options => [options.id, options.userId, options.userName, options.groupId, options.groupName, options.deviceId, options.deviceName].filter(Boolean).length === 1, {
+        error: 'Specify either id, userId, userName, groupId, groupName, deviceId, or deviceName',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'userId', 'userName', 'groupId', 'groupName', 'deviceId', 'deviceName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: "--userId [userId]"
-      },
-      {
-        option: "--userName [userName]"
-      },
-      {
-        option: "--groupId [groupId]"
-      },
-      {
-        option: "--groupName [groupName]"
-      },
-      {
-        option: "--deviceId [deviceId]"
-      },
-      {
-        option: "--deviceName [deviceName]"
-      },
-      {
-        option: '--administrativeUnitId [administrativeUnitId]'
-      },
-      {
-        option: '--administrativeUnitName [administrativeUnitName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId as string)) {
-          return `${args.options.administrativeUnitId} is not a valid GUID`;
-        }
-
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.deviceId && !validation.isValidGuid(args.options.deviceId as string)) {
-          return `${args.options.deviceId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['administrativeUnitId', 'administrativeUnitName'] });
-    this.optionSets.push({ options: ['id', 'userId', 'userName', 'groupId', 'groupName', 'deviceId', 'deviceName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
