@@ -14,8 +14,16 @@ Update `docs/docs/about/release-notes.mdx` based on the changes in the current b
 
 Run:
 
+Get commit hash of latest release notes update
+
 ```shell
-git log main..HEAD --oneline --no-decorate
+git log --grep="Updates release notes" -n 1 --format="%H"
+```
+
+Use the commit hash
+
+```shell
+git log <commit_hash>..HEAD --oneline --no-decorate
 ```
 
 If the branch has no commits ahead of main, inform the user and stop.
