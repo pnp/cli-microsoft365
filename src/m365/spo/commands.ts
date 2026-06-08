@@ -163,6 +163,7 @@ export default {
   LIST_ROLEINHERITANCE_BREAK: `${prefix} list roleinheritance break`,
   LIST_ROLEINHERITANCE_RESET: `${prefix} list roleinheritance reset`,
   LIST_SENSITIVITYLABEL_ENSURE: `${prefix} list sensitivitylabel ensure`,
+  LIST_SENSITIVITYLABEL_REMOVE: `${prefix} list sensitivitylabel remove`,
   LIST_SET: `${prefix} list set`,
   LIST_SITESCRIPT_GET: `${prefix} list sitescript get`,
   LIST_VIEW_ADD: `${prefix} list view add`,

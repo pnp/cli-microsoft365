@@ -3241,6 +3241,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list sensitivitylabel remove',
+              id: 'cmd/spo/list/list-sensitivitylabel-remove'
+            },
+            {
+              type: 'doc',
               label: 'list sitescript get',
               id: 'cmd/spo/list/list-sitescript-get'
             },
