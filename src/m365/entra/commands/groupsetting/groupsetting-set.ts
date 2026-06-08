@@ -6,7 +6,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-const options = z.looseObject({
+export const options = z.looseObject({
   ...globalOptionsZod.shape,
   id: z.uuid().alias('i')
 });

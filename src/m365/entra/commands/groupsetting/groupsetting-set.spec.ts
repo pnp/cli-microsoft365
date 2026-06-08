@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './groupsetting-set.js';
-import { options } from './groupsetting-get.js';
+import { options } from './groupsetting-set.js';
 
 describe(commands.GROUPSETTING_SET, () => {
   let log: string[];
@@ -145,12 +145,12 @@ describe(commands.GROUPSETTING_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
         UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -239,13 +239,13 @@ describe(commands.GROUPSETTING_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
         UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
-      }
+      })
     });
     assert(settingsUpdated);
   });
@@ -332,7 +332,7 @@ describe(commands.GROUPSETTING_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         output: "text",
@@ -340,7 +340,7 @@ describe(commands.GROUPSETTING_SET, () => {
         UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
-      }
+      })
     });
     assert.deepEqual(patchStub.firstCall.args[0].data, {
       displayName: null,
@@ -382,7 +382,7 @@ describe(commands.GROUPSETTING_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '62375ab9-6b52-47ed-826b-58e47e0e304c' }) } as any),
       new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
