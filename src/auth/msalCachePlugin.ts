@@ -1,33 +1,52 @@
-import type { ICachePlugin, TokenCacheContext } from '@azure/msal-node';
-import { FileTokenStorage } from './FileTokenStorage.js';
-import { TokenStorage } from './TokenStorage.js';
+import type { ICachePlugin } from '@azure/msal-node';
+import type { IPersistence } from '@azure/msal-node-extensions';
+import os from 'os';
+import path from 'path';
 
-class MsalCachePlugin implements ICachePlugin {
-  private fileTokenStorage: TokenStorage = new FileTokenStorage(FileTokenStorage.msalCacheFilePath());
+const persistenceConfiguration = {
+  cachePath: path.join(os.homedir(), '.cli-m365-msal.json'),
+  serviceName: 'cli-microsoft365',
+  accountName: 'msal-cache',
+  usePlaintextFileOnLinux: true
+};
 
-  public async beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
-    try {
-      const data: string = await this.fileTokenStorage.get();
-      tokenCacheContext.tokenCache.deserialize(data);
-    }
-    catch {
-      // Do nothing
-    }
+let _initPromise: Promise<{ plugin: ICachePlugin; persistence: IPersistence }> | undefined;
+
+export const msalCachePlugin = {
+  async createPersistence(): Promise<IPersistence> {
+    const { DataProtectionScope, PersistenceCreator } = await import('@azure/msal-node-extensions');
+    return PersistenceCreator.createPersistence({
+      ...persistenceConfiguration,
+      dataProtectionScope: DataProtectionScope.CurrentUser
+    });
+  },
+
+  async createPlugin(persistence: IPersistence): Promise<ICachePlugin> {
+    const { PersistenceCachePlugin } = await import('@azure/msal-node-extensions');
+    return new PersistenceCachePlugin(persistence);
+  },
+
+  async getCachePlugin(): Promise<ICachePlugin> {
+    _initPromise ??= (async () => {
+      const persistence = await msalCachePlugin.createPersistence();
+      const plugin = await msalCachePlugin.createPlugin(persistence);
+      return { plugin, persistence };
+    })();
+    const { plugin } = await _initPromise;
+    return plugin;
+  },
+
+  async clearMsalCache(): Promise<void> {
+    _initPromise ??= (async () => {
+      const persistence = await msalCachePlugin.createPersistence();
+      const plugin = await msalCachePlugin.createPlugin(persistence);
+      return { plugin, persistence };
+    })();
+    const { persistence } = await _initPromise;
+    await persistence.delete();
+  },
+
+  resetForTesting(): void {
+    _initPromise = undefined;
   }
-
-  public async afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
-    if (!tokenCacheContext.cacheHasChanged) {
-      return;
-    }
-
-    try {
-      await this.fileTokenStorage.set(tokenCacheContext.tokenCache.serialize());
-    }
-    catch {
-      // Do nothing
-    }
-  }
-}
-
-const msalCachePlugin = new MsalCachePlugin();
-export { msalCachePlugin };
+};
