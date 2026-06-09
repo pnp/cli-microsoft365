@@ -1,70 +1,87 @@
-import { ISerializableTokenCache, TokenCacheContext } from '@azure/msal-node';
+import type { ICachePlugin } from '@azure/msal-node';
+import type { IPersistence } from '@azure/msal-node-extensions';
 import assert from 'assert';
 import sinon from 'sinon';
-import { sinonUtil } from '../utils/sinonUtil.js';
 import { msalCachePlugin } from './msalCachePlugin.js';
 
-const mockCache: ISerializableTokenCache = {
-  deserialize: () => { },
-  serialize: () => ''
-};
-const mockCacheContext = new TokenCacheContext(mockCache, false);
-
 describe('msalCachePlugin', () => {
-  let mockCacheDeserializeSpy: sinon.SinonSpy;
-  let mockCacheSerializeSpy: sinon.SinonSpy;
+  let mockPersistence: IPersistence;
+  let mockPlugin: ICachePlugin;
 
-  before(() => {
-    mockCacheDeserializeSpy = sinon.spy(mockCache, 'deserialize');
-    mockCacheSerializeSpy = sinon.spy(mockCache, 'serialize');
+  beforeEach(() => {
+    msalCachePlugin.resetForTesting();
+
+    mockPersistence = {
+      save: sinon.stub().resolves(),
+      load: sinon.stub().resolves(null),
+      delete: sinon.stub().resolves(true),
+      reloadNecessary: sinon.stub().resolves(true),
+      getFilePath: sinon.stub().returns('/tmp/test-cache.json'),
+      getLogger: sinon.stub().returns({
+        info: () => { },
+        verbose: () => { },
+        error: () => { },
+        warning: () => { },
+        trace: () => { }
+      }),
+      verifyPersistence: sinon.stub().resolves(true),
+      createForPersistenceValidation: sinon.stub().resolves()
+    } as unknown as IPersistence;
+
+    mockPlugin = {
+      beforeCacheAccess: sinon.stub().resolves(),
+      afterCacheAccess: sinon.stub().resolves()
+    };
   });
 
   afterEach(() => {
-    mockCacheDeserializeSpy.resetHistory();
-    mockCacheSerializeSpy.resetHistory();
-    mockCacheContext.hasChanged = false;
-    sinonUtil.restore([
-      (msalCachePlugin as any).fileTokenStorage.get,
-      (msalCachePlugin as any).fileTokenStorage.set
-    ]);
+    sinon.restore();
+    msalCachePlugin.resetForTesting();
   });
 
-  it(`restores token cache from the cache storage`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').returns('');
-    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
-    assert(mockCacheDeserializeSpy.called);
+  it(`creates persistence using PersistenceCreator`, async () => {
+    const persistence = await msalCachePlugin.createPersistence();
+    assert.notStrictEqual(persistence, undefined);
   });
 
-  it(`doesn't fail restoring cache if cache file not found`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').rejects('File not found');
-    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
-    assert(mockCacheDeserializeSpy.notCalled);
+  it(`creates plugin using PersistenceCachePlugin`, async () => {
+    const plugin = await msalCachePlugin.createPlugin(mockPersistence);
+    assert.notStrictEqual(plugin, undefined);
+    assert.notStrictEqual(plugin.beforeCacheAccess, undefined);
+    assert.notStrictEqual(plugin.afterCacheAccess, undefined);
   });
 
-  it(`doesn't fail restoring cache if an error has occurred`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').rejects('An error has occurred');
-    await msalCachePlugin.beforeCacheAccess(mockCacheContext);
-    assert(mockCacheDeserializeSpy.notCalled);
+  it(`returns a cache plugin from msal-node-extensions`, async () => {
+    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+    assert.strictEqual(plugin, mockPlugin);
   });
 
-  it(`persists cache on disk when cache changed`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').resolves();
-    mockCacheContext.hasChanged = true;
+  it(`returns the same instance on subsequent calls`, async () => {
+    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
 
-    await msalCachePlugin.afterCacheAccess(mockCacheContext);
-    assert(mockCacheSerializeSpy.called);
+    const plugin1 = await msalCachePlugin.getCachePlugin();
+    const plugin2 = await msalCachePlugin.getCachePlugin();
+    assert.strictEqual(plugin1, plugin2);
   });
 
-  it(`doesn't persist cache on disk when cache not changed`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').resolves();
-    await msalCachePlugin.afterCacheAccess(mockCacheContext);
-    assert(mockCacheSerializeSpy.notCalled);
+  it(`clears MSAL cache via persistence delete`, async () => {
+    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+
+    await msalCachePlugin.clearMsalCache();
+    assert((mockPersistence.delete as sinon.SinonStub).calledOnce);
   });
 
-  it(`doesn't throw exception when persisting cache failed`, async () => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'set').rejects('An error has occurred');
-    mockCacheContext.hasChanged = true;
-    await msalCachePlugin.afterCacheAccess(mockCacheContext);
-    assert(mockCacheSerializeSpy.called);
+  it(`initializes persistence only once when clearing cache after getting plugin`, async () => {
+    const createPersistenceStub = sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+
+    await msalCachePlugin.getCachePlugin();
+    await msalCachePlugin.clearMsalCache();
+    assert.strictEqual(createPersistenceStub.callCount, 1);
   });
 });
