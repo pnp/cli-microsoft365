@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:alpine-3.20
+FROM FROM waldekm/powershell:alpine-3.23
 
 ARG CLI_VERSION=latest
 
