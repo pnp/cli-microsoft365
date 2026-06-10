@@ -7,7 +7,7 @@ class M365GroupReportActivityDetailCommand extends DateAndPeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Get details about Microsoft 365 Groups activity by group';
+    return 'Gets details about Microsoft 365 Groups activity by group';
   }
 
   public get usageEndpoint(): string {

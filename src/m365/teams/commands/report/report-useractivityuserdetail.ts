@@ -11,7 +11,7 @@ class TeamsReportUserActivityUserDetailCommand extends DateAndPeriodBasedReport 
   }
 
   public get description(): string {
-    return 'Get details about Microsoft Teams user activity by user.';
+    return 'Gets details about Microsoft Teams user activity by user.';
   }
 }
 

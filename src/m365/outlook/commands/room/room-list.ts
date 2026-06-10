@@ -19,7 +19,7 @@ class OutlookRoomListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a collection of all available rooms';
+    return 'Gets a collection of all available rooms';
   }
 
   public defaultProperties(): string[] | undefined {

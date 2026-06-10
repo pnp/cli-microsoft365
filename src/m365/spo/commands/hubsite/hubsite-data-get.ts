@@ -20,7 +20,7 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get hub site data for the specified site';
+    return 'Gets hub site data for the specified site';
   }
 
   constructor() {

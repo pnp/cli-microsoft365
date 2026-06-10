@@ -8,7 +8,7 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
   }
 
   get title(): string {
-    return 'List view command set items property';
+    return 'Lists view command set items property';
   }
 
   get description(): string {

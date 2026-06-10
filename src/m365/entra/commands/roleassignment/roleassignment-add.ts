@@ -47,7 +47,7 @@ class EntraRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Assign a Entra ID role to a user and specify the scope for which the user has been granted access';
+    return 'Assigns a Entra ID role to a user and specify the scope for which the user has been granted access';
   }
 
   public get schema(): z.ZodType | undefined {

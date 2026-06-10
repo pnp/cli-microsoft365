@@ -34,7 +34,7 @@ class PlannerPlanGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a Microsoft Planner plan';
+    return 'Gets a Microsoft Planner plan';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -15,11 +15,11 @@ export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
   }
 
   get title(): string {
-    return 'List view command set manifest schema';
+    return 'Lists view command set manifest schema';
   }
 
   get description(): string {
-    return 'Update schema in manifest';
+    return 'Updates schema in manifest';
   }
 
   get resolution(): string {

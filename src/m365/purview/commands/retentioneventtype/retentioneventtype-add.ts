@@ -19,7 +19,7 @@ class PurviewRetentionEventTypeAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Create a retention event type';
+    return 'Creates a retention event type';
   }
 
   constructor() {

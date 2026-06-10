@@ -25,7 +25,7 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Get an AI builder model in the specified Power Platform environment.';
+    return 'Gets an AI builder model in the specified Power Platform environment.';
   }
 
   constructor() {

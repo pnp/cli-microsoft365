@@ -23,7 +23,7 @@ class TodoTaskListCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'List tasks from a Microsoft To Do task list';
+    return 'Lists tasks from a Microsoft To Do task list';
   }
 
   public defaultProperties(): string[] | undefined {

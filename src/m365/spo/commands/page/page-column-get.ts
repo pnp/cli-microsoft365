@@ -24,7 +24,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get information about a specific column of a modern page';
+    return 'Gets information about a specific column of a modern page';
   }
 
   constructor() {

@@ -42,7 +42,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Remove the specified member from the specified Microsoft Teams private or shared team channel';
+    return 'Removes the specified member from the specified Microsoft Teams private or shared team channel';
   }
 
   constructor() {

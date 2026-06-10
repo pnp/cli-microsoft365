@@ -18,7 +18,7 @@ export class FN018002_TEAMS_manifest extends Rule {
   }
 
   get description(): string {
-    return 'Create Microsoft Teams tab manifest for the web part';
+    return 'Creates Microsoft Teams tab manifest for the web part';
   }
 
   get resolution(): string {
