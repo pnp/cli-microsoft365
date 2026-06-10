@@ -19,7 +19,7 @@ export class FN011001_MAN_webpart_schema extends ManifestRule {
   }
 
   get description(): string {
-    return 'Update schema in manifest';
+    return 'Updates schema in manifest';
   }
 
   get resolution(): string {

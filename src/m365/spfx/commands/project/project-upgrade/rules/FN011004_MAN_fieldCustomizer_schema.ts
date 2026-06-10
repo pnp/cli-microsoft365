@@ -19,7 +19,7 @@ export class FN011004_MAN_fieldCustomizer_schema extends ManifestRule {
   }
 
   get description(): string {
-    return 'Update schema in manifest';
+    return 'Updates schema in manifest';
   }
 
   get resolution(): string {

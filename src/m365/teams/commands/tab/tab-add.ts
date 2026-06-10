@@ -30,7 +30,7 @@ class TeamsTabAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Add a tab to the specified channel';
+    return 'Adds a tab to the specified channel';
   }
 
   constructor() {

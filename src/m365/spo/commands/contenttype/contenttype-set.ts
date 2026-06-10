@@ -29,7 +29,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Update an existing content type';
+    return 'Updates an existing content type';
   }
 
   constructor() {

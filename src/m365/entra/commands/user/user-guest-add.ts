@@ -24,7 +24,7 @@ class EntraUserGuestAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Invite an external user to the organization';
+    return 'Invites an external user to the organization';
   }
 
   constructor() {

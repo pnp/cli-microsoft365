@@ -18,7 +18,7 @@ class EntraUserPasswordValidateCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return "Check a user's password against the organization's password validation policy";
+    return "Checks a user's password against the organization's password validation policy";
   }
 
   constructor() {

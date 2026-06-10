@@ -27,7 +27,7 @@ class OneNoteNotebookAddCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'Create a new OneNote notebook';
+    return 'Creates a new OneNote notebook';
   }
 
   constructor() {

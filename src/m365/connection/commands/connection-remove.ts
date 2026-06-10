@@ -23,7 +23,7 @@ class ConnectionRemoveCommand extends Command {
   }
 
   public get description(): string {
-    return 'Remove the specified connection';
+    return 'Removes the specified connection';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -27,7 +27,7 @@ class OneNoteNotebookListCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'Retrieve a list of notebooks';
+    return 'Retrieves a list of notebooks';
   }
 
   public defaultProperties(): string[] | undefined {

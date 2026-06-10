@@ -26,7 +26,7 @@ class PpCopilotGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Get information about the specified copilot';
+    return 'Gets information about the specified copilot';
   }
 
   constructor() {

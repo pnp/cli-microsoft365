@@ -27,7 +27,7 @@ class OneNotePageListCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'Retrieve a list of OneNote pages.';
+    return 'Retrieves a list of OneNote pages.';
   }
 
   public defaultProperties(): string[] | undefined {

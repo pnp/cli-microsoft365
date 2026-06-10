@@ -35,7 +35,7 @@ class OutlookCalendarGroupGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve information about a calendar group for a user';
+    return 'Retrieves information about a calendar group for a user';
   }
 
   public get schema(): z.ZodType | undefined {

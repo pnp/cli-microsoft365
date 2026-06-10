@@ -19,7 +19,7 @@ export class FN021007_PKG_scripts_start extends JsonRule {
   }
 
   get description(): string {
-    return 'Update package.json scripts.start property';
+    return 'Updates package.json scripts.start property';
   }
 
   get resolution(): string {

@@ -19,7 +19,7 @@ export class FN021006_PKG_scripts_clean extends JsonRule {
   }
 
   get description(): string {
-    return 'Update package.json scripts.clean property';
+    return 'Updates package.json scripts.clean property';
   }
 
   get resolution(): string {

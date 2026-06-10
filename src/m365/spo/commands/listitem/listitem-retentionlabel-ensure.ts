@@ -31,7 +31,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Apply a retention label to a list item';
+    return 'Applies a retention label to a list item';
   }
 
   constructor() {

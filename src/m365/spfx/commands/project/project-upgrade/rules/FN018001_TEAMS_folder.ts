@@ -18,7 +18,7 @@ export class FN018001_TEAMS_folder extends Rule {
   }
 
   get description(): string {
-    return 'Create folder for Microsoft Teams tab resources';
+    return 'Creates folder for Microsoft Teams tab resources';
   }
 
   get resolution(): string {

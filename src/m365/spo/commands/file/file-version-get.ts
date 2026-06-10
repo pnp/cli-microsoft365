@@ -24,7 +24,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get a specific version of a file in a SharePoint Document library';
+    return 'Gets a specific version of a file in a SharePoint Document library';
   }
 
   constructor() {

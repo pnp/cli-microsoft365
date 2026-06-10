@@ -27,7 +27,7 @@ class CliConfigSetCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Manage global configuration settings about the CLI for Microsoft 365';
+    return 'Manages global configuration settings about the CLI for Microsoft 365';
   }
 
   public get schema(): z.ZodType {

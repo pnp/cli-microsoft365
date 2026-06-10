@@ -23,7 +23,7 @@ class EntraOAuth2GrantSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Update OAuth2 permissions for the service principal';
+    return 'Updates OAuth2 permissions for the service principal';
   }
 
   public get schema(): z.ZodTypeAny | undefined {
