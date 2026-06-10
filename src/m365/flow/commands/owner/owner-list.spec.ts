@@ -10,9 +10,10 @@ import { telemetry } from '../../../../telemetry.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './owner-list.js';
+import command, { options } from './owner-list.js';
 
 describe(commands.OWNER_LIST, () => {
   const environmentName = 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6';
@@ -27,13 +28,17 @@ describe(commands.OWNER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -50,7 +55,6 @@ describe(commands.OWNER_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    commandInfo = cli.getCommandInfo(command);
   });
 
   afterEach(() => {
@@ -115,13 +119,13 @@ describe(commands.OWNER_LIST, () => {
       new CommandError(error.error.message));
   });
 
-  it('fails validation if flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if flowName is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if flowName a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if flowName a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName });
+    assert.strictEqual(actual.success, true);
   });
 });

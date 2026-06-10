@@ -12,7 +12,7 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './flow-export.js';
+import command, { options } from './flow-export.js';
 import { formatting } from '../../../utils/formatting.js';
 import { accessToken } from '../../../utils/accessToken.js';
 
@@ -21,6 +21,7 @@ describe(commands.EXPORT, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`;
@@ -120,6 +121,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
   });
 
@@ -292,49 +294,49 @@ describe(commands.EXPORT, () => {
   });
 
   it('fails validation if the id is not a GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if format is specified as neither JSON nor ZIP', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'text' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'text' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if format is specified as JSON and packageCreatedBy parameter is specified', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageCreatedBy: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageCreatedBy: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if format is specified as JSON and packageDescription parameter is specified', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageDescription: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageDescription: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if format is specified as JSON and packageDisplayName parameter is specified', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageDisplayName: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageDisplayName: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if format is specified as JSON and packageSourceEnvironment parameter is specified', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageSourceEnvironment: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json', packageSourceEnvironment: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if specified path doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, path: '/path/not/found.zip' } }, commandInfo);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, path: '/path/not/found.zip' });
     sinonUtil.restore(fs.existsSync);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the id and environment specified', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}` } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}` });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when the id and environment specified and format set to JSON', async () => {
-    const actual = await command.validate({ options: { environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: foundEnvironmentId, name: `${foundFlowName}`, format: 'json' });
+    assert.strictEqual(actual.success, true);
   });
 });

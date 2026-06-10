@@ -11,7 +11,7 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './flow-list.js';
+import command, { options } from './flow-list.js';
 import { accessToken } from '../../../utils/accessToken.js';
 
 describe(commands.LIST, () => {
@@ -219,6 +219,7 @@ describe(commands.LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -228,6 +229,7 @@ describe(commands.LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -270,23 +272,23 @@ describe(commands.LIST, () => {
   });
 
   it('fails validation if asAdmin is specified in combination with a sharingStatus', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, asAdmin: true, sharingStatus: 'all' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, asAdmin: true, sharingStatus: 'all' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if sharingStatus is not a valid sharingstatus', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, sharingStatus: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, sharingStatus: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if sharingStatus is valid', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, sharingStatus: 'all' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, sharingStatus: 'all' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if asAdmin is passed', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, asAdmin: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, asAdmin: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves available flows', async () => {
