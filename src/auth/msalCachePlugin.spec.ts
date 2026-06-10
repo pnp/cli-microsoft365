@@ -1,5 +1,4 @@
 import type { ICachePlugin } from '@azure/msal-node';
-import type { IPersistence } from '@azure/msal-node-extensions';
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
@@ -7,28 +6,10 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { msalCachePlugin } from './msalCachePlugin.js';
 
 describe('msalCachePlugin', () => {
-  let mockPersistence: IPersistence;
   let mockPlugin: ICachePlugin;
 
   beforeEach(() => {
     msalCachePlugin.resetForTesting();
-
-    mockPersistence = {
-      save: sinon.stub().resolves(),
-      load: sinon.stub().resolves(null),
-      delete: sinon.stub().resolves(true),
-      reloadNecessary: sinon.stub().resolves(true),
-      getFilePath: sinon.stub().returns('/tmp/test-cache.json'),
-      getLogger: sinon.stub().returns({
-        info: () => { },
-        verbose: () => { },
-        error: () => { },
-        warning: () => { },
-        trace: () => { }
-      }),
-      verifyPersistence: sinon.stub().resolves(true),
-      createForPersistenceValidation: sinon.stub().resolves()
-    } as unknown as IPersistence;
 
     mockPlugin = {
       beforeCacheAccess: sinon.stub().resolves(),
@@ -40,37 +21,18 @@ describe('msalCachePlugin', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      fs.unlinkSync
+      fs.unlinkSync,
+      fs.writeFileSync
     ]);
     sinon.restore();
     msalCachePlugin.resetForTesting();
   });
 
-  it(`creates persistence using PersistenceCreator`, async () => {
-    const persistence = await msalCachePlugin.createPersistence();
-    assert.notStrictEqual(persistence, undefined);
-  });
-
-  it(`falls back to FilePersistence when PersistenceCreator fails`, async () => {
-    const msalExtensions = await import('@azure/msal-node-extensions');
-    sinon.stub(msalExtensions.PersistenceCreator, 'createPersistence').rejects(new Error('libsecret not available'));
-    const filePersistenceCreateStub = sinon.stub(msalExtensions.FilePersistence, 'create').resolves(mockPersistence as any);
-
-    const persistence = await msalCachePlugin.createPersistence();
-    assert(filePersistenceCreateStub.calledOnce);
-    assert.strictEqual(persistence, mockPersistence);
-  });
-
-  it(`creates plugin using PersistenceCachePlugin`, async () => {
-    const plugin = await msalCachePlugin.createPlugin(mockPersistence);
-    assert.notStrictEqual(plugin, undefined);
-    assert.notStrictEqual(plugin.beforeCacheAccess, undefined);
-    assert.notStrictEqual(plugin.afterCacheAccess, undefined);
-  });
-
-  it(`returns a cache plugin from msal-node-extensions`, async () => {
-    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+  it(`returns a cache plugin using native persistence`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: sinon.stub().resolves()
+    });
     sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     const plugin = await msalCachePlugin.getCachePlugin();
@@ -78,8 +40,10 @@ describe('msalCachePlugin', () => {
   });
 
   it(`returns the same instance on subsequent calls`, async () => {
-    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: sinon.stub().resolves()
+    });
     sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     const plugin1 = await msalCachePlugin.getCachePlugin();
@@ -87,23 +51,55 @@ describe('msalCachePlugin', () => {
     assert.strictEqual(plugin1, plugin2);
   });
 
-  it(`clears MSAL cache via persistence delete`, async () => {
-    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+  it(`falls back to file-based cache when native persistence fails`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('libsecret not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+    assert.notStrictEqual(plugin, undefined);
+    assert.notStrictEqual(plugin.beforeCacheAccess, undefined);
+    assert.notStrictEqual(plugin.afterCacheAccess, undefined);
+  });
+
+  it(`clears MSAL cache via native persistence`, async () => {
+    const clearCacheStub = sinon.stub().resolves();
+    sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: clearCacheStub
+    });
     sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.clearMsalCache();
-    assert((mockPersistence.delete as sinon.SinonStub).calledOnce);
+    assert(clearCacheStub.calledOnce);
   });
 
-  it(`initializes persistence only once when clearing cache after getting plugin`, async () => {
-    const createPersistenceStub = sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+  it(`clears file-based cache when native persistence fails`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('libsecret not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+
+    await msalCachePlugin.clearMsalCache();
+    assert(unlinkStub.called);
+  });
+
+  it(`does not fail clearing file-based cache when file does not exist`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('libsecret not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(fs, 'unlinkSync').throws(new Error('ENOENT'));
+
+    await msalCachePlugin.clearMsalCache();
+  });
+
+  it(`initializes only once when clearing cache after getting plugin`, async () => {
+    const createStub = sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: sinon.stub().resolves()
+    });
     sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.getCachePlugin();
     await msalCachePlugin.clearMsalCache();
-    assert.strictEqual(createPersistenceStub.callCount, 1);
+    assert.strictEqual(createStub.callCount, 1);
   });
 
   it(`removes legacy plaintext cache file when it exists`, () => {
@@ -145,12 +141,13 @@ describe('msalCachePlugin', () => {
     sinon.stub(fs, 'existsSync').throws(new Error('An error has occurred'));
 
     msalCachePlugin.removeLegacyCache();
-    // no assertion needed - just verifying it doesn't throw
   });
 
   it(`calls removeLegacyCache during initialization via getCachePlugin`, async () => {
-    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: sinon.stub().resolves()
+    });
     const removeLegacyStub = sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.getCachePlugin();
@@ -158,11 +155,97 @@ describe('msalCachePlugin', () => {
   });
 
   it(`calls removeLegacyCache during initialization via clearMsalCache`, async () => {
-    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
-    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
+      plugin: mockPlugin,
+      clearCache: sinon.stub().resolves()
+    });
     const removeLegacyStub = sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.clearMsalCache();
     assert(removeLegacyStub.calledOnce);
+  });
+
+  it(`file cache plugin deserializes token cache from file`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{"token":"data"}');
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
+    const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
+
+    await plugin.beforeCacheAccess(context);
+    assert(mockCache.deserialize.calledWith('{"token":"data"}'));
+  });
+
+  it(`file cache plugin does not fail when cache file is missing`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'existsSync').returns(false);
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
+    const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
+
+    await plugin.beforeCacheAccess(context);
+    assert(mockCache.deserialize.notCalled);
+  });
+
+  it(`file cache plugin serializes token cache to file when changed`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    const writeStub = sinon.stub(fs, 'writeFileSync');
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('{"serialized":"data"}') };
+    const context = { tokenCache: mockCache, cacheHasChanged: true, hasChanged: true } as any;
+
+    await plugin.afterCacheAccess(context);
+    assert(writeStub.calledOnce);
+  });
+
+  it(`file cache plugin does not write when cache not changed`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    const writeStub = sinon.stub(fs, 'writeFileSync');
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
+    const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
+
+    await plugin.afterCacheAccess(context);
+    assert(writeStub.notCalled);
+  });
+
+  it(`file cache plugin does not throw when writing fails`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'writeFileSync').throws(new Error('write failed'));
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('data') };
+    const context = { tokenCache: mockCache, cacheHasChanged: true, hasChanged: true } as any;
+
+    await plugin.afterCacheAccess(context);
+  });
+
+  it(`file cache plugin does not throw when reading fails`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'existsSync').throws(new Error('read failed'));
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
+    const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
+
+    await plugin.beforeCacheAccess(context);
+    assert(mockCache.deserialize.notCalled);
   });
 });
