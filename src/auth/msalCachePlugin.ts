@@ -17,11 +17,19 @@ let _initPromise: Promise<{ plugin: ICachePlugin; persistence: IPersistence }> |
 
 export const msalCachePlugin = {
   async createPersistence(): Promise<IPersistence> {
-    const { DataProtectionScope, PersistenceCreator } = await import('@azure/msal-node-extensions');
-    return PersistenceCreator.createPersistence({
-      ...persistenceConfiguration,
-      dataProtectionScope: DataProtectionScope.CurrentUser
-    });
+    const { DataProtectionScope, FilePersistence, PersistenceCreator } = await import('@azure/msal-node-extensions');
+    try {
+      return await PersistenceCreator.createPersistence({
+        ...persistenceConfiguration,
+        dataProtectionScope: DataProtectionScope.CurrentUser
+      });
+    }
+    catch {
+      // PersistenceCreator fails on Linux when libsecret is not installed
+      // because the keytar native module cannot load. Fall back to an
+      // unencrypted file, which matches the usePlaintextFileOnLinux intent.
+      return FilePersistence.create(persistenceConfiguration.cachePath);
+    }
   },
 
   async createPlugin(persistence: IPersistence): Promise<ICachePlugin> {
