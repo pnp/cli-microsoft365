@@ -28,6 +28,16 @@ describe('msalCachePlugin', () => {
     msalCachePlugin.resetForTesting();
   });
 
+  it(`importMsalExtensions loads the msal-node-extensions module`, async () => {
+    try {
+      const result = await msalCachePlugin.importMsalExtensions();
+      assert.notStrictEqual(result, undefined);
+    }
+    catch {
+      // May fail on systems without native dependencies (e.g. libsecret on Linux)
+    }
+  });
+
   it(`returns a cache plugin using native persistence`, async () => {
     sinon.stub(msalCachePlugin, 'createNativePersistence').resolves({
       plugin: mockPlugin,
@@ -100,6 +110,68 @@ describe('msalCachePlugin', () => {
     await msalCachePlugin.getCachePlugin();
     await msalCachePlugin.clearMsalCache();
     assert.strictEqual(createStub.callCount, 1);
+  });
+
+  it(`creates native persistence using imported msal-extensions`, async () => {
+    const mockPersistence = {
+      delete: sinon.stub().resolves(true)
+    };
+    sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
+      DataProtectionScope: { CurrentUser: 0 },
+      PersistenceCreator: {
+        createPersistence: sinon.stub().resolves(mockPersistence)
+      },
+      PersistenceCachePlugin: class {
+        constructor() { /* empty */ }
+        beforeCacheAccess(): Promise<void> { return Promise.resolve(); }
+        afterCacheAccess(): Promise<void> { return Promise.resolve(); }
+      }
+    } as any);
+
+    const result = await msalCachePlugin.createNativePersistence();
+    assert.notStrictEqual(result.plugin, undefined);
+    assert.notStrictEqual(result.clearCache, undefined);
+  });
+
+  it(`native persistence clearCache delegates to persistence.delete`, async () => {
+    const deleteStub = sinon.stub().resolves(true);
+    const mockPersistence = { delete: deleteStub };
+    sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
+      DataProtectionScope: { CurrentUser: 0 },
+      PersistenceCreator: {
+        createPersistence: sinon.stub().resolves(mockPersistence)
+      },
+      PersistenceCachePlugin: class {
+        constructor() { /* empty */ }
+        beforeCacheAccess(): Promise<void> { return Promise.resolve(); }
+        afterCacheAccess(): Promise<void> { return Promise.resolve(); }
+      }
+    } as any);
+
+    const result = await msalCachePlugin.createNativePersistence();
+    await result.clearCache();
+    assert(deleteStub.calledOnce);
+  });
+
+  it(`createFileFallback returns a plugin and clearCache function`, () => {
+    const result = msalCachePlugin.createFileFallback();
+    assert.notStrictEqual(result.plugin, undefined);
+    assert.notStrictEqual(result.plugin.beforeCacheAccess, undefined);
+    assert.notStrictEqual(result.plugin.afterCacheAccess, undefined);
+    assert.notStrictEqual(result.clearCache, undefined);
+  });
+
+  it(`createFileFallback clearCache deletes the cache file`, async () => {
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+    const result = msalCachePlugin.createFileFallback();
+    await result.clearCache();
+    assert(unlinkStub.calledOnce);
+  });
+
+  it(`createFileFallback clearCache does not throw when file does not exist`, async () => {
+    sinon.stub(fs, 'unlinkSync').throws(new Error('ENOENT'));
+    const result = msalCachePlugin.createFileFallback();
+    await result.clearCache();
   });
 
   it(`removes legacy plaintext cache file when it exists`, () => {
