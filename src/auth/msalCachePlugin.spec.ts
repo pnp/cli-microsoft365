@@ -51,6 +51,16 @@ describe('msalCachePlugin', () => {
     assert.notStrictEqual(persistence, undefined);
   });
 
+  it(`falls back to FilePersistence when PersistenceCreator fails`, async () => {
+    const msalExtensions = await import('@azure/msal-node-extensions');
+    sinon.stub(msalExtensions.PersistenceCreator, 'createPersistence').rejects(new Error('libsecret not available'));
+    const filePersistenceCreateStub = sinon.stub(msalExtensions.FilePersistence, 'create').resolves(mockPersistence as any);
+
+    const persistence = await msalCachePlugin.createPersistence();
+    assert(filePersistenceCreateStub.calledOnce);
+    assert.strictEqual(persistence, mockPersistence);
+  });
+
   it(`creates plugin using PersistenceCachePlugin`, async () => {
     const plugin = await msalCachePlugin.createPlugin(mockPersistence);
     assert.notStrictEqual(plugin, undefined);
