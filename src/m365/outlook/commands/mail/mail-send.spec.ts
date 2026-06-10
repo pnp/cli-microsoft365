@@ -14,12 +14,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './mail-send.js';
+import command, { options } from './mail-send.js';
 
 describe(commands.MAIL_SEND, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.MAIL_SEND, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -311,17 +313,25 @@ describe(commands.MAIL_SEND, () => {
       new CommandError(`An error has occurred`));
   });
 
-  it('fails validation if bodyContentType is invalid', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
   });
 
-  it('fails validation if importance is invalid', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', importance: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
   });
 
-  it('fails validation if file doesn\'t exist', async () => {
+  it('fails validation if bodyContentType is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if importance is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', importance: 'Invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if file doesn\'t exist', () => {
     sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString() === 'C:/File2.txt') {
@@ -331,11 +341,11 @@ describe(commands.MAIL_SEND, () => {
       return true;
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if attachment is not a file', async () => {
+  it('fails validation if attachment is not a file', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').callsFake(path => {
       if (path.toString() === 'C:/File2.txt') {
@@ -345,11 +355,11 @@ describe(commands.MAIL_SEND, () => {
       return { isFile: () => true } as any;
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if attachments are too large', async () => {
+  it('fails validation if attachments are too large', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'readFileSync').callsFake(path => {
@@ -360,43 +370,52 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid read request';
     });
 
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when subject, to and bodyContents are specified', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid attachments are specified', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
+    sinon.stub(fs, 'readFileSync').returns('file content');
+
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when multiple to emails are specified', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when subject, to and bodyContents are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when multiple to emails separated with command and space are specified', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when multiple to emails are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when bodyContentType is set to Text', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Text' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when multiple to emails separated with command and space are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContents: 'Lorem ipsum' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when bodyContentType is set to HTML', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'HTML' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when bodyContentType is set to Text', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Text' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when saveToSentItems is set to false', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when bodyContentType is set to HTML', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'HTML' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when saveToSentItems is set to true', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when saveToSentItems is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when saveToSentItems is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('sends email using a specified group mailbox', async () => {
