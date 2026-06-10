@@ -214,6 +214,31 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
       if (options.skipFeatureDeployment) {
         script.script = script.script.replace(`m365 spo app deploy `, `m365 spo app deploy --skipFeatureDeployment `);
       }
+
+      if (versionRequirements.heft !== undefined) {
+        let steps = this.getPipelineSteps(pipeline);
+
+        const bundleStep = steps.find(step => step.task && step.displayName === "Gulp bundle");
+        if (bundleStep) {
+          pipeline.stages[0].jobs[0].steps = steps.filter(step => step !== bundleStep);
+        }
+
+        const packageStep = steps.find(step => step.task && step.displayName === "Gulp package");
+        if (packageStep) {
+          pipeline.stages[0].jobs[0].steps = pipeline.stages[0].jobs[0].steps.filter(step => step !== packageStep);
+        }
+
+        const installHeftStep: AzureDevOpsPipelineStep = {
+          task: "CmdLine@2",
+          displayName: "Heft build and package",
+          inputs: {
+            script: `npm install -g @rushstack/heft@latest\nheft build --production\nheft package-solution --production\n`
+          }
+        };
+        steps = this.getPipelineSteps(pipeline);
+        const installCLIStepIndex = steps.findIndex(step => step.task === "Npm@1" && step.displayName === "Install CLI for Microsoft 365");
+        pipeline.stages[0].jobs[0].steps.splice(installCLIStepIndex, 0, installHeftStep);
+      }
     }
   }
 
