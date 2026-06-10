@@ -1,21 +1,25 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  emailAddress: z.string(),
+  displayName: z.string().optional(),
+  inviteRedirectUrl: z.string().optional(),
+  welcomeMessage: z.string().optional(),
+  messageLanguage: z.string().optional(),
+  ccRecipients: z.string().optional(),
+  sendInvitationMessage: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  emailAddress: string;
-  displayName?: string;
-  inviteRedirectUrl?: string;
-  welcomeMessage?: string;
-  messageLanguage?: string;
-  ccRecipients?: string;
-  sendInvitationMessage?: boolean;
 }
 
 class EntraUserGuestAddCommand extends GraphCommand {
@@ -27,50 +31,8 @@ class EntraUserGuestAddCommand extends GraphCommand {
     return 'Invite an external user to the organization';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        inviteRedirectUrl: typeof args.options.inviteRedirectUrl !== 'undefined',
-        welcomeMessage: typeof args.options.welcomeMessage !== 'undefined',
-        messageLanguage: typeof args.options.messageLanguage !== 'undefined',
-        ccRecipients: typeof args.options.ccRecipients !== 'undefined',
-        sendInvitationMessage: !!args.options.sendInvitationMessage
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--emailAddress <emailAddress>'
-      },
-      {
-        option: '--displayName [displayName]'
-      },
-      {
-        option: '--inviteRedirectUrl [inviteRedirectUrl]'
-      },
-      {
-        option: '--welcomeMessage [welcomeMessage]'
-      },
-      {
-        option: '--messageLanguage [messageLanguage]'
-      },
-      {
-        option: '--ccRecipients [ccRecipients]'
-      },
-      {
-        option: '--sendInvitationMessage'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

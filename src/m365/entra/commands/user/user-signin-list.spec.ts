@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-signin-list.js';
+import command, { options } from './user-signin-list.js';
 
 describe(commands.USER_SIGNIN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = {
     "value": [
@@ -153,6 +154,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -203,7 +205,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -216,7 +218,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: 'testaccount1@contoso.com' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -230,7 +232,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: '737002f2-9582-4068-b706-044e09481897' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: '737002f2-9582-4068-b706-044e09481897' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -244,7 +246,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -258,7 +260,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, appDisplayName: 'Graph explorer' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appDisplayName: 'Graph explorer' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -272,7 +274,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: 'testaccount1@contoso.com', appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -286,7 +288,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' }) });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
     ));
@@ -296,41 +298,41 @@ describe(commands.USER_SIGNIN_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' }) }), new CommandError(errorMessage));
   });
 
-  it('fails validation if userId and userName specified', async () => {
-    const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId and userName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'not-c49b-4fd4-8223-28f0ac3a6402' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when userName has an invalid value', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when userName has an invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if appId and appDisplayName specified', async () => {
-    const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and appDisplayName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'not-c49b-4fd4-8223-28f0ac3a6402' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the appId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the appId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' });
+    assert.strictEqual(actual.success, true);
   });
 });

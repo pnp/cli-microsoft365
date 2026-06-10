@@ -1,19 +1,25 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: 'Specify valid userName.'
+  }).alias('n'),
+  apiKey: z.string(),
+  domain: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userName: string;
-  apiKey: string;
-  domain?: string
 }
 
 class EntraUserHibpCommand extends AnonymousCommand {
@@ -25,46 +31,8 @@ class EntraUserHibpCommand extends AnonymousCommand {
     return 'Allows you to retrieve all accounts that have been pwned with the specified username';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        domain: args.options.domain
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --userName <userName>'
-      },
-      {
-        option: '--apiKey, <apiKey>'
-      },
-      {
-        option: '--domain, [domain]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidUserPrincipalName(args.options.userName)) {
-          return 'Specify valid userName';
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

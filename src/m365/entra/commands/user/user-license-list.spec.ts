@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-license-list.js';
+import command, { options } from './user-license-list.js';
 
 describe(commands.USER_LICENSE_LIST, () => {
   const userId = '59f80e08-24b1-41f8-8586-16765fd830d3';
@@ -52,6 +52,7 @@ describe(commands.USER_LICENSE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let assertAccessTokenTypeStub: sinon.SinonStub;
 
   before(() => {
@@ -65,6 +66,7 @@ describe(commands.USER_LICENSE_LIST, () => {
     };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -108,30 +110,30 @@ describe(commands.USER_LICENSE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'skuId', 'skuPartNumber']);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('validates for a correct input with a userId defined', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userId defined', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if no options specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no options specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('ensures delegated permissions are enforced', async () => {
     sinon.stub(request, 'get').resolves(licenseResponse);
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
     assert(assertAccessTokenTypeStub.calledOnceWithExactly('delegated'));
   });
 
@@ -144,7 +146,7 @@ describe(commands.USER_LICENSE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
   });
 
@@ -157,7 +159,7 @@ describe(commands.USER_LICENSE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
   });
 
@@ -170,7 +172,7 @@ describe(commands.USER_LICENSE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) });
     assert(loggerLogSpy.calledWith(licenseResponse.value));
   });
 
@@ -183,7 +185,7 @@ describe(commands.USER_LICENSE_LIST, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: { userName: userName }
+      options: commandOptionsSchema.parse({ userName: userName })
     }), new CommandError(error.error.message));
   });
 });

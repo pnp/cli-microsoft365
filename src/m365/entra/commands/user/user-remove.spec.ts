@@ -11,10 +11,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-remove.js';
+import command, { options } from './user-remove.js';
 
 describe(commands.USER_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validUsername = 'john.doe@contoso.com';
@@ -31,6 +32,7 @@ describe(commands.USER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,39 +76,35 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'Invalid GUID'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when userName is not a valid upn', async () => {
-    const actual = await command.validate({
-      options: {
-        userName: 'Invalid upn'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when userName is not a valid upn', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userName: 'Invalid upn'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (userId)', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (userId)', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (userName)', async () => {
-    const actual = await command.validate({ options: { userName: validUsername } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (userName)', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: validUsername });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified user when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -116,9 +114,9 @@ describe(commands.USER_REMOVE, () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
     assert(deleteStub.notCalled);
   });
@@ -136,10 +134,10 @@ describe(commands.USER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: validId
-      }
+      })
     });
     assert(deleteStub.called);
   });
@@ -157,10 +155,10 @@ describe(commands.USER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: validUsername
-      }
+      })
     });
     assert(deleteStub.called);
   });
@@ -175,11 +173,11 @@ describe(commands.USER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: validUsername,
         force: true
-      }
+      })
     });
     assert(deleteStub.called);
   });
@@ -194,11 +192,11 @@ describe(commands.USER_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: validId,
         force: true
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });
