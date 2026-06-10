@@ -48,8 +48,12 @@ class FileCachePlugin implements ICachePlugin {
 }
 
 export const msalCachePlugin = {
+  async importMsalExtensions(): Promise<typeof import('@azure/msal-node-extensions')> {
+    return await import('@azure/msal-node-extensions');
+  },
+
   async createNativePersistence(): Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> {
-    const { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } = await import('@azure/msal-node-extensions');
+    const { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } = await msalCachePlugin.importMsalExtensions();
     const persistence = await PersistenceCreator.createPersistence({
       ...persistenceConfiguration,
       dataProtectionScope: DataProtectionScope.CurrentUser
@@ -57,6 +61,16 @@ export const msalCachePlugin = {
     return {
       plugin: new PersistenceCachePlugin(persistence),
       clearCache: async () => { await persistence.delete(); }
+    };
+  },
+
+  createFileFallback(): { plugin: ICachePlugin; clearCache: () => Promise<void> } {
+    return {
+      plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
+      clearCache: async () => {
+        try { fs.unlinkSync(persistenceConfiguration.cachePath); }
+        catch { /* file may not exist */ }
+      }
     };
   },
 
@@ -85,13 +99,7 @@ export const msalCachePlugin = {
       catch {
         // Fall back to file-based cache when native persistence is
         // unavailable (e.g. Linux without libsecret)
-        return {
-          plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
-          clearCache: async () => {
-            try { fs.unlinkSync(persistenceConfiguration.cachePath); }
-            catch { /* file may not exist */ }
-          }
-        };
+        return msalCachePlugin.createFileFallback();
       }
     })();
     const { plugin } = await _initPromise;
@@ -105,13 +113,7 @@ export const msalCachePlugin = {
         return await msalCachePlugin.createNativePersistence();
       }
       catch {
-        return {
-          plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
-          clearCache: async () => {
-            try { fs.unlinkSync(persistenceConfiguration.cachePath); }
-            catch { /* file may not exist */ }
-          }
-        };
+        return msalCachePlugin.createFileFallback();
       }
     })();
     const { clearCache } = await _initPromise;
