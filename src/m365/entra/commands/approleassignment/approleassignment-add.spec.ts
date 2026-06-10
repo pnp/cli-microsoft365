@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './approleassignment-add.js';
+import command, { options } from './approleassignment-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
@@ -20,6 +20,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const getRequestStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'get').callsFake(async (opts: any) => {
@@ -48,6 +49,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,7 +94,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -102,7 +104,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appObjectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.ReadWrite.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scopes: 'Sites.Read.All,Sites.ReadWrite.All' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -115,7 +117,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appDisplayName: 'myapp', resource: 'SharePoint', scopes: 'Sites.Read.All', output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
@@ -128,28 +130,28 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles intune alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles exchange alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scopes: 'Sites.Read.All' }) });
   });
 
   it('handles appId for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scopes: 'Sites.Read.All' }) });
   });
 
   it('rejects if app roles are not found for the specified resource option value', async () => {
@@ -166,7 +168,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError(`The resource 'SharePoint' does not have any application permissions available.`));
   });
 
@@ -184,7 +186,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
@@ -202,7 +204,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError("The specified service principal doesn't exist"));
   });
 
@@ -228,7 +230,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scopes: 'Sites.Read.All' }) }),
       new CommandError("Multiple service principal found. Found: 24448e9c-d0fa-43d1-a1dd-e279720969a0."));
   });
 
@@ -248,7 +250,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '24448e9c-d0fa-43d1-a1dd-e279720969a0' });
 
-    await command.action(logger, { options: { debug: true, appDisplayName: 'test', resource: 'SharePoint', scopes: 'Scope1' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appDisplayName: 'test', resource: 'SharePoint', scopes: 'Scope1' }) });
     assert.deepEqual(loggerLogSpy.lastCall.args[0][0], {
       objectId: 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw',
       principalDisplayName: 'myapp',
@@ -274,93 +276,39 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId, objectId nor displayName are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, appObjectId, nor appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '123', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the objectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appObjectId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appObjectId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appObjectId, appId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '123', appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appObjectId, appId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appObjectId: '57907bf8-73fa-43a6-89a5-1f603e29e452', appDisplayName: 'abc', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the appId option specified', async () => {
-    const actual = await command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scopes: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying appId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying appDisplayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appDisplayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when the appId option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scopes: 'abc' });
+    assert.strictEqual(actual.success, true);
   });
 });
 

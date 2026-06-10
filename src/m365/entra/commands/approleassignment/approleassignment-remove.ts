@@ -1,7 +1,8 @@
 import os from 'os';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -9,17 +10,20 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { AppRole, AppRoleAssignment, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appDisplayName: z.string().optional(),
+  resource: z.string().alias('r'),
+  scopes: z.string().transform((value) => value.split(',').map(String)).alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appDisplayName?: string;
-  appObjectId?: string;
-  resource: string;
-  scopes: string;
-  force?: boolean;
 }
 
 class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
@@ -31,68 +35,19 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
     return 'Deletes an app role assignment for the specified Entra Application Registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        force: (!!args.options.force).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appDisplayName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either appId, appObjectId, or appDisplayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appDisplayName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '--appObjectId [appObjectId]'
-      },
-      {
-        option: '--appDisplayName [appDisplayName]'
-      },
-      {
-        option: '-r, --resource <resource>',
-        autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
-      },
-      {
-        option: '-s, --scopes <scopes>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
-          return `${args.options.appObjectId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId', 'appDisplayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -160,7 +115,7 @@ class EntraAppRoleAssignmentRemoveCommand extends GraphCommand {
           throw `The resource '${args.options.resource}' does not have any application permissions available.`;
         }
 
-        for (const scope of args.options.scopes.split(',')) {
+        for (const scope of args.options.scopes) {
           const existingRoles = appRolesFound.filter((role: AppRole) => {
             return role.value!.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
           });
