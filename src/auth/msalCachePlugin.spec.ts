@@ -1,7 +1,9 @@
 import type { ICachePlugin } from '@azure/msal-node';
 import type { IPersistence } from '@azure/msal-node-extensions';
 import assert from 'assert';
+import fs from 'fs';
 import sinon from 'sinon';
+import { sinonUtil } from '../utils/sinonUtil.js';
 import { msalCachePlugin } from './msalCachePlugin.js';
 
 describe('msalCachePlugin', () => {
@@ -35,6 +37,11 @@ describe('msalCachePlugin', () => {
   });
 
   afterEach(() => {
+    sinonUtil.restore([
+      fs.existsSync,
+      fs.readFileSync,
+      fs.unlinkSync
+    ]);
     sinon.restore();
     msalCachePlugin.resetForTesting();
   });
@@ -54,6 +61,7 @@ describe('msalCachePlugin', () => {
   it(`returns a cache plugin from msal-node-extensions`, async () => {
     sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
     sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     const plugin = await msalCachePlugin.getCachePlugin();
     assert.strictEqual(plugin, mockPlugin);
@@ -62,6 +70,7 @@ describe('msalCachePlugin', () => {
   it(`returns the same instance on subsequent calls`, async () => {
     sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
     sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     const plugin1 = await msalCachePlugin.getCachePlugin();
     const plugin2 = await msalCachePlugin.getCachePlugin();
@@ -71,6 +80,7 @@ describe('msalCachePlugin', () => {
   it(`clears MSAL cache via persistence delete`, async () => {
     sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
     sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.clearMsalCache();
     assert((mockPersistence.delete as sinon.SinonStub).calledOnce);
@@ -79,9 +89,70 @@ describe('msalCachePlugin', () => {
   it(`initializes persistence only once when clearing cache after getting plugin`, async () => {
     const createPersistenceStub = sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
     sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
 
     await msalCachePlugin.getCachePlugin();
     await msalCachePlugin.clearMsalCache();
     assert.strictEqual(createPersistenceStub.callCount, 1);
+  });
+
+  it(`removes legacy plaintext cache file when it exists`, () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{"AccessToken":{}}');
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+
+    msalCachePlugin.removeLegacyCache();
+    assert(unlinkStub.calledOnce);
+  });
+
+  it(`does not remove cache file when it does not exist`, () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+
+    msalCachePlugin.removeLegacyCache();
+    assert(unlinkStub.notCalled);
+  });
+
+  it(`does not remove cache file when it is empty`, () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+
+    msalCachePlugin.removeLegacyCache();
+    assert(unlinkStub.notCalled);
+  });
+
+  it(`does not fail when cache file contains non-JSON content`, () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('not-json-content');
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+
+    msalCachePlugin.removeLegacyCache();
+    assert(unlinkStub.notCalled);
+  });
+
+  it(`does not fail when reading cache file throws error`, () => {
+    sinon.stub(fs, 'existsSync').throws(new Error('An error has occurred'));
+
+    msalCachePlugin.removeLegacyCache();
+    // no assertion needed - just verifying it doesn't throw
+  });
+
+  it(`calls removeLegacyCache during initialization via getCachePlugin`, async () => {
+    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    const removeLegacyStub = sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    await msalCachePlugin.getCachePlugin();
+    assert(removeLegacyStub.calledOnce);
+  });
+
+  it(`calls removeLegacyCache during initialization via clearMsalCache`, async () => {
+    sinon.stub(msalCachePlugin, 'createPersistence').resolves(mockPersistence);
+    sinon.stub(msalCachePlugin, 'createPlugin').resolves(mockPlugin);
+    const removeLegacyStub = sinon.stub(msalCachePlugin, 'removeLegacyCache');
+
+    await msalCachePlugin.clearMsalCache();
+    assert(removeLegacyStub.calledOnce);
   });
 });
