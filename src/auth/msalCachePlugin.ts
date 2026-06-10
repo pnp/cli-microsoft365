@@ -1,5 +1,4 @@
-import type { ICachePlugin } from '@azure/msal-node';
-import type { IPersistence } from '@azure/msal-node-extensions';
+import type { ICachePlugin, TokenCacheContext } from '@azure/msal-node';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -13,37 +12,58 @@ const persistenceConfiguration = {
   usePlaintextFileOnLinux: true
 };
 
-let _initPromise: Promise<{ plugin: ICachePlugin; persistence: IPersistence }> | undefined;
+let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> | undefined;
 
-export const msalCachePlugin = {
-  async createPersistence(): Promise<IPersistence> {
-    const { DataProtectionScope, FilePersistence, PersistenceCreator } = await import('@azure/msal-node-extensions');
+class FileCachePlugin implements ICachePlugin {
+  private cachePath: string;
+
+  constructor(cachePath: string) {
+    this.cachePath = cachePath;
+  }
+
+  public async beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
     try {
-      return await PersistenceCreator.createPersistence({
-        ...persistenceConfiguration,
-        dataProtectionScope: DataProtectionScope.CurrentUser
-      });
+      if (fs.existsSync(this.cachePath)) {
+        const data = fs.readFileSync(this.cachePath, 'utf8');
+        tokenCacheContext.tokenCache.deserialize(data);
+      }
     }
     catch {
-      // PersistenceCreator fails on Linux when libsecret is not installed
-      // because the keytar native module cannot load. Fall back to an
-      // unencrypted file, which matches the usePlaintextFileOnLinux intent.
-      return FilePersistence.create(persistenceConfiguration.cachePath);
+      // Do nothing
     }
-  },
+  }
 
-  async createPlugin(persistence: IPersistence): Promise<ICachePlugin> {
-    const { PersistenceCachePlugin } = await import('@azure/msal-node-extensions');
-    return new PersistenceCachePlugin(persistence);
+  public async afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
+    if (!tokenCacheContext.cacheHasChanged) {
+      return;
+    }
+
+    try {
+      fs.writeFileSync(this.cachePath, tokenCacheContext.tokenCache.serialize(), 'utf8');
+    }
+    catch {
+      // Do nothing
+    }
+  }
+}
+
+export const msalCachePlugin = {
+  async createNativePersistence(): Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> {
+    const { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } = await import('@azure/msal-node-extensions');
+    const persistence = await PersistenceCreator.createPersistence({
+      ...persistenceConfiguration,
+      dataProtectionScope: DataProtectionScope.CurrentUser
+    });
+    return {
+      plugin: new PersistenceCachePlugin(persistence),
+      clearCache: async () => { await persistence.delete(); }
+    };
   },
 
   removeLegacyCache(): void {
     try {
       if (fs.existsSync(legacyCachePath)) {
         const contents = fs.readFileSync(legacyCachePath, 'utf8');
-        // Legacy cache is a plain JSON object with token data.
-        // If parsing succeeds and the file has content, it's a
-        // legacy plaintext cache that should be removed.
         if (contents.trim().length > 0) {
           JSON.parse(contents);
           fs.unlinkSync(legacyCachePath);
@@ -59,9 +79,20 @@ export const msalCachePlugin = {
   async getCachePlugin(): Promise<ICachePlugin> {
     _initPromise ??= (async () => {
       msalCachePlugin.removeLegacyCache();
-      const persistence = await msalCachePlugin.createPersistence();
-      const plugin = await msalCachePlugin.createPlugin(persistence);
-      return { plugin, persistence };
+      try {
+        return await msalCachePlugin.createNativePersistence();
+      }
+      catch {
+        // Fall back to file-based cache when native persistence is
+        // unavailable (e.g. Linux without libsecret)
+        return {
+          plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
+          clearCache: async () => {
+            try { fs.unlinkSync(persistenceConfiguration.cachePath); }
+            catch { /* file may not exist */ }
+          }
+        };
+      }
     })();
     const { plugin } = await _initPromise;
     return plugin;
@@ -70,12 +101,21 @@ export const msalCachePlugin = {
   async clearMsalCache(): Promise<void> {
     _initPromise ??= (async () => {
       msalCachePlugin.removeLegacyCache();
-      const persistence = await msalCachePlugin.createPersistence();
-      const plugin = await msalCachePlugin.createPlugin(persistence);
-      return { plugin, persistence };
+      try {
+        return await msalCachePlugin.createNativePersistence();
+      }
+      catch {
+        return {
+          plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
+          clearCache: async () => {
+            try { fs.unlinkSync(persistenceConfiguration.cachePath); }
+            catch { /* file may not exist */ }
+          }
+        };
+      }
     })();
-    const { persistence } = await _initPromise;
-    await persistence.delete();
+    const { clearCache } = await _initPromise;
+    await clearCache();
   },
 
   resetForTesting(): void {
