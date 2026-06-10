@@ -14,6 +14,15 @@ const persistenceConfiguration = {
 
 let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> | undefined;
 
+// Fallback ICachePlugin that stores tokens as plain JSON on disk.
+// @azure/msal-node-extensions ships a usePlaintextFileOnLinux option
+// for Linux systems without libsecret, but the package's barrel export
+// eagerly loads LibSecretPersistence which does `import keytar` at the
+// top level. When libsecret is missing, the entire dynamic import of
+// the package fails before any fallback logic can run. This class
+// provides equivalent file-based persistence without depending on the
+// package at all.
+// See: https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7170
 class FileCachePlugin implements ICachePlugin {
   private cachePath: string;
 
