@@ -34,7 +34,7 @@
 ## Documentation
 
 - Include an `mdx` help page.
-- Reference the md help page in the table of contents.
+- Reference the `mdx` help page in the sidebar navigation.
 - Start all code samples with `m365`.
 - Ensure samples use long names of options rather than short ones.
 - Include the marker to incorporate global options rather than listing them explicitly.
