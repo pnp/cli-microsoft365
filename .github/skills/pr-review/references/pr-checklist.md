@@ -33,7 +33,7 @@
 
 ## Documentation
 
-- Include an md help page.
+- Include an `mdx` help page.
 - Reference the md help page in the table of contents.
 - Start all code samples with `m365`.
 - Ensure samples use long names of options rather than short ones.
