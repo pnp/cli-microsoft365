@@ -91,7 +91,7 @@ describe(commands.ITEM_ADD, () => {
       priority: 'high',
       assignee: 'Steve'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
@@ -132,7 +132,7 @@ describe(commands.ITEM_ADD, () => {
       'assignee@odata.type': 'Collection(String)',
       assignee: 'Steve;#Brian'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
@@ -179,7 +179,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve;#Brian',
       output: 'csv'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     const extendedItem = {
       "id": "ticket1",
       "acl": [
@@ -246,7 +246,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve',
       output: 'md'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     const extendedItem = {
       "id": "ticket1",
       "acl": [
@@ -297,7 +297,7 @@ describe(commands.ITEM_ADD, () => {
       priority: 'high',
       assignee: 'Steve'
     };
-    await assert.rejects(command.action(logger, { options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }),
       new CommandError(`An error has occurred`));
   });
 

@@ -85,7 +85,7 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { schema: schema, externalConnectionId: externalConnectionId, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ schema: schema, externalConnectionId: externalConnectionId, verbose: true }) });
   });
 
   it('creates an external connection schema and waits for provisioning to complete', async () => {
@@ -120,14 +120,7 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
       fn();
       return {} as any;
     });
-    await command.action(logger, {
-      options: {
-        schema: schema,
-        externalConnectionId: externalConnectionId,
-        verbose: true,
-        wait: true
-      }
-    } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ schema: schema, externalConnectionId: externalConnectionId, verbose: true, wait: true }) });
     assert.strictEqual(waitsForCompletion, true);
   });
 
@@ -164,14 +157,8 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
       fn();
       return {} as any;
     });
-    await assert.rejects(command.action(logger, {
-      options: {
-        schema: schema,
-        externalConnectionId: externalConnectionId,
-        debug: true,
-        wait: true
-      }
-    } as any), new CommandError('Provisioning schema failed: An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ schema: schema, externalConnectionId: externalConnectionId, debug: true, wait: true }) }),
+      new CommandError('Provisioning schema failed: An error has occurred'));
   });
 
   it('correctly handles error when request is malformed or schema already exists', async () => {
@@ -182,7 +169,7 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
       }
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { schema: schema, externalConnectionId: externalConnectionId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ schema: schema, externalConnectionId: externalConnectionId }) }),
       new CommandError(errorMessage));
   });
 

@@ -286,7 +286,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -370,7 +370,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       output: 'json',
       debug: true
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -453,7 +453,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'search',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -530,7 +530,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'all',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -624,7 +624,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       id: 'msgraphdocs',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -727,7 +727,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -775,7 +775,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -856,7 +856,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -980,7 +980,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1074,7 +1074,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1188,7 +1188,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1290,7 +1290,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1388,7 +1388,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1552,7 +1552,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1670,7 +1670,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'search',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1793,7 +1793,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'search',
       output: 'json'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -1871,7 +1871,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'text'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.called);
   });
 
@@ -1907,7 +1907,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'text'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.called);
   });
 
@@ -2014,7 +2014,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'text'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.called);
   });
 
@@ -2042,7 +2042,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'csv'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",
@@ -2134,7 +2134,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
       ux: 'copilot',
       output: 'md'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "loadExternalConnection",

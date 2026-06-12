@@ -1,7 +1,6 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -13,14 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-get.js';
+import command, { options } from './connection-get.js';
 
 describe(commands.CONNECTION_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: ReturnType<typeof command.getSchemaToParse>;
+  let commandOptionsSchema: typeof options;
 
   const externalConnection: ExternalConnectors.ExternalConnection = {
     "id": "contosohr",
@@ -41,7 +40,7 @@ describe(commands.CONNECTION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse();
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -90,10 +89,8 @@ describe(commands.CONNECTION_GET, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-      }
-    }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'contosohr' }) }),
+      new CommandError('An error has occurred'));
   });
 
   it('should get external connection information by id (debug)', async () => {
@@ -104,12 +101,7 @@ describe(commands.CONNECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        id: 'contosohr'
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'contosohr' }) });
 
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].id, 'contosohr');
@@ -131,12 +123,7 @@ describe(commands.CONNECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso HR'
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'Contoso HR' }) });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].id, 'contosohr');
     assert.strictEqual(call.args[0].name, 'Contoso HR');
@@ -155,36 +142,32 @@ describe(commands.CONNECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso HR'
-      }
-    }), new CommandError(`External connection with name 'Contoso HR' not found`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'Contoso HR' }) }),
+      new CommandError(`External connection with name 'Contoso HR' not found`));
   });
 
   it('passes validation with id specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ name: 'Contoso HR' });
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso HR' });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation with both id and name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', name: 'Contoso HR' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr', name: 'Contoso HR' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation with neither id nor name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({});
+    const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation with unknown options', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 });

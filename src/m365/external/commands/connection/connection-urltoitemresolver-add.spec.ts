@@ -68,7 +68,7 @@ describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
       itemId: '{id}',
       priority: 1
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
   });
 
   it('correctly handles error', async () => {
@@ -93,7 +93,7 @@ describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
       priority: 1
     };
 
-    await assert.rejects(command.action(logger, { options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }),
       new CommandError(`An error has occurred`));
   });
 

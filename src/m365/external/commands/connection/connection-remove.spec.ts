@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -12,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-remove.js';
+import command, { options } from './connection-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CONNECTION_REMOVE, () => {
@@ -20,7 +19,7 @@ describe(commands.CONNECTION_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: ReturnType<typeof command.getSchemaToParse>;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,7 +28,7 @@ describe(commands.CONNECTION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse();
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -89,28 +88,20 @@ describe(commands.CONNECTION_REMOVE, () => {
   });
 
   it('prompts before removing the specified external connection by id when force option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        id: "contosohr"
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "contosohr" }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified external connection by name when force option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        name: "Contoso HR"
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: "Contoso HR" }) });
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified external connection when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    await command.action(logger, { options: { debug: true, id: "contosohr" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: "contosohr" }) });
     assert(postSpy.notCalled);
   });
 
@@ -130,7 +121,7 @@ describe(commands.CONNECTION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
 
-    await command.action(logger, { options: { debug: true, id: "contosohr" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: "contosohr" }) });
     assert(externalConnectionRemoveCallIssued);
   });
 
@@ -143,7 +134,7 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: "contosohr", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "contosohr", force: true }) });
   });
 
   it('removes external connection with specified ID', async () => {
@@ -154,7 +145,7 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw '';
     });
 
-    await command.action(logger, { options: { id: "contosohr", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "contosohr", force: true }) });
   });
 
   it('removes external connection with specified name', async () => {
@@ -180,7 +171,7 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw '';
     });
 
-    await command.action(logger, { options: { name: "Contoso HR", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: "Contoso HR", force: true }) });
   });
 
   it('fails to get external connection by name when it does not exists', async () => {
@@ -193,12 +184,8 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw 'The specified connection does not exist';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: "Fabrikam HR",
-        force: true
-      }
-    } as any), new CommandError("The specified connection does not exist"));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: "Fabrikam HR", force: true }) }),
+      new CommandError("The specified connection does not exist"));
   });
 
   it('fails when multiple external connections with same name exists', async () => {
@@ -228,12 +215,8 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw "Invalid request";
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: "My HR",
-        force: true
-      }
-    } as any), new CommandError("Multiple external connections with name My HR found. Found: fabrikamhr, contosohr."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: "My HR", force: true }) }),
+      new CommandError("Multiple external connections with name My HR found. Found: fabrikamhr, contosohr."));
   });
 
   it('handles selecting single result when external connections with the specified name found and cli is set to prompt', async () => {
@@ -269,32 +252,32 @@ describe(commands.CONNECTION_REMOVE, () => {
       throw '';
     });
 
-    await command.action(logger, { options: { name: "My HR", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: "My HR", force: true }) });
     assert(removeRequestIssued);
   });
 
   it('passes validation with id specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ name: 'Contoso HR' });
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso HR' });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation with both id and name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', name: 'Contoso HR' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr', name: 'Contoso HR' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation with neither id nor name specified', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({});
+    const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation with unknown options', () => {
-    const actual = (commandOptionsSchema as z.ZodType).safeParse({ id: 'contosohr', unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ id: 'contosohr', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 });

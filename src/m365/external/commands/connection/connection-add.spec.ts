@@ -104,7 +104,7 @@ describe(commands.CONNECTION_ADD, () => {
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
   });
 
@@ -121,7 +121,7 @@ describe(commands.CONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
@@ -138,7 +138,7 @@ describe(commands.CONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
@@ -156,7 +156,7 @@ describe(commands.CONNECTION_ADD, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'TestConnectionForCLI', name: 'Test Connection', description: 'Test' }) }),
       new CommandError(`An error has occurred`));
   });
 
