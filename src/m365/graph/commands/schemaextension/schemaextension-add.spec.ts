@@ -1,8 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,13 +9,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './schemaextension-add.js';
+import command, { options } from './schemaextension-add.js';
 
 describe(commands.SCHEMAEXTENSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,7 +23,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,13 +90,13 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "id": "ext6kguklm2_TestSchemaExtension",
@@ -150,14 +148,14 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
@@ -185,182 +183,156 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the owner is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'invalid',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the owner is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'invalid',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if properties is not valid JSON string', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: 'foobar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if properties is not valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: 'foobar'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if properties have no valid type', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Foo"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if properties have no valid type', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Foo"},{"name":"MyString","type":"String"}]'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if a specified property has missing type', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if a specified property has missing type', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt"},{"name":"MyString","type":"String"}]'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if a specified property has missing name', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if a specified property has missing name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"type":"Integer"},{"name":"MyString","type":"String"}]'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if properties JSON string is not an array', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '{}'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if properties JSON string is not an array', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '{}'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the owner is a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: 'Test Description',
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the owner is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+      description: 'Test Description',
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the optional description is missing', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the optional description is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the property type is Binary', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Binary"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the property type is Binary', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Binary"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the property type is Boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Boolean"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the property type is Boolean', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Boolean"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the property type is DateTime', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"DateTime"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the property type is DateTime', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"DateTime"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the property type is Integer', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"Integer"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the property type is Integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"Integer"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the property type is String', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestSchemaExtension',
-        description: null,
-        owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        targetTypes: 'Group',
-        properties: '[{"name":"MyInt","type":"String"}]'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the property type is String', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestSchemaExtension',
+
+      owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
+      targetTypes: 'Group',
+      properties: '[{"name":"MyInt","type":"String"}]'
+    });
+    assert.strictEqual(actual.success, true);
   });
 });

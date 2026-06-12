@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import commands from '../../commands.js';
 import { sinonUtil } from './../../../../utils/sinonUtil.js';
-import command from './changelog-list.js';
+import command, { options } from './changelog-list.js';
 
 describe(commands.CHANGELOG_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validVersions = 'beta,v1.0';
   const validChangeType = 'Addition';
   const validServices = 'Groups,Security';
@@ -94,6 +95,7 @@ describe(commands.CHANGELOG_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -135,104 +137,82 @@ describe(commands.CHANGELOG_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['category', 'title', 'description']);
   });
 
-  it('fails validation if versions contains an invalid value.', async () => {
-    const actual = command.validate({
-      options: {
-        versions: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if versions contains an invalid value.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      versions: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if changeType is an invalid value.', async () => {
-    const actual = command.validate({
-      options: {
-        changeType: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if changeType is an invalid value.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      changeType: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if services contains an invalid value.', async () => {
-    const actual = command.validate({
-      options: {
-        services: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if services contains an invalid value.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      services: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if startDate is invalid ISO date.', async () => {
-    const actual = command.validate({
-      options: {
-        startDate: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if startDate is invalid ISO date.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      startDate: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if endDate is invalid ISO date.', async () => {
-    const actual = command.validate({
-      options: {
-        endDate: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if endDate is invalid ISO date.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      endDate: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if endDate is earlier than startDate.', async () => {
-    const actual = command.validate({
-      options: {
-        endDate: '2018-11-01',
-        startDate: '2018-12-01'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if endDate is earlier than startDate.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      endDate: '2018-11-01',
+      startDate: '2018-12-01'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation when valid versions specified', async () => {
-    const actual = await command.validate({
-      options: {
-        versions: validVersions
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid versions specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      versions: validVersions
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid changeType specified', async () => {
-    const actual = await command.validate({
-      options: {
-        changeType: validChangeType
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid changeType specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      changeType: validChangeType
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid services specified', async () => {
-    const actual = await command.validate({
-      options: {
-        services: validServices
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid services specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      services: validServices
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid startDate specified', async () => {
-    const actual = await command.validate({
-      options: {
-        startDate: validStartDate
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid startDate specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      startDate: validStartDate
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid endDate specified', async () => {
-    const actual = await command.validate({
-      options: {
-        endDate: validEndDate
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid endDate specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      endDate: validEndDate
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves changelog list', async () => {
@@ -245,7 +225,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -260,7 +240,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { output: 'text' }
+      options: commandOptionsSchema.parse({ output: 'text' })
     });
     assert(loggerLogSpy.calledWith(validChangelogText));
   });
@@ -275,9 +255,9 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         changeType: validChangeType
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -292,12 +272,12 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         versions: validVersions,
         services: validServices,
         startDate: validStartDate,
         endDate: validEndDate
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -305,6 +285,6 @@ describe(commands.CHANGELOG_LIST, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });

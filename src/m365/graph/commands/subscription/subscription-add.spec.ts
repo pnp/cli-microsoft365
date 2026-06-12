@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './subscription-add.js';
+import command, { options } from './subscription-add.js';
 
 describe(commands.SUBSCRIPTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -86,13 +88,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscriptions/$entity",
@@ -128,13 +130,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
   });
@@ -160,13 +162,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
   });
@@ -191,14 +193,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: "2019-01-03T00:00:00Z"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
   });
@@ -225,12 +227,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
     const expected = '2019-01-03T22:29:00.000Z';
@@ -257,14 +259,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
   });
@@ -289,14 +291,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
     assert(loggerLogToStderrSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
@@ -323,14 +325,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z',
         latestTLSVersion: 'v1_3'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscriptions/$entity",
@@ -369,7 +371,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
@@ -378,7 +380,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         withResourceData: true,
         encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1',
         encryptionCertificateId: 'MyCert'
-      }
+      })
     });
 
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
@@ -401,275 +403,227 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if expirationDateTime is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if expirationDateTime is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      expirationDateTime: 'foo'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if notificationUrl is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "foo",
-        expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if notificationUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "foo",
+      expirationDateTime: '2016-11-20T18:23:45.935Z'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if changeTypes is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'foo',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if changeTypes is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'foo',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      expirationDateTime: '2016-11-20T18:23:45.935Z'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the clientState exceeds maximum allowed length', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientState exceeds maximum allowed length', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the notificationUrlAppId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        notificationUrlAppId: 'foo',
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the notificationUrlAppId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      notificationUrlAppId: 'foo'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if latestTLSVersion is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        latestTLSVersion: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if latestTLSVersion is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      latestTLSVersion: 'foo'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if lifecycleNotificationUrl is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        lifecycleNotificationUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if lifecycleNotificationUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      lifecycleNotificationUrl: 'foo'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if resource data should be included, but encryptionCertificate is not set', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        withResourceData: true,
-        encryptionCertificateId: 'MyCert'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if resource data should be included, but encryptionCertificate is not set', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      withResourceData: true,
+      encryptionCertificateId: 'MyCert'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if resource data should be included, but encryptionCertificateId is not set', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        withResourceData: true,
-        encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if resource data should be included, but encryptionCertificateId is not set', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: 'https://webhook.azurewebsites.net/api/send/myNotifyClient',
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      withResourceData: true,
+      encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the expirationDateTime is not specified', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the expirationDateTime is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the notificationUrl points to valid https URL', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the notificationUrl points to valid https URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the notificationUrl points to valid Azure Event Hub location', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the notificationUrl points to valid Azure Event Hub location', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the notificationUrl points to valid Azure Event Grid Partner Topic', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the notificationUrl points to valid Azure Event Grid Partner Topic', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the lifecycleNotificationUrl points to valid https URL', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        lifecycleNotificationUrl: "https://webhook.azurewebsites.net/api/lifecycleNotifications",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the lifecycleNotificationUrl points to valid https URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      lifecycleNotificationUrl: "https://webhook.azurewebsites.net/api/lifecycleNotifications"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the lifecycleNotificationUrl points to valid Azure Event Hub location', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com",
-        lifecycleNotificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the lifecycleNotificationUrl points to valid Azure Event Hub location', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com",
+      lifecycleNotificationUrl: "EventHub:https://exchangenotifications.servicebus.windows.net/eventhubname/inboxmessages?tenantId=contoso.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the lifecycleNotificationUrl points to valid Azure Event Grid Partner Topic', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral",
-        lifecycleNotificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral",
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the lifecycleNotificationUrl points to valid Azure Event Grid Partner Topic', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral",
+      lifecycleNotificationUrl: "EventGrid:?azuresubscriptionid=b07a45b3-f7b7-489b-9269-da6f3f93dff0&resourcegroup=rg-graph-api&partnertopic=messages&location=germanywestcentral"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the notificationUrlAppId is a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        notificationUrlAppId: '24d3b144-21ae-4080-943f-7067b395b913',
-        expirationDateTime: null
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the notificationUrlAppId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      notificationUrlAppId: '24d3b144-21ae-4080-943f-7067b395b913'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if latestTLSVersion is valid', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        latestTLSVersion: 'v1_3'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if latestTLSVersion is valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      latestTLSVersion: 'v1_3'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if resource data should be included and encryptionCertificate is specified together with encryptionCertificateId', async () => {
-    const actual = await command.validate({
-      options: {
-        resource: "me/mailFolders('Inbox')/messages",
-        changeTypes: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z',
-        withResourceData: true,
-        encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1',
-        encryptionCertificateId: 'MyCert'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if resource data should be included and encryptionCertificate is specified together with encryptionCertificateId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: "me/mailFolders('Inbox')/messages",
+      changeTypes: 'updated',
+      clientState: 'secretClientValue',
+      notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      expirationDateTime: '2016-11-20T18:23:45.935Z',
+      withResourceData: true,
+      encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1',
+      encryptionCertificateId: 'MyCert'
+    });
+    assert.strictEqual(actual.success, true);
   });
 });
