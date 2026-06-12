@@ -13,7 +13,7 @@ class PurviewRetentionEventTypeListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of retention event types';
+    return 'Gets a list of retention event types';
   }
 
   public get schema(): z.ZodTypeAny | undefined {

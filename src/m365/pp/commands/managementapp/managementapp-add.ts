@@ -22,7 +22,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Register management application for Power Platform';
+    return 'Registers management application for Power Platform';
   }
 
   constructor() {

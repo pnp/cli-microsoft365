@@ -25,7 +25,7 @@ class PurviewAuditLogListCommand extends O365MgmtCommand {
   }
 
   public get description(): string {
-    return 'List audit logs within your tenant';
+    return 'Lists audit logs within your tenant';
   }
 
   public defaultProperties(): string[] | undefined {

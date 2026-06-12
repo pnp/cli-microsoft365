@@ -21,7 +21,7 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Delete a retention label';
+    return 'Deletes a retention label';
   }
 
   constructor() {

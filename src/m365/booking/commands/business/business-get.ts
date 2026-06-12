@@ -26,7 +26,7 @@ class BookingBusinessGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the specified Microsoft Bookings business.';
+    return 'Retrieves the specified Microsoft Bookings business.';
   }
 
   public get schema(): z.ZodType | undefined {

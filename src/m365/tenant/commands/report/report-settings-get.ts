@@ -9,7 +9,7 @@ class TenantReportSettingsGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get the tenant-level settings for Microsoft 365 reports';
+    return 'Gets the tenant-level settings for Microsoft 365 reports';
   }
 
   public async commandAction(logger: Logger): Promise<void> {

@@ -19,7 +19,7 @@ class TenantReportOffice365ActivationsUserCountsCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get the count of enabled users with activated Office subscriptions.';
+    return 'Gets the count of enabled users with activated Office subscriptions.';
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

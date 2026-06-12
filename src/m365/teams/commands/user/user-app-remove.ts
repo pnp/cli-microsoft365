@@ -25,7 +25,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Uninstall an app from the personal scope of the specified user.';
+    return 'Uninstalls an app from the personal scope of the specified user.';
   }
 
   constructor() {

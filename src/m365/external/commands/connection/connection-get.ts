@@ -20,7 +20,7 @@ class ExternalConnectionGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a specific external connection';
+    return 'Gets a specific external connection';
   }
 
   public alias(): string[] | undefined {

@@ -33,7 +33,7 @@ class SpoSiteAccessRequestSettingSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Update access requests for a specific site';
+    return 'Updates access requests for a specific site';
   }
 
   public get schema(): z.ZodType | undefined {

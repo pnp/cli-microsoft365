@@ -26,7 +26,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Disconnect a hub site from its parent hub site';
+    return 'Disconnects a hub site from its parent hub site';
   }
 
   constructor() {

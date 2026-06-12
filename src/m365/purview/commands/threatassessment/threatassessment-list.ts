@@ -20,7 +20,7 @@ class PurviewThreatAssessmentListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of threat assessments';
+    return 'Gets a list of threat assessments';
   }
 
   public defaultProperties(): string[] | undefined {
