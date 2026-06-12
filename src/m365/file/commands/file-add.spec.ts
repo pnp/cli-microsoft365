@@ -12,12 +12,13 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './file-add.js';
+import command, { options } from './file-add.js';
 
 describe(commands.ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -42,6 +44,7 @@ describe(commands.ADD, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(fs, 'existsSync').returns(true);
   });
 
   afterEach(() => {
@@ -147,11 +150,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
+      })
     });
   });
 
@@ -219,11 +222,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
+      })
     });
   });
 
@@ -306,11 +309,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/'
-      }
+      })
     });
   });
 
@@ -393,11 +396,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/Folder'
-      }
+      })
     });
   });
 
@@ -480,11 +483,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/DemoDocs'
-      }
+      })
     });
   });
 
@@ -555,10 +558,10 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'file.pdf',
         folderUrl: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents'
-      }
+      })
     });
   });
 
@@ -629,10 +632,10 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents'
-      }
+      })
     });
   });
 
@@ -687,11 +690,11 @@ describe(commands.ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents',
         siteUrl: 'https://contoso.sharepoint.com/sites/Contoso'
-      }
+      })
     });
   });
 
@@ -750,11 +753,11 @@ describe(commands.ADD, () => {
     sinon.stub(request, 'put').rejects(new Error('Issued PUT request'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Docs'
-      }
+      })
     }), new CommandError('Drive not found'));
   });
 
@@ -778,10 +781,10 @@ describe(commands.ADD, () => {
     sinon.stub(request, 'put').rejects(new Error('Issued PUT request'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 
@@ -844,10 +847,10 @@ describe(commands.ADD, () => {
     sinon.stub(request, 'put').rejects(new Error('Issued PUT request'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'https://contoso.sharepoint.com/Shared Documents/file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 
@@ -934,34 +937,36 @@ describe(commands.ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 
   it(`fails validation if the specified local source file doesn't exist`, async () => {
+    sinonUtil.restore(fs.existsSync);
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it(`fails validation if the specified folderUrl is invalid`, async () => {
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: '/' });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`fails validation if the specified siteUrl is invalid`, async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({
-      options: {
-        filePath: 'file.pdf',
-        folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
-        siteUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      filePath: 'file.pdf',
+      folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
+      siteUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`passes validation if the target file is a URL`, async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' });
+    assert.strictEqual(actual.success, true);
   });
 });
