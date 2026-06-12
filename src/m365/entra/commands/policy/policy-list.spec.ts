@@ -98,9 +98,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       type: "authorization"
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledWith({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
       "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
@@ -145,9 +145,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       type: "tokenLifetime"
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledWith([
       {
         id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
@@ -842,8 +842,8 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
-    }).data! });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+    }) });
     assert(loggerLogSpy.calledWith([
       {
         "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/adminConsentRequestPolicy/$entity",
@@ -1454,9 +1454,9 @@ describe(commands.POLICY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       type: "roleManagement"
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "DirectoryRole_a457c42c-0f2e-4a25-be2a-545e840add1f_7ace6474-d11c-4a14-bc8f-3c9fdfc34930",
@@ -1490,13 +1490,13 @@ describe(commands.POLICY_LIST, () => {
   it('correctly handles API OData error for specified policies', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ type: "activityBasedTimeout" }).data! }), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: "activityBasedTimeout" }) }), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
     sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({}).data! }), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError("An error has occurred."));
   });
 
   it('accepts type to be activityBasedTimeout', async () => {

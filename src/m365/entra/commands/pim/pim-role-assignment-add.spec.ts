@@ -341,11 +341,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       userId: userId,
       justification: 'Need SharePoint Administrator role'
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseNoExpiration));
   });
 
@@ -374,12 +374,12 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       userId: userId,
       justification: 'Need SharePoint Administrator role',
-      expiration: false
-    }).data! });
+      noExpiration: true
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseNoExpiration));
   });
 
@@ -413,7 +413,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionName: roleDefinitionName,
       userName: userName,
       administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
@@ -421,7 +421,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       duration: 'PT4H',
       justification: 'Need SharePoint Administrator role for admin unit for half day',
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseAfterDuration));
   });
 
@@ -451,13 +451,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       groupId: groupId,
       applicationId: '94446d35-4df6-45da-a17f-c601310a8342',
       endDateTime: '2024-02-12T12:00:00Z',
       justification: 'Need Application Administrator role for group for two days'
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseAfterDateTime));
   });
 
@@ -490,15 +490,15 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       groupName: groupName,
       justification: 'Need User Administrator role for group, ticket details included',
       ticketSystem: 'JIRA',
       ticketNumber: 'MSFT-2024',
-      expiration: false,
+      noExpiration: true,
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseWithTicketInfo));
   });
 
@@ -532,12 +532,12 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw opts.data;
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       justification: 'Need SharePoint Administrator role',
-      expiration: false,
+      noExpiration: true,
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseNoExpiration));
   });
 
@@ -548,7 +548,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
     };
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, verbose: true }).data! }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, verbose: true }) }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
   });
 
   it('throws an error during self activation when role assignment does not exist', async () => {
@@ -591,7 +591,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, justification: 'Need SharePoint Administrator role', expiration: false }).data! }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, justification: 'Need SharePoint Administrator role', noExpiration: true }) }), new CommandError(error.error.message));
   });
 
   it('throws an error during admin assignment when role assignment already exists', async () => {
@@ -628,6 +628,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, userId: userId, justification: 'Need SharePoint Administrator role', expiration: false }).data! }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, userId: userId, justification: 'Need SharePoint Administrator role', noExpiration: true }) }), new CommandError(error.error.message));
   });
 });

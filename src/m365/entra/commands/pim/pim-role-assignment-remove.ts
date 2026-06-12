@@ -6,6 +6,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { roleDefinition } from '../../../../utils/roleDefinition.js';
+import { validation } from '../../../../utils/validation.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -16,7 +17,9 @@ export const options = z.strictObject({
   roleDefinitionName: z.string().optional().alias('n'),
   roleDefinitionId: z.uuid().optional().alias('i'),
   userId: z.uuid().optional(),
-  userName: z.string().optional(),
+  userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
+    error: e => `'${e.input}' is not a valid user principal name for option 'userName'.`
+  }).optional(),
   groupId: z.uuid().optional(),
   groupName: z.string().optional(),
   administrativeUnitId: z.uuid().optional(),

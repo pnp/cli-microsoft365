@@ -12,7 +12,9 @@ import { odata } from '../../../../utils/odata.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   userId: z.uuid().optional(),
-  userName: z.string().optional(),
+  userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
+    error: e => `'${e.input}' is not a valid user principal name for option 'userName'.`
+  }).optional(),
   groupId: z.uuid().optional(),
   groupName: z.string().optional(),
   startDateTime: z.string().refine(date => validation.isValidISODateTime(date), {

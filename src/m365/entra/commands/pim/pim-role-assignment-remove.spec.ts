@@ -251,6 +251,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation when userName is not a valid UPN', async () => {
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690', userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation when administrativeUnitId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, administrativeUnitId: 'foo' });
     assert.notStrictEqual(actual.success, true);
@@ -279,11 +284,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       userId: userId,
       justification: 'Remove user from SharePoint Administrator role'
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseTenantScope));
   });
 
@@ -308,13 +313,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionName: roleDefinitionName,
       userName: userName,
       administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
       justification: 'Remove user from SharePoint Administrator role for admin unit',
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseAdminUnitScope));
   });
 
@@ -336,12 +341,12 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       groupId: groupId,
       applicationId: '94446d35-4df6-45da-a17f-c601310a8342',
       justification: 'Remove Application Administrator role for group'
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseApplicationScope));
   });
 
@@ -367,14 +372,14 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       groupName: groupName,
       justification: 'Remove User Administrator role for group, ticket details included',
       ticketSystem: 'JIRA',
       ticketNumber: 'MSFT-2024',
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseWithTicketInfo));
   });
 
@@ -403,11 +408,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw opts.data;
     });
 
-    await command.action(logger, { options: commandOptionsSchema.safeParse({
+    await command.action(logger, { options: commandOptionsSchema.parse({
       roleDefinitionId: roleDefinitionId,
       justification: 'Remove SharePoint Administrator role',
       verbose: true
-    }).data! });
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseTenantScope));
   });
 
@@ -418,7 +423,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
     };
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, verbose: true }).data! }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, verbose: true }) }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
   });
 
   it('throws an error during self deactivation when role assignment does not exist', async () => {
@@ -456,6 +461,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, justification: 'Remove SharePoint Administrator role' }).data! }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, justification: 'Remove SharePoint Administrator role' }) }), new CommandError(error.error.message));
   });
 });

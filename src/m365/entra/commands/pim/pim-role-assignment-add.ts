@@ -34,7 +34,7 @@ export const options = z.strictObject({
   }).optional().alias('d'),
   ticketNumber: z.string().optional(),
   ticketSystem: z.string().optional(),
-  expiration: z.boolean().default(true)
+  noExpiration: z.boolean().default(false)
 });
 
 declare type Options = z.infer<typeof options>;
@@ -66,13 +66,13 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
         }
       })
       .refine(options => {
-        const specified = [!options.expiration ? true : undefined, options.endDateTime, options.duration].filter(o => o !== undefined).length;
+        const specified = [options.noExpiration ? true : undefined, options.endDateTime, options.duration].filter(o => o !== undefined).length;
         return specified <= 1;
       }, {
-        message: 'Specify only one of the following options: expiration, endDateTime, duration',
+        message: 'Specify only one of the following options: noExpiration, endDateTime, duration',
         params: {
           customCode: 'optionSet',
-          options: ['expiration', 'endDateTime', 'duration']
+          options: ['noExpiration', 'endDateTime', 'duration']
         }
       })
       .refine(options => {
@@ -192,7 +192,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
       return 'afterDateTime';
     }
 
-    if (!options.expiration) {
+    if (options.noExpiration) {
       return 'noExpiration';
     }
 
@@ -200,7 +200,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   private getDuration(options: Options): string | undefined {
-    if (!options.duration && !options.endDateTime && options.expiration) {
+    if (!options.duration && !options.endDateTime && !options.noExpiration) {
       return 'PT8H';
     }
 
