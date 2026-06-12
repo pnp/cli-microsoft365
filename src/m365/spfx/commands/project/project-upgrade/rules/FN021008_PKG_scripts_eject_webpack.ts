@@ -19,7 +19,7 @@ export class FN021008_PKG_scripts_eject_webpack extends JsonRule {
   }
 
   get description(): string {
-    return 'Updates package.json scripts.eject-webpack property';
+    return 'Update package.json scripts.eject-webpack property';
   }
 
   get resolution(): string {

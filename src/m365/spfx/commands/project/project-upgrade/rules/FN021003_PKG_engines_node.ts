@@ -19,7 +19,7 @@ export class FN021003_PKG_engines_node extends JsonRule {
   }
 
   get description(): string {
-    return 'Updates package.json engines.node property';
+    return 'Update package.json engines.node property';
   }
 
   get resolution(): string {

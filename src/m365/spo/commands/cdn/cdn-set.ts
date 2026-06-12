@@ -24,7 +24,7 @@ class SpoCdnSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Enables or disable the specified Microsoft 365 CDN';
+    return 'Enables or disables the specified Microsoft 365 CDN';
   }
 
   constructor() {

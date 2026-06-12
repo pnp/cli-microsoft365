@@ -28,7 +28,7 @@ export class FN018003_TEAMS_tab20x20_png extends Rule {
   }
 
   get description(): string {
-    return 'Creates Microsoft Teams tab small icon for the web part';
+    return 'Create Microsoft Teams tab small icon for the web part';
   }
 
   get resolution(): string {

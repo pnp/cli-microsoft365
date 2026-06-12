@@ -7,7 +7,7 @@ class M365GroupReportActivityFileCountsCommand extends PeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Gets the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group';
+    return 'Gets the total number of files and how many of them were active across all group sites associated with a Microsoft 365 Group';
   }
 
   public get usageEndpoint(): string {

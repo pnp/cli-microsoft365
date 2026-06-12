@@ -24,7 +24,7 @@ class SpoThemeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Adds or update a theme';
+    return 'Adds or updates a theme';
   }
 
   constructor() {
