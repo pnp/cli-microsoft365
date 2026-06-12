@@ -12,15 +12,14 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../../commands.js';
-import command from './convert-pdf.js';
+import command, { options } from './convert-pdf.js';
 
 describe(commands.CONVERT_PDF, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let unlinkSyncStub: sinon.SinonStub;
   const mockPdfFile = 'pdf';
   let pdfConvertResponseStream: PassThrough;
@@ -34,7 +33,7 @@ describe(commands.CONVERT_PDF, () => {
     auth.connection.active = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').returns();
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -157,10 +156,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -225,11 +224,11 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -294,10 +293,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/Shared%20Documents/Demo%20Files/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -362,10 +361,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/DemoDocs/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -422,10 +421,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -482,10 +481,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -542,10 +541,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/subsite/DocLib/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -598,10 +597,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -654,10 +653,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/Folder/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -710,10 +709,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -766,10 +765,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -826,10 +825,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/site/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -886,13 +885,14 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').returns('abc');
+      sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -1009,13 +1009,14 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').returns('abc');
+      sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.calledOnce, 'Did not remove local file');
@@ -1076,11 +1077,11 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'https://contoso.sharepoint.com/Docs/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       }), new CommandError('Drive not found'));
       assert(unlinkSyncStub.notCalled, 'Removed local file');
     });
@@ -1142,11 +1143,11 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       }), new CommandError('Error: Request failed with status code 404'));
       assert(unlinkSyncStub.notCalled, 'Removed local file');
     });
@@ -1217,11 +1218,11 @@ describe(commands.CONVERT_PDF, () => {
       }, 5);
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: './foo/file.pdf'
-        }
+        })
       }), new CommandError("Error: ENOENT: no such file or directory, open './foo/file.pdf'"));
       assert(unlinkSyncStub.notCalled, 'Removed local file');
     });
@@ -1296,10 +1297,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-        }
+        })
       }), new CommandError('An error has occurred'));
 
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
@@ -1369,10 +1370,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'delete').rejects(new Error('Issue DELETE request'));
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-        }
+        })
       }), new CommandError('An error has occurred'));
 
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
@@ -1467,10 +1468,10 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(fs, 'readFileSync').returns('abc');
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-        }
+        })
       }), new CommandError('An error has occurred'));
 
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
@@ -1525,13 +1526,14 @@ describe(commands.CONVERT_PDF, () => {
         }
       });
       sinon.stub(fs, 'readFileSync').returns('abc');
+      sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       }), new CommandError('An error has occurred'));
 
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
@@ -1649,15 +1651,16 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').returns('abc');
+      sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
       sinonUtil.restore(fs.unlinkSync);
       unlinkSyncStub = sinon.stub(fs, 'unlinkSync').throws(new Error('An error has occurred'));
 
       await assert.rejects(command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
-        }
+        })
       }), new CommandError('An error has occurred'));
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.calledOnce, 'Did not remove local file');
@@ -1723,13 +1726,14 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').returns('abc');
+      sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
 
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'file.pdf'
-        }
+        })
       });
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.notCalled, 'Removed local file');
@@ -1741,12 +1745,13 @@ describe(commands.CONVERT_PDF, () => {
       expiresOn: '123',
       accessToken: '123.YQ==.456' // 'a' simulating invalid token
     };
+    sinon.stub(fs, 'existsSync').callsFake((filePath: fs.PathLike) => filePath === 'file.docx');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         sourceFile: 'file.docx',
         targetFile: 'file.pdf'
-      }
+      })
     }), new CommandError('Unable to determine authentication type'));
   });
 

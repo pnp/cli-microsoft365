@@ -11,15 +11,14 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
-import { z } from 'zod';
 import commands from '../commands.js';
-import command from './file-move.js';
+import command, { options } from './file-move.js';
 
 describe(commands.MOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
 
   const defaultPostStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -178,7 +177,7 @@ describe(commands.MOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -256,13 +255,13 @@ describe(commands.MOVE, () => {
     defaultPatchStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: '/Shared Documents/file.pdf',
         targetUrl: '/Shared Documents/NewFolder',
         nameConflictBehavior: 'rename',
         newName: 'file_renamed.pdf'
-      }
+      })
     });
   });
 
@@ -271,13 +270,13 @@ describe(commands.MOVE, () => {
     defaultPatchStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: '/Shared Documents/file.pdf',
         targetUrl: '/Shared Documents/NewFolder',
         nameConflictBehavior: 'rename',
         newName: 'file_renamed'
-      }
+      })
     });
   });
 
@@ -287,12 +286,12 @@ describe(commands.MOVE, () => {
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: '/Shared Documents/file.pdf',
         targetUrl: '/teams/finance/Shared Documents',
         verbose: true
-      }
+      })
     });
 
     assert(getStub.called);
@@ -375,12 +374,12 @@ describe(commands.MOVE, () => {
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/',
         sourceUrl: '/shared documents/file.pdf',
         targetUrl: '/teams/finance/Shared Documents',
         verbose: true
-      }
+      })
     });
 
     assert(deleteStub.called);
@@ -391,11 +390,11 @@ describe(commands.MOVE, () => {
     defaultPostStub();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/teams/finance',
         sourceUrl: '/teams/finance/shared documents/file.pdf',
         targetUrl: '/Shared Documents'
-      }
+      })
     }), new CommandError(`Name already exists`));
   });
 
@@ -405,13 +404,13 @@ describe(commands.MOVE, () => {
     defaultDeleteStub();
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: '/Shared Documents/folder1',
         targetUrl: '/teams/finance/Shared Documents',
         nameConflictBehavior: 'rename',
         newName: 'folder1_renamed'
-      }
+      })
     }));
   });
 
@@ -421,12 +420,12 @@ describe(commands.MOVE, () => {
     defaultDeleteStub();
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'https://contoso.sharepoint.com/Shared Documents/file.pdf',
         targetUrl: 'https://contoso.sharepoint.com/teams/finance/Shared Documents',
         verbose: true
-      }
+      })
     }));
   });
 
@@ -434,11 +433,11 @@ describe(commands.MOVE, () => {
     defaultGetStub();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: '/invalid/file.pdf',
         targetUrl: '/teams/finance/Shared Documents'
-      }
+      })
     }), new CommandError(`Drive 'https://contoso.sharepoint.com/invalid/file.pdf' not found`));
   });
 });

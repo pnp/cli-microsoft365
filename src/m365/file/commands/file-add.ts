@@ -12,7 +12,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   folderUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+      error: e => `'${e.input}' is not a valid SharePoint Online folder URL.`
     })
     .alias('u'),
   filePath: z.string().alias('p'),
