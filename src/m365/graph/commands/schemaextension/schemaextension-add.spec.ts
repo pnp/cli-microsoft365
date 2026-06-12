@@ -90,13 +90,13 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "id": "ext6kguklm2_TestSchemaExtension",
@@ -148,14 +148,14 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
@@ -183,14 +183,14 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the owner is not a valid GUID', () => {

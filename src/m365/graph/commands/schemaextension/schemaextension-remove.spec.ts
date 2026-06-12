@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './schemaextension-remove.js';
+import command, { options } from './schemaextension-remove.js';
 
 describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   let log: string[];
@@ -18,6 +19,8 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptIssued: boolean = false;
+  let commandOptionsSchema: typeof options;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +28,8 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -79,7 +84,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -92,12 +97,12 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'exttyee4dv5_MySchemaExtension', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'exttyee4dv5_MySchemaExtension', force: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before removing schema extension when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension' }) });
 
     assert(promptIssued);
   });
@@ -107,7 +112,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension' }) });
   });
 
   it('removes schema extension when prompt confirmed', async () => {
@@ -122,21 +127,21 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension' }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').rejects({ error: 'An error has occurred' });
 
-    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'exttyee4dv5_MySchemaExtension', force: true }) }),
       new CommandError('An error has occurred'));
   });
 

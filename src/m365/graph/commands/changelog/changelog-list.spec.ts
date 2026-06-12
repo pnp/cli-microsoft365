@@ -225,7 +225,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -240,7 +240,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { output: 'text' }
+      options: commandOptionsSchema.parse({ output: 'text' })
     });
     assert(loggerLogSpy.calledWith(validChangelogText));
   });
@@ -255,9 +255,9 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         changeType: validChangeType
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -272,12 +272,12 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         versions: validVersions,
         services: validServices,
         startDate: validStartDate,
         endDate: validEndDate
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -285,6 +285,6 @@ describe(commands.CHANGELOG_LIST, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });

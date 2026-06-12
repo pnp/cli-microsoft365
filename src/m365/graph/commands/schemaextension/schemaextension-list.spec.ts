@@ -96,7 +96,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     try {
       assert(loggerLogSpy.calledWith([{
@@ -176,7 +176,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     try {
       assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
@@ -223,9 +223,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
-      }
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -298,9 +298,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
-        pageNumber: 1
-      }
+      options: commandOptionsSchema.parse({
+        pageNumber: '1'
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -373,10 +373,10 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
-        pageNumber: 1,
-        pageSize: 1
-      }
+      options: commandOptionsSchema.parse({
+        pageNumber: '1',
+        pageSize: '1'
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -444,9 +444,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -476,7 +476,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(errorMessage));
   });
 
   it('passes validation if the owner is a valid GUID', () => {

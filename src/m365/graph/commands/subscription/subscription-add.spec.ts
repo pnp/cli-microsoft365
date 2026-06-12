@@ -88,13 +88,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscriptions/$entity",
@@ -130,13 +130,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
   });
@@ -162,13 +162,13 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
   });
@@ -193,14 +193,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: "2019-01-03T00:00:00Z"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
   });
@@ -227,12 +227,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "groups",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
     const expected = '2019-01-03T22:29:00.000Z';
@@ -259,14 +259,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
   });
@@ -291,14 +291,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
-      }
+      })
     });
     // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
     assert(loggerLogToStderrSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
@@ -325,14 +325,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z',
         latestTLSVersion: 'v1_3'
-      }
+      })
     });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscriptions/$entity",
@@ -371,7 +371,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
@@ -380,7 +380,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         withResourceData: true,
         encryptionCertificate: 'Q0xJIGZvciBNaWNyb3NvZnQgMzY1',
         encryptionCertificateId: 'MyCert'
-      }
+      })
     });
 
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
@@ -403,14 +403,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         resource: "me/mailFolders('Inbox')/messages",
         changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('fails validation if expirationDateTime is not valid', () => {

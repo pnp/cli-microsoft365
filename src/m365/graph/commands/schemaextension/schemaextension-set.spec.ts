@@ -90,14 +90,14 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'ext6kguklm2_TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         status: 'Available',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
@@ -112,7 +112,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'ext6kguklm2_TestSchemaExtension',
         description: 'Test Description',
@@ -120,7 +120,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         targetTypes: 'Group',
         status: 'Available',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith("Schema extension successfully updated."));
   });
@@ -135,13 +135,13 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: 'ext6kguklm2_TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         status: 'Available'
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -150,14 +150,14 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     sinon.stub(request, 'patch').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the owner is not a valid GUID', () => {
