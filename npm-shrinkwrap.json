@@ -915,6 +915,7 @@
     "node_modules/@opentelemetry/api": {
       "version": "1.9.1",
       "license": "Apache-2.0",
+      "peer": true,
       "engines": {
         "node": ">=8.0.0"
       }
@@ -1765,6 +1766,7 @@
       "resolved": "https://registry.npmjs.org/@types/node/-/node-24.12.4.tgz",
       "integrity": "sha512-GUUEShf+PBCGW2KaXwcIt3Yk+e3pkKwWKb9GSyM9WQVE+ep2jzmHdGsHzu4wgcZy5fN9FBdVzjpBQsYlpfpgLA==",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "undici-types": "~7.16.0"
       }
@@ -1878,6 +1880,7 @@
       "integrity": "sha512-A0M6ua6H252bVjPvvtSgl2QA4+ET9S5Mtkb2GDyTxIhH/C4qDItT7RQNO5PhMC6NXGYXOR9dIalcDDgBKT7oFA==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "8.60.1",
         "@typescript-eslint/types": "8.60.1",
@@ -2471,6 +2474,7 @@
     "node_modules/acorn": {
       "version": "8.16.0",
       "license": "MIT",
+      "peer": true,
       "bin": {
         "acorn": "bin/acorn"
       },
@@ -3255,6 +3259,7 @@
     "node_modules/diagnostic-channel": {
       "version": "1.1.1",
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "semver": "^7.5.3"
       }
@@ -3415,6 +3420,7 @@
       "integrity": "sha512-loXy6bWOoP3EP6JA7jo6p5jMpBJmHmsNZM5SFRHLdh1MGOPurMnNBj4ZlAbaqUAaQWbCr7jHV4P7gzAyryZWkQ==",
       "dev": true,
       "license": "MIT",
+      "peer": true,
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.8.0",
         "@eslint-community/regexpp": "^4.12.2",
@@ -6039,6 +6045,7 @@
       "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
       "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
       "license": "Apache-2.0",
+      "peer": true,
       "bin": {
         "tsc": "bin/tsc",
         "tsserver": "bin/tsserver"

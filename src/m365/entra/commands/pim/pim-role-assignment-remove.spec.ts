@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './pim-role-assignment-remove.js';
+import command, { options } from './pim-role-assignment-remove.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -156,6 +156,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -164,6 +165,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -210,53 +212,58 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
   });
 
   it('passes validation when roleDefinitionId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId, roleDefinitionName: 'Global Administrator' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: userId, roleDefinitionName: 'Global Administrator' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, roleDefinitionName: 'Global Administrator' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, roleDefinitionName: 'Global Administrator' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when administrativeUnitId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when applicationId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, applicationId: '94446d35-4df6-45da-a17f-c601310a8342' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, applicationId: '94446d35-4df6-45da-a17f-c601310a8342' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when roleDefinitionId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'foo', roleDefinitionName: 'Global Administrator' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: 'foo', roleDefinitionName: 'Global Administrator' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo', roleDefinitionName: 'Global Administrator' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo', roleDefinitionName: 'Global Administrator' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when userName is not a valid UPN', async () => {
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690', userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when administrativeUnitId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, administrativeUnitId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, administrativeUnitId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when applicationId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleDefinitionId: roleDefinitionId, applicationId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, applicationId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('correctly requests deactivation of role specified by id for a user specified by id tenant-wide scope', async () => {
@@ -277,14 +284,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        userId: userId,
-        justification: 'Remove user from SharePoint Administrator role'
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+      roleDefinitionId: roleDefinitionId,
+      userId: userId,
+      justification: 'Remove user from SharePoint Administrator role'
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseTenantScope));
   });
 
@@ -309,16 +313,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options:
-      {
-        roleDefinitionName: roleDefinitionName,
-        userName: userName,
-        administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
-        justification: 'Remove user from SharePoint Administrator role for admin unit',
-        verbose: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+      roleDefinitionName: roleDefinitionName,
+      userName: userName,
+      administrativeUnitId: '81bb36e4-f4c6-4984-8e56-d4f8feae9e09',
+      justification: 'Remove user from SharePoint Administrator role for admin unit',
+      verbose: true
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseAdminUnitScope));
   });
 
@@ -340,15 +341,12 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        groupId: groupId,
-        applicationId: '94446d35-4df6-45da-a17f-c601310a8342',
-        justification: 'Remove Application Administrator role for group'
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+      roleDefinitionId: roleDefinitionId,
+      groupId: groupId,
+      applicationId: '94446d35-4df6-45da-a17f-c601310a8342',
+      justification: 'Remove Application Administrator role for group'
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseApplicationScope));
   });
 
@@ -374,17 +372,14 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        groupName: groupName,
-        justification: 'Remove User Administrator role for group, ticket details included',
-        ticketSystem: 'JIRA',
-        ticketNumber: 'MSFT-2024',
-        verbose: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+      roleDefinitionId: roleDefinitionId,
+      groupName: groupName,
+      justification: 'Remove User Administrator role for group, ticket details included',
+      ticketSystem: 'JIRA',
+      ticketNumber: 'MSFT-2024',
+      verbose: true
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseWithTicketInfo));
   });
 
@@ -413,14 +408,11 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw opts.data;
     });
 
-    await command.action(logger, {
-      options:
-      {
-        roleDefinitionId: roleDefinitionId,
-        justification: 'Remove SharePoint Administrator role',
-        verbose: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({
+      roleDefinitionId: roleDefinitionId,
+      justification: 'Remove SharePoint Administrator role',
+      verbose: true
+    }) });
     assert(loggerLogSpy.calledOnceWithExactly(roleAssignmentResponseTenantScope));
   });
 
@@ -431,7 +423,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
     };
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, verbose: true } }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, verbose: true }) }), new CommandError('When running with application permissions either userId, userName, groupId or groupName is required'));
   });
 
   it('throws an error during self deactivation when role assignment does not exist', async () => {
@@ -469,6 +461,6 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { roleDefinitionId: roleDefinitionId, justification: 'Remove SharePoint Administrator role' } }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleDefinitionId: roleDefinitionId, justification: 'Remove SharePoint Administrator role' }) }), new CommandError(error.error.message));
   });
 });
