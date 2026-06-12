@@ -19,7 +19,7 @@ export class FN021004_PKG_scripts_build extends JsonRule {
   }
 
   get description(): string {
-    return 'Updates package.json scripts.build property';
+    return 'Update package.json scripts.build property';
   }
 
   get resolution(): string {

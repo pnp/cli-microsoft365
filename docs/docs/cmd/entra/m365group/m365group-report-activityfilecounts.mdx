@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # entra m365group report activityfilecounts
 
-Gets the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group
+Gets the total number of files and how many of them were active across all group sites associated with a Microsoft 365 Group
 
 ## Usage
 
@@ -52,19 +52,19 @@ This command supports only csv and json output.
 
 ## Examples
 
-Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week
+Get the total number of files and how many of them were active across all group sites associated with a Microsoft 365 Group for the last week
 
 ```sh
 m365 entra m365group report activityfilecounts --period D7
 ```
 
-Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week and exports the report data in the specified path in text format
+Get the total number of files and how many of them were active across all group sites associated with a Microsoft 365 Group for the last week and exports the report data in the specified path in text format
 
 ```sh
 m365 entra m365group report activityfilecounts --period D7 --output text > "m365groupactivityfilecounts.txt"
 ```
 
-Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week and exports the report data in the specified path in json format
+Get the total number of files and how many of them were active across all group sites associated with a Microsoft 365 Group for the last week and exports the report data in the specified path in json format
 
 ```sh
 m365 entra m365group report activityfilecounts --period D7 --output json > "m365groupactivityfilecounts.json"

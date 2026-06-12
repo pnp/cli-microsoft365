@@ -12,7 +12,7 @@ export class FN011010_MAN_webpart_version extends ManifestRule {
   }
 
   get description(): string {
-    return 'Updates version in manifest to use automated component versioning';
+    return 'Update version in manifest to use automated component versioning';
   }
 
   get resolution(): string {

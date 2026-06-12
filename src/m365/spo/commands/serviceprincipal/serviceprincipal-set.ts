@@ -22,7 +22,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Enables or disable the service principal';
+    return 'Enables or disables the service principal';
   }
 
   constructor() {

@@ -9,7 +9,7 @@ export class FN003005_CFG_localizedResource_pathLib extends JsonRule {
   }
 
   get title(): string {
-    return 'Updates path of the localized resource';
+    return 'Update path of the localized resource';
   }
 
   get description(): string {
