@@ -65,7 +65,7 @@ For each new command, determine:
    - `viva` → Viva
    - `external` → External
    - `flow` → Flow
-   - `pa` → Power Apps
+   - `Pa` → Power Apps
    - `pp` → Power Platform
    - `planner` → Planner
    - `purview` → Purview
