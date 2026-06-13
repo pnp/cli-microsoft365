@@ -1,9 +1,9 @@
 {
   "editor.tabSize": 2,
   "files.insertFinalNewline": false,
-  "editor.insertSpaces": true,
+  "editor.insertSpaces":     ,
   "editor.detectIndentation": false,
-  "editor.inlineSuggest.enabled": true,
+  "editor.inlineSuggest.enabled":     ,
   "typescript.tsdk": "node_modules/typescript/lib",
   "docker.commands.runInteractive": [
     {
@@ -17,10 +17,10 @@
     }
   ],
   "[markdown][mdx]": {
-    "files.insertFinalNewline": true
+    "files.insertFinalNewline": 
   },
   "[javascript][typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": 
   }
 }
