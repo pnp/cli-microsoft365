@@ -109,7 +109,7 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ id: '@meid' }) });
+    await command.action(logger, { options: { id: '@meid' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -196,7 +196,7 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ userName: '@meusername' }) });
+    await command.action(logger, { options: { userName: '@meusername' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
