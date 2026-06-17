@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './item-add.js';
+import command, { options } from './item-add.js';
 
 describe(commands.ITEM_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.ITEM_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     logger = {
       log: async () => { },
       logRaw: async () => { },
@@ -89,7 +91,7 @@ describe(commands.ITEM_ADD, () => {
       priority: 'high',
       assignee: 'Steve'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
@@ -130,7 +132,7 @@ describe(commands.ITEM_ADD, () => {
       'assignee@odata.type': 'Collection(String)',
       assignee: 'Steve;#Brian'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(putStub.lastCall.args[0].data, externalItem);
   });
 
@@ -177,7 +179,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve;#Brian',
       output: 'csv'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     const extendedItem = {
       "id": "ticket1",
       "acl": [
@@ -244,7 +246,7 @@ describe(commands.ITEM_ADD, () => {
       assignee: 'Steve',
       output: 'md'
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     const extendedItem = {
       "id": "ticket1",
       "acl": [
@@ -295,233 +297,185 @@ describe(commands.ITEM_ADD, () => {
       priority: 'high',
       assignee: 'Steve'
     };
-    await assert.rejects(command.action(logger, { options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }),
       new CommandError(`An error has occurred`));
   });
 
   //#region validation
-  it('fails validation when invalid contentType specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'invalid',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation when invalid contentType specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'invalid',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when contentType is text', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contentType is text', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when contentType is html', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'html',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contentType is html', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'html',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when one acl with other than 3 elements', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation when one acl with other than 3 elements', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when multiple acls specified where one is with other than 3 elements', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone;grant,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation when multiple acls specified where one is with other than 3 elements', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone;grant,everyone'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation for a single correct acl', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for a single correct acl', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for multiple correct acls', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone;grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for multiple correct acls', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone;grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation for invalid acl access type', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'invalid,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation for invalid acl access type', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'invalid,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation for acl access type grant', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl access type grant', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for acl access type deny', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'deny,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl access type deny', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'deny,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation for invalid acl type', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,invalid,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation for invalid acl type', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,invalid,everyone'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation for acl type user', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,user,steve@contoso.com',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl type user', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,user,steve@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for acl type grant', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,group,Users',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl type grant', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,group,Users'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for acl type everyone', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyone,everyone',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl type everyone', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for acl type everyoneExceptGuests', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,everyoneExceptGuests,everyoneExceptGuests',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl type everyoneExceptGuests', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,everyoneExceptGuests,everyoneExceptGuests'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for acl type externalGroup', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'ticket1',
-        externalConnectionId: 'connection',
-        content: 'Hello world',
-        contentType: 'text',
-        acls: 'grant,externalGroup,Users',
-        name: 'Test item'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for acl type externalGroup', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      contentType: 'text',
+      acls: 'grant,externalGroup,Users'
+    });
+    assert.strictEqual(actual.success, true);
   });
   //#endregion
 
@@ -531,34 +485,14 @@ describe(commands.ITEM_ADD, () => {
   });
 
   //#region options
-  it('supports specifying id', () => {
-    const containsOption = command.options
-      .some(o => o.option.indexOf('--id') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying externalConnectionId', () => {
-    const containsOption = command.options
-      .some(o => o.option.indexOf('--externalConnectionId') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying content', () => {
-    const containsOption = command.options
-      .some(o => o.option.indexOf('--content') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying contentType', () => {
-    const containsOption = command.options
-      .some(o => o.option.indexOf('--contentType') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying acls', () => {
-    const containsOption = command.options
-      .some(o => o.option.indexOf('--acls') > -1);
-    assert(containsOption);
+  it('passes validation with all required options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'ticket1',
+      externalConnectionId: 'connection',
+      content: 'Hello world',
+      acls: 'grant,everyone,everyone'
+    });
+    assert.strictEqual(actual.success, true);
   });
   //#endregion
 });

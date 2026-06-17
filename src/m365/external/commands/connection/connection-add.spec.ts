@@ -12,12 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-add.js';
+import command, { options } from './connection-add.js';
 
 describe(commands.CONNECTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const externalConnectionAddResponse: ExternalConnectors.ExternalConnection = {
     configuration: {
@@ -48,6 +49,7 @@ describe(commands.CONNECTION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,7 +104,7 @@ describe(commands.CONNECTION_ADD, () => {
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
   });
 
@@ -119,7 +121,7 @@ describe(commands.CONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
@@ -136,7 +138,7 @@ describe(commands.CONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
@@ -154,106 +156,71 @@ describe(commands.CONNECTION_ADD, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'TestConnectionForCLI', name: 'Test Connection', description: 'Test' }) }),
       new CommandError(`An error has occurred`));
   });
 
-  it('fails validation if id is less than 3 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'T',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('fails validation if id is more than 32 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('fails validation if id is not alphanumeric', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'Test_Connection!',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('fails validation if id starts with Microsoft', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'MicrosoftTestConnectionForCLI',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('fails validation if id is SharePoint', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'SharePoint',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
-  });
-
-  it('passes validation for a valid id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'myapp',
-        name: 'Test Connection for CLI',
-        description: 'Test connection'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if id is less than 3 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'T',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if id is more than 32 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying description', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--description') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if id is not alphanumeric', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'Test_Connection!',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id starts with Microsoft', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'MicrosoftTestConnectionForCLI',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id is SharePoint', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'SharePoint',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation for a valid id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'myapp',
+      name: 'Test Connection for CLI',
+      description: 'Test connection'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'myapp',
+      name: 'Test Connection for CLI',
+      description: 'Test connection',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
