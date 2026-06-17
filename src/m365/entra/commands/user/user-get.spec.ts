@@ -109,6 +109,9 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });
 
+    // Uses 'as any' because @meid is a runtime token replaced by
+    // loadValuesFromAccessToken before commandAction runs,
+    // bypassing Zod schema validation.
     await command.action(logger, { options: { id: '@meid' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
@@ -196,6 +199,9 @@ describe(commands.USER_GET, () => {
 
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });
 
+    // Uses 'as any' because @meusername is a runtime token replaced by
+    // loadValuesFromAccessToken before commandAction runs,
+    // bypassing Zod schema validation.
     await command.action(logger, { options: { userName: '@meusername' } as any });
     assert(loggerLogSpy.calledWith(resultValue));
   });
