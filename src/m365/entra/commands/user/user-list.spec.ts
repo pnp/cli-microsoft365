@@ -12,10 +12,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-list.js';
+import command, { options } from './user-list.js';
 
 describe(commands.USER_LIST, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -27,6 +28,7 @@ describe(commands.USER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,14 +66,19 @@ describe(commands.USER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if type is not a valid user type', async () => {
-    const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if type is not a valid user type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if type is a valid user type', async () => {
-    const actual = await command.validate({ options: { type: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if type is a valid user type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'Member' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation for unknown options because schema is loose', () => {
+    const actual = commandOptionsSchema.safeParse({ surname: 'M' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('lists users in the tenant with the default properties (debug)', async () => {
@@ -88,7 +95,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" },
       { "id": "717f1683-00fa-488c-b68d-5d0051f6bcfa", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }
@@ -108,7 +115,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { properties: 'displayName,mail' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'displayName,mail' }) });
     assert(loggerLogSpy.calledWith([
       { "displayName": "Aarif Sherzai", "mail": "AarifS@contoso.onmicrosoft.com" }, { "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com" }
     ]));
@@ -127,7 +134,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { properties: 'displayName,manager/displayName,manager/department' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'displayName,manager/displayName,manager/department' }) });
     assert(loggerLogSpy.calledWith([
       { "displayName": "Aarif Sherzai", "manager": { "displayName": "Jon Doe", "department": "IT" } }, { "displayName": "Achim Maier", "manager": { "displayName": "Jon Doe", "department": "IT" } }
     ]));
@@ -146,7 +153,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { surname: 'M' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ surname: 'M' }) });
     assert(loggerLogSpy.calledWith([
       { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "0fe76bf5-222b-48f8-a5c1-a3a03b96d472", "displayName": "Karl Matteson", "mail": "KarlM@contoso.onmicrosoft.com", "userPrincipalName": "KarlM@contoso.onmicrosoft.com" }
     ]));
@@ -165,7 +172,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { surname: 'M', givenName: 'A' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ surname: 'M', givenName: 'A' }) });
     assert(loggerLogSpy.calledWith([
       { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "7f50c7d9-916b-4da9-949e-09a431de2646", "displayName": "Anne Matthews", "mail": "AnneM@contoso.onmicrosoft.com", "userPrincipalName": "AnneM@contoso.onmicrosoft.com" }
     ]));
@@ -184,7 +191,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { surname: 'S', type: 'Guest' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ surname: 'S', type: 'Guest' }) });
     assert(loggerLogSpy.calledWith([
       { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
     ]));
@@ -203,7 +210,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'Guest', properties: 'displayName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'Guest', properties: 'displayName' }) });
     assert(loggerLogSpy.calledWith([
       { "id": "7dc52cef-c513-4a53-bd43-93e9f6727911", "displayName": "Aarif Sherzai", "mail": "AarifS@fabrikam.onmicrosoft.com", "userPrincipalName": "AarifS_fabrikam.onmicrosoft.com#EXT#@contoso.onmicrosoft.com" }
     ]));
@@ -221,7 +228,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: displayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -239,12 +246,12 @@ describe(commands.USER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         surname: 'M',
         givenName: 'A',
-        output: "json",
+        output: 'json',
         verbose: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       { "id": "1f5595b2-aa07-445d-9801-a45ea18160b2", "displayName": "Achim Maier", "mail": "AchimM@contoso.onmicrosoft.com", "userPrincipalName": "AchimM@contoso.onmicrosoft.com" }, { "id": "7f50c7d9-916b-4da9-949e-09a431de2646", "displayName": "Anne Matthews", "mail": "AnneM@contoso.onmicrosoft.com", "userPrincipalName": "AnneM@contoso.onmicrosoft.com" }
@@ -269,11 +276,11 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 
   it('handles error when option to filter by specified without a value (flag)', async () => {
-    await assert.rejects(command.action(logger, { options: { surname: true } } as any), new CommandError('Specify value for the surname property'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ surname: true }) }), new CommandError('Specify value for the surname property'));
   });
 
   it('allows unknown options', () => {

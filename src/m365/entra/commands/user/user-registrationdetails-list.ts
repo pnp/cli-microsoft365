@@ -1,5 +1,6 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { odata } from '../../../../utils/odata.js';
@@ -8,30 +9,52 @@ import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+const authenticationMethodValues = ['push', 'oath', 'voiceMobile', 'voiceAlternateMobile', 'voiceOffice', 'sms', 'none'] as const;
+const methodsRegisteredValues = ['mobilePhone', 'email', 'fido2', 'microsoftAuthenticatorPush', 'softwareOneTimePasscode'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  isAdmin: z.boolean().optional(),
+  userType: z.enum(['member', 'guest']).optional(),
+  userPreferredMethodForSecondaryAuthentication: z.string().refine(val => {
+    const methods = val.split(',').map(m => m.trim());
+    return methods.every(m => (authenticationMethodValues as readonly string[]).includes(m));
+  }, {
+    error: e => `'${e.input}' is not a valid userPreferredMethodForSecondaryAuthentication value. Allowed values ${authenticationMethodValues.join(', ')}.`
+  }).optional(),
+  systemPreferredAuthenticationMethods: z.string().refine(val => {
+    const methods = val.split(',').map(m => m.trim());
+    return methods.every(m => (authenticationMethodValues as readonly string[]).includes(m));
+  }, {
+    error: e => `'${e.input}' is not a valid systemPreferredAuthenticationMethods value. Allowed values ${authenticationMethodValues.join(', ')}.`
+  }).optional(),
+  isSelfServicePasswordResetRegistered: z.boolean().optional(),
+  isSelfServicePasswordResetEnabled: z.boolean().optional(),
+  isSelfServicePasswordResetCapable: z.boolean().optional(),
+  isMfaRegistered: z.boolean().optional(),
+  isMfaCapable: z.boolean().optional(),
+  isPasswordlessCapable: z.boolean().optional(),
+  isSystemPreferredAuthenticationMethodEnabled: z.boolean().optional(),
+  methodsRegistered: z.string().refine(val => {
+    const methods = val.split(',').map(m => m.trim());
+    return methods.every(m => (methodsRegisteredValues as readonly string[]).includes(m));
+  }, {
+    error: e => `'${e.input}' is not a valid methodsRegistered value. Allowed values ${methodsRegisteredValues.join(', ')}.`
+  }).optional(),
+  userIds: z.string().refine(val => validation.isValidGuidArray(val) === true, {
+    error: e => `The following GUIDs are invalid for the option 'userIds': ${validation.isValidGuidArray(e.input as string)}.`
+  }).optional(),
+  userPrincipalNames: z.string().refine(val => validation.isValidUserPrincipalNameArray(val) === true, {
+    error: e => `The following user principal names are invalid for the option 'userPrincipalNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+  }).optional(),
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
-
-interface Options extends GlobalOptions {
-  isAdmin?: boolean;
-  userType?: string;
-  userPreferredMethodForSecondaryAuthentication?: string;
-  systemPreferredAuthenticationMethods?: string;
-  isSelfServicePasswordResetRegistered?: boolean;
-  isSelfServicePasswordResetEnabled?: boolean;
-  isSelfServicePasswordResetCapable?: boolean;
-  isMfaRegistered?: boolean;
-  isMfaCapable?: boolean;
-  isPasswordlessCapable?: boolean;
-  isSystemPreferredAuthenticationMethodEnabled?: boolean;
-  methodsRegistered?: string;
-  userIds?: string;
-  userPrincipalNames?: string;
-  properties?: string;
-}
-
-const authenticationMethods = ['push', 'oath', 'voiceMobile', 'voiceAlternateMobile', 'voiceOffice', 'sms', 'none'];
-const methodsRegistered = ['mobilePhone', 'email', 'fido2', 'microsoftAuthenticatorPush', 'softwareOneTimePasscode'];
 
 class EntraUserRegistrationDetailsListCommand extends GraphCommand {
   public get name(): string {
@@ -45,140 +68,8 @@ class EntraUserRegistrationDetailsListCommand extends GraphCommand {
     return ['userPrincipalName', 'methodsRegistered', 'lastUpdatedDateTime'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        isAdmin: !!args.options.isAdmin,
-        userType: typeof args.options.userType !== 'undefined',
-        userPreferredMethodForSecondaryAuthentication: typeof args.options.userPreferredMethodForSecondaryAuthentication !== 'undefined',
-        systemPreferredAuthenticationMethods: typeof args.options.systemPreferredAuthenticationMethods !== 'undefined',
-        isSelfServicePasswordResetRegistered: !!args.options.isSelfServicePasswordResetRegistered,
-        isSelfServicePasswordResetEnabled: !!args.options.isSelfServicePasswordResetEnabled,
-        isSelfServicePasswordResetCapable: !!args.options.isSelfServicePasswordResetCapable,
-        isMfaRegistered: !!args.options.isMfaRegistered,
-        isMfaCapable: !!args.options.isMfaCapable,
-        isPasswordlessCapable: !!args.options.isPasswordlessCapable,
-        isSystemPreferredAuthenticationMethodEnabled: !!args.options.isSystemPreferredAuthenticationMethodEnabled,
-        methodsRegistered: typeof args.options.methodsRegistered !== 'undefined',
-        userIds: typeof args.options.userIds !== 'undefined',
-        userPrincipalNames: typeof args.options.userPrincipalNames !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--isAdmin [isAdmin]'
-      },
-      {
-        option: '--userType [userType]',
-        autocomplete: ['member', 'guest']
-      },
-      {
-        option: '--userPreferredMethodForSecondaryAuthentication [userPreferredMethodForSecondaryAuthentication ]',
-        autocomplete: authenticationMethods
-      },
-      {
-        option: '--systemPreferredAuthenticationMethods [systemPreferredAuthenticationMethods ]',
-        autocomplete: authenticationMethods
-      },
-      {
-        option: '--isSelfServicePasswordResetRegistered [isSelfServicePasswordResetRegistered]'
-      },
-      {
-        option: '--isSelfServicePasswordResetEnabled [isSelfServicePasswordResetEnabled]'
-      },
-      {
-        option: '--isSelfServicePasswordResetCapable [isSelfServicePasswordResetCapable]'
-      },
-      {
-        option: '--isMfaRegistered [isMfaRegistered]'
-      },
-      {
-        option: '--isMfaCapable [isMfaCapable]'
-      },
-      {
-        option: '--isPasswordlessCapable [isPasswordlessCapable]'
-      },
-      {
-        option: '--isSystemPreferredAuthenticationMethodEnabled [isSystemPreferredAuthenticationMethodEnabled]'
-      },
-      {
-        option: '--methodsRegistered [methodsRegistered]',
-        autocomplete: methodsRegistered
-      },
-      {
-        option: '--userIds [userIds]'
-      },
-      {
-        option: '--userPrincipalNames [userPrincipalNames]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userType) {
-          if (['member', 'guest'].every(type => type !== args.options.userType)) {
-            return `'${args.options.userType}' is not a valid userType value. Allowed values member, guest`;
-          }
-        }
-
-        if (args.options.userPreferredMethodForSecondaryAuthentication) {
-          const methods = args.options.userPreferredMethodForSecondaryAuthentication.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
-          if (invalidMethods.length > 0) {
-            return `'${args.options.userPreferredMethodForSecondaryAuthentication}' is not a valid userPreferredMethodForSecondaryAuthentication value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join(', ')}`;
-          }
-        }
-
-        if (args.options.systemPreferredAuthenticationMethods) {
-          const methods = args.options.systemPreferredAuthenticationMethods.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => !authenticationMethods.includes(m));
-          if (invalidMethods.length > 0) {
-            return `'${args.options.systemPreferredAuthenticationMethods}' is not a valid systemPreferredAuthenticationMethods value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${authenticationMethods.join(', ')}`;
-          }
-        }
-
-        if (args.options.methodsRegistered) {
-          const methods = args.options.methodsRegistered.split(',').map(m => m.trim());
-          const invalidMethods = methods.filter(m => !methodsRegistered.includes(m));
-          if (invalidMethods.length > 0) {
-            return `'${args.options.methodsRegistered}' is not a valid methodsRegistered value. Invalid values: ${invalidMethods.join(',')}. Allowed values ${methodsRegistered.join(', ')}`;
-          }
-        }
-
-        if (args.options.userIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.userIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'userIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.userPrincipalNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userPrincipalNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'userPrincipalNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
