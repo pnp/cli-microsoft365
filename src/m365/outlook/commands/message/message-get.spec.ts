@@ -142,7 +142,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -155,7 +155,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userName: userName }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -168,7 +168,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userId: userId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -181,7 +181,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`Graph error occurred`));
   });
 
@@ -196,7 +196,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userName: userName }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -211,7 +211,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userId: userId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -226,7 +226,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId }) }),
       new CommandError(`Graph error occurred`));
   });
 
@@ -241,11 +241,11 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userName }) }),
       new CommandError(`Graph error occurred`));
   });
 
-  it('fails validation if id is empty', async () => {
+  it('fails validation if id is empty', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -253,13 +253,13 @@ describe(commands.MESSAGE_GET, () => {
 
       return defaultValue;
     });
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is filled in', async () => {
-    const actual = await command.validate({ options: { id: messageId } }, commandInfo);
-    assert.equal(actual, true);
+  it('passes validation if id is filled in', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('defines schema', () => {
@@ -294,7 +294,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`The option 'userId' or 'userName' is required when retrieving an email using app only credentials`));
   });
 
@@ -302,7 +302,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: options.parse({ id: messageId, userId: userId, userName: userName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using app only credentials`));
   });
 
@@ -310,7 +310,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: options.parse({ id: messageId, userId: userId, userName: userName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using delegated credentials`));
   });
 });

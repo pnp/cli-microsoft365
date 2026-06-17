@@ -116,7 +116,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -132,7 +132,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: messageId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -145,7 +145,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userId: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -158,7 +158,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userName: userPrincipalName, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userPrincipalName, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -173,7 +173,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userId: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -188,7 +188,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userName: userPrincipalName, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userPrincipalName, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -196,7 +196,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`The option 'userId' or 'userName' is required when removing a message using application permissions.`));
   });
 
@@ -204,12 +204,12 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, userName: userPrincipalName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using application permissions.`));
   });
 
   it('throws an error when both userId and userName are defined when removing a message using delegated permissions', async () => {
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, userName: userPrincipalName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using delegated permissions.`));
   });
 
@@ -233,12 +233,12 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, force: true }) }),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the message when confirm option not passed', async () => {
-    await command.action(logger, { options: { id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) });
 
     assert(promptIssued);
   });
@@ -246,7 +246,7 @@ describe(commands.MESSAGE_REMOVE, () => {
   it('aborts removing the message when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) });
     assert(deleteSpy.notCalled);
   });
 });

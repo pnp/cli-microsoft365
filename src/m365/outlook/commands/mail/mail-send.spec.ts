@@ -99,7 +99,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -125,7 +125,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -154,7 +154,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -187,7 +187,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -220,7 +220,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -247,12 +247,14 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false }) });
     assert.strictEqual(actual, expected);
   });
 
   it('sends email with multiple attachments', async () => {
     const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
 
     const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -264,18 +266,20 @@ describe(commands.MAIL_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         subject: 'Lorem ipsum',
         to: 'mail@domain.com',
         bodyContents: 'Lorem ipsum',
         attachment: ['C:/File1.txt', 'C:/File2.txt']
-      }
+      })
     });
     assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }, { '@odata.type': '#microsoft.graph.fileAttachment', name: 'File2.txt', contentBytes: fileContentBase64 }]);
   });
 
   it('sends email with single attachment', async () => {
     const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
     sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
 
     const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -287,12 +291,12 @@ describe(commands.MAIL_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         subject: 'Lorem ipsum',
         to: 'mail@domain.com',
         bodyContents: 'Lorem ipsum',
         attachment: 'C:/File1.txt'
-      }
+      })
     });
     assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }]);
   });
@@ -309,7 +313,7 @@ describe(commands.MAIL_SEND, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' }) }),
       new CommandError(`An error has occurred`));
   });
 
@@ -441,7 +445,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -467,7 +471,7 @@ describe(commands.MAIL_SEND, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -476,11 +480,11 @@ describe(commands.MAIL_SEND, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         subject: 'Lorem ipsum',
         to: 'mail@domain.com',
         bodyContents: 'Lorem ipsum'
-      }
-    } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
+      })
+    }), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
   });
 });
