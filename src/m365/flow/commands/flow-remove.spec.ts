@@ -93,10 +93,10 @@ describe(commands.REMOVE, () => {
 
   it('prompts before removing the specified Microsoft Flow owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -108,10 +108,10 @@ describe(commands.REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -129,22 +129,22 @@ describe(commands.REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before removing the specified Microsoft Flow owned by another user when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
-      }
+      })
     });
 
     assert(promptIssued);
@@ -156,11 +156,11 @@ describe(commands.REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -178,12 +178,12 @@ describe(commands.REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -198,12 +198,12 @@ describe(commands.REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -218,13 +218,13 @@ describe(commands.REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         force: true,
         asAdmin: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -239,11 +239,11 @@ describe(commands.REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         force: true
-      }
+      })
     } as any), new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`));
   });
 
@@ -260,10 +260,10 @@ describe(commands.REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
-      }
+      })
     } as any), new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`));
   });
 
@@ -275,10 +275,10 @@ describe(commands.REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
-      }
+      })
     } as any), new CommandError(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
   });
 
@@ -287,11 +287,11 @@ describe(commands.REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         force: true
-      }
+      })
     } as any), new CommandError(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
   });
 });

@@ -179,7 +179,7 @@ describe(commands.RUN_LIST, () => {
       throw 'Invalid request ' + opts.url;
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowRunListResponse.value));
   });
 
@@ -196,7 +196,7 @@ describe(commands.RUN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, asAdmin: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowRunListResponse.value));
   });
 
@@ -213,7 +213,7 @@ describe(commands.RUN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, status: status, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, status: status, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowRunListResponse.value));
   });
 
@@ -230,7 +230,7 @@ describe(commands.RUN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowRunListResponse.value));
   });
 
@@ -259,7 +259,7 @@ describe(commands.RUN_LIST, () => {
       throw 'Invalid request ' + opts.url;
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, withTrigger: true, verbose: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, withTrigger: true, verbose: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith(flowRunListResponseClone.value));
   });
 
@@ -271,14 +271,14 @@ describe(commands.RUN_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName }) } as any),
       new CommandError(`Access to the environment '${environmentName}' is denied.`));
   });
 
   it('correctly handles no runs for this flow found', async () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
-    await command.action(logger, { options: { verbose: true, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -294,7 +294,7 @@ describe(commands.RUN_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName }) } as any),
       new CommandError('An error has occurred'));
   });
 

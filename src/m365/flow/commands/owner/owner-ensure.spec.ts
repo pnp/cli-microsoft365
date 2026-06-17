@@ -144,7 +144,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, roleName: 'CanView' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, roleName: 'CanView' }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -173,7 +173,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -200,7 +200,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupId: validGroupId, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupId: validGroupId, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -229,7 +229,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -271,7 +271,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -283,7 +283,7 @@ describe(commands.OWNER_ENSURE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId }) } as any),
       new CommandError(error.error.message));
   });
 });

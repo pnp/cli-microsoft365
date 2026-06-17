@@ -168,7 +168,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'zip' }) });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path './${actualFilename}'.`));
   });
 
@@ -177,7 +177,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'zip' }) });
     assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
@@ -186,7 +186,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { verbose: true, name: nonZipFileFlowId, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: nonZipFileFlowId, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' }) });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path './output.zip'.`));
   });
 
@@ -195,7 +195,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: foundFlowName, environmentName: foundEnvironmentId, format: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: foundFlowName, environmentName: foundEnvironmentId, format: 'json' }) });
     assert(loggerLogSpy.calledWith(`./${flowDisplayName}.json`));
   });
 
@@ -215,7 +215,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'json' }) });
     assert(loggerLogSpy.calledWith('./_Flow __name_ _ with_ Illegal _ characters__.json'));
   });
 
@@ -224,7 +224,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: foundFlowName, environmentName: foundEnvironmentId, format: 'json' }) });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path './${flowDisplayName}.json'.`));
   });
 
@@ -233,7 +233,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip' }) });
     assert(loggerLogSpy.calledWith(`./${actualFilename}`));
   });
 
@@ -242,7 +242,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip' }) });
     assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
@@ -251,7 +251,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -260,7 +260,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' }) });
     assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
@@ -270,7 +270,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: `${foundFlowName}`, environmentName: foundEnvironmentId, format: 'zip', path: './output.zip' }) });
     assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources["L1BST1ZJREVSUy9NSUNST1NPRlQuRkxPVy9GTE9XUy9GMkVCOEIzNy1GNjI0LTRCMjItOTk1NC1CNUQwQ0JCMjhGOEI="].suggestedCreationType, 'Update');
     resourceIds.forEach((id) => {
       assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources[id].suggestedCreationType, 'Existing');
@@ -281,7 +281,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: notFoundEnvironmentId, name: `${foundFlowName}` } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: notFoundEnvironmentId, name: `${foundFlowName}` }) } as any),
       new CommandError(`Access to the environment '${notFoundEnvironmentId}' is denied.`));
   });
 
@@ -289,7 +289,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: foundEnvironmentId, name: notFoundFlowName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: foundEnvironmentId, name: notFoundFlowName }) } as any),
       new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowName}' under Api 'shared_logicflows'.`));
   });
 

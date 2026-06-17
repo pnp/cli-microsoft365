@@ -300,7 +300,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName }) });
     assert(loggerLogSpy.calledOnceWithExactly(regularFlowResponse.value));
   });
 
@@ -313,7 +313,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'ownedByMe' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'ownedByMe' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -329,7 +329,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'all' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'all' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -342,7 +342,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'personal' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'personal' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -355,7 +355,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'sharedWithMe' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'sharedWithMe' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -368,7 +368,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, asAdmin: true, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(adminFlowResponse.value));
   });
 
@@ -380,7 +380,7 @@ describe(commands.LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName }) } as any),
       new CommandError(`Access to the environment '${environmentName}' is denied.`));
   });
 
@@ -396,7 +396,7 @@ describe(commands.LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName }) } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -420,7 +420,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, withSolutions: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, withSolutions: true }) } as any);
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -462,7 +462,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' }) } as any);
     assert(loggerLogSpy.calledWith([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -484,7 +484,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, output: 'text' }) });
     const expectedOutput = regularFlowResponse.value.map(f => ({ ...f, displayName: f.properties.displayName }));
     assert(loggerLogSpy.calledOnceWithExactly(expectedOutput));
   });
@@ -498,7 +498,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, asAdmin: true, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, asAdmin: true, output: 'text' }) });
     const expectedOutput = adminFlowResponse.value.map(f => ({ ...f, displayName: f.properties.displayName }));
     assert(loggerLogSpy.calledOnceWithExactly(expectedOutput));
   });

@@ -274,7 +274,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowResponseFormatted));
   });
 
@@ -287,7 +287,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName }) });
     assert(loggerLogSpy.calledWith(flowResponseFormattedNoEndTime));
   });
 
@@ -304,7 +304,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, withTrigger: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName, withTrigger: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(flowResponseFormattedIncludingInformation));
   });
 
@@ -332,7 +332,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, withActions: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName, withActions: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(commandResultIncluddingAllActions));
   });
 
@@ -360,7 +360,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, withActions: "Compose", verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName, withActions: "Compose", verbose: true }) });
     assert(loggerLogSpy.calledWith(commandResultIncludingSelectedAction));
   });
 
@@ -388,7 +388,7 @@ describe(commands.RUN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, withActions: "Wrong,Wrong2", verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName, withActions: "Wrong,Wrong2", verbose: true }) });
     assert(loggerLogSpy.calledWith(flowResponseFormattedIncludingActionsBasicInformation));
   });
 
@@ -400,7 +400,7 @@ describe(commands.RUN_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ flowName: flowName, environmentName: environmentName, name: runName }) } as any),
       new CommandError(`Could not find flow '${flowName}'.`));
   });
 

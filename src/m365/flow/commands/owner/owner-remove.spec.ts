@@ -102,7 +102,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -116,7 +116,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -131,7 +131,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupId: groupId, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -145,7 +145,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -174,9 +174,9 @@ describe(commands.OWNER_REMOVE, () => {
     sinon.stub(request, 'post').rejects('POST request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true
-      }
+      })
     }), new CommandError(`Multiple groups with name 'Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -204,7 +204,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -217,12 +217,12 @@ describe(commands.OWNER_REMOVE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userId: userId, force: true }) } as any),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the specified owner from a flow when force option not passed', async () => {
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userName: userName }) });
 
     assert(promptIssued);
   });
@@ -232,7 +232,7 @@ describe(commands.OWNER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userName: userName }) });
     assert(postSpy.notCalled);
   });
 
