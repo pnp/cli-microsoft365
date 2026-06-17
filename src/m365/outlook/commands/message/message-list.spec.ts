@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-list.js';
+import command, { options } from './message-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -21,6 +21,7 @@ describe(commands.MESSAGE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const folderId = 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=';
   const folderName = 'Inbox';
   const startTime = '2023-12-16';
@@ -205,6 +206,7 @@ describe(commands.MESSAGE_LIST, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -256,7 +258,7 @@ describe(commands.MESSAGE_LIST, () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('You must specify either the userId or userName option when using app-only permissions.'));
   });
 
@@ -269,7 +271,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { folderName: 'inbox' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'inbox' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -282,7 +284,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, folderName: 'inbox' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, folderName: 'inbox' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -295,7 +297,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { folderId: 'inbox' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderId: 'inbox' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -317,7 +319,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { folderName: 'SecondInbox' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'SecondInbox' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -330,7 +332,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -343,7 +345,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -356,7 +358,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { startTime: startTime } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ startTime: startTime }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -369,7 +371,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId, endTime: endTime } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, endTime: endTime }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -382,7 +384,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { startTime: startTime, endTime: endTime, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ startTime: startTime, endTime: endTime, userName: userName }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -395,7 +397,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { folderName: 'Imbox' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'Imbox' }) }),
       new CommandError(`Folder with name 'Imbox' not found`));
   });
 
@@ -425,7 +427,7 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { folderName: 'Archives' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'Archives' }) }),
       new CommandError("Multiple folders with name 'Archives' found. Found: AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=, AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=."));
   });
 
@@ -455,7 +457,7 @@ describe(commands.MESSAGE_LIST, () => {
       "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
     });
 
-    await command.action(logger, { options: { folderName: 'Archives' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'Archives' }) });
     assert(loggerLogSpy.calledOnceWith(emailOutput));
   });
 
@@ -468,84 +470,84 @@ describe(commands.MESSAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { folderName: 'inbox', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ folderName: 'inbox', output: 'json' }) });
     assert(loggerLogSpy.calledWith(emailResponse.value));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred'));
   });
 
-  it('passes validation if both start and endTime are valid ISO datetimes', async () => {
-    const actual = await command.validate({ options: { startTime: startTime, endTime: endTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if both start and endTime are valid ISO datetimes', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime, endTime: endTime });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if startTime is not a valid ISO datetime', async () => {
-    const actual = await command.validate({ options: { startTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
   });
 
-  it('fails validation if endTime is not a valid ISO datetime', async () => {
-    const actual = await command.validate({ options: { endTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
   });
 
-  it('fails validation if endTime is in the future', async () => {
+  it('fails validation if startTime is not a valid ISO datetime', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if endTime is not a valid ISO datetime', () => {
+    const actual = commandOptionsSchema.safeParse({ endTime: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if endTime is in the future', () => {
     const endTime = new Date();
     endTime.setHours(endTime.getHours() + 1);
-    const actual = await command.validate({ options: { endTime: endTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ endTime: endTime.toISOString() });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if startTime is in the future', async () => {
+  it('fails validation if startTime is in the future', () => {
     const startTime = new Date();
     startTime.setHours(startTime.getHours() + 1);
-    const actual = await command.validate({ options: { startTime: startTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime.toISOString() });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if endTime is before startTime', async () => {
+  it('fails validation if endTime is before startTime', () => {
     const startTime = new Date();
     const endTime = new Date(startTime);
     endTime.setTime(endTime.getTime() - 1);
-    const actual = await command.validate({ options: { startTime: startTime.toISOString(), endTime: endTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime.toISOString(), endTime: endTime.toISOString() });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both folderId and folderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { folderId: folderId, folderName: folderName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both folderId and folderName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ folderId: folderId, folderName: folderName });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if userName is a valid user principal name', async () => {
-    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 });

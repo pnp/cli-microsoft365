@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-get.js';
+import command, { options } from './message-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_GET, () => {
@@ -77,6 +77,7 @@ describe(commands.MESSAGE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -89,6 +90,7 @@ describe(commands.MESSAGE_GET, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -140,7 +142,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -153,7 +155,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userName: userName }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -166,7 +168,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userId: userId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -179,7 +181,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`Graph error occurred`));
   });
 
@@ -194,7 +196,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userName: userName }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -209,7 +211,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: messageId, userId: userId }) });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -224,7 +226,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId }) }),
       new CommandError(`Graph error occurred`));
   });
 
@@ -239,11 +241,11 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userName }) }),
       new CommandError(`Graph error occurred`));
   });
 
-  it('fails validation if id is empty', async () => {
+  it('fails validation if id is empty', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -251,20 +253,48 @@ describe(commands.MESSAGE_GET, () => {
 
       return defaultValue;
     });
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is filled in', async () => {
-    const actual = await command.validate({ options: { id: messageId } }, commandInfo);
-    assert.equal(actual, true);
+  it('passes validation if id is filled in', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
+  });
+
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
+  });
+
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid-guid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userName: 'invalid-upn' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId, userName: userName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if only userId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('throws an error when the upn or userName is not defined when signed in using app only authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`The option 'userId' or 'userName' is required when retrieving an email using app only credentials`));
   });
 
@@ -272,7 +302,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: options.parse({ id: messageId, userId: userId, userName: userName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using app only credentials`));
   });
 
@@ -280,7 +310,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: options.parse({ id: messageId, userId: userId, userName: userName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be set when retrieving an email using delegated credentials`));
   });
 });
