@@ -1,6 +1,7 @@
 import { Drive } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import GraphCommand from '../../base/GraphCommand.js';
 import { setTimeout } from 'timers/promises';
 import commands from '../commands.js';
@@ -10,21 +11,29 @@ import { urlUtil } from '../../../utils/urlUtil.js';
 import { drive } from '../../../utils/drive.js';
 import { validation } from '../../../utils/validation.js';
 
+const nameConflictBehaviorOptions = ['fail', 'replace', 'rename'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  sourceUrl: z.string().alias('s'),
+  targetUrl: z.string().alias('t'),
+  newName: z.string().optional(),
+  nameConflictBehavior: z.enum(nameConflictBehaviorOptions).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  sourceUrl: string;
-  targetUrl: string;
-  newName?: string;
-  nameConflictBehavior?: string;
-}
-
 class FileMoveCommand extends GraphCommand {
   private pollingInterval: number = 10_000;
-  private readonly nameConflictBehaviorOptions = ['fail', 'replace', 'rename'];
 
   public get name(): string {
     return commands.MOVE;
@@ -34,46 +43,8 @@ class FileMoveCommand extends GraphCommand {
     return 'Moves a file to another location using the Microsoft Graph';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined',
-        sourceUrl: typeof args.options.sourceUrl !== 'undefined',
-        targetUrl: typeof args.options.targetUrl !== 'undefined',
-        newName: typeof args.options.newName !== 'undefined',
-        nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '-s, --sourceUrl <sourceUrl>' },
-      { option: '-t, --targetUrl <targetUrl>' },
-      { option: '--newName [newName]' },
-      { option: '--nameConflictBehavior [nameConflictBehavior]', autocomplete: this.nameConflictBehaviorOptions }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.nameConflictBehavior && this.nameConflictBehaviorOptions.indexOf(args.options.nameConflictBehavior) === -1) {
-          return `${args.options.nameConflictBehavior} is not a valid nameConflictBehavior value. Allowed values: ${this.nameConflictBehaviorOptions.join(', ')}.`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -143,7 +114,7 @@ class FileMoveCommand extends GraphCommand {
       const sourceFileName = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
       const sourceFileExtension = sourceFileName.includes('.') ? sourceFileName.substring(sourceFileName.lastIndexOf('.')) : '';
       const newNameExtension = newName.includes('.') ? newName.substring(newName.lastIndexOf('.')) : '';
-      requestOptions.data.name = newNameExtension ? `${newName.replace(newNameExtension, "")}${sourceFileExtension}` : `${newName}${sourceFileExtension}`;
+      requestOptions.data.name = newNameExtension ? `${newName.replace(newNameExtension, '')}${sourceFileExtension}` : `${newName}${sourceFileExtension}`;
     }
 
     return requestOptions;

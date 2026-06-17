@@ -11,13 +11,14 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './file-list.js';
+import command, { options } from './file-list.js';
 
 describe(commands.LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -460,10 +462,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -1167,11 +1169,11 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs',
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -1875,10 +1877,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/',
         folderUrl: 'DemoDocs/'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -2582,10 +2584,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/',
         folderUrl: '/DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -3289,10 +3291,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'demodocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -3996,10 +3998,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'Demo Docs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -4402,10 +4404,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs/Folder'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=a05f5fb4-6ac7-4ce2-ba39-47376af92b81&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NTQ4MTAuc2hhcmVwb2ludC5jb21AMWIxMWY1MDItOWViMC00MDFhLWIxNjQtNjg5MzNlNmU5NDQzIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjI5Njc4NCIsImV4cCI6IjE2MzYzMDAzODQiLCJlbmRwb2ludHVybCI6ImhaRjR2ZzFOVXZ0cFJ3QmNlUnArMXJZaTVEcVA3SWNUUTVuOHA4aWY2K289IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjIiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpHWm1Nakl3WkdRdE5HVXpOeTAwT1RCaExXRm1NVEl0WWpWallXSTJPVEkxWXpBMSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJORFkxWXprM05UZ3RNREpsWXkwME9UbGxMVGhrTXpJdFptTmhPV0V6TURSaE1UazAiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwiYXBwaWQiOiIzMTM1OWM3Zi1iZDdlLTQ3NWMtODZkYi1mZGI4YzkzNzU0OGUiLCJ0aWQiOiIxYjExZjUwMi05ZWIwLTQwMWEtYjE2NC02ODkzM2U2ZTk0NDMiLCJ1cG4iOiJhZG1pbkBtMzY1eDk1NDgxMC5vbm1pY3Jvc29mdC5jb20iLCJwdWlkIjoiMTAwMzIwMDE1M0Y5NjFBMiIsImNhY2hla2V5IjoiMGguZnxtZW1iZXJzaGlwfDEwMDMyMDAxNTNmOTYxYTJAbGl2ZS5jb20iLCJzY3AiOiJhbGxzaXRlcy5mdWxsY29udHJvbCBncm91cC53cml0ZSBhbGxwcm9maWxlcy53cml0ZSB0ZXJtc3RvcmUud3JpdGUiLCJ0dCI6IjIiLCJ1c2VQZXJzaXN0ZW50Q29va2llIjpudWxsLCJpcGFkZHIiOiIyMC4xOTAuMTYwLjE2NCJ9.VzM1N0l1azFQVWhJSVU5MDJncDBDM29RTFY4RmYySGs5VG02cEdRQUw2RT0&ApiVersion=2.0",
@@ -4574,10 +4576,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: `DemoDocs/Fo'lde'r`
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=88fa8bc8-0eca-40e5-84c6-8d3974384803&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NTQ4MTAuc2hhcmVwb2ludC5jb21AMWIxMWY1MDItOWViMC00MDFhLWIxNjQtNjg5MzNlNmU5NDQzIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjI5NzIzOSIsImV4cCI6IjE2MzYzMDA4MzkiLCJlbmRwb2ludHVybCI6ImJUNlVod0k3TDQ5UEsyY3kxTisvWFlaUm5Ra25ZWGlMeEdxcFhmSk11QzA9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjIiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlkyUTBZekE1TlRrdE1HRTVaQzAwT1RNMUxXRmxZek10TjJObU5tTXdOamRtT1dVeCIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJORFkxWXprM05UZ3RNREpsWXkwME9UbGxMVGhrTXpJdFptTmhPV0V6TURSaE1UazAiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwiYXBwaWQiOiIzMTM1OWM3Zi1iZDdlLTQ3NWMtODZkYi1mZGI4YzkzNzU0OGUiLCJ0aWQiOiIxYjExZjUwMi05ZWIwLTQwMWEtYjE2NC02ODkzM2U2ZTk0NDMiLCJ1cG4iOiJhZG1pbkBtMzY1eDk1NDgxMC5vbm1pY3Jvc29mdC5jb20iLCJwdWlkIjoiMTAwMzIwMDE1M0Y5NjFBMiIsImNhY2hla2V5IjoiMGguZnxtZW1iZXJzaGlwfDEwMDMyMDAxNTNmOTYxYTJAbGl2ZS5jb20iLCJzY3AiOiJhbGxzaXRlcy5mdWxsY29udHJvbCBncm91cC53cml0ZSBhbGxwcm9maWxlcy53cml0ZSB0ZXJtc3RvcmUud3JpdGUiLCJ0dCI6IjIiLCJ1c2VQZXJzaXN0ZW50Q29va2llIjpudWxsLCJpcGFkZHIiOiIyMC4xOTAuMTYwLjk2In0.T0VCSjFjOU1OS05FR2cvUkNrRXdlenhIckxVWDFiRVFxM2VuT2VhdGhMbz0&ApiVersion=2.0",
@@ -4981,10 +4983,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
@@ -5685,10 +5687,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design/',
         folderUrl: 'DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
@@ -6099,10 +6101,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs/Folder'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=77e5e9f4-4731-478e-82ae-6eece079ae8b&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMTY1MiIsImV4cCI6IjE2MzY4MjUyNTIiLCJlbmRwb2ludHVybCI6IlFWaVJuSEVIRWRHNW5vSHhrOUFwQ3lXS3JKa05uL3pFVFhqT3NGWGpmQkE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik1EZzRNV1UyTnpjdE1EUmpOeTAwWVdOaExXRXpZV1V0TWpNeE56WTJaR0UzTkdZeSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.M0xocUpuM3V6RStHbU5NRnBsQTBVK09SU3Jya3o5SmZZU0UyeE9sNTR6cz0&ApiVersion=2.0",
@@ -6539,11 +6541,11 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/',
         folderUrl: '/DemoDocs',
         recursive: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -7318,11 +7320,11 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs',
         recursive: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -8256,11 +8258,11 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs',
         recursive: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -9049,10 +9051,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
@@ -9477,10 +9479,10 @@ describe(commands.LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -9542,10 +9544,10 @@ describe(commands.LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/design',
         folderUrl: 'DemoDocs'
-      }
+      })
     }), new CommandError('Requested site could not be found'));
   });
 
@@ -9593,10 +9595,10 @@ describe(commands.LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs'
-      }
+      })
     }), new CommandError(`Document library 'DemoDocs' not found`));
   });
 
@@ -9644,10 +9646,10 @@ describe(commands.LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/',
         folderUrl: 'DemoDocs'
-      }
+      })
     }), new CommandError(`Document library 'DemoDocs' not found`));
   });
 
@@ -9707,10 +9709,10 @@ describe(commands.LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs/Fodler'
-      }
+      })
     }), new CommandError('The resource could not be found.'));
   });
 
@@ -9770,30 +9772,26 @@ describe(commands.LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: 'DemoDocs/Folder/Subfolder'
-      }
+      })
     }), new CommandError('The resource could not be found.'));
   });
 
   it(`fails validation if the specified webUrl is invalid`, async () => {
-    const actual = await command.validate({
-      options: {
-        folderUrl: '/Shared Documents',
-        webUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      folderUrl: '/Shared Documents',
+      webUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`passes validation if the target file is a URL`, async () => {
-    const actual = await command.validate({
-      options: {
-        folderUrl: 'Shared Documents',
-        webUrl: 'https://contoso.sharepoint.com/Shared Documents'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      folderUrl: 'Shared Documents',
+      webUrl: 'https://contoso.sharepoint.com/Shared Documents'
+    });
+    assert.strictEqual(actual.success, true);
   });
 });
