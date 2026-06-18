@@ -267,6 +267,7 @@ it('supports specifying id', () => {
 
 **ALWAYS add these tests:**
 
+For commands that reject unknown options:
 ```typescript
 it('fails validation with unknown options', () => {
   const actual = commandOptionsSchema.safeParse({
@@ -275,7 +276,6 @@ it('fails validation with unknown options', () => {
   });
   assert.strictEqual(actual.success, false);
 });
-```
 
 For commands where all specific options are optional:
 ```typescript
