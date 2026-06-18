@@ -17,7 +17,7 @@ Migrate a CLI for Microsoft 365 command from the legacy `#initOptions()`/`#initV
 1. Read the command source file (`.ts`) and its test file (`.spec.ts`)
 2. Identify: options, aliases, validators, telemetry, option sets, types
 3. Check if the command has `autocomplete` values on any options
-4. Check if the command uses `@meid`/`@meusername` tokens in any GUID/UPN fields
+4. Check whether any command option representing a GUID or UPN accepts the runtime tokens `@meid` or `@meusername`
 
 ## Procedure
 
