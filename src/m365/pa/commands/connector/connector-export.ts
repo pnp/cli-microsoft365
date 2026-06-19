@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
@@ -9,14 +10,17 @@ import flowCommands from '../../../flow/commands.js';
 import commands from '../../commands.js';
 import { Connector } from './Connector.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  name: z.string().alias('n'),
+  outputFolder: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  environmentName: string;
-  outputFolder?: string;
 }
 
 class PaConnectorExportCommand extends PowerAppsCommand {
@@ -32,52 +36,18 @@ class PaConnectorExportCommand extends PowerAppsCommand {
     return [flowCommands.CONNECTOR_EXPORT];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        outputFolder: typeof args.options.outputFolder !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.outputFolder || fs.existsSync(path.resolve(opts.outputFolder)), {
+        message: `Specified output folder doesn't exist.`
+      })
+      .refine(opts => !fs.existsSync(path.resolve(opts.outputFolder || '.', opts.name)), {
+        message: 'Connector output folder already exists.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--outputFolder [outputFolder]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.outputFolder &&
-          !fs.existsSync(path.resolve(args.options.outputFolder))) {
-          return `Specified output folder ${args.options.outputFolder} doesn't exist`;
-        }
-
-        const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.name);
-        if (fs.existsSync(outputFolder)) {
-          return `Connector output folder ${outputFolder} already exists`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

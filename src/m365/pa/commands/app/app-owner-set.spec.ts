@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-owner-set.js';
+import command, { options } from './app-owner-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
@@ -20,6 +20,7 @@ describe(commands.APP_OWNER_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const validEnvironmentName: string = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
   const validAppName: string = '784670e6-199a-4993-ae13-4b6747a0cd5d';
@@ -212,6 +213,7 @@ describe(commands.APP_OWNER_SET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -250,7 +252,7 @@ describe(commands.APP_OWNER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userId or userName not specified', async () => {
+  it('fails validation if userId or userName not specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -259,11 +261,11 @@ describe(commands.APP_OWNER_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userId and userName are both specified', async () => {
+  it('fails validation if userId and userName are both specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -272,48 +274,53 @@ describe(commands.APP_OWNER_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, userName: validUserName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, userName: validUserName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appName is not a GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: 'invalid', userId: validUserId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appName is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: 'invalid', userId: validUserId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if appName is a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if appName is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userName: validUserName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userName: validUserName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if roleForOldAppOwner is not a valid role', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if roleForOldAppOwner is not a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if roleForOldAppOwner is a valid role', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if roleForOldAppOwner is a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('sets a new Power Apps app owner using userName', async () => {
@@ -336,7 +343,7 @@ describe(commands.APP_OWNER_SET, () => {
       roleForOldAppOwner: undefined
     };
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, appName: validAppName, userName: validUserName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, appName: validAppName, userName: validUserName }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -352,7 +359,7 @@ describe(commands.APP_OWNER_SET, () => {
       roleForOldAppOwner: undefined
     };
 
-    await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -368,7 +375,7 @@ describe(commands.APP_OWNER_SET, () => {
       roleForOldAppOwner: 'CanView'
     };
 
-    await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -384,7 +391,7 @@ describe(commands.APP_OWNER_SET, () => {
       roleForOldAppOwner: 'CanEdit'
     };
 
-    await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanEdit' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanEdit' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
