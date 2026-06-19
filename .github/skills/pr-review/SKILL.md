@@ -51,7 +51,6 @@ Walk through each applicable item in the checklist and verify it against the dif
 - **`optionSet`** for mutually exclusive options (no custom validation).
 - **`GetFileByServerRelativePath`/`GetFolderByServerRelativePath`** in `spo` commands (not `...Url` variants).
 - **No `any` types**, no commented-out code.
-- **No PII in telemetry**.
 - **User input escaped** in XML and URLs.
 - **Bug fixes** include a test for the fixed case.
 - **Documentation** included where needed.
@@ -72,6 +71,22 @@ Check test files (`.spec.ts`) for:
 - Coverage of happy path and error cases.
 - Proper use of mocks and assertions.
 - Tests that actually verify behavior (not just that code runs).
+
+#### D. Documentation Quality
+
+Check documentation files (`.mdx`) for:
+
+- Every command needs a reference page at `docs/docs/cmd/<workload>/<command-name>.mdx`.
+- The `.mdx` file name matches the command file name.
+- Must include: title, description, usage, options table, examples, permissions, and response. A remarks section can be used for additional information, but is not mandatory.
+- When a command has a response, include sample output for all four output formats: JSON, Markdown, text, and CSV.
+- Include at least 2 examples for the examples section, covering different option combinations.
+- Import and use `<Global />` for standard CLI options.
+- Examples should use `m365` prefix and long option names (not short aliases).
+- Document the minimum required permissions that allow success with any option combination.
+- Docs must build without warnings.
+- When importing components in the docs, use absolute imports from `@site/src/components/` instead of relative paths.
+- When importing global options in the docs, use a relative import from `../_global.mdx`.
 
 ### Phase 3: Present Findings
 
@@ -176,3 +191,11 @@ If the PR has zero issues, the summary should simply acknowledge the quality of 
 ### Reference Files
 
 - **`references/pr-checklist.md`** — Full PR checklist with all items organized by category (General, Coding Standards, Documentation).
+
+### Reference Commands
+
+When providing feedback, point contributors to well-implemented commands as examples. Use these as reference implementations:
+
+- **`src/m365/spo/commands/list/list-list.ts`** — Example of a list command with `defaultProperties` and proper text output.
+- **`src/m365/spo/commands/web/web-get.ts`** — Example of a get command with verbose logging and proper error handling.
+- **`src/m365/entra/commands/user/user-get.ts`** — Example of a command using Zod schema validation.
