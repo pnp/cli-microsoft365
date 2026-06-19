@@ -17,7 +17,6 @@
 - The command class is named following the pattern `[Service][Command]Command`. For example, `SpoWebRemoveCommand`.
 - Verify the command works as expected.
 - List commands must have readable output in `text` mode, with each item fitting in one row of 130 characters preferably.
-- Command telemetry must not track Personally Identifiable Information (PII).
 - Avoid commented-out code and usage of `any` types, preferring specific types.
 - Remove commands should include a `force` option.
 - For bug fixes, include a test for the fixed use case.
@@ -29,7 +28,7 @@
 - For commands with multiple options where the user is required to choose one, define these options using an `optionSet` without specific validation logic in the command's validate method.
 - Use `async/await` instead of `promise/then`.
 - When working with `spo` commands, use `GetFileByServerRelativePath` and `GetFolderByServerRelativePath` API endpoint instead of `GetFileByServerRelativeUrl` and `GetFolderByServerRelativeUrl`.
-- All tests must pass.
+- `npm test` must pass without errors.
 
 ## Documentation
 
