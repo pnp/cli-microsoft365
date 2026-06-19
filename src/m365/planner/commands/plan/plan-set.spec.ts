@@ -173,6 +173,11 @@ describe(commands.PLAN_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
+  });
+
   it('fails validation if the ownerGroupId is not a valid guid.', () => {
     const actual = commandOptionsSchema.safeParse({
       title: title,
