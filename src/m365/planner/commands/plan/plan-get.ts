@@ -1,6 +1,7 @@
 import { PlannerPlan, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { planner } from '../../../../utils/planner.js';
@@ -8,16 +9,23 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  rosterId: z.string().optional(),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  rosterId?: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
 }
 
 class PlannerPlanGetCommand extends GraphCommand {
@@ -29,76 +37,26 @@ class PlannerPlanGetCommand extends GraphCommand {
     return 'Get a Microsoft Planner plan';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined',
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title, opts.rosterId].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'id', 'title' or 'rosterId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'rosterId']
+        }
+      })
+      .refine(opts => !opts.title || [opts.ownerGroupId, opts.ownerGroupName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId' or 'ownerGroupName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerGroupId', 'ownerGroupName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--rosterId [rosterId]'
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['id', 'title', 'rosterId']
-      },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.title !== undefined;
-        }
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

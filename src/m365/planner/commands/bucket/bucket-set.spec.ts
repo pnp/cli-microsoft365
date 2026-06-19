@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './bucket-set.js';
+import command, { options } from './bucket-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUCKET_SET, () => {
@@ -98,6 +98,7 @@ describe(commands.BUCKET_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -110,6 +111,7 @@ describe(commands.BUCKET_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -158,100 +160,97 @@ describe(commands.BUCKET_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation id when id and plan details are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        planId: validPlanId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation id when id and plan details are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      planId: validPlanId,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when owner group id is not a guid', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when owner group id is not a guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupId: invalidOwnerGroupId,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when plan id is used with owner group name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when plan id is used with owner group name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planId: validPlanId,
+      ownerGroupName: validOwnerGroupName,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when plan id is used with owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when plan id is used with owner group id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planId: validPlanId,
+      ownerGroupId: validOwnerGroupId,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when roster id is used with owner group name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when roster id is used with owner group name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      rosterId: validRosterId,
+      ownerGroupName: validOwnerGroupName,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when roster id is used with owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when roster id is used with owner group id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      rosterId: validRosterId,
+      ownerGroupId: validOwnerGroupId,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when new name or order hint is not specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when new name or order hint is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        newName: 'New name'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      newName: 'New name',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        newName: 'New name'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct input with name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName,
+      newName: 'New name'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when no groups found', async () => {
@@ -264,11 +263,12 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
+        ownerGroupName: validOwnerGroupName,
+        newName: 'New name'
+      })
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
 
@@ -291,11 +291,12 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
+        ownerGroupName: validOwnerGroupName,
+        newName: 'New name'
+      })
     }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -310,10 +311,11 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
-        planId: validPlanId
-      }
+        planId: validPlanId,
+        newName: 'New name'
+      })
     }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
@@ -336,10 +338,11 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
-        planId: validPlanId
-      }
+        planId: validPlanId,
+        newName: 'New name'
+      })
     }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
@@ -369,13 +372,13 @@ describe(commands.BUCKET_SET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         newName: 'New bucket name',
         orderHint: validOrderHint
-      }
+      })
     }));
   });
 
@@ -396,10 +399,10 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validBucketId,
         newName: validBucketName
-      }
+      })
     }));
   });
 
@@ -426,13 +429,13 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         newName: 'New bucket name',
         orderHint: validOrderHint
-      }
+      })
     }));
   });
 
@@ -457,12 +460,12 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         rosterId: validRosterId,
         newName: 'New bucket name',
         orderHint: validOrderHint
-      }
+      })
     });
 
     assert(patchStub.called);
@@ -488,14 +491,14 @@ describe(commands.BUCKET_SET, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         newName: 'New bucket name',
         orderHint: validOrderHint,
         verbose: true
-      }
+      })
     }));
   });
 });

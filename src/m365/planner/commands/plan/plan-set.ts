@@ -1,6 +1,7 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,19 +10,34 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional(),
+  rosterId: z.string().optional(),
+  newTitle: z.string().optional(),
+  shareWithUserIds: z.string()
+    .refine(val => validation.isValidGuidArray(val) === true, {
+      message: 'The value contains invalid GUIDs.'
+    })
+    .optional(),
+  shareWithUserNames: z.string()
+    .refine(val => validation.isValidUserPrincipalNameArray(val) === true, {
+      message: 'The value contains invalid user principal names.'
+    })
+    .optional()
+}).catchall(z.unknown());
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
-  rosterId?: string;
-  newTitle?: string;
-  shareWithUserIds?: string;
-  shareWithUserNames?: string;
 }
 
 class PlannerPlanSetCommand extends GraphCommand {
@@ -33,146 +49,40 @@ class PlannerPlanSetCommand extends GraphCommand {
     return 'Updates a Microsoft Planner plan';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined',
-        newTitle: typeof args.options.newTitle !== 'undefined',
-        shareWithUserIds: typeof args.options.shareWithUserIds !== 'undefined',
-        shareWithUserNames: typeof args.options.shareWithUserNames !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title, opts.rosterId].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'id', 'title' or 'rosterId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'rosterId']
+        }
+      })
+      .refine(opts => !opts.title || [opts.ownerGroupId, opts.ownerGroupName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId' or 'ownerGroupName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerGroupId', 'ownerGroupName']
+        }
+      })
+      .refine(opts => !opts.shareWithUserIds || !opts.shareWithUserNames, {
+        message: 'Specify either shareWithUserIds or shareWithUserNames but not both'
+      })
+      .refine(opts => {
+        const allowedCategories: string[] = Array.from({ length: 25 }, (_, i) => `category${i + 1}`);
+        const keys = Object.keys(opts);
+        const hasCategoryKey = keys.some(key => key.indexOf('category') !== -1);
+        if (!hasCategoryKey) {
+          return true;
+        }
+        return keys.filter(key => key.indexOf('category') !== -1).every(key => allowedCategories.indexOf(key) !== -1);
+      }, {
+        message: 'Specify category values between category1 to category25'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--rosterId [rosterId]'
-      },
-      {
-        option: '--newTitle [newTitle]'
-      },
-      {
-        option: '--shareWithUserIds [shareWithUserIds]'
-      },
-      {
-        option: '--shareWithUserNames [shareWithUserNames]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.title) {
-          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-            return `${args.options.ownerGroupId} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.shareWithUserIds && args.options.shareWithUserNames) {
-          return 'Specify either shareWithUserIds or shareWithUserNames but not both';
-        }
-
-        if (args.options.shareWithUserIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.shareWithUserIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'shareWithUserIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.shareWithUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.shareWithUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'shareWithUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        const allowedCategories: string[] = [
-          'category1',
-          'category2',
-          'category3',
-          'category4',
-          'category5',
-          'category6',
-          'category7',
-          'category8',
-          'category9',
-          'category10',
-          'category11',
-          'category12',
-          'category13',
-          'category14',
-          'category15',
-          'category16',
-          'category17',
-          'category18',
-          'category19',
-          'category20',
-          'category21',
-          'category22',
-          'category23',
-          'category24',
-          'category25'
-        ];
-
-        let invalidCategoryOptions: boolean = false;
-        Object.keys(args.options).forEach(key => {
-          if (key.indexOf('category') !== -1 && allowedCategories.indexOf(key) === -1) {
-            invalidCategoryOptions = true;
-          }
-        });
-
-        if (invalidCategoryOptions) {
-          return 'Specify category values between category1 to category25';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['id', 'title', 'rosterId']
-      },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.title !== undefined;
-        }
-      });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName', 'rosterId', 'newTitle', 'shareWithUserIds', 'shareWithUserNames');
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -299,7 +209,7 @@ class PlannerPlanSetCommand extends GraphCommand {
 
     Object.keys(options).forEach(key => {
       if (key.indexOf('category') !== -1) {
-        categories[key] = options[key];
+        categories[key] = (options as any)[key];
         categoriesCount++;
       }
     });

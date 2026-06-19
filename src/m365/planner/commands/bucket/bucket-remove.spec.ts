@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './bucket-remove.js';
+import command, { options } from './bucket-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUCKET_REMOVE, () => {
@@ -97,6 +97,7 @@ describe(commands.BUCKET_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -110,6 +111,7 @@ describe(commands.BUCKET_REMOVE, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -164,98 +166,89 @@ describe(commands.BUCKET_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation id when id and plan details are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        planId: validPlanId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation id when id and plan details are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      planId: validPlanId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when owner group id is not a guid', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when owner group id is not a guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupId: invalidOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when plan id is used with owner group name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when plan id is used with owner group name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planId: validPlanId,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when plan id is used with owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when plan id is used with owner group id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planId: validPlanId,
+      ownerGroupId: validOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when roster id is used with owner group name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when roster id is used with owner group name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      rosterId: validRosterId,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when roster id is used with owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when roster id is used with owner group id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      rosterId: validRosterId,
+      ownerGroupId: validOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with name', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct input with name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified bucket when force option not passed with id', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validBucketId
-      }
+      })
     });
-
 
     assert(promptIssued);
   });
@@ -263,9 +256,9 @@ describe(commands.BUCKET_REMOVE, () => {
   it('aborts removing the specified bucket when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validBucketId
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -280,12 +273,12 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         force: true
-      }
+      })
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
 
@@ -307,12 +300,12 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         force: true
-      }
+      })
     }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -326,11 +319,11 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planId: validPlanId,
         force: true
-      }
+      })
     }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
@@ -352,11 +345,11 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planId: validPlanId,
         force: true
-      }
+      })
     }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
@@ -387,11 +380,11 @@ describe(commands.BUCKET_REMOVE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     }));
   });
 
@@ -412,10 +405,10 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validBucketId,
         force: true
-      }
+      })
     }));
   });
 
@@ -442,12 +435,12 @@ describe(commands.BUCKET_REMOVE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         force: true
-      }
+      })
     }));
   });
 
@@ -474,10 +467,10 @@ describe(commands.BUCKET_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         rosterId: validRosterId
-      }
+      })
     });
 
     assert(deleteStub.called);
@@ -505,12 +498,12 @@ describe(commands.BUCKET_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         verbose: true
-      }
+      })
     }));
   });
 });
