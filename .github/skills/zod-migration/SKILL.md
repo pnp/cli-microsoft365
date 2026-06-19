@@ -276,6 +276,7 @@ it('fails validation with unknown options', () => {
   });
   assert.strictEqual(actual.success, false);
 });
+```
 
 For commands where all specific options are optional:
 ```typescript
