@@ -166,7 +166,7 @@ describe(commands.BUCKET_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation id when id and plan details are specified', () => {
+  it('fails validation when id and plan details are specified', () => {
     const actual = commandOptionsSchema.safeParse({
       id: validBucketId,
       planId: validPlanId
