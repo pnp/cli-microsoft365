@@ -25,7 +25,7 @@
 - Escape user input in XML and URLs.
 - Verbose and debug outputs are logged to stdErr (`logger.logToStderr` instead of `logger.log`).
 - Do not do conditional output in JSON output mode; use `defaultProperties` for defining default properties.
-- For commands with multiple options where the user is required to choose one, define these options using an `optionSet` without specific validation logic in the command's validate method.
+- For commands with multiple options where the user is required to choose one, define these options using a custom Zod validation.
 - Use `async/await` instead of `promise/then`.
 - When working with `spo` commands, use `GetFileByServerRelativePath` and `GetFolderByServerRelativePath` API endpoint instead of `GetFileByServerRelativeUrl` and `GetFolderByServerRelativeUrl`.
 - `npm test` must pass without errors.

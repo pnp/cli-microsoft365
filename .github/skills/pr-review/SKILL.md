@@ -48,7 +48,7 @@ Walk through each applicable item in the checklist and verify it against the dif
 - **`handleRejectedODataJsonPromise`** when `responseType: 'json'` is used.
 - **`logger.logToStderr`** for verbose/debug output (not `logger.log`).
 - **`defaultProperties`** instead of conditional JSON output.
-- **`optionSet`** for mutually exclusive options (no custom validation).
+- **Custom Zod validation** for mutually exclusive options.
 - **`GetFileByServerRelativePath`/`GetFolderByServerRelativePath`** in `spo` commands (not `...Url` variants).
 - **No `any` types**, no commented-out code.
 - **User input escaped** in XML and URLs.
@@ -71,6 +71,8 @@ Check test files (`.spec.ts`) for:
 - Coverage of happy path and error cases.
 - Proper use of mocks and assertions.
 - Tests that actually verify behavior (not just that code runs).
+- Tests for command name, description not being `null`, and schema validation.
+- Use `sinon.restore()` in `after()` to reset stubs/spies.
 
 #### D. Documentation Quality
 
