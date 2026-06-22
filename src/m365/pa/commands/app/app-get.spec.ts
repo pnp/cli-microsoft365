@@ -718,11 +718,11 @@ describe(commands.APP_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         displayName: 'NoAppFound'
-      }
-    } as any), new CommandError(`No app found with displayName 'NoAppFound'.`));
+      })
+    }), new CommandError(`No app found with displayName 'NoAppFound'.`));
   });
 
   it('correctly handles no apps found using displayName (debug)', async () => {
@@ -734,11 +734,11 @@ describe(commands.APP_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         displayName: 'Playwright'
-      }
-    } as any), new CommandError('No apps found.'));
+      })
+    }), new CommandError('No apps found.'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -753,7 +753,7 @@ describe(commands.APP_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' }) }),
       new CommandError('An error has occurred'));
   });
 

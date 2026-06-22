@@ -3450,7 +3450,7 @@ describe(commands.APP_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred'));
   });
 

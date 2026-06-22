@@ -184,12 +184,12 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: environmentName,
         name: name,
         bypass: true,
         force: true
-      }
-    } as any), new CommandError(error.error.message));
+      })
+    }), new CommandError(error.error.message));
   });
 });

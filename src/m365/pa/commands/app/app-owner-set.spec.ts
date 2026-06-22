@@ -405,7 +405,7 @@ describe(commands.APP_OWNER_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, appName: validAppName, userId: validUserId }) }),
       new CommandError(errorMessage));
   });
 });
