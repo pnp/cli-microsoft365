@@ -46,12 +46,12 @@ Walk through each applicable item in the checklist and verify it against the dif
 - **`force` option** on remove commands.
 - **`async/await`** instead of `promise/then`.
 - **`handleRejectedODataJsonPromise`** when `responseType: 'json'` is used.
-- **`logger.logToStderr`** for verbose/debug output (not `logger.log`).
-- **`defaultProperties`** instead of conditional JSON output.
+- **`defaultProperties`** in list commands instead of conditional JSON output.
 - **Custom Zod validation** for mutually exclusive options.
+- **Verbose logging**: Every command should include at least one verbose log message that provides useful execution context.
+- **User input escaped** in XML and URLs using `formatting.encodeQueryParameter()` or `formatting.escapeXml()`.
 - **`GetFileByServerRelativePath`/`GetFolderByServerRelativePath`** in `spo` commands (not `...Url` variants).
 - **No `any` types**, no commented-out code.
-- **User input escaped** in XML and URLs.
 - **Bug fixes** include a test for the fixed case.
 - **Documentation** included where needed.
 

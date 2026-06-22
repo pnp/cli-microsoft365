@@ -22,9 +22,9 @@
 - For bug fixes, include a test for the fixed use case.
 - Avoid unnecessary retrieval of form digest.
 - Handle failed promises properly when `responseType: 'json'` is used by using `handleRejectedODataJsonPromise`.
-- Escape user input in XML and URLs.
+- Escape user input in XML and URLs using `formatting.encodeQueryParameter()` or `formatting.escapeXml()`.
 - Verbose and debug outputs are logged to stdErr (`logger.logToStderr` instead of `logger.log`).
-- Do not do conditional output in JSON output mode; use `defaultProperties` for defining default properties.
+- Do not do conditional output in JSON output mode; use `defaultProperties` for defining default properties in list commands.
 - For commands with multiple options where the user is required to choose one, define these options using a custom Zod validation.
 - Use `async/await` instead of `promise/then`.
 - When working with `spo` commands, use `GetFileByServerRelativePath` and `GetFolderByServerRelativePath` API endpoint instead of `GetFileByServerRelativeUrl` and `GetFolderByServerRelativeUrl`.
@@ -37,5 +37,5 @@
 - Start all code samples with `m365`.
 - Ensure samples use long names of options rather than short ones.
 - Include the marker to incorporate global options rather than listing them explicitly.
-- Check for no warnings when building docs (lines that begin with `WARNING - `).
 - If there is an option modifying the output, include responses for both default and modified output.
+- For a command page, ensure it includes the following sections: title, description, usage, options, examples, permissions, and response. In some cases a remarks section is also allowed.
