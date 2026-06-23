@@ -94,6 +94,11 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if multiple targeting options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '2609af39-7775-4f94-a3dc-0dd67657e900', groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(request, 'get').resolves([]);
 

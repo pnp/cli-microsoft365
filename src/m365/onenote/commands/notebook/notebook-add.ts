@@ -13,7 +13,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   name: z.string()
     .refine(name => name.length <= 128, {
-      error: 'The specified name is too long. It should be less than 128 characters.'
+      error: 'The specified name is too long. It should be at most 128 characters.'
     })
     .refine(name => !/[?*/:<>|'"]/.test(name), {
       error: `The specified name contains invalid characters. It cannot contain ?*/:<>|'". Please remove them and try again.`
@@ -57,7 +57,11 @@ class OneNoteNotebookAddCommand extends GraphDelegatedCommand {
         const defined = opts.filter(item => item !== undefined);
         return defined.length <= 1;
       }, {
-        error: 'Specify userId, userName, groupId, groupName, or webUrl, but not multiple.'
+        error: 'Specify userId, userName, groupId, groupName, or webUrl, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName', 'webUrl']
+        }
       });
   }
 

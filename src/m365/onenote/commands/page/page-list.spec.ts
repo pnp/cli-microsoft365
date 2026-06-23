@@ -163,6 +163,11 @@ describe(commands.PAGE_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if multiple targeting options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '0e38b3b3-d9ac-42fa-81db-437ac8caec2f', groupId: 'bba4c915-0ac8-47a1-bd05-087a44c92d3b' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(odata, 'getAllItems').resolves([]);
 

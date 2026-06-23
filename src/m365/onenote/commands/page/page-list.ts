@@ -51,7 +51,11 @@ class OneNotePageListCommand extends GraphDelegatedCommand {
         const defined = opts.filter(item => item !== undefined);
         return defined.length <= 1;
       }, {
-        error: 'Specify userId, userName, groupId, groupName, or webUrl, but not multiple.'
+        error: 'Specify userId, userName, groupId, groupName, or webUrl, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName', 'webUrl']
+        }
       });
   }
 
