@@ -7,7 +7,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { SiteClassificationSettings } from './SiteClassificationSettings.js';
 
-export const options = globalOptionsZod;
+export const options = globalOptionsZod.strict();
 
 class EntraSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
@@ -18,7 +18,7 @@ class EntraSiteClassificationGetCommand extends GraphCommand {
     return 'Gets site classification configuration';
   }
 
-  public get schema(): z.ZodType | undefined {
+  public get schema(): z.ZodTypeAny | undefined {
     return options;
   }
 
