@@ -33,19 +33,19 @@ export const options = z.looseObject({
     .optional(),
   ownerIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid for option 'ownerIds': ${e.input}.`
+      error: e => `The following GUIDs are invalid for option 'ownerIds': ${validation.isValidGuidArray(e.input as string)}.`
     }).optional(),
   ownerUserNames: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
-      error: e => `The following user principal names are invalid for option 'ownerUserNames': ${e.input}.`
+      error: e => `The following user principal names are invalid for option 'ownerUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
     }).optional(),
   memberIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid for option 'memberIds': ${e.input}.`
+      error: e => `The following GUIDs are invalid for option 'memberIds': ${validation.isValidGuidArray(e.input as string)}.`
     }).optional(),
   memberUserNames: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
-      error: e => `The following user principal names are invalid for option 'memberUserNames': ${e.input}.`
+      error: e => `The following user principal names are invalid for option 'memberUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
     }).optional(),
   visibility: zod.coercedEnum(VisibilityEnum).optional()
 });

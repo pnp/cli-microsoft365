@@ -20,11 +20,11 @@ export const options = z.strictObject({
   groupName: z.string().optional().alias('n'),
   userIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid for the option 'userIds': ${e.input}.`
+      error: e => `The following GUIDs are invalid for the option 'userIds': ${validation.isValidGuidArray(e.input as string)}.`
     }).optional(),
   userNames: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
-      error: e => `User principal name '${e.input}' is invalid for option 'userNames'.`
+      error: e => `User principal name '${validation.isValidUserPrincipalNameArray(e.input as string)}' is invalid for option 'userNames'.`
     }).optional(),
   role: zod.coercedEnum(RoleEnum).alias('r')
 });

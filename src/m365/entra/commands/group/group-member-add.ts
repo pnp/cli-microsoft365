@@ -20,15 +20,15 @@ export const options = z.strictObject({
   groupName: z.string().optional().alias('n'),
   userIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid for the option 'userIds': ${e.input}.`
+      error: e => `The following GUIDs are invalid for the option 'userIds': ${validation.isValidGuidArray(e.input as string)}.`
     }).optional(),
   userNames: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
-      error: e => `The following user principal names are invalid for the option 'userNames': ${e.input}.`
+      error: e => `The following user principal names are invalid for the option 'userNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
     }).optional(),
   subgroupIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid for the option 'subgroupIds': ${e.input}.`
+      error: e => `The following GUIDs are invalid for the option 'subgroupIds': ${validation.isValidGuidArray(e.input as string)}.`
     }).optional(),
   subgroupNames: z.string().optional(),
   role: zod.coercedEnum(RoleEnum).alias('r')
