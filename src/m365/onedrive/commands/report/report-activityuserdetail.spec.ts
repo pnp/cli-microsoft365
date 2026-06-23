@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -18,7 +17,7 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let commandOptionsSchema: z.ZodType;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,7 +26,7 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    commandOptionsSchema = commandInfo.command.getSchemaToParse()!;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -109,7 +108,7 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: options.parse({ period: 'D7' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOneDriveActivityUserDetail(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -123,7 +122,7 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: options.parse({ date: '2019-07-13' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ date: '2019-07-13' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOneDriveActivityUserDetail(date=2019-07-13)");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -131,6 +130,6 @@ describe(commands.REPORT_ACTIVITYUSERDETAIL, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: options.parse({ period: 'D7' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) }), new CommandError('An error has occurred'));
   });
 });
