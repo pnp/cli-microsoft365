@@ -109,7 +109,7 @@ describe(commands.GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));
   });
 
@@ -124,7 +124,7 @@ describe(commands.GROUP_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(groupResponse);
 
-    await command.action(logger, { options: { displayName: validDisplayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: validDisplayName }) });
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));
   });
 
@@ -132,7 +132,7 @@ describe(commands.GROUP_GET, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) }), new CommandError(errorMessage));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

@@ -308,7 +308,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365' }) });
     assert(loggerLogSpy.calledWith(microsoft365Group));
   });
 
@@ -321,7 +321,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       displayName: 'Microsoft 365 Group',
       description: 'Microsoft 365 group',
@@ -343,7 +343,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Security Group', description: 'Security Group', mailNickname: 'SecurityGroup', type: 'security' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Security Group', description: 'Security Group', mailNickname: 'SecurityGroup', type: 'security' }) });
     assert(loggerLogSpy.calledWith(securityGroup));
   });
 
@@ -365,7 +365,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addOwnersRequest);
   });
 
@@ -387,7 +387,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', memberIds: userIds.join(',') } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', memberIds: userIds.join(',') }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addMembersRequest);
   });
 
@@ -411,7 +411,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerUserNames: userUpns.join(',') } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerUserNames: userUpns.join(',') }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addOwnersRequest);
   });
 
@@ -435,7 +435,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', memberUserNames: userUpns.join(','), verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', memberUserNames: userUpns.join(','), verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, addMembersRequest);
   });
 
@@ -449,7 +449,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', visibility: 'Public', type: 'microsoft365' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', visibility: 'Public', type: 'microsoft365' }) });
     assert(loggerLogSpy.calledWith(groupWithGeneratedMailNickname));
   });
 
@@ -483,7 +483,7 @@ describe(commands.GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
@@ -499,7 +499,7 @@ describe(commands.GROUP_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Microsoft 365 Group', description: 'Microsoft 365 group', mailNickname: 'Microsoft365Group', visibility: 'Public', type: 'microsoft365', ownerIds: userIds.join(',') }) }),
       new CommandError('Invalid request'));
   });
 });

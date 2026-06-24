@@ -154,7 +154,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -221,7 +221,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
     });
 
     const ids = userIds.map(id => id + ' ').join(',');
-    await command.action(logger, { options: { groupId: groupId, userIds: ids, role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: ids, role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -291,7 +291,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -361,7 +361,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
     });
 
     const userNames = userUpns.map(u => ' ' + u).join(',');
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data.requests, [
       {
         id: 1,
@@ -411,7 +411,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member' }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
@@ -452,7 +452,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member' }) }),
       new CommandError('Service unavailable.'));
   });
 
@@ -511,7 +511,7 @@ describe(commands.GROUP_MEMBER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member' }) }),
       new CommandError('Service unavailable.'));
   });
 });

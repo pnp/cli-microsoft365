@@ -132,7 +132,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   it('prompts before removing the specified users when confirm option not passed', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { groupName: 'IT department', subgroupNames: groupNames.join(','), role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'IT department', subgroupNames: groupNames.join(','), role: 'Member' }) });
 
     assert(confirmationStub.calledOnce);
   });
@@ -142,7 +142,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     const postSpy = sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(',') } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(',') }) });
     assert(postSpy.notCalled);
   });
 
@@ -162,7 +162,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -185,7 +185,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.map(i => i + ' ').join(','), force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.map(i => i + ' ').join(','), force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -213,7 +213,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: upns.join(','), verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: upns.join(','), verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -239,7 +239,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: upns.map(u => + ' ' + u).join(','), force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: upns.map(u => + ' ' + u).join(','), force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -262,7 +262,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Owner', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Owner', force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 10 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -288,7 +288,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: upns.join(','), role: 'Member', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: upns.join(','), role: 'Member', force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 10 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -311,7 +311,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, subgroupIds: groupIds.join(','), role: 'Member', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, subgroupIds: groupIds.join(','), role: 'Member', force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 3 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -338,7 +338,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, subgroupNames: groupNames.join(','), role: 'Member', force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, subgroupNames: groupNames.join(','), role: 'Member', force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, Array.from({ length: 3 }, (_, index) => ({
       id: index + 1,
       method: 'DELETE',
@@ -376,7 +376,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), force: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), force: true, verbose: true }) }),
       new CommandError(errorMessage));
   });
 
@@ -409,7 +409,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), suppressNotFound: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), suppressNotFound: true, force: true, verbose: true }) });
     assert(postStub.calledOnce);
   });
 });

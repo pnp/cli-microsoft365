@@ -121,7 +121,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: groupId }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -165,7 +165,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupName: groupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupName: groupName }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -197,7 +197,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, role: "Owner" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -233,9 +233,9 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         groupName: groupName
-      }
+      })
     }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -261,7 +261,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
 
-    await command.action(logger, { options: { groupName: groupName, role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName, role: "Owner" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -288,7 +288,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, role: "Member" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, role: "Member" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -331,7 +331,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, properties: "displayName,mail,memberof/id,memberof/displayName" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, properties: "displayName,mail,memberof/id,memberof/displayName" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"] },
@@ -358,7 +358,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, filter: "userType eq 'Guest'" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, filter: "userType eq 'Guest'" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -393,7 +393,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, groupId: groupId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: groupId }) }),
       new CommandError(error.error.message));
   });
 });
