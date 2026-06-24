@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-list.js';
+import command, { options } from './group-list.js';
 
 describe(commands.GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.GROUP_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,21 +71,17 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('fails validation when invalid type specified', async () => {
-    const actual = await command.validate({
-      options: {
-        type: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: 'Invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when valid type specified', async () => {
-    const actual = await command.validate({
-      options: {
-        type: 'microsoft365'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      type: 'microsoft365'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('lists all aad groups in the tenant (verbose)', async () => {
@@ -142,7 +140,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -248,7 +246,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, output: 'text' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -325,7 +323,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'microsoft365' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'microsoft365' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -357,7 +355,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'microsoft365', properties: 'id,displayName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'microsoft365', properties: 'id,displayName' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -389,7 +387,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'distribution' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'distribution' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -427,7 +425,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'security' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'security' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -463,7 +461,7 @@ describe(commands.GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'mailEnabledSecurity' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'mailEnabledSecurity' }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -482,6 +480,6 @@ describe(commands.GROUP_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(errorMessage));
   });
 });

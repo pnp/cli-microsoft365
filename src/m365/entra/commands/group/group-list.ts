@@ -1,19 +1,31 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const GroupType = {
+  microsoft365: 'microsoft365',
+  security: 'security',
+  distribution: 'distribution',
+  mailEnabledSecurity: 'mailEnabledSecurity'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: zod.coercedEnum(GroupType).optional(),
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  type?: string;
-  properties?: string;
 }
 
 interface ExtendedGroup extends Group {
@@ -21,8 +33,6 @@ interface ExtendedGroup extends Group {
 }
 
 class EntraGroupListCommand extends GraphCommand {
-  private static readonly groupTypes: string[] = ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity'];
-
   public get name(): string {
     return commands.GROUP_LIST;
   }
@@ -35,45 +45,8 @@ class EntraGroupListCommand extends GraphCommand {
     return ['id', 'displayName', 'groupType'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--type [type]',
-        autocomplete: EntraGroupListCommand.groupTypes
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type && EntraGroupListCommand.groupTypes.every(g => g.toLowerCase() !== args.options.type?.toLowerCase())) {
-          return `${args.options.type} is not a valid type value. Allowed values microsoft365|security|distribution|mailEnabledSecurity.`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -82,9 +55,7 @@ class EntraGroupListCommand extends GraphCommand {
       let useConsistencyLevelHeader = false;
 
       if (args.options.type) {
-        const groupType = EntraGroupListCommand.groupTypes.find(g => g.toLowerCase() === args.options.type?.toLowerCase());
-
-        switch (groupType) {
+        switch (args.options.type) {
           case 'microsoft365':
             requestUrl += `?$filter=groupTypes/any(c:c+eq+'Unified')`;
             break;

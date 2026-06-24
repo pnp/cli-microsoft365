@@ -9,7 +9,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-member-add.js';
+import command, { options } from './group-member-add.js';
 import request from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -25,6 +25,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +34,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,58 +75,58 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo', userIds: userIds[0], role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo', userIds: userIds[0], role: 'Member' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if userIds contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: `${userIds[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: `${userIds[0]},foo`, role: 'Member' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroupIds contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: `${groupIds[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: `${groupIds[0]},foo`, role: 'Member' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if userNames contains an invalid UPN', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if role is not a valid role', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.join(','), role: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.join(','), role: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroups specified by ids are added as owners', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupIds: groupIds.join(','), role: 'Owner' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: groupIds.join(','), role: 'Owner' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if subgroups specified by names are added as owners', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, subgroupNames: groupNames.join(','), role: 'Owner' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupNames: groupNames.join(','), role: 'Owner' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with userIds', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.join(','), role: 'Member' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with userIds with leading spaces', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userIds: userIds.map(i => ' ' + i).join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: userIds.map(i => ' ' + i).join(','), role: 'Member' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with names', async () => {
-    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.join(','), role: 'Owner' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupName: 'IT department', userNames: userUpns.join(','), role: 'Owner' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when all required parameters are valid with names with trailing spaces', async () => {
-    const actual = await command.validate({ options: { groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupName: 'IT department', userNames: userUpns.map(u => u + ' ').join(','), role: 'Member' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully adds users to the group with userIds', async () => {
@@ -141,7 +143,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -179,7 +181,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     const ids = userIds.map(id => id + ' ').join(',');
-    await command.action(logger, { options: { groupId: groupId, userIds: ids, role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: ids, role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -219,7 +221,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupDisplayName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -256,7 +258,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, subgroupIds: groupIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, subgroupIds: groupIds.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -296,7 +298,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -337,7 +339,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     });
 
     const userNames = userUpns.map(u => ' ' + u).join(',');
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userNames, role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -377,7 +379,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', subgroupNames: groupNames.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', subgroupNames: groupNames.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -385,7 +387,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         url: `/groups/${groupId}`,
         headers: { 'content-type': 'application/json;odata.metadata=none' },
         body: {
-          'owners@odata.bind': groupIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+          'members@odata.bind': groupIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
         }
       },
       {
@@ -394,7 +396,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         url: `/groups/${groupId}`,
         headers: { 'content-type': 'application/json;odata.metadata=none' },
         body: {
-          'owners@odata.bind': groupIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+          'members@odata.bind': groupIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
         }
       }
     ]);
@@ -426,7 +428,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userIds: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userIds: userIds.join(','), role: 'Member' }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 });
