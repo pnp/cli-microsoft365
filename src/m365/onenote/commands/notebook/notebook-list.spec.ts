@@ -102,7 +102,7 @@ describe(commands.NOTEBOOK_LIST, () => {
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(request, 'get').resolves([]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -130,7 +130,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -171,7 +171,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: '2609af39-7775-4f94-a3dc-0dd67657e900' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -212,7 +212,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -238,7 +238,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'MyGroup' }) } as any), new CommandError('An error has occurred'));
   });
 
   it('lists Microsoft OneNote notebooks in group by name', async () => {
@@ -277,7 +277,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'MyGroup' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'MyGroup' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -303,7 +303,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/testsite' }) } as any), new CommandError('An error has occurred'));
   });
 
   it('lists Microsoft OneNote notebooks for site', async () => {
@@ -345,7 +345,7 @@ describe(commands.NOTEBOOK_LIST, () => {
         throw 'Invalid request';
       });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -386,7 +386,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: 'user1@contoso.onmicrosoft.com' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",

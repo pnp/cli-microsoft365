@@ -145,7 +145,7 @@ describe(commands.NOTEBOOK_ADD, () => {
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name }) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -158,7 +158,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -172,7 +172,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, userId: userId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, userId: userId, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -186,7 +186,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, groupId: groupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, groupId: groupId, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -202,7 +202,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, groupName: groupName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, groupName: groupName, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -220,7 +220,7 @@ describe(commands.NOTEBOOK_ADD, () => {
 
     sinon.stub(spo, 'getSpoGraphSiteId').resolves(siteId);
 
-    await command.action(logger, { options: { name: name, webUrl: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, webUrl: siteUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -235,7 +235,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, userName: userName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, userName: userName, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -260,6 +260,6 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: name, verbose: true } } as any), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, verbose: true }) } as any), new CommandError(error.error.message));
   });
 });

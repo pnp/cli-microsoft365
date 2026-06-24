@@ -171,7 +171,7 @@ describe(commands.PAGE_LIST, () => {
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(odata, 'getAllItems').resolves([]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -183,7 +183,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -195,7 +195,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -207,7 +207,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -219,7 +219,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -238,7 +238,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -258,7 +258,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -282,7 +282,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl } } as any), new CommandError('Requested site could not be found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl }) } as any), new CommandError('Requested site could not be found'));
   });
 
   it('throws error if group by displayName returns no results', async () => {
@@ -293,7 +293,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } } as any), new CommandError(`The specified group '${groupName}' does not exist.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) } as any), new CommandError(`The specified group '${groupName}' does not exist.`));
   });
 
   it('throws an error if group by displayName returns multiple results', async () => {
@@ -313,7 +313,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) }),
       new CommandError("Multiple groups with name 'Dummy Group A' found. Found: bba4c915-0ac8-47a1-bd05-087a44c92d3b, 9f3c2c36-1682-4922-9ae1-f57d2caf0de1."));
   });
 });
