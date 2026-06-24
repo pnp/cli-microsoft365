@@ -221,7 +221,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ groupDisplayName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -379,7 +379,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', subgroupNames: groupNames.join(','), role: 'Owner', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', subgroupNames: groupNames.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -387,7 +387,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         url: `/groups/${groupId}`,
         headers: { 'content-type': 'application/json;odata.metadata=none' },
         body: {
-          'owners@odata.bind': groupIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+          'members@odata.bind': groupIds.slice(0, 20).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
         }
       },
       {
@@ -396,7 +396,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         url: `/groups/${groupId}`,
         headers: { 'content-type': 'application/json;odata.metadata=none' },
         body: {
-          'owners@odata.bind': groupIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
+          'members@odata.bind': groupIds.slice(20, 40).map(u => `https://graph.microsoft.com/v1.0/directoryObjects/${u}`)
         }
       }
     ]);
