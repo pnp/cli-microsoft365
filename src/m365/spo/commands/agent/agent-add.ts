@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable cli-microsoft365/camelcase */
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';

@@ -672,7 +672,7 @@ export default abstract class Command {
       escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
       quote: cli.getConfig().get(settingsNames.csvQuote),
       quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       quoted_empty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false),
       cast: {
         boolean: (value: boolean) => value ? '1' : '0'

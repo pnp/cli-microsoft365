@@ -178,7 +178,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     this.assignNodeVersion(workflow, nodeVersion);
 
     if (options.manuallyTrigger) {
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       workflow.on.workflow_dispatch = null;
     }
 

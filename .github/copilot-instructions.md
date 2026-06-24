@@ -22,7 +22,7 @@
 ## Developer Workflows
 - **Build**: `npm run build` (TypeScript compile + command metadata generation)
 - **Test**: `npm test` (runs version check, lint, and Mocha tests)
-- **Lint**: `npm run lint` (uses custom ESLint rules from `eslint-rules/`)
+- **Lint**: `npm run lint` (uses Oxlint with custom rules from `eslint-rules/`)
 - **Watch**: `npm run watch` (TypeScript in watch mode)
 - **Symlink for local CLI**: `npm link` (after build)
 - **Node version**: Must be 24 (see `scripts/check-version.js`)
@@ -35,7 +35,7 @@
 - **Output**: Prefer returning objects/arrays; formatting handled by CLI core.
 - **No direct file/console output in commands**: Use provided logger and output mechanisms.
 - **Testing**: Mocha-based, see test files alongside source (e.g., `*.spec.ts`). 100% code coverage.
-- **Custom ESLint rules**: See `eslint-rules/` and `eslint-plugin-cli-microsoft365` in `package.json`.
+- **Custom lint rules**: See `eslint-rules/` for custom Oxlint JS plugin rules loaded via `jsPlugins` in `.oxlintrc.json`.
 
 ## Integration & External Dependencies
 - **Microsoft Graph, SharePoint REST, etc.**: Use `request.ts` for all HTTP calls.

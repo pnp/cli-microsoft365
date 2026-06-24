@@ -319,6 +319,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('successfully removes subgroups from the group by using group names', async () => {
+    // eslint-disable-next-line no-unused-vars
     const entraGroupStub = sinon.stub(entraGroup, 'getGroupIdByDisplayName').callsFake(async () => {
       return groupIds[entraGroupStub.callCount - 1];
     });

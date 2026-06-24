@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable cli-microsoft365/camelcase */
 import assert from 'assert';
 import sinon from 'sinon';
 import { z } from 'zod';

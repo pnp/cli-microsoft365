@@ -1,0 +1,97 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "ignorePatterns": [
+    "**/package-generate/assets/**",
+    "**/test-projects/**",
+    "clientsidepages.ts",
+    "**/*.d.ts",
+    "**/*.js",
+    "**/*.cjs"
+  ],
+  "jsPlugins": [
+    { "name": "@stylistic", "specifier": "@stylistic/eslint-plugin" },
+    { "name": "cli-microsoft365", "specifier": "./eslint-rules/lib/index.js" }
+  ],
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "globals": {
+    "NodeJS": "readonly"
+  },
+  "rules": {
+    "curly": ["error", "all"],
+    "eqeqeq": ["error", "always"],
+    "no-empty-function": "error",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+
+    "typescript/no-explicit-any": "off",
+    "typescript/no-var-requires": "off",
+    "typescript/no-inferrable-types": "off",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/explicit-module-boundary-types": ["error", {
+      "allowArgumentsExplicitlyTypedAsAny": true
+    }],
+    "typescript/explicit-function-return-type": ["error", {
+      "allowExpressions": true
+    }],
+    "typescript/no-floating-promises": "error",
+
+    "jest/no-identical-title": "error",
+
+    "@stylistic/indent": ["error", 2],
+    "@stylistic/semi": ["error"],
+    "@stylistic/comma-dangle": ["error", "never"],
+    "@stylistic/brace-style": ["error", "stroustrup", {
+      "allowSingleLine": true
+    }],
+
+    "cli-microsoft365/correct-command-class-name": ["error",
+      ["groupmembership","administrative","eventreceiver","conversation","organization","registration","activations","application","eligibility","externalize","inheritance","multitenant","sensitivity","activation","assessment","assignment","customizer","definition","enterprise","historical","management","membership","permission","checklist","community","container","dataverse","directory","installed","messaging","office365","retention","adaptive","autofill","calendar","external","groupify","pronouns","property","resolver","settings","approve","builder","catalog","command","content","default","details","install","mailbox","profile","records","recycle","request","service","session","setting","sharing","storage","webhook","access","assets","center","client","colors","custom","folder","health","logout","member","oauth2","policy","record","revoke","schema","search","status","threat","apply","audit","azure","brand","entra","event","group","guest","issue","label","login","model","owner","place","setup","table","teams","token","value","call","card","comm","hide","home","info","init","item","list","link","m365","news","open","role","room","side","site","todo","type","unit","user","app","bin","dev","fun","hub","log","one","ops","org","pim","set","url","web","ai","in","is","to"],
+      ["OAuth2"]
+    ],
+    "cli-microsoft365/correct-command-name": "error",
+    "cli-microsoft365/no-by-server-relative-url-usage": "error",
+    "cli-microsoft365/camelcase": ["error", {
+      "allow": [
+        "child_process",
+        "error_description",
+        "_Child_Items_",
+        "_Object_Type_",
+        "FN\\d+",
+        "OData__.*",
+        "vti_.*",
+        "Query.*",
+        "app_displayname",
+        "access_token",
+        "expires_on",
+        "extension_*"
+      ]
+    }],
+    "cli-microsoft365/naming-convention": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts"],
+      "rules": {
+        "no-console": "error",
+        "no-empty-function": "off",
+        "cli-microsoft365/correct-command-class-name": "off",
+        "cli-microsoft365/correct-command-name": "off"
+      }
+    },
+    {
+      "files": ["**/viva/commands/engage/**"],
+      "rules": {
+        "cli-microsoft365/camelcase": "off"
+      }
+    },
+    {
+      "files": ["**/*.mjs"],
+      "rules": {
+        "typescript/explicit-function-return-type": "off"
+      }
+    }
+  ]
+}

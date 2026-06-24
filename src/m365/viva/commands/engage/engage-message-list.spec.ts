@@ -168,7 +168,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Top' } } as any,);
+    await command.action(logger, { options: { feedType: 'Top' } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 

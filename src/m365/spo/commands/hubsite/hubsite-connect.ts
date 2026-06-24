@@ -72,7 +72,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       },
       {
         option: '--parentUrl [parentUrl]'
-      },
+      }
     );
   }
 

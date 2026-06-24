@@ -67,13 +67,6 @@ jobs:
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Cache .eslintcache
-        id: eslintcache
-        uses: actions/cache@v5
-        with:
-          path: |
-            .eslintcache
-          key: eslintcache-ubuntu-latest-${{ env.NODE_VERSION }}-${{ hashFiles('npm-shrinkwrap.json', 'eslint.config.mjs') }}
       - name: Test
         run: npm test
         env:

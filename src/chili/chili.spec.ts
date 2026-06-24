@@ -41,7 +41,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -78,7 +78,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -115,7 +115,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -152,7 +152,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -189,7 +189,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -225,7 +225,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -263,7 +263,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -300,7 +300,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -342,7 +342,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -391,7 +391,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -436,7 +436,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -471,7 +471,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: ++conversationsStarted
           };
         case 'https://api.mendable.ai/v1/mendableChat':
@@ -530,7 +530,7 @@ describe('chili', () => {
       switch (options.url) {
         case 'https://api.mendable.ai/v1/newConversation':
           return {
-            // eslint-disable-next-line camelcase
+            // eslint-disable-next-line cli-microsoft365/camelcase
             conversation_id: 1
           };
         case 'https://api.mendable.ai/v1/mendableChat':

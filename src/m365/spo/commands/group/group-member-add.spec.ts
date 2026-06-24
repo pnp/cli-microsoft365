@@ -355,6 +355,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('correctly logs result when adding users by userNames', async () => {
+    // eslint-disable-next-line no-unused-vars
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
         return userResponses[postStub.callCount - 1];
@@ -428,6 +429,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('correctly logs result when adding groups', async () => {
+    // eslint-disable-next-line no-unused-vars
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/SiteGroups/GetById(${spGroupId})/users`) {
         return groupResponses[postStub.callCount - 1];

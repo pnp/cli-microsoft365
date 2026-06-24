@@ -64,7 +64,7 @@ class SpoListWebhookListCommand extends SpoCommand {
       },
       {
         option: '--listUrl [listUrl]'
-      },
+      }
     );
   }
 

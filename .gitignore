@@ -39,7 +39,7 @@ jspm_packages/
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
+# Optional linter cache
 .eslintcache
 
 # Optional REPL history

@@ -220,7 +220,7 @@ class EntraAppAddCommand extends GraphCommand {
         }
 
         return true;
-      },
+      }
     );
   }
 

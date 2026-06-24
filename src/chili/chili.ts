@@ -168,9 +168,9 @@ async function endConversation(conversationId: number): Promise<void> {
     },
     responseType: 'json',
     data: {
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       api_key: mendableApiKey,
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       conversation_id: conversationId
     }
   };
@@ -187,9 +187,9 @@ async function runMendableChat(conversationId: number, question: string): Promis
     },
     responseType: 'json',
     data: {
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       api_key: mendableApiKey,
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       conversation_id: conversationId,
       question,
       history,
@@ -209,7 +209,7 @@ async function getConversationId(): Promise<number> {
     },
     responseType: 'json',
     data: {
-      // eslint-disable-next-line camelcase
+      // eslint-disable-next-line cli-microsoft365/camelcase
       api_key: mendableApiKey
     }
   };

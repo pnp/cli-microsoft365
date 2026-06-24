@@ -13,7 +13,7 @@ export class MsalNetworkClient implements INetworkModule {
   private async sendRequestAsync<T>(
     url: string,
     method: 'GET' | 'POST',
-    options: NetworkRequestOptions = {},
+    options: NetworkRequestOptions = {}
   ): Promise<NetworkResponse<T>> {
     const requestOptions: CliRequestOptions = {
       url: url,

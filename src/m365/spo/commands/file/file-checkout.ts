@@ -83,7 +83,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'url', 'id',);
+    this.types.string.push('webUrl', 'url', 'id');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
