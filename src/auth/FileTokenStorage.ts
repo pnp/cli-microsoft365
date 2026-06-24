@@ -4,10 +4,6 @@ import path from 'path';
 import { TokenStorage } from './TokenStorage.js';
 
 export class FileTokenStorage implements TokenStorage {
-  public static msalCacheFilePath(): string {
-    return path.join(os.homedir(), '.cli-m365-msal.json');
-  }
-
   public static connectionInfoFilePath(): string {
     return path.join(os.homedir(), '.cli-m365-connection.json');
   }

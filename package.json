@@ -304,6 +304,7 @@
   "dependencies": {
     "@azure/msal-common": "^16.6.2",
     "@azure/msal-node": "^5.2.2",
+    "@azure/msal-node-extensions": "^5.2.3",
     "@inquirer/confirm": "^6.1.0",
     "@inquirer/input": "^5.1.0",
     "@inquirer/select": "^5.2.0",
