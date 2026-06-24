@@ -268,13 +268,13 @@
   ],
   "overrides": {
     "adaptive-expressions": {
-      "fast-xml-parser": "5.7.0",
-      "lodash": "4.18.0",
+      "fast-xml-parser": "5.8.0",
+      "lodash": "4.18.1",
       "@xmldom/xmldom": "^0.8.13",
       "uuid": "11.1.1"
     },
     "adaptivecards": {
-      "swiper": "12.1.3"
+      "swiper": "12.2.0"
     },
     "mocha": {
       "diff": "8.0.4",
@@ -293,8 +293,8 @@
       "protobufjs": "7.6.0"
     },
     "@azure/monitor-opentelemetry": {
-      "@opentelemetry/sdk-node": "0.217.0",
-      "@opentelemetry/exporter-prometheus": "0.217.0"
+      "@opentelemetry/sdk-node": "0.218.0",
+      "@opentelemetry/exporter-prometheus": "0.218.0"
     },
     "protobufjs": "7.6.0",
     "applicationinsights": {
@@ -304,9 +304,9 @@
   "dependencies": {
     "@azure/msal-common": "^16.6.2",
     "@azure/msal-node": "^5.2.2",
-    "@inquirer/confirm": "^6.1.0",
-    "@inquirer/input": "^5.1.0",
-    "@inquirer/select": "^5.2.0",
+    "@inquirer/confirm": "^6.1.1",
+    "@inquirer/input": "^5.1.1",
+    "@inquirer/select": "^5.2.1",
     "@xmldom/xmldom": "^0.9.10",
     "adaptive-expressions": "^4.23.3",
     "adaptivecards": "^3.0.6",
@@ -355,7 +355,7 @@
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.58.0",
     "c8": "^11.0.0",
-    "eslint": "^10.4.0",
+    "eslint": "^10.4.1",
     "eslint-plugin-mocha": "^11.3.0",
     "globals": "^17.6.0",
     "mocha": "^11.7.6",
