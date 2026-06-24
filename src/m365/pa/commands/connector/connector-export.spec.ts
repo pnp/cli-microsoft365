@@ -14,7 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import flowCommands from '../../../flow/commands.js';
 import commands from '../../commands.js';
-import command from './connector-export.js';
+import command, { options } from './connector-export.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CONNECTOR_EXPORT, () => {
@@ -22,6 +22,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let writeFileSyncStub: sinon.SinonStub;
   let mkdirSyncStub: sinon.SinonStub;
 
@@ -35,6 +36,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -120,7 +122,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').returns(false);
 
-    await command.action(logger, { options: { environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
     assert(retrievedConnectorInfo, 'Did not retrieve connector info');
     assert(retrievedSwagger, 'Did not retrieve swagger');
     assert(retrievedIcon, 'Did not retrieve icon');
@@ -177,7 +179,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').returns(false);
 
-    await command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
     assert(loggerLogToStderrSpy.calledWithExactly('Downloaded swagger'));
   });
 
@@ -299,7 +301,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       throw 'Invalid request';
     });
     sinon.stub(fs, 'existsSync').returns(false);
-    await command.action(logger, { options: { environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
   });
 
   it('skips downloading swagger if the connector information does not contain a swagger reference (debug)', async () => {
@@ -404,7 +406,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').returns(false);
 
-    await command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
     assert(loggerLogToStderrSpy.calledWith('originalSwaggerUrl not set. Skipping'));
   });
 
@@ -499,7 +501,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       throw 'Invalid request';
     });
     sinon.stub(fs, 'existsSync').returns(false);
-    await command.action(logger, { options: { environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
   });
 
   it('skips downloading icon if the connector information does not contain icon URL (debug)', async () => {
@@ -594,7 +596,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').returns(false);
 
-    await command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' }) });
     assert(loggerLogToStderrSpy.calledWith('iconUri not set. Skipping'));
   });
 
@@ -638,37 +640,34 @@ describe(commands.CONNECTOR_EXPORT, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation when the specified output folder does not exist', async () => {
+  it('fails validation when the specified output folder does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the specified connector folder already exists', async () => {
+  it('fails validation when the specified connector folder already exists', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when all required options specified', async () => {
-    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required options specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the specified output folder exists', async () => {
+  it('passes validation when the specified output folder exists', () => {
     sinon.stub(fs, 'existsSync').callsFake((folder) => folder.toString().indexOf('connector') < 0);
-    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying environment name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
+
 });

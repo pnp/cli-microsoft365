@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { setTimeout } from 'timers/promises';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,18 +10,29 @@ import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for option name.'
+    })
+    .alias('n'),
+  environmentName: z.string().alias('e'),
+  packageDisplayName: z.string().optional(),
+  packageDescription: z.string().optional().alias('d'),
+  packageCreatedBy: z.string().optional().alias('c'),
+  packageSourceEnvironment: z.string().optional().alias('s'),
+  path: z.string().optional()
+    .refine(val => !val || fs.existsSync(path.dirname(val)), {
+      message: 'Specified path where to save the file does not exist.'
+    })
+    .alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  environmentName: string;
-  packageDisplayName?: string;
-  packageDescription?: string;
-  packageCreatedBy?: string;
-  packageSourceEnvironment?: string;
-  path?: string;
 }
 
 class PaAppExportCommand extends PowerPlatformCommand {
@@ -34,70 +46,8 @@ class PaAppExportCommand extends PowerPlatformCommand {
     return 'Exports the specified Power App';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        packageDescription: typeof args.options.packageDescription !== 'undefined',
-        packageCreatedBy: typeof args.options.packageCreatedBy !== 'undefined',
-        packageSourceEnvironment: typeof args.options.packageSourceEnvironment !== 'undefined',
-        path: typeof args.options.path !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--packageDisplayName [packageDisplayName]'
-      },
-      {
-        option: '-d, --packageDescription [packageDescription]'
-      },
-      {
-        option: '-c, --packageCreatedBy [packageCreatedBy]'
-      },
-      {
-        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
-      },
-      {
-        option: '-p, --path [path]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID for option name`;
-        }
-
-        if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-          return 'Specified path where to save the file does not exist';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('name', 'environmentName', 'packageDisplayName', 'packageDescription', 'packageCreatedBy', 'packageSourceEnvironment', 'path');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

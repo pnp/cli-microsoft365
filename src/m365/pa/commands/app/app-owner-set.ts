@@ -1,25 +1,39 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  appName: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for appName.'
+    }),
+  userId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for userId.'
+    })
+    .optional(),
+  userName: z.string()
+    .refine(val => validation.isValidUserPrincipalName(val), {
+      message: 'The value is not a valid UPN for userName.'
+    })
+    .optional(),
+  roleForOldAppOwner: z.enum(['CanView', 'CanEdit']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  environmentName: string;
-  appName: string;
-  userId?: string;
-  userName?: string;
-  roleForOldAppOwner?: string;
-}
-
 class PaAppOwnerSetCommand extends PowerAppsCommand {
-  private static readonly roleForOldAppOwner = ['CanView', 'CanEdit'];
   public get name(): string {
     return commands.APP_OWNER_SET;
   }
@@ -28,72 +42,19 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
     return 'Sets a new owner for a Power Apps app';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        roleForOldAppOwner: typeof args.options.roleForOldAppOwner !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.userId, opts.userName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'userId' or 'userName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--appName <appName>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--roleForOldAppOwner [roleForOldAppOwner]',
-        autocomplete: PaAppOwnerSetCommand.roleForOldAppOwner
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.appName)) {
-          return `${args.options.appName} is not a valid GUID for appName`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID for userId`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid UPN for userName`;
-        }
-
-        if (args.options.roleForOldAppOwner && PaAppOwnerSetCommand.roleForOldAppOwner.indexOf(args.options.roleForOldAppOwner) < 0) {
-          return `${args.options.roleForOldAppOwner} is not a valid roleForOldAppOwner. Allowed values are: ${PaAppOwnerSetCommand.roleForOldAppOwner.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

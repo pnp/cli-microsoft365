@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-consent-set.js';
+import command, { options } from './app-consent-set.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_CONSENT_SET, () => {
@@ -23,6 +23,7 @@ describe(commands.APP_CONSENT_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -33,6 +34,7 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,35 +78,41 @@ describe(commands.APP_CONSENT_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the name is not valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: environmentName,
-        name: 'invalid',
-        bypass: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: environmentName,
+      name: 'invalid',
+      bypass: true
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the name specified', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: environmentName,
-        name: name,
-        bypass: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the name specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: environmentName,
+      name: name,
+      bypass: true
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: environmentName,
+      name: name,
+      bypass: true,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before bypassing consent for the specified Microsoft Power App when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: environmentName,
         name: name,
         bypass: true
-      }
+      })
     });
 
     assert(promptIssued);
@@ -116,11 +124,11 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: environmentName,
         name: name,
         bypass: true
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -138,12 +146,12 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: environmentName,
         name: name,
         bypass: true
-      }
+      })
     }));
   });
 
@@ -157,12 +165,12 @@ describe(commands.APP_CONSENT_SET, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: environmentName,
         name: name,
         bypass: true,
         force: true
-      }
+      })
     }));
   });
 
@@ -176,12 +184,12 @@ describe(commands.APP_CONSENT_SET, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: environmentName,
         name: name,
         bypass: true,
         force: true
-      }
-    } as any), new CommandError(error.error.message));
+      })
+    }), new CommandError(error.error.message));
   });
 });
