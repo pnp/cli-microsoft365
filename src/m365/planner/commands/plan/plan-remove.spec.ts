@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './plan-remove.js';
+import command, { options } from './plan-remove.js';
 
 describe(commands.PLAN_REMOVE, () => {
   const validPlanTitle = 'My Plan';
@@ -51,6 +51,7 @@ describe(commands.PLAN_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -63,6 +64,7 @@ describe(commands.PLAN_REMOVE, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -108,72 +110,67 @@ describe(commands.PLAN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when id and ownerGroupId is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validPlanId,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when id and ownerGroupId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validPlanId,
+      ownerGroupId: validOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title is specified with both ownerGroupName and ownerGroupId', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validPlanTitle,
-        ownerGroupId: validOwnerGroupId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when title is specified with both ownerGroupName and ownerGroupId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validPlanTitle,
+      ownerGroupId: validOwnerGroupId,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title is specified without ownerGroupName or ownerGroupId', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when title is specified without ownerGroupName or ownerGroupId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validPlanTitle
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title is specified with invalid ownerGroupId', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validPlanTitle,
-        ownerGroupId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when title is specified with invalid ownerGroupId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validPlanTitle,
+      ownerGroupId: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validPlanId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validPlanId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with title', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validPlanId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct input with title', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validPlanTitle,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified plan when force option not passed with id', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validPlanId
-      }
+      })
     });
-
 
     assert(promptIssued);
   });
@@ -181,9 +178,9 @@ describe(commands.PLAN_REMOVE, () => {
   it('aborts removing the specified plan when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validPlanId
-      }
+      })
     });
     assert(deleteSpy.notCalled);
   });
@@ -205,10 +202,10 @@ describe(commands.PLAN_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validPlanId,
         force: true
-      }
+      })
     });
   });
 
@@ -234,10 +231,10 @@ describe(commands.PLAN_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     });
   });
 
@@ -260,11 +257,11 @@ describe(commands.PLAN_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         verbose: true
-      }
+      })
     });
   });
 
@@ -273,10 +270,10 @@ describe(commands.PLAN_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validPlanId,
         force: true
-      }
-    }), new CommandError("An error has occurred"));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

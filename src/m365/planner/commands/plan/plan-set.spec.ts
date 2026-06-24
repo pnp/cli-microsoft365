@@ -12,14 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './plan-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './plan-set.js';
 
 describe(commands.PLAN_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const id = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const title = 'Plan name';
@@ -37,25 +37,25 @@ describe(commands.PLAN_SET, () => {
   const category25 = 'Urgent';
 
   const userResponse = {
-    "value": [
+    value: [
       {
-        "id": userId,
-        "userPrincipalName": user
+        id: userId,
+        userPrincipalName: user
       }
     ]
   };
 
   const user1Response = {
-    "value": [
+    value: [
       {
-        "id": user1Id,
-        "userPrincipalName": user1
+        id: user1Id,
+        userPrincipalName: user1
       }
     ]
   };
 
   const etagResponse = {
-    "@odata.etag": "TestEtag"
+    '@odata.etag': 'TestEtag'
   };
 
   const singleGroupsResponse = {
@@ -77,41 +77,41 @@ describe(commands.PLAN_SET, () => {
   };
 
   const planResponse = {
-    "id": id,
-    "title": title
+    id: id,
+    title: title
   };
 
   const planDetailsResponse = {
-    "sharedWith": {
-      "00000000-0000-0000-0000-000000000000": true,
-      "00000000-0000-0000-0000-000000000001": true
+    sharedWith: {
+      '00000000-0000-0000-0000-000000000000': true,
+      '00000000-0000-0000-0000-000000000001': true
     },
-    "categoryDescriptions": {
-      "category1": null,
-      "category2": null,
-      "category3": null,
-      "category4": null,
-      "category5": null,
-      "category6": null,
-      "category7": null,
-      "category8": null,
-      "category9": null,
-      "category10": null,
-      "category11": null,
-      "category12": null,
-      "category13": null,
-      "category14": null,
-      "category15": null,
-      "category16": null,
-      "category17": null,
-      "category18": null,
-      "category19": null,
-      "category20": null,
-      "category21": category21,
-      "category22": null,
-      "category23": null,
-      "category24": null,
-      "category25": category25
+    categoryDescriptions: {
+      category1: null,
+      category2: null,
+      category3: null,
+      category4: null,
+      category5: null,
+      category6: null,
+      category7: null,
+      category8: null,
+      category9: null,
+      category10: null,
+      category11: null,
+      category12: null,
+      category13: null,
+      category14: null,
+      category15: null,
+      category16: null,
+      category17: null,
+      category18: null,
+      category19: null,
+      category20: null,
+      category21: category21,
+      category22: null,
+      category23: null,
+      category24: null,
+      category25: category25
     }
   };
 
@@ -131,6 +131,7 @@ describe(commands.PLAN_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -154,8 +155,7 @@ describe(commands.PLAN_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch,
-      cli.getSettingWithDefaultValue
+      request.patch
     ]);
   });
 
@@ -173,128 +173,105 @@ describe(commands.PLAN_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: 'invalid guid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('allows unknown options', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('fails validation if shareWithUserNames contains invalid user principal name', async () => {
-    const shareWithUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        shareWithUserNames: shareWithUserNames.join(',')
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided when using title.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the ownerGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: 'invalid guid'
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified when using title', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if shareWithUserNames contains invalid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      shareWithUserNames: 'john.doe@contoso.com,foo'
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        ownerGroupName: ownerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if shareWithUserIds contains invalid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        shareWithUserIds: "invalid guid"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided when using title.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        shareWithUserIds: shareWithUserIds,
-        shareWithUserNames: shareWithUserNames
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both ownerGroupId and ownerGroupName are specified when using title', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      ownerGroupName: ownerGroupName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid category are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: id,
-        category27: 'ToDo',
-        category35: 'Urgent'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if shareWithUserIds contains invalid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      shareWithUserIds: 'invalid guid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid title and ownerGroupId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupName: ownerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      shareWithUserIds: shareWithUserIds,
+      shareWithUserNames: shareWithUserNames
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        shareWithUserIds: shareWithUserIds
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when invalid category are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      category27: 'ToDo',
+      category35: 'Urgent'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        ownerGroupId: ownerGroupId,
-        shareWithUserNames: shareWithUserNames
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid title and ownerGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupName: ownerGroupName
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid title, ownerGroupId, and shareWithUserIds specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      shareWithUserIds: shareWithUserIds
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid title, ownerGroupId, and shareWithUserNames specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      ownerGroupId: ownerGroupId,
+      shareWithUserNames: shareWithUserNames
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with category options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      category21: category21,
+      category25: category25
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly updates planner plan title with given id (debug)', async () => {
@@ -319,11 +296,11 @@ describe(commands.PLAN_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         newTitle: newTitle
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
@@ -367,11 +344,11 @@ describe(commands.PLAN_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         ownerGroupName: ownerGroupName,
         shareWithUserNames: shareWithUserNames
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
@@ -407,17 +384,17 @@ describe(commands.PLAN_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         ownerGroupId: ownerGroupId,
         shareWithUserIds: shareWithUserIds
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly updates planner plan shareWithUserIds with given title and rosterId', async () => {
+  it('correctly updates planner plan shareWithUserIds with given rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${rosterId}/plans?$select=id`) {
         return singlePlansResponse;
@@ -443,16 +420,14 @@ describe(commands.PLAN_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        title: title,
+      options: commandOptionsSchema.parse({
         rosterId: rosterId,
         shareWithUserIds: shareWithUserIds
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
   });
-
 
   it('correctly updates planner plan categories with given id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -476,12 +451,12 @@ describe(commands.PLAN_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         category21: category21,
         category25: category25
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
@@ -521,17 +496,22 @@ describe(commands.PLAN_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         ownerGroupName: ownerGroupName,
         shareWithUserNames: shareWithUserNames
-      }
+      })
     }), new CommandError(`Cannot proceed with planner plan creation. The following users provided are invalid: ${user1}`));
   });
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        id: id,
+        newTitle: newTitle
+      })
+    }), new CommandError('An error has occurred.'));
   });
 });

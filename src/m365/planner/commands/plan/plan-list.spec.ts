@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './plan-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './plan-list.js';
 
 describe(commands.PLAN_LIST, () => {
   const ownerGroupId = '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4';
@@ -114,6 +113,7 @@ describe(commands.PLAN_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -126,6 +126,7 @@ describe(commands.PLAN_LIST, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -147,8 +148,7 @@ describe(commands.PLAN_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -170,72 +170,54 @@ describe(commands.PLAN_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        ownerGroupId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the ownerGroupId nor ownerGroupName nor rosterId are provided.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the ownerGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ownerGroupId: 'invalid'
     });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when ownerGroupId, rosterId and ownerGroupName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if neither the ownerGroupId nor ownerGroupName nor rosterId are provided.', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation when ownerGroupId, rosterId and ownerGroupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ownerGroupId: ownerGroupId,
+      ownerGroupName: ownerGroupName,
+      rosterId: rosterId
     });
-
-    const actual = await command.validate({
-      options: {
-        ownerGroupId: ownerGroupId,
-        ownerGroupName: ownerGroupName,
-        rosterId: rosterId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid ownerGroupId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        ownerGroupId: ownerGroupId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid ownerGroupId specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ownerGroupId: ownerGroupId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid ownerGroupName specified', async () => {
-    const actual = await command.validate({
-      options: {
-        ownerGroupName: ownerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid ownerGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ownerGroupName: ownerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid rosterId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        rosterId: rosterId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid rosterId specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: rosterId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ownerGroupId: ownerGroupId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly list planner plans with given ownerGroupId', async () => {
@@ -247,11 +229,7 @@ describe(commands.PLAN_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
-      ownerGroupId: ownerGroupId
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ ownerGroupId: ownerGroupId }) });
     assert(loggerLogSpy.calledWith(formattedResponse));
   });
 
@@ -268,11 +246,7 @@ describe(commands.PLAN_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
-      ownerGroupName: ownerGroupName
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ ownerGroupName: ownerGroupName }) });
     assert(loggerLogSpy.calledWith(formattedResponse));
   });
 
@@ -285,11 +259,7 @@ describe(commands.PLAN_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
-      rosterId: rosterId
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ rosterId: rosterId }) });
     assert(loggerLogSpy.calledWith(formattedResponse));
   });
 
@@ -306,17 +276,13 @@ describe(commands.PLAN_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
-      ownerGroupId: ownerGroupId
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ ownerGroupId: ownerGroupId }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ ownerGroupId: ownerGroupId }) }), new CommandError("An error has occurred."));
   });
 });
