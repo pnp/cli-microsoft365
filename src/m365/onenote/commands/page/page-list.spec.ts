@@ -13,7 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './page-list.js';
+import command, { options } from './page-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
@@ -77,6 +77,7 @@ describe(commands.PAGE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let accessTokenStub: sinon.SinonStub;
 
   before(() => {
@@ -86,6 +87,7 @@ describe(commands.PAGE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
@@ -131,40 +133,45 @@ describe(commands.PAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'title', 'id']);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the groupId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if no option specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no option specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if multiple targeting options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '0e38b3b3-d9ac-42fa-81db-437ac8caec2f', groupId: 'bba4c915-0ac8-47a1-bd05-087a44c92d3b' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(odata, 'getAllItems').resolves([]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -176,7 +183,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -188,7 +195,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -200,7 +207,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -212,7 +219,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -231,7 +238,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -251,7 +258,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl }) });
     assert(loggerLogSpy.calledWith(pageResponse.value));
   });
 
@@ -275,7 +282,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl } } as any), new CommandError('Requested site could not be found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl }) } as any), new CommandError('Requested site could not be found'));
   });
 
   it('throws error if group by displayName returns no results', async () => {
@@ -286,7 +293,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } } as any), new CommandError(`The specified group '${groupName}' does not exist.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) } as any), new CommandError(`The specified group '${groupName}' does not exist.`));
   });
 
   it('throws an error if group by displayName returns multiple results', async () => {
@@ -306,7 +313,7 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName }) }),
       new CommandError("Multiple groups with name 'Dummy Group A' found. Found: bba4c915-0ac8-47a1-bd05-087a44c92d3b, 9f3c2c36-1682-4922-9ae1-f57d2caf0de1."));
   });
 });

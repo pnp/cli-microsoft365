@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './notebook-add.js';
+import command, { options } from './notebook-add.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -56,6 +56,7 @@ describe(commands.NOTEBOOK_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let accessTokenStub: sinon.SinonStub;
 
   before(() => {
@@ -65,6 +66,7 @@ describe(commands.NOTEBOOK_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,41 +106,46 @@ describe(commands.NOTEBOOK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if name contains invalid characters', async () => {
-    const actual = await command.validate({ options: { name: 'My notebook /' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if name contains invalid characters', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My notebook /' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if name is longer than 128 characters', async () => {
+  it('fails validation if name is longer than 128 characters', () => {
     const longString = 'x'.repeat(129);
-    const actual = await command.validate({ options: { name: longString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ name: longString });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not a valid webUrl', async () => {
-    const actual = await command.validate({ options: { name: name, webUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid webUrl', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if no option but name specified', async () => {
-    const actual = await command.validate({ options: { name: name } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no option but name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if multiple targeting options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, userId: '2609af39-7775-4f94-a3dc-0dd67657e900', groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name }) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -151,7 +158,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -165,7 +172,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, userId: userId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, userId: userId, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -179,7 +186,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, groupId: groupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, groupId: groupId, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -195,7 +202,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, groupName: groupName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, groupName: groupName, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -213,7 +220,7 @@ describe(commands.NOTEBOOK_ADD, () => {
 
     sinon.stub(spo, 'getSpoGraphSiteId').resolves(siteId);
 
-    await command.action(logger, { options: { name: name, webUrl: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, webUrl: siteUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -228,7 +235,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, userName: userName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, userName: userName, verbose: true }) });
     assert(loggerLogSpy.calledWith(addResponse));
   });
 
@@ -253,6 +260,6 @@ describe(commands.NOTEBOOK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: name, verbose: true } } as any), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, verbose: true }) } as any), new CommandError(error.error.message));
   });
 });
