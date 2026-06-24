@@ -8,12 +8,11 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { cli } from '../../../../cli/cli.js';
-import command from './administrativeunit-member-get.js';
+import command, { options } from './administrativeunit-member-get.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandError } from '../../../../Command.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
@@ -41,6 +40,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -49,6 +49,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,8 +71,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      cli.getSettingWithDefaultValue
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName
     ]);
   });
 
@@ -88,45 +88,29 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when member id and administrativeUnitId are GUIDs', async () => {
-    const actual = await command.validate({ options: { id: userId, administrativeUnitId: administrativeUnitId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when member id and administrativeUnitId are GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ id: userId, administrativeUnitId: administrativeUnitId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if member id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid', administrativeUnitId: administrativeUnitId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if member id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid', administrativeUnitId: administrativeUnitId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if administrativeUnitId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: userId, administrativeUnitId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if administrativeUnitId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: userId, administrativeUnitId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: userId, administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ id: userId, administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ id: userId });
+    assert.strictEqual(actual.success, false);
   });
 
   it('get member info for an administrative unit specified by id and member specified by id', async () => {

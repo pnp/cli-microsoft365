@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './bucket-list.js';
+import command, { options } from './bucket-list.js';
 
 describe(commands.BUCKET_LIST, () => {
   const bucketListResponseValue = [
@@ -65,11 +65,11 @@ describe(commands.BUCKET_LIST, () => {
     }]
   };
 
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -82,20 +82,21 @@ describe(commands.BUCKET_LIST, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/RuY-PSpdw02drevnYDTCJpgAEfoI/plans?$select=id`) {
+      if (opts.url === 'https://graph.microsoft.com/beta/planner/rosters/RuY-PSpdw02drevnYDTCJpgAEfoI/plans?$select=id') {
         return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'&$select=id`) {
         return groupByDisplayNameResponse;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans?$select=id,title') {
         return plansInOwnerGroup;
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets') {
         return bucketListResponse;
       }
       throw 'Invalid request';
@@ -142,80 +143,80 @@ describe(commands.BUCKET_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'planId', 'orderHint']);
   });
 
-  it('passes validation when valid planId is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid planId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid planTitle and ownerGroupId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid planTitle and ownerGroupId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid planTitle and ownerGroupName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid planTitle and ownerGroupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      ownerGroupName: 'My Planner Group'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the ownerGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly lists planner buckets with planId', async () => {
-    const options: any = {
+    const args = commandOptionsSchema.parse({
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-    };
+    });
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: args });
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
   it('correctly lists planner buckets with planTitle and ownerGroupName', async () => {
-    const options: any = {
+    const args = commandOptionsSchema.parse({
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
-    };
+    });
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: args });
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
   it('correctly lists planner buckets with planTitle and ownerGroupId', async () => {
-    const options: any = {
+    const args = commandOptionsSchema.parse({
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
-    };
+    });
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: args });
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
   it('correctly lists planner buckets by rosterId', async () => {
-    const options: any = {
+    const args = commandOptionsSchema.parse({
       rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI'
-    };
+    });
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: args });
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
@@ -229,17 +230,21 @@ describe(commands.BUCKET_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
-      }
+      })
     }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
   it('correctly handles API OData error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+      })
+    }), new CommandError('An error has occurred.'));
   });
 });

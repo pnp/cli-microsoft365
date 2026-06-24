@@ -1,5 +1,7 @@
-import PeriodBasedReport from '../../../base/PeriodBasedReport.js';
+import PeriodBasedReport, { periodBasedReportOptions } from '../../../base/PeriodBasedReport.js';
 import commands from '../../commands.js';
+
+export const options = periodBasedReportOptions;
 
 class OutlookReportMailActivityUserCountsCommand extends PeriodBasedReport {
   public get name(): string {

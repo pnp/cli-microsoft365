@@ -1,7 +1,8 @@
+import { z } from 'zod';
+import Command, { globalOptionsZod } from '../../../../Command.js';
+import type GlobalOptions from '../../../../GlobalOptions.js';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -9,15 +10,23 @@ import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 import paAppListCommand from '../app/app-list.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional()
+    .alias('n'),
+  displayName: z.string().optional().alias('d'),
+  environmentName: z.string().optional().alias('e'),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name?: string;
-  displayName?: string;
-  environmentName?: string;
-  asAdmin?: boolean;
 }
 
 class PaAppGetCommand extends PowerAppsCommand {
@@ -29,65 +38,25 @@ class PaAppGetCommand extends PowerAppsCommand {
     return 'Gets information about the specified Microsoft Power App';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        asAdmin: !!args.options.asAdmin,
-        environmentName: typeof args.options.environmentName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.name, opts.displayName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'name' or 'displayName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'displayName']
+        }
+      })
+      .refine(opts => !opts.asAdmin || opts.environmentName, {
+        message: 'When specifying the asAdmin option, the environment option is required as well.'
+      })
+      .refine(opts => !opts.environmentName || opts.asAdmin, {
+        message: 'When specifying the environment option, the asAdmin option is required as well.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-e, --environmentName [environmentName]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.name && !validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID`;
-        }
-
-        if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option, the environment option is required as well.';
-        }
-
-        if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environment option, the asAdmin option is required as well.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['name', 'displayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

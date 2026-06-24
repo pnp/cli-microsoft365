@@ -9,7 +9,7 @@ Typically, you'll work with CLI for Microsoft 365 in a command line. You'll eith
 
 ## Integrate CLI for Microsoft 365 in your app
 
-If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. This API lets you call any of the CLI's commands. The following examples show how you could call several CLI for Microsoft 365 commands in a Node.js app:
+If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. CLI for Microsoft 365 is published as an ES module, so an app that imports it should use ES modules as well. To add the package to your app, execute `npm install @pnp/cli-microsoft365`. This API lets you call any of the CLI's commands. The following examples show how you could call several CLI for Microsoft 365 commands in a Node.js app:
 
 ```javascript
 import { executeCommand } from '@pnp/cli-microsoft365';
@@ -34,8 +34,8 @@ try {
   }
   
   const siteUrl = sites[0].Url;
-  // m365 spo web get --webUrl https://contoso.sharepoint.com/sites/project-x --withGroups
-  const siteInfo = await executeCommand('spo web get', { webUrl: siteUrl, withGroups: true });
+  // m365 spo web get --url https://contoso.sharepoint.com/sites/project-x --withGroups
+  const siteInfo = await executeCommand('spo web get', { url: siteUrl, withGroups: true });
 
   console.log(siteInfo.stdout);
   

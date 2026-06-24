@@ -1,17 +1,20 @@
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
 import auth, { Connection } from '../../../Auth.js';
 import commands from '../commands.js';
-import Command, { CommandError } from '../../../Command.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../Command.js';
 import { formatting } from '../../../utils/formatting.js';
 import { cli } from '../../../cli/cli.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name?: string;
 }
 
 class ConnectionUseCommand extends Command {
@@ -23,32 +26,8 @@ class ConnectionUseCommand extends Command {
     return 'Activate the specified Microsoft 365 tenant connection';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTelemetry();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('name');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

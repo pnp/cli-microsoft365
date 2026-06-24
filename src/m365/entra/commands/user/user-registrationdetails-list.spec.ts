@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import commands from '../../commands.js';
 import request from '../../../../request.js';
-import command from './user-registrationdetails-list.js';
+import command, { options } from './user-registrationdetails-list.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -18,66 +18,66 @@ import { formatting } from '../../../../utils/formatting.js';
 describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
   const registrationDetails = [
     {
-      "id": "61b0c52f-a902-4769-9a09-c6628335b00a",
-      "userPrincipalName": "AdeleV@contoso.onmicrosoft.com",
-      "userDisplayName": "Adele Vance",
-      "userType": "member",
-      "isAdmin": false,
-      "isSsprRegistered": false,
-      "isSsprEnabled": false,
-      "isSsprCapable": false,
-      "isMfaRegistered": false,
-      "isMfaCapable": false,
-      "isPasswordlessCapable": false,
-      "methodsRegistered": [],
-      "isSystemPreferredAuthenticationMethodEnabled": false,
-      "systemPreferredAuthenticationMethods": [],
-      "userPreferredMethodForSecondaryAuthentication": "none",
-      "lastUpdatedDateTime": "2024-01-11T11:38:04.5006379Z"
+      'id': '61b0c52f-a902-4769-9a09-c6628335b00a',
+      'userPrincipalName': 'AdeleV@contoso.onmicrosoft.com',
+      'userDisplayName': 'Adele Vance',
+      'userType': 'member',
+      'isAdmin': false,
+      'isSsprRegistered': false,
+      'isSsprEnabled': false,
+      'isSsprCapable': false,
+      'isMfaRegistered': false,
+      'isMfaCapable': false,
+      'isPasswordlessCapable': false,
+      'methodsRegistered': [],
+      'isSystemPreferredAuthenticationMethodEnabled': false,
+      'systemPreferredAuthenticationMethods': [],
+      'userPreferredMethodForSecondaryAuthentication': 'none',
+      'lastUpdatedDateTime': '2024-01-11T11:38:04.5006379Z'
     },
     {
-      "id": "f9e0ee63-73dc-48a9-aa97-e5159ec11705",
-      "userPrincipalName": "JohannaL@contoso.onmicrosoft.com",
-      "userDisplayName": "Johanna Lorenz",
-      "userType": "member",
-      "isAdmin": false,
-      "isSsprRegistered": false,
-      "isSsprEnabled": false,
-      "isSsprCapable": false,
-      "isMfaRegistered": true,
-      "isMfaCapable": true,
-      "isPasswordlessCapable": false,
-      "methodsRegistered": [
-        "microsoftAuthenticatorPush",
-        "softwareOneTimePasscode"
+      'id': 'f9e0ee63-73dc-48a9-aa97-e5159ec11705',
+      'userPrincipalName': 'JohannaL@contoso.onmicrosoft.com',
+      'userDisplayName': 'Johanna Lorenz',
+      'userType': 'member',
+      'isAdmin': false,
+      'isSsprRegistered': false,
+      'isSsprEnabled': false,
+      'isSsprCapable': false,
+      'isMfaRegistered': true,
+      'isMfaCapable': true,
+      'isPasswordlessCapable': false,
+      'methodsRegistered': [
+        'microsoftAuthenticatorPush',
+        'softwareOneTimePasscode'
       ],
-      "isSystemPreferredAuthenticationMethodEnabled": false,
-      "systemPreferredAuthenticationMethods": [],
-      "userPreferredMethodForSecondaryAuthentication": "push",
-      "lastUpdatedDateTime": "2024-01-11T11:38:04.5053823Z"
+      'isSystemPreferredAuthenticationMethodEnabled': false,
+      'systemPreferredAuthenticationMethods': [],
+      'userPreferredMethodForSecondaryAuthentication': 'push',
+      'lastUpdatedDateTime': '2024-01-11T11:38:04.5053823Z'
     },
     {
-      "id": "abcd1234-e024-4bc6-8e98-123458962525",
-      "userPrincipalName": "JohnDoe@contoso.onmicrosoft.com",
-      "userDisplayName": "John Doe",
-      "userType": "member",
-      "isAdmin": true,
-      "isSsprRegistered": true,
-      "isSsprEnabled": true,
-      "isSsprCapable": true,
-      "isMfaRegistered": true,
-      "isMfaCapable": true,
-      "isPasswordlessCapable": false,
-      "methodsRegistered": [
-        "email",
-        "mobilePhone",
-        "microsoftAuthenticatorPush",
-        "softwareOneTimePasscode"
+      'id': 'abcd1234-e024-4bc6-8e98-123458962525',
+      'userPrincipalName': 'JohnDoe@contoso.onmicrosoft.com',
+      'userDisplayName': 'John Doe',
+      'userType': 'member',
+      'isAdmin': true,
+      'isSsprRegistered': true,
+      'isSsprEnabled': true,
+      'isSsprCapable': true,
+      'isMfaRegistered': true,
+      'isMfaCapable': true,
+      'isPasswordlessCapable': false,
+      'methodsRegistered': [
+        'email',
+        'mobilePhone',
+        'microsoftAuthenticatorPush',
+        'softwareOneTimePasscode'
       ],
-      "isSystemPreferredAuthenticationMethodEnabled": false,
-      "systemPreferredAuthenticationMethods": [],
-      "userPreferredMethodForSecondaryAuthentication": "push",
-      "lastUpdatedDateTime": "2024-01-11T11:38:04.5040399Z"
+      'isSystemPreferredAuthenticationMethodEnabled': false,
+      'systemPreferredAuthenticationMethods': [],
+      'userPreferredMethodForSecondaryAuthentication': 'push',
+      'lastUpdatedDateTime': '2024-01-11T11:38:04.5040399Z'
     }
   ];
 
@@ -85,6 +85,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -93,6 +94,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -114,7 +116,6 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue,
       entraUser.getUpnByUserId
     ]);
   });
@@ -136,58 +137,55 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['userPrincipalName', 'methodsRegistered', 'lastUpdatedDateTime']);
   });
 
-  it('fails validation if userType contains invalid value', async () => {
-    const actual = await command.validate({ options: { userType: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userType contains invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ userType: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userPreferredMethodForSecondaryAuthentication contains invalid value', async () => {
-    const actual = await command.validate({ options: { userPreferredMethodForSecondaryAuthentication: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userPreferredMethodForSecondaryAuthentication contains invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ userPreferredMethodForSecondaryAuthentication: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if systemPreferredAuthenticationMethods contains invalid value', async () => {
-    const actual = await command.validate({ options: { systemPreferredAuthenticationMethods: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if systemPreferredAuthenticationMethods contains invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ systemPreferredAuthenticationMethods: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if methodsRegistered contains invalid value', async () => {
-    const actual = await command.validate({ options: { methodsRegistered: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if methodsRegistered contains invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ methodsRegistered: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userIds contains invalid GUID', async () => {
+  it('fails validation if userIds contains invalid GUID', () => {
     const userIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
-    const actual = await command.validate({ options: { userIds: userIds.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userIds: userIds.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userPrincipalNames contains invalid user principal name', async () => {
+  it('fails validation if userPrincipalNames contains invalid user principal name', () => {
     const userPrincipalNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({ options: { userPrincipalNames: userPrincipalNames.join(',') } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userPrincipalNames: userPrincipalNames.join(',') });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if all optional parameters are valid', async () => {
+  it('passes validation if all optional parameters are valid', () => {
     const userIds = ['7167b488-1ffb-43f1-9547-35969469bada', '6dcd4ce0-4f89-11d3-9a0c-0305e82c3302'];
     const userPrincipalNames = ['john.doe@contoso.com', 'adele.vance@contoso.com'];
-    const actual = await command.validate({
-      options:
-      {
-        userType: 'guest',
-        userPreferredMethodForSecondaryAuthentication: 'push',
-        systemPreferredAuthenticationMethods: 'push',
-        methodsRegistered: 'microsoftAuthenticatorPush',
-        userIds: userIds.join(','),
-        userPrincipalNames: userPrincipalNames.join(',')
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      userType: 'guest',
+      userPreferredMethodForSecondaryAuthentication: 'push',
+      systemPreferredAuthenticationMethods: 'push',
+      methodsRegistered: 'microsoftAuthenticatorPush',
+      userIds: userIds.join(','),
+      userPrincipalNames: userPrincipalNames.join(',')
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('should get a list of user registration details', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/authenticationMethods/userRegistrationDetails`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/reports/authenticationMethods/userRegistrationDetails') {
         return {
           value: registrationDetails
         };
@@ -196,14 +194,14 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(loggerLogSpy.calledWith(registrationDetails));
   });
 
   it('should get a list of user registration details with selected properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/reports/authenticationMethods/userRegistrationDetails?$select=id,userPrincipalName,methodsRegistered`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/reports/authenticationMethods/userRegistrationDetails?$select=id,userPrincipalName,methodsRegistered') {
         return {
           value: registrationDetails
         };
@@ -212,7 +210,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { properties: 'id,userPrincipalName,methodsRegistered' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'id,userPrincipalName,methodsRegistered' }) });
 
     assert(loggerLogSpy.calledWith(registrationDetails));
   });
@@ -246,7 +244,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         isAdmin: true,
         userType: 'member',
         userPreferredMethodForSecondaryAuthentication: 'oath, voiceMobile,push',
@@ -261,7 +259,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
         methodsRegistered: 'fido2, microsoftAuthenticatorPush',
         userIds: '7167b488-1ffb-43f1-9547-35969469bada, 6dcd4ce0-4f89-11d3-9a0c-0305e82c3302',
         userPrincipalNames: 'john.doe@contoso.com, adele.vance@contoso.com'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(registrationDetails));
@@ -281,7 +279,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         isAdmin: false,
         isSelfServicePasswordResetCapable: false,
         isSelfServicePasswordResetEnabled: false,
@@ -290,7 +288,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
         isMfaRegistered: false,
         isPasswordlessCapable: false,
         isSystemPreferredAuthenticationMethodEnabled: false
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(registrationDetails));
@@ -308,7 +306,7 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('Invalid request'));
   });
 });

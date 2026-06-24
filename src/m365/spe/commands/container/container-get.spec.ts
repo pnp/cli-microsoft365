@@ -9,11 +9,40 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './container-get.js';
+import command, { options } from './container-get.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { cli } from '../../../../cli/cli.js';
+import { spe } from '../../../../utils/spe.js';
+import z from 'zod';
 
 describe(commands.CONTAINER_GET, () => {
+  const containerTypeId = 'c6f08d91-77fa-485f-9369-f246ec0fc19c';
+  const containerTypeName = 'Container type name';
+  const containerId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ';
+  const containerName = 'My Application Storage Container';
+  const containerResponse = {
+    id: containerId,
+    displayName: containerName,
+    description: 'Description of My Application Storage Container',
+    containerTypeId: '91710488-5756-407f-9046-fbe5f0b4de73',
+    status: 'active',
+    createdDateTime: '2021-11-24T15:41:52.347Z',
+    settings: {
+      isOcrEnabled: false
+    }
+  };
+  const deletedContainersResponse = [
+    {
+      id: containerId,
+      displayName: containerName
+    }
+  ];
+
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let schema: z.ZodTypeAny;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
@@ -21,7 +50,11 @@ describe(commands.CONTAINER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+
     auth.connection.active = true;
+    schema = command.getSchemaToParse()!;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -42,7 +75,10 @@ describe(commands.CONTAINER_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.post,
+      request.get,
+      spe.getContainerTypeIdByName,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -59,6 +95,41 @@ describe(commands.CONTAINER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if both id and name options are passed', async () => {
+    const actual = commandOptionsSchema.safeParse({ id: containerId, name: containerName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither id nor name options are passed', async () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if containerType option is used with id option', async () => {
+    const actual = commandOptionsSchema.safeParse({ id: containerId, containerTypeId: containerTypeId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if name is passed without containerType information', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if containerTypeId is not a valid GUID', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, containerTypeId: 'invalid-guid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if name is passed with containerTypeName', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, containerTypeName: containerTypeName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if name is passed', async () => {
+    const actual = commandOptionsSchema.safeParse({ name: containerName, containerTypeId: containerTypeId });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('correctly handles error', async () => {
     const errorMessage = 'Bad request.';
     sinon.stub(request, 'get').rejects({
@@ -67,33 +138,114 @@ describe(commands.CONTAINER_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'invalid', verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: schema.parse({ id: 'invalid', verbose: true }) } as any),
       new CommandError(errorMessage));
   });
 
   it('gets container by id', async () => {
-    const containerId = 'eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxNTU1MjcwOTQyNzIifQ';
-    const response = {
-      id: containerId,
-      displayName: "My Application Storage Container",
-      description: "Description of My Application Storage Container",
-      containerTypeId: "91710488-5756-407f-9046-fbe5f0b4de73",
-      status: "active",
-      createdDateTime: "2021-11-24T15:41:52.347Z",
-      settings: {
-        isOcrEnabled: false
-      }
-    };
-
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}`) {
-        return response;
+        return containerResponse;
       }
 
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: containerId } } as any);
-    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], response);
+    await command.action(logger, { options: schema.parse({ id: containerId }) } as any);
+    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], containerResponse);
+  });
+
+  it('correctly retrieves a container by name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: deletedContainersResponse
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}`) {
+        return containerResponse;
+      }
+
+      throw 'Invalid GET request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId } });
+    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], containerResponse);
+  });
+
+  it('correctly retrieves a container by name and container type name', async () => {
+    sinon.stub(spe, 'getContainerTypeIdByName').callsFake(async (name) => {
+      if (name === containerTypeName) {
+        return containerTypeId;
+      }
+
+      throw `Container type with name '${name}' not found.`;
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: deletedContainersResponse
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}`) {
+        return containerResponse;
+      }
+
+      throw 'Invalid GET request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: { name: containerName, containerTypeName: containerTypeName, verbose: true } });
+    assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], containerResponse);
+  });
+
+  it('correctly throws error when container name does not exist', async () => {
+    sinon.stub(request, 'get').resolves({
+      value: deletedContainersResponse
+    });
+
+    await assert.rejects(command.action(logger, { options: { name: 'Non-existing container', containerTypeId: containerTypeId } }),
+      new CommandError(`The specified container 'Non-existing container' does not exist.`));
+  });
+
+  it('correctly handles multiple containers with the same name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers?$filter=containerTypeId eq ${containerTypeId}&$select=id,displayName`) {
+        return {
+          value: [
+            ...deletedContainersResponse,
+            {
+              id: 'b!anotherContainerId',
+              displayName: containerName
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}`) {
+        return containerResponse;
+      }
+
+      throw 'Invalid GET request: ' + opts.url;
+    });
+
+    const stubMultiResults = sinon.stub(cli, 'handleMultipleResultsFound').resolves(deletedContainersResponse.find(c => c.id === containerId)!);
+    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId } });
+    assert(stubMultiResults.calledOnce);
+  });
+
+  it('correctly handles unexpected error', async () => {
+    const errorMessage = 'Access denied';
+    sinon.stub(request, 'get').rejects({
+      error: {
+        code: 'accessDenied',
+        message: errorMessage
+      }
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: containerId } }),
+      new CommandError(errorMessage));
   });
 });

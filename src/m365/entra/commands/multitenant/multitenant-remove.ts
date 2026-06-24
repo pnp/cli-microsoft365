@@ -1,4 +1,5 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Organization } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -11,12 +12,14 @@ interface MultitenantOrganizationMember {
   tenantId?: string;
 }
 
+export const options = globalOptionsZod
+  .extend({
+    force: z.boolean().optional().alias('f')
+  }).strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  force?: boolean;
 }
 
 class EntraMultitenantRemoveCommand extends GraphCommand {
@@ -28,27 +31,8 @@ class EntraMultitenantRemoveCommand extends GraphCommand {
     return 'Removes a multitenant organization';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-f, --force'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

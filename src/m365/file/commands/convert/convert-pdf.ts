@@ -3,22 +3,25 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  sourceFile: z.string().alias('s'),
+  targetFile: z.string().alias('t')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  sourceFile: string;
-  targetFile: string;
 }
 
 class FileConvertPdfCommand extends GraphCommand {
@@ -33,42 +36,18 @@ class FileConvertPdfCommand extends GraphCommand {
     return 'Converts the specified file to PDF using Microsoft Graph';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --sourceFile <sourceFile>'
-      },
-      {
-        option: '-t, --targetFile <targetFile>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.sourceFile.toLowerCase().startsWith('https://') &&
-          !fs.existsSync(args.options.sourceFile)) {
-          // assume local path
-          return `Specified source file ${args.options.sourceFile} doesn't exist`;
-        }
-
-        if (!args.options.targetFile.toLowerCase().startsWith('https://') &&
-          fs.existsSync(args.options.targetFile)) {
-          // assume local path
-          return `Another file found at ${args.options.targetFile}`;
-        }
-
-        return true;
-      }
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.sourceFile.toLowerCase().startsWith('https://') || fs.existsSync(options.sourceFile), {
+        error: e => `Specified source file ${(e.input as Options).sourceFile} doesn't exist`
+      })
+      .refine(options => options.targetFile.toLowerCase().startsWith('https://') || !fs.existsSync(options.targetFile), {
+        error: e => `Another file found at ${(e.input as Options).targetFile}`
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

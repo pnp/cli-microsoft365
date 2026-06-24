@@ -1,6 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandError } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -9,10 +10,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connection-urltoitemresolver-add.js';
+import command, { options } from './connection-urltoitemresolver-add.js';
 
 describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
   let logger: Logger;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -20,6 +22,8 @@ describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,7 +68,7 @@ describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
       itemId: '{id}',
       priority: 1
     };
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
   });
 
   it('correctly handles error', async () => {
@@ -89,37 +93,30 @@ describe(commands.CONNECTION_URLTOITEMRESOLVER_ADD, () => {
       priority: 1
     };
 
-    await assert.rejects(command.action(logger, { options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }),
       new CommandError(`An error has occurred`));
   });
 
-  it('supports specifying connection ID', () => {
-    const containsOption = !!command.options
-      .find(o => o.option.indexOf('--externalConnectionId') > -1);
-    assert(containsOption);
+  it('passes validation with all required options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: 'conn',
+      baseUrls: 'https://contoso.com',
+      urlPattern: '/(?<id>.*)',
+      itemId: '{id}',
+      priority: 1
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying base URLs', () => {
-    const containsOption = !!command.options
-      .find(o => o.option.indexOf('--baseUrls') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying URL patterns', () => {
-    const containsOption = !!command.options
-      .find(o => o.option.indexOf('--urlPattern') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying item ID', () => {
-    const containsOption = !!command.options
-      .find(o => o.option.indexOf('--itemId') > -1);
-    assert(containsOption);
-  });
-
-  it('supports specifying priority', () => {
-    const containsOption = !!command.options
-      .find(o => o.option.indexOf('--priority') > -1);
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      externalConnectionId: 'conn',
+      baseUrls: 'https://contoso.com',
+      urlPattern: '/(?<id>.*)',
+      itemId: '{id}',
+      priority: 1,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -11,7 +11,7 @@ import { telemetry } from '../../telemetry.js';
 import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
-import PeriodBasedReport from './PeriodBasedReport.js';
+import PeriodBasedReport, { periodBasedReportOptions } from './PeriodBasedReport.js';
 
 class MockCommand extends PeriodBasedReport {
   public get name(): string {
@@ -35,6 +35,7 @@ describe('PeriodBasedReport', () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof periodBasedReportOptions;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,6 +44,7 @@ describe('PeriodBasedReport', () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(mockCommand);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof periodBasedReportOptions;
   });
 
   beforeEach(() => {
@@ -81,45 +83,34 @@ describe('PeriodBasedReport', () => {
     assert.notStrictEqual(mockCommand.description, null);
   });
 
-  it('fails validation on invalid period', async () => {
-    const actual = await mockCommand.validate({ options: { period: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on invalid period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation on valid \'D7\' period', async () => {
-    const actual = await mockCommand.validate({
-      options: {
-        period: 'D7'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation on valid \'D30\' period', async () => {
-    const actual = await mockCommand.validate({
-      options: {
-        period: 'D30'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid \'D7\' period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation on valid \'D90\' period', async () => {
-    const actual = await mockCommand.validate({
-      options: {
-        period: 'D90'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid \'D30\' period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D30' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation on valid \'180\' period', async () => {
-    const actual = await mockCommand.validate({
-      options: {
-        period: 'D90'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid \'D90\' period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D90' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation on valid \'D180\' period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D180' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('get unique device type in teams and export it in a period', async () => {
@@ -134,7 +125,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { period: 'D7' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -151,7 +142,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { period: 'D7' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -167,7 +158,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { period: 'D7', output: 'json' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7', output: 'json' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -184,7 +175,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { period: 'D7', output: 'text' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -201,7 +192,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { period: 'D7' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -215,7 +206,7 @@ describe('PeriodBasedReport', () => {
       throw 'Invalid request';
     });
 
-    await mockCommand.action(logger, { options: { debug: true, period: 'D7', output: 'json' } });
+    await mockCommand.action(logger, { options: commandOptionsSchema.parse({ debug: true, period: 'D7', output: 'json' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -223,6 +214,6 @@ describe('PeriodBasedReport', () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(mockCommand.action(logger, { options: { period: 'D7' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(mockCommand.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) }), new CommandError('An error has occurred'));
   });
 });

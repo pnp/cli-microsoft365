@@ -1,0 +1,160 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spe container set
+
+Updates a SharePoint Embedded container
+
+## Usage
+
+```sh
+m365 spe container set [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id <id>`
+: The Id of the container.
+
+`--newName [newName]`
+: New display name for the container.
+
+`--description [description]`
+: Description of the container.
+
+`--isOcrEnabled [isOcrEnabled]`
+: Indicates whether OCR is enabled for the container. Possible values: `true`, `false`.
+
+`--isItemVersioningEnabled [isItemVersioningEnabled]`
+: Indicates whether item versioning is enabled. Possible values: `true`, `false`.
+
+`--itemMajorVersionLimit [itemMajorVersionLimit]`
+: Maximum number of major versions to keep. Requires versioning to be enabled.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
+
+## Remarks
+
+In addition to Graph permissions, the app/user must have container-type level permission for the respective container type. The caller must have write access to the container (for example, writer, manager, or owner role) to update metadata/settings.
+
+## Examples
+
+Update the container display name by Id.
+
+```sh
+m365 spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --newName "Contoso Project A"
+```
+
+Update description only.
+
+```sh
+m365 spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --description "Files for the Contoso Project A team"
+```
+
+Disable OCR for a container.
+
+```sh
+m365 spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --isOcrEnabled false
+```
+
+Enable versioning and set the major version limit.
+
+```sh
+m365 spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --isItemVersioningEnabled true --itemMajorVersionLimit 100
+```
+
+Update name, description, and settings together.
+
+```sh
+m365 spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --newName "Contoso Project A - Phase 2" --description "Phase 2 workspace" --isOcrEnabled true --isItemVersioningEnabled true --itemMajorVersionLimit 50
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z",
+    "displayName": "Contoso Project A",
+    "description": "Files for the Contoso Project A team",
+    "containerTypeId": "91710488-5756-407f-9046-fbe5f0b4de73",
+    "status": "active",
+    "createdDateTime": "2021-11-24T15:41:52.347Z",
+    "lockState": "unlocked",
+    "settings": {
+      "isOcrEnabled": false,
+      "itemMajorVersionLimit": 50,
+      "isItemVersioningEnabled": true
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  containerTypeId: 91710488-5756-407f-9046-fbe5f0b4de73
+  createdDateTime: 2021-11-24T15:41:52.347Z
+  description    : Files for the Contoso Project A team
+  displayName    : Contoso Project A
+  id             : b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z
+  lockState      : unlocked
+  settings       : {"isOcrEnabled":false,"itemMajorVersionLimit":50,"isItemVersioningEnabled":true}
+  status         : active
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName,description,containerTypeId,status,createdDateTime,lockState
+  b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z,Contoso Project A,Files for the Contoso Project A team,91710488-5756-407f-9046-fbe5f0b4de73,active,2021-11-24T15:41:52.347Z,unlocked
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spe container set --id "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --newName "Contoso Project A"
+
+  Date: 07/04/2026
+
+  ## Contoso Project A (b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z)
+
+  Property | Value
+  ---------|-------
+  id | b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z
+  displayName | Contoso Project A
+  description | Files for the Contoso Project A team
+  containerTypeId | 91710488-5756-407f-9046-fbe5f0b4de73
+  status | active
+  createdDateTime | 2021-11-24T15:41:52.347Z
+  lockState | unlocked
+  ```
+
+  </TabItem>
+</Tabs>

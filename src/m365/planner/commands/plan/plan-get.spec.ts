@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './plan-get.js';
+import command, { options } from './plan-get.js';
 
 describe(commands.PLAN_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
@@ -60,6 +61,7 @@ describe(commands.PLAN_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,52 +101,50 @@ describe(commands.PLAN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the ownerGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: invalidOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when id specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when title and valid ownerGroupId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when title and valid ownerGroupId specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when title and valid ownerGroupName specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when title and valid ownerGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when rosterId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        rosterId: validRosterId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when rosterId specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly get planner plan with given id', async () => {
@@ -161,9 +161,9 @@ describe(commands.PLAN_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(outputResponse));
@@ -182,12 +182,12 @@ describe(commands.PLAN_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
+    const argsOptions = commandOptionsSchema.parse({
       title: validTitle,
       ownerGroupId: validOwnerGroupId
-    };
+    });
 
-    await command.action(logger, { options: options });
+    await command.action(logger, { options: argsOptions });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
@@ -208,12 +208,12 @@ describe(commands.PLAN_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
+    const argsOptions = commandOptionsSchema.parse({
       title: validTitle,
       ownerGroupName: validOwnerGroupName
-    };
+    });
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: argsOptions });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
@@ -230,11 +230,11 @@ describe(commands.PLAN_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
+    const argsOptions = commandOptionsSchema.parse({
       rosterId: validRosterId
-    };
+    });
 
-    await command.action(logger, { options: options });
+    await command.action(logger, { options: argsOptions });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
@@ -248,18 +248,18 @@ describe(commands.PLAN_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const options: any = {
+    const argsOptions = commandOptionsSchema.parse({
       title: validTitle,
       ownerGroupId: validOwnerGroupId
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any));
+    await assert.rejects(command.action(logger, { options: argsOptions }));
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').rejects(new Error(`Planner plan with id '${validId}' was not found.`));
 
-    await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(`Planner plan with id '${validId}' was not found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) }), new CommandError(`Planner plan with id '${validId}' was not found.`));
   });
 });

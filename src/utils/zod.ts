@@ -148,7 +148,7 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends EnumLike>(e: T): z.ZodPipe<z.ZodTransform<string | number | null, unknown>, z.ZodEnum<T>> =>
+  coercedEnum: <T extends EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
     z.preprocess(val => {
       const target = String(val)?.toLowerCase();
       for (const k of Object.values(e)) {
@@ -158,5 +158,5 @@ export const zod = {
       }
 
       return null;
-    }, z.enum(e)) as unknown as z.ZodPipe<z.ZodTransform<string | number | null, unknown>, z.ZodEnum<T>>
+    }, z.enum(e)) as unknown as z.ZodPreprocess<z.ZodEnum<T>>
 };

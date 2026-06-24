@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -8,9 +10,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './report-mailappusageuserdetail.js';
+import command, { options } from './report-mailappusageuserdetail.js';
 
 describe(commands.REPORT_MAILAPPUSAGEUSERDETAIL, () => {
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
 
@@ -20,6 +24,8 @@ describe(commands.REPORT_MAILAPPUSAGEUSERDETAIL, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -66,7 +72,7 @@ describe(commands.REPORT_MAILAPPUSAGEUSERDETAIL, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { period: 'D7' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getEmailAppUsageUserDetail(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });

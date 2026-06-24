@@ -28,6 +28,25 @@ m365 spo commandset list [options]
 
 This command can be used for retrieving a list of ListView Command Sets from a specific site. To retrieve a list of ListView Command Sets that are installed tenant-wide, view our dedicated [spo tenant commandset list](../tenant/tenant-commandset-list.mdx) command.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieves a list of ListView Command Sets.

@@ -1,19 +1,25 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
+import { cli } from '../../../cli/cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
 import { CommandError } from '../../../Command.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './context-init.js';
+import command, { options } from './context-init.js';
 
 describe(commands.INIT, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -51,6 +57,16 @@ describe(commands.INIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ option: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('logs an error if an error occurred while reading the .m365rc.json', async () => {
     const originalFsExistsSync = fs.existsSync;
     const originalFsReadFileSync = fs.readFileSync;
@@ -72,7 +88,7 @@ describe(commands.INIT, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true } }), new CommandError('Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }), new CommandError('Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });
 
   it(`logs an error if the .m365rc.json file contents couldn't be parsed`, async () => {
@@ -104,7 +120,7 @@ describe(commands.INIT, () => {
       errorMessage = err;
     }
 
-    await assert.rejects(command.action(logger, { options: { verbose: true } }), new CommandError(`Error reading .m365rc.json: ${errorMessage}. Please add context info to .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }), new CommandError(`Error reading .m365rc.json: ${errorMessage}. Please add context info to .m365rc.json manually.`));
   });
 
   it(`logs an error if the content can't be written to the .m365rc.json file`, async () => {
@@ -131,7 +147,7 @@ describe(commands.INIT, () => {
     });
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(() => command.action(logger, { options: { verbose: true } }), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
+    await assert.rejects(() => command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });
 
   it(`creates the .m365rc.json file if it doesn't exist and saves context info`, async () => {
@@ -147,7 +163,7 @@ describe(commands.INIT, () => {
     });
     const fsWriteFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(fsWriteFileSyncStub.calledWith('.m365rc.json', JSON.stringify({
       context: {}
@@ -176,7 +192,7 @@ describe(commands.INIT, () => {
     });
     const fsWriteFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(fsWriteFileSyncStub.calledWith('.m365rc.json', JSON.stringify({
       context: {}
@@ -207,7 +223,7 @@ describe(commands.INIT, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(fsWriteFileSyncSpy.notCalled);
   });
@@ -235,7 +251,7 @@ describe(commands.INIT, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await assert.rejects(command.action(logger, { options: { verbose: true } }), new CommandError('Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }), new CommandError('Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
     assert(fsWriteFileSyncSpy.notCalled);
   });
 
@@ -251,6 +267,6 @@ describe(commands.INIT, () => {
     });
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true } }), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });
 });

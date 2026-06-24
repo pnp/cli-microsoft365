@@ -11,7 +11,7 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './flow-list.js';
+import command, { options } from './flow-list.js';
 import { accessToken } from '../../../utils/accessToken.js';
 
 describe(commands.LIST, () => {
@@ -219,6 +219,7 @@ describe(commands.LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -228,6 +229,7 @@ describe(commands.LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -270,23 +272,23 @@ describe(commands.LIST, () => {
   });
 
   it('fails validation if asAdmin is specified in combination with a sharingStatus', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, asAdmin: true, sharingStatus: 'all' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, asAdmin: true, sharingStatus: 'all' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if sharingStatus is not a valid sharingstatus', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, sharingStatus: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, sharingStatus: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if sharingStatus is valid', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, sharingStatus: 'all' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, sharingStatus: 'all' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if asAdmin is passed', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, asAdmin: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, asAdmin: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves available flows', async () => {
@@ -298,7 +300,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName }) });
     assert(loggerLogSpy.calledOnceWithExactly(regularFlowResponse.value));
   });
 
@@ -311,7 +313,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'ownedByMe' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'ownedByMe' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -327,7 +329,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'all' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'all' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -340,7 +342,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'personal' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'personal' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -353,7 +355,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, sharingStatus: 'sharedWithMe' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, sharingStatus: 'sharedWithMe' }) });
     assert(loggerLogSpy.calledOnceWithExactly(flowResponse.value));
   });
 
@@ -366,7 +368,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, asAdmin: true, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(adminFlowResponse.value));
   });
 
@@ -378,7 +380,7 @@ describe(commands.LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName }) } as any),
       new CommandError(`Access to the environment '${environmentName}' is denied.`));
   });
 
@@ -394,7 +396,7 @@ describe(commands.LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName }) } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -418,7 +420,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, withSolutions: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, withSolutions: true }) } as any);
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -460,7 +462,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' }) } as any);
     assert(loggerLogSpy.calledWith([
       {
         name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -482,7 +484,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, output: 'text' }) });
     const expectedOutput = regularFlowResponse.value.map(f => ({ ...f, displayName: f.properties.displayName }));
     assert(loggerLogSpy.calledOnceWithExactly(expectedOutput));
   });
@@ -496,7 +498,7 @@ describe(commands.LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, asAdmin: true, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, asAdmin: true, output: 'text' }) });
     const expectedOutput = adminFlowResponse.value.map(f => ({ ...f, displayName: f.properties.displayName }));
     assert(loggerLogSpy.calledOnceWithExactly(expectedOutput));
   });

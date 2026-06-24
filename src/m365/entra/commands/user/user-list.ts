@@ -1,24 +1,29 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
+import { zod } from '../../../../utils/zod.js';
+
+const allowedTypes = { Member: 'Member', Guest: 'Guest' } as const;
+
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  type: zod.coercedEnum(allowedTypes).optional(),
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  type?: string;
-  properties?: string;
-}
-
 class EntraUserListCommand extends GraphCommand {
-  private static readonly allowedTypes: string[] = ['Member', 'Guest'];
-
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -35,50 +40,8 @@ class EntraUserListCommand extends GraphCommand {
     return ['id', 'displayName', 'mail', 'userPrincipalName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--type [type]',
-        autocomplete: EntraUserListCommand.allowedTypes
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type && !EntraUserListCommand.allowedTypes.some(t => t.toLowerCase() === args.options.type!.toLowerCase())) {
-          return `'${args.options.type}' is not a valid value for option 'type'. Allowed values are: ${EntraUserListCommand.allowedTypes.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('type', 'properties');
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -116,13 +79,13 @@ class EntraUserListCommand extends GraphCommand {
   private getFilter(options: Options): string | null {
     const filters: string[] = [];
 
-    const unknownOptions = optionsUtils.getUnknownOptions(options, this.options);
+    const unknownOptions = optionsUtils.getUnknownOptions(options, zod.schemaToOptions(this.schema!));
     Object.keys(unknownOptions).forEach(key => {
-      if (typeof options[key] === 'boolean') {
+      if (typeof (options as any)[key] === 'boolean') {
         throw `Specify value for the ${key} property`;
       }
 
-      filters.push(`startsWith(${key}, '${formatting.encodeQueryParameter(options[key].toString())}')`);
+      filters.push(`startsWith(${key}, '${formatting.encodeQueryParameter((options as any)[key].toString())}')`);
     });
 
     if (options.type) {

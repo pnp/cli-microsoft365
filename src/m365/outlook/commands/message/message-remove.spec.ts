@@ -11,7 +11,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import command from './message-remove.js';
+import command, { options } from './message-remove.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
@@ -24,6 +24,7 @@ describe(commands.MESSAGE_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,24 +83,28 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: messageId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { id: messageId, userName: userPrincipalName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: messageId, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { id: messageId, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ id: messageId, userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('removes specific message using delegated permissions without prompting for confirmation', async () => {
@@ -110,7 +116,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -126,7 +132,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: messageId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -139,7 +145,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userId: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -152,7 +158,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userName: userPrincipalName, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userPrincipalName, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -167,7 +173,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userId: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -182,7 +188,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, userName: userPrincipalName, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userName: userPrincipalName, force: true, verbose: true }) });
     assert(deleteRequestStub.calledOnce);
   });
 
@@ -190,7 +196,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) }),
       new CommandError(`The option 'userId' or 'userName' is required when removing a message using application permissions.`));
   });
 
@@ -198,12 +204,12 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, userName: userPrincipalName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using application permissions.`));
   });
 
   it('throws an error when both userId and userName are defined when removing a message using delegated permissions', async () => {
-    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userName: userPrincipalName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, userId: userId, userName: userPrincipalName }) }),
       new CommandError(`Both options 'userId' and 'userName' cannot be used together when removing a message using delegated permissions.`));
   });
 
@@ -227,12 +233,12 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, force: true }) }),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the message when confirm option not passed', async () => {
-    await command.action(logger, { options: { id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) });
 
     assert(promptIssued);
   });
@@ -240,7 +246,7 @@ describe(commands.MESSAGE_REMOVE, () => {
   it('aborts removing the message when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: messageId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId }) });
     assert(deleteSpy.notCalled);
   });
 });

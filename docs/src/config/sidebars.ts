@@ -1316,6 +1316,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'calendar list',
+              id: 'cmd/outlook/calendar/calendar-list'
+            },
+            {
+              type: 'doc',
               label: 'calendar remove',
               id: 'cmd/outlook/calendar/calendar-remove'
             },
@@ -2218,6 +2223,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container set',
+              id: 'cmd/spe/container/container-set'
+            },
+            {
+              type: 'doc',
               label: 'container permission list',
               id: 'cmd/spe/container/container-permission-list'
             },
@@ -2758,6 +2768,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file unarchive',
+              id: 'cmd/spo/file/file-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'file retentionlabel ensure',
               id: 'cmd/spo/file/file-retentionlabel-ensure'
             },
@@ -2859,6 +2874,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder add',
               id: 'cmd/spo/folder/folder-add'
+            },
+            {
+              type: 'doc',
+              label: 'folder archive',
+              id: 'cmd/spo/folder/folder-archive'
             },
             {
               type: 'doc',
@@ -3223,6 +3243,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'list sensitivitylabel ensure',
               id: 'cmd/spo/list/list-sensitivitylabel-ensure'
+            },
+            {
+              type: 'doc',
+              label: 'list sensitivitylabel remove',
+              id: 'cmd/spo/list/list-sensitivitylabel-remove'
             },
             {
               type: 'doc',
@@ -5023,6 +5048,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage role list',
               id: 'cmd/viva/engage/engage-role-list'
+            },
+            {
+              type: 'doc',
+              label: 'engage role member add',
+              id: 'cmd/viva/engage/engage-role-member-add'
             },
             {
               type: 'doc',

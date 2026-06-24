@@ -1,39 +1,49 @@
 import { DOMParser } from '@xmldom/xmldom';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { md } from '../../../../utils/md.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import { Changelog, ChangelogItem } from '../../Changelog.js';
 import commands from '../../commands.js';
+
+const allowedVersions = ['beta', 'v1.0'];
+enum ChangeType {
+  Addition = 'Addition',
+  Change = 'Change',
+  Deletion = 'Deletion',
+  Deprecation = 'Deprecation'
+}
+const allowedServices = [
+  'Applications', 'Calendar', 'Change notifications', 'Cloud communications',
+  'Compliance', 'Cross-device experiences', 'Customer booking', 'Device and app management',
+  'Education', 'Files', 'Financials', 'Groups',
+  'Identity and access', 'Mail', 'Notes', 'Notifications',
+  'People and workplace intelligence', 'Personal contacts', 'Reports', 'Search',
+  'Security', 'Sites and lists', 'Tasks and plans', 'Teamwork',
+  'To-do tasks', 'Users', 'Workbooks and charts'
+];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  versions: z.string().optional().alias('v'),
+  changeType: zod.coercedEnum(ChangeType).optional().alias('c'),
+  services: z.string().optional().alias('s'),
+  startDate: z.string().optional(),
+  endDate: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  versions?: string;
-  changeType?: string;
-  services?: string;
-  startDate?: string;
-  endDate?: string;
-}
-
 class GraphChangelogListCommand extends AnonymousCommand {
-  private allowedVersions: string[] = ['beta', 'v1.0'];
-  private allowedChangeTypes: string[] = ['Addition', 'Change', 'Deletion', 'Deprecation'];
-  private allowedServices: string[] = [
-    'Applications', 'Calendar', 'Change notifications', 'Cloud communications',
-    'Compliance', 'Cross-device experiences', 'Customer booking', 'Device and app management',
-    'Education', 'Files', 'Financials', 'Groups',
-    'Identity and access', 'Mail', 'Notes', 'Notifications',
-    'People and workplace intelligence', 'Personal contacts', 'Reports', 'Search',
-    'Security', 'Sites and lists', 'Tasks and plans', 'Teamwork',
-    'To-do tasks', 'Users', 'Workbooks and charts'
-  ];
-
   public get name(): string {
     return commands.CHANGELOG_LIST;
   }
@@ -46,78 +56,47 @@ class GraphChangelogListCommand extends AnonymousCommand {
     return ['category', 'title', 'description'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        versions: typeof args.options.versions !== 'undefined',
-        changeType: typeof args.options.changeType !== 'undefined',
-        services: typeof args.options.services !== 'undefined',
-        startDate: typeof args.options.startDate !== 'undefined',
-        endDate: typeof args.options.endDate !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => {
+        if (!options.versions) {
+          return true;
+        }
+        return !options.versions.toLocaleLowerCase().split(',').some(x => !allowedVersions.map(y => y.toLocaleLowerCase()).includes(x));
+      }, {
+        error: `The versions contains an invalid value. Specify either ${allowedVersions.join(', ')} as properties`,
+        path: ['versions']
+      })
+      .refine(options => {
+        if (!options.services) {
+          return true;
+        }
+        return !options.services.toLocaleLowerCase().split(',').some(x => !allowedServices.map(y => y.toLocaleLowerCase()).includes(x));
+      }, {
+        error: `The services contains invalid value. Specify either ${allowedServices.join(', ')} as properties`,
+        path: ['services']
+      })
+      .refine(options => !options.startDate || validation.isValidISODate(options.startDate), {
+        error: 'The startDate is not a valid ISO date string',
+        path: ['startDate']
+      })
+      .refine(options => !options.endDate || validation.isValidISODate(options.endDate), {
+        error: 'The endDate is not a valid ISO date string',
+        path: ['endDate']
+      })
+      .refine(options => !(options.endDate && options.startDate && new Date(options.endDate) < new Date(options.startDate)), {
+        error: 'The endDate should be later than startDate',
+        path: ['endDate']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-v, --versions [versions]', autocomplete: this.allowedVersions },
-      { option: "-c, --changeType [changeType]", autocomplete: this.allowedChangeTypes },
-      { option: "-s, --services [services]", autocomplete: this.allowedServices },
-      { option: "--startDate [startDate]" },
-      { option: "--endDate [endDate]" }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (
-          args.options.versions &&
-          args.options.versions.toLocaleLowerCase().split(',').some(x => !this.allowedVersions.map(y => y.toLocaleLowerCase()).includes(x))) {
-          return `The verions contains an invalid value. Specify either ${this.allowedVersions.join(', ')} as properties`;
-        }
-
-        if (
-          args.options.changeType &&
-          !this.allowedChangeTypes.map(x => x.toLocaleLowerCase()).includes(args.options.changeType.toLocaleLowerCase())) {
-          return `The change type contain an invalid value. Specify either ${this.allowedChangeTypes.join(', ')} as properties`;
-        }
-
-        if (
-          args.options.services &&
-          args.options.services.toLocaleLowerCase().split(',').some(x => !this.allowedServices.map(y => y.toLocaleLowerCase()).includes(x))) {
-          return `The services contains invalid value. Specify either ${this.allowedServices.join(', ')} as properties`;
-        }
-
-        if (args.options.startDate && !validation.isValidISODate(args.options.startDate)) {
-          return 'The startDate is not a valid ISO date string';
-        }
-
-        if (args.options.endDate && !validation.isValidISODate(args.options.endDate)) {
-          return 'The endDate is not a valid ISO date string';
-        }
-
-        if (args.options.endDate && args.options.startDate && new Date(args.options.endDate) < new Date(args.options.startDate)) {
-          return 'The endDate should be later than startDate';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
-      const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
+      const searchParam = args.options.changeType ? `/?filterBy=${args.options.changeType}` : '';
 
       const requestOptions: CliRequestOptions = {
         url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
@@ -144,17 +123,17 @@ class GraphChangelogListCommand extends AnonymousCommand {
     let items: ChangelogItem[] = changelog.items;
 
     if (options.services) {
-      const allowedServices: string[] = this.allowedServices
+      const matchedServices: string[] = allowedServices
         .filter(allowedService => options.services!.toLocaleLowerCase().split(',').includes(allowedService.toLocaleLowerCase()));
 
-      items = changelog.items.filter(item => allowedServices.includes(item.title));
+      items = changelog.items.filter(item => matchedServices.includes(item.title));
     }
 
     if (options.versions) {
-      const allowedVersions: string[] = this.allowedVersions
+      const matchedVersions: string[] = allowedVersions
         .filter(allowedVersion => options.versions!.toLocaleLowerCase().split(',').includes(allowedVersion.toLocaleLowerCase()));
 
-      items = items.filter(item => allowedVersions.includes(item.category));
+      items = items.filter(item => matchedVersions.includes(item.category));
     }
 
     if (options.startDate) {

@@ -1,23 +1,33 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
-import { validation } from '../../../../utils/validation.js';
 import { CliRequestOptions } from '../../../../request.js';
+import { zod } from '../../../../utils/zod.js';
+
+enum MemberType {
+  User = 'user',
+  Group = 'group',
+  Device = 'device'
+}
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  administrativeUnitId: z.uuid().optional().alias('i'),
+  administrativeUnitName: z.string().optional().alias('n'),
+  type: zod.coercedEnum(MemberType).optional().alias('t'),
+  properties: z.string().optional().alias('p'),
+  filter: z.string().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  administrativeUnitId?: string;
-  administrativeUnitName?: string;
-  type?: string;
-  properties?: string;
-  filter?: string;
 }
 
 interface DirectoryObjectEx extends DirectoryObject {
@@ -38,70 +48,22 @@ class EntraAdministrativeUnitMemberListCommand extends GraphCommand {
     return ['id', 'displayName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        filter: typeof args.options.filter !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.administrativeUnitId, options.administrativeUnitName].filter(Boolean).length === 1, {
+        error: 'Specify either administrativeUnitId or administrativeUnitName',
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'administrativeUnitName']
+        }
+      })
+      .refine(options => !options.filter || options.type, {
+        error: 'Filter can be specified only if type is set'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --administrativeUnitId [administrativeUnitId]'
-      },
-      {
-        option: '-n, --administrativeUnitName [administrativeUnitName]'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['user', 'group', 'device']
-      },
-      {
-        option: '-p, --properties [properties]'
-      },
-      {
-        option: '-f, --filter [filter]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.administrativeUnitId && !validation.isValidGuid(args.options.administrativeUnitId as string)) {
-          return `${args.options.administrativeUnitId} is not a valid GUID`;
-        }
-
-        if (args.options.type) {
-          if (['user', 'group', 'device'].every(type => type !== args.options.type)) {
-            return `${args.options.type} is not a valid type value. Allowed values user|group|device`;
-          }
-        }
-
-        if (args.options.filter && !args.options.type) {
-          return 'Filter can be specified only if type is set';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['administrativeUnitId', 'administrativeUnitName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

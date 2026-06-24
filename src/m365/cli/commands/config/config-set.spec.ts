@@ -9,15 +9,17 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './config-set.js';
+import command, { options } from './config-set.js';
 
 describe(commands.CONFIG_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
@@ -205,194 +207,178 @@ describe(commands.CONFIG_SET, () => {
   });
 
 
-  it('supports specifying key and value', () => {
-    const options = command.options;
-    let containsOptionKey = false;
-    let containsOptionValue = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--key') > -1) {
-        containsOptionKey = true;
-      }
-
-      if (o.option.indexOf('--value') > -1) {
-        containsOptionValue = true;
-      }
-    });
-    assert(containsOptionKey && containsOptionValue);
+  it('fails validation if specified key is invalid ', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'invalid', value: 'false' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified key is invalid ', async () => {
-    const actual = await command.validate({ options: { key: 'invalid', value: false } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to true`, () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.showHelpOnFailure, value: 'true' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to true`, async () => {
-    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'true' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to false`, () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.showHelpOnFailure, value: 'false' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to false`, async () => {
-    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'false' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified output type is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.output, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified output type is invalid', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.output, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for output type text', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.output, value: 'text' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for output type text', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.output, value: 'text' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for output type json', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.output, value: 'json' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for output type json', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.output, value: 'json' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for output type csv', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.output, value: 'csv' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for output type csv', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.output, value: 'csv' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified authType is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified authType is invalid', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for authType type deviceCode', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'deviceCode' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type deviceCode', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'deviceCode' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for authType type browser', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'browser' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type browser', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'browser' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for authType type certificate', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'certificate' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type certificate', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'certificate' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for authType type password', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'password' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type password', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'password' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for authType type identity', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'identity' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type identity', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'identity' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for authType type secret', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.authType, value: 'secret' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for authType type secret', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'secret' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified error output type is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.errorOutput, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified error output type is invalid', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for error output stdout', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.errorOutput, value: 'stdout' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for error output stdout', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stdout' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for error output stderr', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.errorOutput, value: 'stderr' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for error output stderr', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified help mode is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified help mode is invalid', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for help mode options', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'options' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help mode options', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'options' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for help mode examples', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'examples' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help mode examples', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'examples' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for help mode remarks', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'remarks' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help mode remarks', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'remarks' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for help mode response', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'response' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help mode response', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'response' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for help mode full', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpMode, value: 'full' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help mode full', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified promptListPageSize value is a string', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.promptListPageSize, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified promptListPageSize value is a string', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified promptListPageSize value is 0', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.promptListPageSize, value: '0' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified promptListPageSize value is 0', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 0 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified promptListPageSize value is negative', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.promptListPageSize, value: '-1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified promptListPageSize value is negative', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: -1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for number value in promptListPageSize', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.promptListPageSize, value: '10' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for number value in promptListPageSize', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 10 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified help target is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpTarget, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified help target is invalid', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation for help target web', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpTarget, value: 'web' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help target web', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'web' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation for help target console', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.helpTarget, value: 'console' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation for help target console', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'console' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified clientId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.clientId, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified clientId is not a GUID', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.clientId, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if specified clientId is a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.clientId, value: '00000000-0000-0000-c000-000000000001' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if specified clientId is a GUID', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.clientId, value: '00000000-0000-0000-c000-000000000001' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if specified tenantId is not a GUID or common', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.tenantId, value: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified tenantId is not a GUID or common', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if specified tenantId is a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.tenantId, value: '00000000-0000-0000-c000-000000000001' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if specified tenantId is a GUID', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: '00000000-0000-0000-c000-000000000001' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if specified tenantId is common', async () => {
-    const actual = await command.validate({ options: { key: settingsNames.tenantId, value: 'common' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if specified tenantId is common', () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.tenantId, value: 'common' });
+    assert.strictEqual(actual.success, true);
   });
 });

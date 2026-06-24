@@ -6,9 +6,9 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-import command from './connection-use.js';
-import { settingsNames } from '../../../settingsNames.js';
+import command, { options } from './connection-use.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { CommandError } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
 import { ConnectionDetails } from '../../commands/ConnectionDetails.js';
@@ -17,6 +17,8 @@ describe(commands.USE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const mockContosoApplicationIdentityResponse = {
     "connectedAs": "Contoso Application",
     "connectionName": "acd6df42-10a9-4315-8928-53334f1c9d01",
@@ -80,7 +82,9 @@ describe(commands.USE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
+
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
@@ -132,8 +136,18 @@ describe(commands.USE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: "value" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it(`fails with error if the connection cannot be found`, async () => {
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'Non-existent connection' }) }),
       new CommandError(`The connection 'Non-existent connection' cannot be found.`));
   });
 
@@ -142,7 +156,7 @@ describe(commands.USE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore(auth.restoreAuth);
@@ -150,17 +164,17 @@ describe(commands.USE, () => {
   });
 
   it(`switches to the 'Contoso Application' identity using the name option`, async () => {
-    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'acd6df42-10a9-4315-8928-53334f1c9d01' }) });
     assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
   });
 
   it(`switches to the user identity using the name option`, async () => {
-    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: '028de82d-7fd9-476e-a9fd-be9714280ff3' }) });
     assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
   });
 
   it(`switches to the user identity using the name option (debug)`, async () => {
-    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true }) });
     const logged = loggerLogSpy.args[0][0] as unknown as ConnectionDetails;
     assert.strictEqual(logged.connectedAs, mockUserIdentityResponse.connectedAs);
   });
@@ -168,14 +182,14 @@ describe(commands.USE, () => {
   it('switches to the identity connection using prompting', async () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(connections[1]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
   });
 
   it(`switches to the user identity using prompting`, async () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(connections[0]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
   });
 });

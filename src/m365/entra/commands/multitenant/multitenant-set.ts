@@ -1,17 +1,20 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { MultitenantOrganization } from './MultitenantOrganization.js';
 
+export const options = globalOptionsZod
+  .extend({
+    displayName: z.string().optional().alias('n'),
+    description: z.string().optional().alias('d')
+  }).strict();
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName?: string;
-  description?: string;
 }
 
 class EntraMultitenantSetCommand extends GraphCommand {
@@ -23,49 +26,15 @@ class EntraMultitenantSetCommand extends GraphCommand {
     return 'Updates the properties of a multitenant organization';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.displayName || options.description, {
+        error: 'Specify either displayName or description or both'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '-d, --description [description]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.displayName && !args.options.description) {
-          return 'Specify either displayName or description or both.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('displayName', 'description');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

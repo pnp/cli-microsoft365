@@ -1,6 +1,7 @@
 import { Drive, DriveItem, Site } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
 import { odata } from '../../../utils/odata.js';
@@ -8,14 +9,21 @@ import { validation } from '../../../utils/validation.js';
 import GraphCommand from '../../base/GraphCommand.js';
 import commands from '../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderUrl: z.string(),
+  recursive: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl: string;
-  recursive?: boolean;
 }
 
 class FileListCommand extends GraphCommand {
@@ -33,34 +41,8 @@ class FileListCommand extends GraphCommand {
     return ['name', 'lastModifiedByUser'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        recursive: !!args.options.recursive
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '--folderUrl <folderUrl>' },
-      { option: '--recursive' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

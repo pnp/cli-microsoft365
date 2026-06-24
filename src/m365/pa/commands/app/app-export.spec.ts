@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-export.js';
+import command, { options } from './app-export.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_EXPORT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const packageDisplayName = 'Power App';
   const packageDescription = 'Power App Description';
@@ -154,6 +155,7 @@ describe(commands.APP_EXPORT, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -173,6 +175,7 @@ describe(commands.APP_EXPORT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      fs.existsSync,
       request.get,
       request.post,
       fs.writeFileSync
@@ -223,7 +226,7 @@ describe(commands.APP_EXPORT, () => {
     });
     const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
 
-    await command.action(logger, { options: { name: appId, environmentName: environmentName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: appId, environmentName: environmentName }) });
     assert(writeFileStub.calledOnceWithExactly(`./${appId}.zip`, fileBlobResponse, 'binary'));
   });
 
@@ -258,7 +261,7 @@ describe(commands.APP_EXPORT, () => {
     });
     const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
 
-    await command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName }) });
     assert(writeFileStub.calledOnceWithExactly(`./${packageDisplayName}.zip`, fileBlobResponse, 'binary'));
   });
 
@@ -292,26 +295,32 @@ describe(commands.APP_EXPORT, () => {
       throw 'invalid request';
     });
     const writeFileStub = sinon.stub(fs, 'writeFileSync').returns();
+    sinon.stub(fs, 'existsSync').returns(true);
 
-    await command.action(logger, { options: { verbose: true, name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path }) });
     assert(writeFileStub.calledOnceWithExactly(`${path}/${packageDisplayName}.zip`, fileBlobResponse, 'binary'));
   });
 
-  it('fails validation if the name is not a GUID', async () => {
-    const actual = await command.validate({ options: { name: 'foo', environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'foo', environmentName: environmentName, packageDisplayName: packageDisplayName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified path doesn\'t exist', async () => {
+  it('fails validation if specified path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
+    const actual = commandOptionsSchema.safeParse({ name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' });
     sinonUtil.restore(fs.existsSync);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the name, environment and packageDisplayName specified', async () => {
-    const actual = await command.validate({ options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the name, environment and packageDisplayName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles API OData error', async () => {
@@ -323,7 +332,7 @@ describe(commands.APP_EXPORT, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName }) }),
       new CommandError(error.error.message));
   });
 });

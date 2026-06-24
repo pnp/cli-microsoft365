@@ -13,8 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './user-set.js';
 
 describe(commands.USER_SET, () => {
   const currentPassword = '9%9OLUg6p@Ra';
@@ -37,6 +36,7 @@ describe(commands.USER_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,6 +51,7 @@ describe(commands.USER_SET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -75,9 +76,9 @@ describe(commands.USER_SET, () => {
       request.patch,
       request.post,
       request.put,
+      request.delete,
       accessToken.getUserNameFromAccessToken,
-      accessToken.getUserIdFromAccessToken,
-      cli.getSettingWithDefaultValue
+      accessToken.getUserIdFromAccessToken
     ]);
   });
 
@@ -98,133 +99,109 @@ describe(commands.USER_SET, () => {
     assert.strictEqual(command.allowUnknownOptions(), true);
   });
 
-  it('fails validation if neither the id nor the userName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the id nor the userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both the id and the userName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: id, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both the id and the userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, userName: userName });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if currentPassword is set without newPassword', async () => {
-    const actual = await command.validate({ options: { id: id, currentPassword: currentPassword } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if currentPassword is set without newPassword', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, currentPassword: currentPassword });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if newPassword is set without currentPassword', async () => {
-    const actual = await command.validate({ options: { id: id, newPassword: newPassword } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if newPassword is set without currentPassword', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newPassword: newPassword });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if resetPassword is set without a password', async () => {
-    const actual = await command.validate({ options: { id: id, resetPassword: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if resetPassword is set without a password', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, resetPassword: true });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if resetPassword and password is set and currentPassword is also set', async () => {
-    const actual = await command.validate({ options: { id: id, resetPassword: true, password: newPassword, currentPassword: currentPassword } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if resetPassword and password is set and currentPassword is also set', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, resetPassword: true, newPassword: newPassword, currentPassword: currentPassword });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when userName has an invalid value', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when userName has an invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation usageLocation is not a valid usageLocation', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, usageLocation: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation usageLocation is not a valid usageLocation', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, usageLocation: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation preferredLanguage is not a valid preferredLanguage', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, preferredLanguage: 'z' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation preferredLanguage is not a valid preferredLanguage', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, preferredLanguage: 'z' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both managerUserId and managerUserName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both managerUserId and managerUserName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, managerUserId: managerUserId, managerUserName: managerUserName });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if managerUserName is not a valid userName', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if managerUserName is not a valid userName', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, managerUserName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if managerUserId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if managerUserId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, managerUserId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if firstName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, firstName: largeString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if firstName has more than 64 characters', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, firstName: largeString });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if lastName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, lastName: largeString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if lastName has more than 64 characters', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, lastName: largeString });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if jobTitle has more than 128 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, jobTitle: largeString + largeString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if jobTitle has more than 128 characters', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, jobTitle: largeString + largeString });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if companyName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, companyName: largeString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if companyName has more than 64 characters', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, companyName: largeString });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if department has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, id: id, department: largeString } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if department has more than 64 characters', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, id: id, department: largeString });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if forceChangePasswordNextSignIn is set without resetPassword', async () => {
-    const actual = await command.validate({ options: { id: id, forceChangePasswordNextSignIn: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if forceChangePasswordNextSignIn is set without resetPassword', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, forceChangePasswordNextSignIn: true });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if forceChangePasswordNextSignInWithMfa is set without resetPassword', async () => {
-    const actual = await command.validate({ options: { id: id, forceChangePasswordNextSignInWithMfa: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if forceChangePasswordNextSignInWithMfa is set without resetPassword', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, forceChangePasswordNextSignInWithMfa: true });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, true);
   });
 
   it('allows unknown properties', () => {
@@ -234,42 +211,42 @@ describe(commands.USER_SET, () => {
 
   it('throws error when id is not equal to current signed in id in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserIdFromAccessToken').returns('7c47b08e-e7b3-427a-9eba-b679815148e9');
-    await assert.rejects(command.action(logger, { options: { verbose: true, id: id, newPassword: newPassword, currentPassword: currentPassword } } as any),
-      new CommandError(`You can only change your own password. Please use --id @meId to reference to your own userId`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, newPassword: newPassword, currentPassword: currentPassword }) }),
+      new CommandError('You can only change your own password. Please use --id @meId to reference to your own userId'));
   });
 
   it('throws error when userName is not equal to current signed in userName in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('john@contoso.com');
-    await assert.rejects(command.action(logger, { options: { verbose: true, userName: userName, newPassword: newPassword, currentPassword: currentPassword } } as any),
-      new CommandError(`You can only change your own password. Please use --userName @meUserName to reference to your own user principal name`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: userName, newPassword: newPassword, currentPassword: currentPassword }) }),
+      new CommandError('You can only change your own password. Please use --userName @meUserName to reference to your own user principal name'));
   });
 
   it('correctly handles user or property not found', async () => {
     sinon.stub(request, 'patch').rejects({
-      "error": {
-        "code": "Request_ResourceNotFound",
-        "message": "Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.",
-        "innerError": {
-          "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-          "date": "2018-04-24T18:56:48"
+      error: {
+        code: 'Request_ResourceNotFound',
+        message: "Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.",
+        innerError: {
+          'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
+          date: '2018-04-24T18:56:48'
         }
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, id: id, NonExistingProperty: 'Value' } } as any),
-      new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, NonExistingProperty: 'Value' }) }),
+      new CommandError(`Resource '${id}' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('correctly updates information about the specified user', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
+      if ((opts.url as string).indexOf('/v1.0/users/') > -1) {
         return;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: id,
         Department: 'Sales & Marketing',
@@ -282,21 +259,21 @@ describe(commands.USER_SET, () => {
         jobTitle: jobTitle,
         department: department,
         preferredLanguage: preferredLanguage
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly updates information about the specified user with unknown options', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
+      if ((opts.url as string).indexOf('/v1.0/users/') > -1) {
         return;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: id,
         department: 'Sales & Marketing',
@@ -310,8 +287,8 @@ describe(commands.USER_SET, () => {
         preferredLanguage: preferredLanguage,
         accountEnabled: false,
         extension_b7d8e648520f41d3b9c0fdeb91768a0a_jobGroupTracker: 'JobGroupN'
-      }
-    } as any);
+      })
+    });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
       companyName: 'Contoso',
       department: 'Sales & Marketing',
@@ -337,11 +314,11 @@ describe(commands.USER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         companyName: ''
-      }
-    } as any);
+      })
+    });
 
     assert.strictEqual(patchStub.lastCall.args[0].data.companyName, null);
   });
@@ -359,15 +336,15 @@ describe(commands.USER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: id,
         resetPassword: true,
         newPassword: newPassword,
         forceChangePasswordNextSignIn: true,
         forceChangePasswordNextSignInWithMfa: true
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -383,13 +360,13 @@ describe(commands.USER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: userName,
         resetPassword: true,
         newPassword: newPassword
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -406,13 +383,13 @@ describe(commands.USER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: userName,
         currentPassword: currentPassword,
         newPassword: newPassword
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -429,31 +406,31 @@ describe(commands.USER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: id,
         currentPassword: currentPassword,
         newPassword: newPassword
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly enables the specified user', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
+      if ((opts.url as string).indexOf('/v1.0/users/') > -1) {
         return;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: userName,
         accountEnabled: true
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -466,7 +443,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, managerUserId: managerUserId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, managerUserId: managerUserId }) });
     assert.deepEqual(putStub.lastCall.args[0].data, {
       '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserId}`
     });
@@ -481,7 +458,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: userName, managerUserName: managerUserName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: userName, managerUserName: managerUserName }) });
     assert.deepEqual(putStub.lastCall.args[0].data, {
       '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserName}`
     });
@@ -496,7 +473,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: userName, removeManager: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName: userName, removeManager: true }) });
     assert(deleteStub.called);
   });
 });

@@ -1,15 +1,20 @@
+import { z } from 'zod';
 import { Logger } from '../../cli/Logger.js';
-import GlobalOptions from '../../GlobalOptions.js';
+import { globalOptionsZod } from '../../Command.js';
 import request, { CliRequestOptions } from '../../request.js';
 import { formatting } from '../../utils/formatting.js';
 import GraphCommand from "./GraphCommand.js";
 
-export interface CommandArgs {
-  options: UsagePeriodOptions;
-}
+export const periodBasedReportOptions = z.strictObject({
+  ...globalOptionsZod.shape,
+  output: z.enum(['json', 'csv']).optional().alias('o'),
+  period: z.enum(['D7', 'D30', 'D90', 'D180']).alias('p')
+});
 
-interface UsagePeriodOptions extends GlobalOptions {
-  period: string;
+declare type Options = z.infer<typeof periodBasedReportOptions>;
+
+export interface CommandArgs {
+  options: Options;
 }
 
 export default abstract class PeriodBasedReport extends GraphCommand {
@@ -19,26 +24,8 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     return ['json', 'csv'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.push(
-      {
-        option: '-p, --period <period>',
-        autocomplete: ['D7', 'D30', 'D90', 'D180']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      (args) => this.validatePeriod(args),
-    );
+  public get schema(): z.ZodType | undefined {
+    return periodBasedReportOptions;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -99,15 +86,5 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     }
 
     return jsonObj;
-  }
-
-  protected async validatePeriod(args: CommandArgs): Promise<boolean | string> {
-    const period = args.options.period;
-    if (period &&
-      ['D7', 'D30', 'D90', 'D180'].indexOf(period) < 0) {
-      return `${period} is not a valid period type. The supported values are D7|D30|D90|D180`;
-    }
-
-    return true;
   }
 }

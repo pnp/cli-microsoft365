@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './pim-role-assignment-eligibility-list.js';
+import command, { options } from './pim-role-assignment-eligibility-list.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CommandError } from '../../../../Command.js';
@@ -201,6 +201,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -209,6 +210,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -249,33 +251,33 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
   });
 
   it('passes validation when userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when userName is a valid user principal name', async () => {
-    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when userName is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { userName: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('should get a list of eligible roles for any user', async () => {
@@ -289,7 +291,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse));
   });
@@ -307,7 +309,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[0]]));
   });
@@ -326,7 +328,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[0]]));
   });
@@ -344,7 +346,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
@@ -363,7 +365,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentEligibilityScheduleInstanceTransformedResponse[1]]));
   });
@@ -379,7 +381,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { withPrincipalDetails: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ withPrincipalDetails: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentEligibilityScheduleInstanceWithPrincipalTransformedResponse));
   });
@@ -393,7 +395,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });
