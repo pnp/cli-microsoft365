@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './managementapp-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './managementapp-add.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
@@ -21,6 +20,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,6 +30,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,9 +78,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app'
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -88,9 +89,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app'
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -98,9 +99,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
+      })
     }), new CommandError(`An error has occurred`));
   });
 
@@ -108,87 +109,60 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My app'
-      }
+      })
     }), new CommandError(`An error has occurred`));
   });
 
-  it('fails validation if appId and objectId specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and objectId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId and name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if objectId and name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if objectId and name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither appId, objectId, nor name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, objectId, nor name specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the objectId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { objectId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the objectId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { appId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (appId)', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (appId)', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (objectId)', async () => {
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (objectId)', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { name: 'My app' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My app' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('successfully registers app as managementapp when passing appId', async () => {
@@ -203,9 +177,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
+      })
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
@@ -231,9 +205,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'My Test App', debug: true
-      }
+      })
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
@@ -259,9 +233,9 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: '340a4aa3-1af6-43ac-87d8-189819003952', debug: true
-      }
+      })
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');

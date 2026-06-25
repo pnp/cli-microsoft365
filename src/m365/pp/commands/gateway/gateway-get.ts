@@ -1,10 +1,24 @@
+import { z } from 'zod';
 import { Logger } from "../../../../cli/Logger.js";
-import { CommandArgs } from "../../../../Command.js";
+import { globalOptionsZod } from "../../../../Command.js";
 import request from "../../../../request.js";
 import { formatting } from "../../../../utils/formatting.js";
 import { validation } from "../../../../utils/validation.js";
 import PowerBICommand from "../../../base/PowerBICommand.js";
 import commands from "../../commands.js";
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
 
 class PpGatewayGetCommand extends PowerBICommand {
   public get name(): string {
@@ -15,25 +29,8 @@ class PpGatewayGetCommand extends PowerBICommand {
     return "Gets information about the specified gateway.";
   }
 
-  constructor() {
-    super();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift({
-      option: "-i, --id <id>"
-    });
-  }
-
-  #initValidators(): void {
-    this.validators.push(async (args: CommandArgs) => {
-      if (!validation.isValidGuid(args.options.id as string)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-      return true;
-    });
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

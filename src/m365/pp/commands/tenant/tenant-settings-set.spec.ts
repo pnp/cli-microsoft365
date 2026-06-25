@@ -11,11 +11,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-settings-set.js';
+import command, { options } from './tenant-settings-set.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.TENANT_SETTINGS_SET, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const successResponse = {
     walkMeOptOut: false,
@@ -80,6 +81,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -117,49 +119,54 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if not one property is specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ walkMeOptOut: false, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the shareWithColleaguesUserLimit is not a valid number', async () => {
-    const actual = await command.validate({ options: { shareWithColleaguesUserLimit: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if not one property is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the shareWithColleaguesUserLimit is a negative number', async () => {
-    const actual = await command.validate({ options: { shareWithColleaguesUserLimit: -1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the shareWithColleaguesUserLimit is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ shareWithColleaguesUserLimit: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the shareWithColleaguesUserLimit is a float number', async () => {
-    const actual = await command.validate({ options: { shareWithColleaguesUserLimit: 3.14 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the shareWithColleaguesUserLimit is a negative number', () => {
+    const actual = commandOptionsSchema.safeParse({ shareWithColleaguesUserLimit: '-1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the shareWithColleaguesUserLimit is a valid number', async () => {
-    const actual = await command.validate({ options: { shareWithColleaguesUserLimit: 9 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the shareWithColleaguesUserLimit is a float number', () => {
+    const actual = commandOptionsSchema.safeParse({ shareWithColleaguesUserLimit: '3.14' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the storageCapacityConsumptionWarningThreshold is not a valid number', async () => {
-    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the shareWithColleaguesUserLimit is a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ shareWithColleaguesUserLimit: '9' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the storageCapacityConsumptionWarningThreshold is a negative number', async () => {
-    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: -1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the storageCapacityConsumptionWarningThreshold is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ storageCapacityConsumptionWarningThreshold: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the storageCapacityConsumptionWarningThreshold is a float number', async () => {
-    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: 3.14 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the storageCapacityConsumptionWarningThreshold is a negative number', () => {
+    const actual = commandOptionsSchema.safeParse({ storageCapacityConsumptionWarningThreshold: '-1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the storageCapacityConsumptionWarningThreshold is a valid number', async () => {
-    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: 9 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the storageCapacityConsumptionWarningThreshold is a float number', () => {
+    const actual = commandOptionsSchema.safeParse({ storageCapacityConsumptionWarningThreshold: '3.14' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when the storageCapacityConsumptionWarningThreshold is a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ storageCapacityConsumptionWarningThreshold: '9' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully updates tenant settings', async () => {
@@ -171,7 +178,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         walkMeOptOut: false,
         disableNPSCommentsReachout: false,
         disableNewsletterSendout: false,
@@ -184,7 +191,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         disableDocsSearch: false,
         disableCommunitySearch: false,
         disableBingVideoSearch: false,
-        shareWithColleaguesUserLimit: 10000,
+        shareWithColleaguesUserLimit: '10000',
         disableShareWithEveryone: false,
         enableGuestsToMake: false,
         disableMembersIndicator: false,
@@ -193,14 +200,14 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         disableAdminDigest: false,
         disableDeveloperEnvironmentCreationByNonAdminUsers: false,
         disableBillingPolicyCreationByNonAdminUsers: false,
-        storageCapacityConsumptionWarningThreshold: 85,
+        storageCapacityConsumptionWarningThreshold: '85',
         disableChampionsInvitationReachout: false,
         disableSkillsMatchInvitationReachout: false,
         disableCopilot: false,
         enableOpenAiBotPublishing: false,
         enableModelDataSharing: false
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.calledWith(successResponse));
   });
 
@@ -215,6 +222,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ walkMeOptOut: false }) }), new CommandError(error.error.message));
   });
 });
