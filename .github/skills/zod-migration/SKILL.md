@@ -62,6 +62,15 @@ interface CommandArgs {
 5. **Preserve case-insensitive behavior** — if old validator lowercased input before comparing, add `.transform(v => v.toLowerCase())` or use `.refine()` with case-insensitive check.
 6. **Keep option names identical** — do not rename options during migration (breaking change).
 7. **Use `z.enum()` for options with fixed `autocomplete` values** — this preserves shell completion metadata.
+8. **For commands with ONLY global options** (no command-specific options), use `globalOptionsZod.strict()` — `globalOptionsZod` alone is NOT strict and will allow unknown options to slip through:
+
+```typescript
+// WRONG - not strict, allows unknown options
+export const options = globalOptionsZod;
+
+// CORRECT - strict, rejects unknown options
+export const options = globalOptionsZod.strict();
+```
 
 #### GUID Fields That Accept `@meid`
 
@@ -81,6 +90,26 @@ When an option accepts comma-separated values (e.g., `--scopes Sites.Read.All,Si
 
 ```typescript
 scopes: z.string().transform(value => value.split(',').map(s => s.trim())).alias('s')
+```
+
+#### Comma-Separated GUID/UPN Validation Error Messages
+
+When validating comma-separated GUIDs or UPNs, error messages MUST report only the invalid values, not the entire input string. The full input may contain valid values mixed with invalid ones.
+
+```typescript
+// WRONG - reports entire input string (misleading when it contains valid values)
+ids: z.string().refine(val => validation.isValidGuidArray(val), {
+  message: `'${val}' contains invalid GUIDs`  // val is "guid1,invalid,guid2"
+})
+
+// CORRECT - reports only the invalid values
+ids: z.string().refine(val => {
+  const items = val.split(',').map(s => s.trim());
+  const invalid = items.filter(item => !validation.isValidGuid(item));
+  return invalid.length === 0;
+}, val => ({
+  message: `The following values are not valid GUIDs: ${val.split(',').map(s => s.trim()).filter(item => !validation.isValidGuid(item)).join(', ')}`
+}))
 ```
 
 #### Numeric Values Received as Strings
@@ -190,6 +219,8 @@ export const options = z.object({
 
 ### Step 7: Migrate the Test File (`.spec.ts`)
 
+**CRITICAL: Update ALL spec files for ALL commands being migrated** — including commands that only have global options (no command-specific options). Every spec file must get the `commandOptionsSchema` pattern and use `commandOptionsSchema.parse()` in action tests.
+
 #### 7a. Update imports
 
 ```typescript
@@ -233,15 +264,18 @@ Note: Validation tests become **synchronous** (no `async`).
 
 #### 7d. Convert action tests to use `commandOptionsSchema.parse()`
 
-```typescript
-// Old:
-await command.action(logger, { options: { id: 'abc', verbose: true } } as any);
+**CRITICAL:** Always use `commandOptionsSchema.parse()` — NEVER use `options.parse()` directly. The `commandOptionsSchema` variable is obtained from `commandInfo.command.getSchemaToParse()` which returns the refined schema (including cross-field validations from `getRefinedSchema()`).
 
-// New:
+```typescript
+// WRONG - uses options.parse() directly (misses refined schema)
+await command.action(logger, { options: options.parse({ id: 'abc', verbose: true }) });
+
+// WRONG - passes raw options object (no schema validation)
+await command.action(logger, { options: { id: 'abc', verbose: true } });
+
+// CORRECT - uses commandOptionsSchema.parse()
 await command.action(logger, { options: commandOptionsSchema.parse({ id: 'abc', verbose: true }) });
 ```
-
-**CRITICAL:** Use `.parse()` (throws) for action tests, `.safeParse()` for validation tests.
 
 **Exception for `@meid`/`@meusername` tokens:** Tests that use runtime tokens like `@meid` or `@meusername` (which are replaced by `loadValuesFromAccessToken` before schema validation) must keep `as any` since these values intentionally bypass Zod:
 
@@ -292,6 +326,7 @@ Before submitting, verify:
 
 - [ ] `options` is **exported** from the command file
 - [ ] Schema uses `z.strictObject()` (unless command accepts unknown options)
+- [ ] For commands with ONLY global options, uses `globalOptionsZod.strict()` — not bare `globalOptionsZod`
 - [ ] Schema spreads `...globalOptionsZod.shape`
 - [ ] `schema` getter returns `options`
 - [ ] All old init methods (`#initOptions`, `#initValidators`, `#initTelemetry`, `#initTypes`, `#initOptionSets`) are removed
@@ -304,10 +339,12 @@ Before submitting, verify:
 - [ ] Options with `autocomplete` values use `z.enum()` when possible
 - [ ] Case-insensitive validation preserved where it existed before
 - [ ] No option renames (no breaking changes)
+- [ ] Comma-separated GUID/UPN validation errors report only invalid values (not the full input)
+- [ ] **ALL spec files** updated (including for commands with only global options)
 - [ ] Spec file imports `{ options }` from the command file
 - [ ] Spec declares `commandOptionsSchema: typeof options`
 - [ ] Spec initializes `commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options`
-- [ ] All action tests use `commandOptionsSchema.parse({...})`
+- [ ] All action tests use `commandOptionsSchema.parse({...})` — NEVER `options.parse({...})` directly
 - [ ] All validation tests use `commandOptionsSchema.safeParse({...})`
 - [ ] Validation tests are synchronous (no `async`)
 - [ ] Legacy "supports specifying" tests removed
