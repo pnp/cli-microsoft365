@@ -2969,6 +2969,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder sharinglink set',
               id: 'cmd/spo/folder/folder-sharinglink-set'
+            },
+            {
+              type: 'doc',
+              label: 'folder unarchive',
+              id: 'cmd/spo/folder/folder-unarchive'
             }
           ]
         },
