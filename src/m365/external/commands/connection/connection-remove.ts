@@ -26,7 +26,7 @@ class ExternalConnectionRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes a specific external connection';
+    return 'Allows the administrator to remove a specific external connection';
   }
 
   public alias(): string[] | undefined {

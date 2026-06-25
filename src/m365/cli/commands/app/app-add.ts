@@ -28,7 +28,7 @@ class CliAppAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Creates a Microsoft Entra application registration for CLI for Microsoft 365';
+    return 'Creates a new app registration to use for the CLI for Microsoft 365';
   }
 
   public get schema(): z.ZodType | undefined {

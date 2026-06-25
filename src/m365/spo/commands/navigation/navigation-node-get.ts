@@ -27,7 +27,7 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Retrieves information about a specific navigation node';
+    return 'Gets information about a specific navigation node';
   }
 
   public get schema(): z.ZodType {

@@ -23,7 +23,7 @@ class TeamsTeamGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieves information about the specified Microsoft Team';
+    return 'Gets information about the specified Microsoft Teams team';
   }
 
   constructor() {

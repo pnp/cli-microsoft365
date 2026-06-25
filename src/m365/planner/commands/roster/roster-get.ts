@@ -18,7 +18,7 @@ class PlannerRosterGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieves information about a specific Microsoft Planner Roster';
+    return 'Gets information about the specific Microsoft Planner Roster';
   }
 
   constructor() {
