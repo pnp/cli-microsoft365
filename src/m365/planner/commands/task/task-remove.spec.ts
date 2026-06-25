@@ -626,6 +626,34 @@ describe(commands.TASK_REMOVE, () => {
     });
   });
 
+  it('correctly deletes task by title with bucketId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: validTaskTitle,
+        bucketId: validBucketId,
+        force: true
+      })
+    });
+  });
+
   it('correctly deletes task by title with group id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans?$select=id,title`) {

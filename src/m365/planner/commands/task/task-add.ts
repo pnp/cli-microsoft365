@@ -48,10 +48,7 @@ export const options = z.strictObject({
     .superRefine((val, ctx) => {
       const result = validation.isValidGuidArray(val);
       if (result !== true) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `The following GUIDs are invalid for the option 'assignedToUserIds': ${typeof result === 'string' ? result : val}.`
-        });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `The following GUIDs are invalid for the option 'assignedToUserIds': ${result}.` });
       }
     })
     .optional(),
@@ -59,10 +56,7 @@ export const options = z.strictObject({
     .superRefine((val, ctx) => {
       const result = validation.isValidUserPrincipalNameArray(val);
       if (result !== true) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `The following user principal names are invalid for the option 'assignedToUserNames': ${typeof result === 'string' ? result : val}.`
-        });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `The following user principal names are invalid for the option 'assignedToUserNames': ${result}.` });
       }
     })
     .optional(),

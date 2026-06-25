@@ -479,6 +479,30 @@ describe(commands.TASK_GET, () => {
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
+  it('gets a task by title and bucketId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
+        return taskResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
+        return taskDetailsResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: validTaskTitle,
+        bucketId: validBucketId
+      })
+    });
+    assert(loggerLogSpy.calledWith(outputResponse));
+  });
+
   it('fails validation when no tasks found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {

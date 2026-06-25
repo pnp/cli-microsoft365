@@ -490,6 +490,28 @@ describe(commands.TASK_ADD, () => {
     assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
+  it('correctly adds planner task with title, planId, bucketId, and percentComplete', async () => {
+    sinonUtil.restore(request.post);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
+        assert.strictEqual(opts.data.percentComplete, 50);
+        return taskAddResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        percentComplete: '50'
+      })
+    });
+    assert(loggerLogSpy.calledWith(taskAddResponse));
+  });
+
   it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {

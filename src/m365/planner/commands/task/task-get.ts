@@ -53,11 +53,11 @@ class PlannerTaskGetCommand extends GraphCommand {
         message: `Specify exactly one of the following options: 'id' or 'title'.`,
         params: { customCode: 'optionSet', options: ['id', 'title'] }
       })
-      .refine(opts => opts.id !== undefined || [opts.planId, opts.planTitle, opts.rosterId].filter(x => x !== undefined).length === 1, {
+      .refine(opts => opts.id !== undefined || opts.bucketId !== undefined || [opts.planId, opts.planTitle, opts.rosterId].filter(x => x !== undefined).length === 1, {
         message: `Specify exactly one of the following options: 'planId', 'planTitle' or 'rosterId'.`,
         params: { customCode: 'optionSet', options: ['planId', 'planTitle', 'rosterId'] }
       })
-      .refine(opts => opts.title === undefined || [opts.bucketId, opts.bucketName].filter(x => x !== undefined).length === 1, {
+      .refine(opts => opts.id !== undefined || [opts.bucketId, opts.bucketName].filter(x => x !== undefined).length === 1, {
         message: `Specify exactly one of the following options: 'bucketId' or 'bucketName'.`,
         params: { customCode: 'optionSet', options: ['bucketId', 'bucketName'] }
       })
