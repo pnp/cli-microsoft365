@@ -12,11 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './solution-publisher-get.js';
+import command, { options } from './solution-publisher-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISHER_GET, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = 'd21aab70-79e7-11dd-8874-00188b01e34f';
   const validName = 'MicrosoftCorporation';
@@ -47,6 +48,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -85,6 +87,11 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation when no publisher found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -99,31 +106,29 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     }), new CommandError(`The specified publisher '${validName}' does not exist.`));
   });
 
-  it('fails validation if the id is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves a specific publisher from power platform environment with the name parameter', async () => {
@@ -139,7 +144,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, name: validName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, name: validName }) });
     assert(loggerLogSpy.calledWith(publisherResponse.value[0]));
   });
 
@@ -156,7 +161,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: validEnvironment, id: validId }) });
     assert(loggerLogSpy.calledWith(publisherResponse.value[0]));
   });
 
@@ -181,7 +186,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, name: validName }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

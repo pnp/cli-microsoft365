@@ -1,19 +1,27 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional(),
+  objectId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional(),
+  name: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  objectId?: string;
-  name?: string;
 }
 
 class PpManagementAppAddCommand extends PowerPlatformCommand {
@@ -25,51 +33,19 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     return 'Register management application for Power Platform';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.appId, opts.objectId, opts.name].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'appId', 'objectId', or 'name', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'objectId', 'name']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--objectId [objectId]' },
-      { option: '--name [name]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
-          return `${args.options.objectId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
