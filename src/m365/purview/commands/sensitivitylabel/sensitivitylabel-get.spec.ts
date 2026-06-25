@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './sensitivitylabel-get.js';
+import command, { options } from './sensitivitylabel-get.js';
 
 describe(commands.SENSITIVITYLABEL_GET, () => {
   const sensitivityLabelId = '6f4fb2db-ecf4-4279-94ba-23d059bf157e';
@@ -38,6 +38,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -50,6 +51,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -91,34 +93,39 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if a correct id is entered', async () => {
-    const actual = await command.validate({ options: { id: sensitivityLabelId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if a correct id is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: sensitivityLabelId, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with a userId defined', async () => {
-    const actual = await command.validate({ options: { id: sensitivityLabelId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userId defined', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { id: sensitivityLabelId, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with a userName defined', async () => {
-    const actual = await command.validate({ options: { id: sensitivityLabelId, userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userName defined', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId, userName: userName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: sensitivityLabelId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves sensitivity label that the current logged in user has access to', async () => {
@@ -130,7 +137,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: sensitivityLabelId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: sensitivityLabelId, verbose: true }) });
     assert(loggerLogSpy.calledWith(sensitivityLabelGetResponse));
   });
 
@@ -143,7 +150,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: sensitivityLabelId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: sensitivityLabelId, userId: userId }) });
     assert(loggerLogSpy.calledWith(sensitivityLabelGetResponse));
   });
 
@@ -156,7 +163,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: sensitivityLabelId, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: sensitivityLabelId, userName: userName }) });
     assert(loggerLogSpy.calledWith(sensitivityLabelGetResponse));
   });
 
@@ -165,7 +172,7 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
-      options: { id: sensitivityLabelId }
+      options: commandOptionsSchema.parse({ id: sensitivityLabelId })
     }), new CommandError(`Specify at least 'userId' or 'userName' when using application permissions.`));
   });
 
@@ -178,6 +185,6 @@ describe(commands.SENSITIVITYLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: sensitivityLabelId } }), new CommandError(`Error: The resource could not be found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: sensitivityLabelId }) }), new CommandError(`Error: The resource could not be found.`));
   });
 });

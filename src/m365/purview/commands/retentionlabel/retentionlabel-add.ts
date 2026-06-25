@@ -1,34 +1,40 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const behaviorDuringRetentionPeriods = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'] as const;
+const actionAfterRetentionPeriods = ['none', 'delete', 'startDispositionReview'] as const;
+const retentionTriggers = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'] as const;
+const defaultRecordBehaviors = ['startLocked', 'startUnlocked'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().alias('n'),
+  behaviorDuringRetentionPeriod: z.enum(behaviorDuringRetentionPeriods),
+  actionAfterRetentionPeriod: z.enum(actionAfterRetentionPeriods),
+  retentionDuration: z.string().refine(val => !isNaN(Number(val)), {
+    message: 'retentionDuration must be a number'
+  }),
+  retentionTrigger: z.enum(retentionTriggers).optional().alias('t'),
+  defaultRecordBehavior: z.enum(defaultRecordBehaviors).optional(),
+  descriptionForUsers: z.string().optional(),
+  descriptionForAdmins: z.string().optional(),
+  labelToBeApplied: z.string().optional(),
+  eventTypeId: z.string().optional(),
+  eventTypeName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  displayName: string;
-  behaviorDuringRetentionPeriod: string;
-  actionAfterRetentionPeriod: string;
-  retentionDuration: number;
-  retentionTrigger?: string;
-  defaultRecordBehavior?: string;
-  descriptionForUsers?: string;
-  descriptionForAdmins?: string;
-  labelToBeApplied?: string;
-  eventTypeId?: string;
-  eventTypeName?: string;
-}
-
 class PurviewRetentionLabelAddCommand extends GraphCommand {
-  private static readonly behaviorDuringRetentionPeriods = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'];
-  private static readonly actionAfterRetentionPeriods = ['none', 'delete', 'startDispositionReview'];
-  private static readonly retentionTriggers = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'];
-  private static readonly defaultRecordBehavior = ['startLocked', 'startUnlocked'];
-
   public get name(): string {
     return commands.RETENTIONLABEL_ADD;
   }
@@ -37,105 +43,24 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     return 'Create a retention label';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        retentionTrigger: typeof args.options.retentionTrigger !== 'undefined',
-        defaultRecordBehavior: typeof args.options.defaultRecordBehavior !== 'undefined',
-        descriptionForUsers: typeof args.options.descriptionForUsers !== 'undefined',
-        descriptionForAdmins: typeof args.options.descriptionForAdmins !== 'undefined',
-        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined',
-        eventTypeId: typeof args.options.eventTypeId !== 'undefined',
-        eventTypeName: typeof args.options.eventTypeName !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '--behaviorDuringRetentionPeriod <behaviorDuringRetentionPeriod>',
-        autocomplete: PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods
-      },
-      {
-        option: '--actionAfterRetentionPeriod <actionAfterRetentionPeriod>',
-        autocomplete: PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods
-      },
-      {
-        option: '--retentionDuration <retentionDuration>'
-      },
-      {
-        option: '-t, --retentionTrigger [retentionTrigger]',
-        autocomplete: PurviewRetentionLabelAddCommand.retentionTriggers
-      },
-      {
-        option: '--defaultRecordBehavior [defaultRecordBehavior]',
-        autocomplete: PurviewRetentionLabelAddCommand.defaultRecordBehavior
-      },
-      {
-        option: '--descriptionForUsers [descriptionForUsers]'
-      },
-      {
-        option: '--descriptionForAdmins [descriptionForAdmins]'
-      },
-      {
-        option: '--labelToBeApplied [labelToBeApplied]'
-      },
-      {
-        option: '--eventTypeId [eventTypeId]'
-      },
-      {
-        option: '--eventTypeName [eventTypeName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (isNaN(args.options.retentionDuration)) {
-          return `Specified retentionDuration ${args.options.retentionDuration} is not a number`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.retentionTrigger === 'dateOfEvent') {
+          return [opts.eventTypeId, opts.eventTypeName].filter(x => x !== undefined).length === 1;
         }
-
-        if (PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods.indexOf(args.options.behaviorDuringRetentionPeriod) === -1) {
-          return `${args.options.behaviorDuringRetentionPeriod} is not a valid behavior of a document with the label. Allowed values are ${PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods.join(', ')}`;
-        }
-
-        if (PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods.indexOf(args.options.actionAfterRetentionPeriod) === -1) {
-          return `${args.options.actionAfterRetentionPeriod} is not a valid action to take on a document with the label. Allowed values are ${PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods.join(', ')}`;
-        }
-
-        if (args.options.retentionTrigger &&
-          PurviewRetentionLabelAddCommand.retentionTriggers.indexOf(args.options.retentionTrigger) === -1) {
-          return `${args.options.retentionTrigger} is not a valid action retention duration calculation. Allowed values are ${PurviewRetentionLabelAddCommand.retentionTriggers.join(', ')}`;
-        }
-
-        if (args.options.defaultRecordBehavior &&
-          PurviewRetentionLabelAddCommand.defaultRecordBehavior.indexOf(args.options.defaultRecordBehavior) === -1) {
-          return `${args.options.defaultRecordBehavior} is not a valid state of a record label. Allowed values are ${PurviewRetentionLabelAddCommand.defaultRecordBehavior.join(', ')}`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['eventTypeId', 'eventTypeName'], runsWhen(args) { return args.options.retentionTrigger === 'dateOfEvent'; } }
-    );
+      }, {
+        message: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['eventTypeId', 'eventTypeName']
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -149,7 +74,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       retentionTrigger: retentionTrigger,
       retentionDuration: {
         '@odata.type': '#microsoft.graph.security.retentionDurationInDays',
-        days: args.options.retentionDuration
+        days: Number(args.options.retentionDuration)
       },
       defaultRecordBehavior: defaultRecordBehavior
     };

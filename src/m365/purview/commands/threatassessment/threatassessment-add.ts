@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -8,25 +9,28 @@ import auth from '../../../../Auth.js';
 import fs from 'fs';
 import path from 'path';
 
+const allowedTypes = ['file', 'url'] as const;
+const allowedExpectedAssessments = ['block', 'unblock'] as const;
+const allowedCategories = ['spam', 'phishing', 'malware'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(allowedTypes).alias('t'),
+  expectedAssessment: z.enum(allowedExpectedAssessments).alias('e'),
+  category: z.enum(allowedCategories).alias('c'),
+  path: z.string().refine(val => fs.existsSync(val), {
+    message: 'Specified file does not exist.'
+  }).optional().alias('p'),
+  url: z.string().optional().alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  type: string;
-  expectedAssessment: string;
-  category: string;
-  recipientEmail?: string;
-  path?: string;
-  url?: string;
-  messageUri?: string;
-}
-
 class PurviewThreatAssessmentAddCommand extends GraphCommand {
-  private readonly allowedTypes = ['file', 'url'];
-  private readonly allowedExpectedAssessments = ['block', 'unblock'];
-  private readonly allowedCategories = ['spam', 'phishing', 'malware'];
-
   public get name(): string {
     return commands.THREATASSESSMENT_ADD;
   }
@@ -35,86 +39,36 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
     return 'Create a threat assessment';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        path: typeof args.options.path !== 'undefined',
-        url: typeof args.options.url !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type <type>',
-        autocomplete: this.allowedTypes
-      },
-      {
-        option: '-e, --expectedAssessment <expectedAssessment>',
-        autocomplete: this.allowedExpectedAssessments
-      },
-      {
-        option: '-c, --category <category>',
-        autocomplete: this.allowedCategories
-      },
-      {
-        option: '-p, --path [path]'
-      },
-      {
-        option: '-u, --url [url]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!this.allowedTypes.some(type => type === args.options.type)) {
-          return `${args.options.type} is not an allowed type. Allowed types are ${this.allowedTypes.join('|')}`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.type === 'file') {
+          return opts.path !== undefined;
         }
-
-        if (!this.allowedExpectedAssessments.some(expectedAssessment => expectedAssessment === args.options.expectedAssessment)) {
-          return `${args.options.expectedAssessment} is not an allowed expected assessment. Allowed expected assessments are ${this.allowedExpectedAssessments.join('|')}`;
-        }
-
-        if (!this.allowedCategories.some(category => category === args.options.category)) {
-          return `${args.options.category} is not an allowed category. Allowed categories are ${this.allowedCategories.join('|')}`;
-        }
-
-        if (args.options.path && !fs.existsSync(args.options.path)) {
-          return `File '${args.options.path}' not found. Please provide a valid path to the file.`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['path'],
-        runsWhen: (args) => {
-          return args.options.type === 'file';
+      }, {
+        message: `'path' is required when type is 'file'.`,
+        path: ['path'],
+        params: {
+          customCode: 'required'
         }
-      },
-      {
-        options: ['url'],
-        runsWhen: (args) => {
-          return args.options.type === 'url';
+      })
+      .refine(opts => {
+        if (opts.type === 'url') {
+          return opts.url !== undefined;
         }
-      }
-    );
+        return true;
+      }, {
+        message: `'url' is required when type is 'url'.`,
+        path: ['url'],
+        params: {
+          customCode: 'required'
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

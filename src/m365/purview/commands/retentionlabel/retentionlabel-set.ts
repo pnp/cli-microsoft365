@@ -1,32 +1,40 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const behaviorDuringRetentionPeriodValues = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'] as const;
+const actionAfterRetentionPeriodValues = ['none', 'delete', 'startDispositionReview'] as const;
+const retentionTriggerValues = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'] as const;
+const defaultRecordBehaviorValues = ['startLocked', 'startUnlocked'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).alias('i'),
+  behaviorDuringRetentionPeriod: z.enum(behaviorDuringRetentionPeriodValues).optional(),
+  actionAfterRetentionPeriod: z.enum(actionAfterRetentionPeriodValues).optional(),
+  retentionDuration: z.string().refine(val => !isNaN(Number(val)), {
+    message: 'retentionDuration must be a number'
+  }).optional(),
+  retentionTrigger: z.enum(retentionTriggerValues).optional().alias('t'),
+  defaultRecordBehavior: z.enum(defaultRecordBehaviorValues).optional(),
+  descriptionForUsers: z.string().optional(),
+  descriptionForAdmins: z.string().optional(),
+  labelToBeApplied: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id: string;
-  behaviorDuringRetentionPeriod?: string;
-  actionAfterRetentionPeriod?: string;
-  retentionDuration?: number;
-  retentionTrigger?: string;
-  defaultRecordBehavior?: string;
-  descriptionForUsers?: string;
-  descriptionForAdmins?: string;
-  labelToBeApplied?: string;
-}
-
 class PurviewRetentionLabelSetCommand extends GraphCommand {
-  public allowedBehaviorDuringRetentionPeriodValues = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'];
-  public allowedActionAfterRetentionPeriodValues = ['none', 'delete', 'startDispositionReview'];
-  public allowedRetentionTriggerValues = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'];
-  public allowedDefaultRecordBehaviorValues = ['startLocked', 'startUnlocked'];
-
   public get name(): string {
     return commands.RETENTIONLABEL_SET;
   }
@@ -35,96 +43,18 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
     return 'Update a retention label';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        behaviorDuringRetentionPeriod: typeof args.options.behaviorDuringRetentionPeriod !== 'undefined',
-        actionAfterRetentionPeriod: typeof args.options.actionAfterRetentionPeriod !== 'undefined',
-        retentionDuration: typeof args.options.retentionDuration !== 'undefined',
-        retentionTrigger: typeof args.options.retentionTrigger !== 'undefined',
-        defaultRecordBehavior: typeof args.options.defaultRecordBehavior !== 'undefined',
-        descriptionForUsers: typeof args.options.descriptionForUsers !== 'undefined',
-        descriptionForAdmins: typeof args.options.descriptionForAdmins !== 'undefined',
-        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.behaviorDuringRetentionPeriod || opts.actionAfterRetentionPeriod || opts.retentionDuration || opts.retentionTrigger || opts.defaultRecordBehavior || opts.descriptionForUsers || opts.descriptionForAdmins || opts.labelToBeApplied, {
+        message: 'Specify at least one property to update.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--behaviorDuringRetentionPeriod [behaviorDuringRetentionPeriod]',
-        autocomplete: this.allowedBehaviorDuringRetentionPeriodValues
-      },
-      {
-        option: '--actionAfterRetentionPeriod [actionAfterRetentionPeriod]',
-        autocomplete: this.allowedActionAfterRetentionPeriodValues
-      },
-      {
-        option: '--retentionDuration [retentionDuration]'
-      },
-      {
-        option: '-t, --retentionTrigger [retentionTrigger]',
-        autocomplete: this.allowedRetentionTriggerValues
-      },
-      {
-        option: '--defaultRecordBehavior [defaultRecordBehavior]',
-        autocomplete: this.allowedDefaultRecordBehaviorValues
-      },
-      {
-        option: '--descriptionForUsers [descriptionForUsers]'
-      },
-      {
-        option: '--descriptionForAdmins [descriptionForAdmins]'
-      },
-      {
-        option: '--labelToBeApplied [labelToBeApplied]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `'${args.options.id}' is not a valid GUID.`;
-        }
-
-        const { actionAfterRetentionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger } = args.options;
-        if ([actionAfterRetentionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger].every(i => typeof i === 'undefined')) {
-          return `Specify at least one property to update.`;
-        }
-
-        if (behaviorDuringRetentionPeriod && this.allowedBehaviorDuringRetentionPeriodValues.indexOf(behaviorDuringRetentionPeriod) === -1) {
-          return `'${behaviorDuringRetentionPeriod}' is not a valid value for the behaviorDuringRetentionPeriod option. Allowed values are ${this.allowedBehaviorDuringRetentionPeriodValues.join('|')}`;
-        }
-
-        if (actionAfterRetentionPeriod && this.allowedActionAfterRetentionPeriodValues.indexOf(actionAfterRetentionPeriod) === -1) {
-          return `'${actionAfterRetentionPeriod}' is not a valid value for the actionAfterRetentionPeriod option. Allowed values are ${this.allowedActionAfterRetentionPeriodValues.join('|')}`;
-        }
-
-        if (retentionTrigger && this.allowedRetentionTriggerValues.indexOf(retentionTrigger) === -1) {
-          return `'${retentionTrigger}' is not a valid value for the retentionTrigger option. Allowed values are ${this.allowedRetentionTriggerValues.join('|')}`;
-        }
-
-        if (defaultRecordBehavior && this.allowedDefaultRecordBehaviorValues.indexOf(defaultRecordBehavior) === -1) {
-          return `'${defaultRecordBehavior}' is not a valid value for the defaultRecordBehavior option. Allowed values are ${this.allowedDefaultRecordBehaviorValues.join('|')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
