@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { JSONSchema } from 'zod/v4/core';
-import { EnumLike } from 'zod/v4/core/util.cjs';
 import { CommandOptionInfo } from '../cli/CommandOptionInfo';
 import { CommandOption } from '../Command';
+
+type EnumLike = Readonly<Record<string, string | number>>;
 
 declare module 'zod' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -157,5 +158,5 @@ export const zod = {
       }
 
       return null;
-    }, z.enum(e))
+    }, z.enum(e)) as unknown as z.ZodPreprocess<z.ZodEnum<T>>
 };

@@ -21,8 +21,8 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsc -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
-    "watch": "tsc-watch --onSuccess \"node scripts/write-all-commands.js\"",
+    "build": "tsgo -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
+    "watch": "node scripts/watch.js",
     "clean": "rimraf ./dist",
     "test": "npm run test:version && npm run lint && npm run test:cov",
     "test:version": "node scripts/check-version.js",
@@ -327,7 +327,6 @@
     "open": "^11.0.0",
     "semver": "^7.8.1",
     "strip-json-comments": "^5.0.3",
-    "typescript": "^5.9.3",
     "update-notifier": "^7.3.1",
     "uuid": "^14.0.0",
     "yaml": "^2.9.0",
@@ -354,6 +353,7 @@
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.58.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260421.2",
     "c8": "^11.0.0",
     "eslint": "^10.4.0",
     "eslint-plugin-mocha": "^11.3.0",
@@ -361,7 +361,6 @@
     "mocha": "^11.7.6",
     "rimraf": "^6.1.3",
     "sinon": "^22.0.0",
-    "source-map-support": "^0.5.21",
-    "tsc-watch": "^7.2.0"
+    "source-map-support": "^0.5.21"
   }
 }
