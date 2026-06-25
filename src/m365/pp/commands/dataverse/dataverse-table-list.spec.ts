@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,10 +11,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './dataverse-table-list.js';
+import command, { options } from './dataverse-table-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.DATAVERSE_TABLE_LIST, () => {
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
   const dataverseResponse: any = {
@@ -157,6 +161,8 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -198,6 +204,14 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['SchemaName', 'EntitySetName', 'LogicalName', 'IsManaged']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves data from dataverse', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`) {
@@ -219,7 +233,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' }) });
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
@@ -244,7 +258,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true }) });
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
@@ -271,7 +285,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' }) });
       assert.fail('No error message thrown.');
     }
     catch (ex) {

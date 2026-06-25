@@ -1,17 +1,21 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  asAdmin: boolean;
 }
 
 class PpDataverseTableListCommand extends PowerPlatformCommand {
@@ -27,30 +31,8 @@ class PpDataverseTableListCommand extends PowerPlatformCommand {
     return ['SchemaName', 'EntitySetName', 'LogicalName', 'IsManaged'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -12,11 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './dataverse-table-row-remove.js';
+import command, { options } from './dataverse-table-row-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
@@ -41,6 +42,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -88,35 +90,44 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID',
-        tableName: validTableName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID',
+      tableName: validTableName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (tableName)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, tableName: validTableName, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (tableName)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, tableName: validTableName, id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (entitySetName)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, entitySetName: validEntitySetName, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (entitySetName)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName, id: validId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: validId,
+      entitySetName: validEntitySetName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified row from a dataverse table owned by the currently signed-in user when force option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
-        id: validId
-      }
+        id: validId,
+        entitySetName: validEntitySetName
+      })
     });
 
     assert(promptIssued);
@@ -127,10 +138,11 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
-        id: validId
-      }
+        id: validId,
+        entitySetName: validEntitySetName
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -149,12 +161,12 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         entitySetName: validEntitySetName
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -181,13 +193,13 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         tableName: validTableName,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -200,13 +212,13 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         force: true,
         entitySetName: validEntitySetName
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -222,13 +234,13 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         entitySetName: validEntitySetName,
         force: true
-      }
+      })
     });
 
     assert(loggerLogToStderrSpy.called);
