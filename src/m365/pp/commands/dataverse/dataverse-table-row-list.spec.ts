@@ -12,12 +12,13 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './dataverse-table-row-list.js';
+import command, { options } from './dataverse-table-row-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
   //#region Mocked Responses
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validTableName = 'cr6c3_clitable';
   const validEntitySetName = 'cr6c3_clitables';
@@ -64,6 +65,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,14 +104,23 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if required options specified (entitySetName)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, entitySetName: validEntitySetName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (entitySetName)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, tableName: validTableName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, tableName: validTableName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      entitySetName: validEntitySetName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves dataverse table rows with the entitySetName parameter', async () => {
@@ -125,7 +136,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, entitySetName: validEntitySetName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, entitySetName: validEntitySetName }) });
     assert(loggerLogSpy.calledWith(rowsResponse.value));
   });
 
@@ -148,7 +159,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, tableName: validTableName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, tableName: validTableName }) });
     assert(loggerLogSpy.calledWith(rowsResponse.value));
   });
 
@@ -172,7 +183,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, entitySetName: validEntitySetName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, entitySetName: validEntitySetName }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

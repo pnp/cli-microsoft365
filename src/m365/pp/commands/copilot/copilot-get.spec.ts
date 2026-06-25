@@ -13,12 +13,13 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './copilot-get.js';
+import command, { options } from './copilot-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.COPILOT_GET, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
@@ -90,6 +91,7 @@ describe(commands.COPILOT_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -137,24 +139,31 @@ describe(commands.COPILOT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws error when multiple copilots found with the same name', async () => {
@@ -185,10 +194,10 @@ describe(commands.COPILOT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     }), new CommandError("Multiple copilots with name 'CLI 365 Copilot' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
@@ -213,7 +222,7 @@ describe(commands.COPILOT_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(botResponse.value[0]);
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, name: validName }) });
     assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
@@ -231,10 +240,10 @@ describe(commands.COPILOT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     }), new CommandError(`The specified copilot '${validName}' does not exist.`));
   });
 
@@ -251,7 +260,7 @@ describe(commands.COPILOT_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, name: validName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, name: validName }) });
     assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
@@ -268,7 +277,7 @@ describe(commands.COPILOT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment, id: validId }) });
     assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
@@ -289,7 +298,7 @@ describe(commands.COPILOT_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, name: validName }) }),
       new CommandError(`bot With Id = ${validId} Does Not Exist`));
   });
 });
