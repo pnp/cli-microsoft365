@@ -221,9 +221,9 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        bucketName: 'My Bucket'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      bucketName: 'My Bucket'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -238,8 +238,8 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Bucket'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Bucket'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -254,11 +254,11 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Bucket',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        planTitle: 'My Planner',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Bucket',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      planTitle: 'My Planner',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -273,9 +273,9 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Bucket',
-        planTitle: 'My Planner Plan'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Bucket',
+      planTitle: 'My Planner Plan'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -290,61 +290,61 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Bucket',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Bucket',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      ownerGroupName: 'My Planner Group'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Bucket',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Bucket',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if startDateTime contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        startDateTime: '2021-99-99'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      startDateTime: '2021-99-99'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if dueDateTime contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        dueDateTime: '2021-99-99'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      dueDateTime: '2021-99-99'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if percentComplete contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        percentComplete: 'Not A Number'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      percentComplete: 'Not A Number'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if percentComplete is not between 0 and 100.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        percentComplete: '599'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      percentComplete: '599'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if assignedToUserIds contains invalid guid.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-test"
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-test"
     });
     assert.strictEqual(actual.success, false);
   });
@@ -352,8 +352,8 @@ describe(commands.TASK_SET, () => {
   it('fails validation if assignedToUserNames contains invalid user principal name', async () => {
     const assignedToUserNames = ['john.doe@contoso.com', 'foo'];
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        assignedToUserNames: assignedToUserNames.join(',')
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      assignedToUserNames: assignedToUserNames.join(',')
     });
     assert.strictEqual(actual.success, false);
   });
@@ -368,57 +368,57 @@ describe(commands.TASK_SET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-eb6030e1a09e",
-        assignedToUserNames: "Allan.Carroll@contoso.onmicrosoft.com,Ida.Stevens@contoso.onmicrosoft.com"
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-eb6030e1a09e",
+      assignedToUserNames: "Allan.Carroll@contoso.onmicrosoft.com,Ida.Stevens@contoso.onmicrosoft.com"
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if incorrect appliedCategory is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        appliedCategories: "category1,category9"
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      appliedCategories: "category1,category9"
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority lower than 0 is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        priority: '-1'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: '-1'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority higher than 10 is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        priority: '11'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: '11'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority is specified which is a number with decimals.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        priority: '5.6'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: '5.6'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if unknown priority label is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        priority: 'invalid'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: 'invalid'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when valid options specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        title: 'My Planner Task'
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      title: 'My Planner Task'
     });
     assert.strictEqual(actual.success, true);
   });

@@ -317,8 +317,8 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
-        bucketName: 'Planner Bucket A'
+      bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
+      bucketName: 'Planner Bucket A'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -333,7 +333,7 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketName: 'Planner Bucket A'
+      bucketName: 'Planner Bucket A'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -348,10 +348,10 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketName: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner Plan',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
+      bucketName: 'Planner Bucket A',
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      planTitle: 'My Planner Plan',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -366,8 +366,8 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        debug: true,
-        bucketName: 'Planner Bucket A'
+      debug: true,
+      bucketName: 'Planner Bucket A'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -382,10 +382,10 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketName: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
+      bucketName: 'Planner Bucket A',
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      planTitle: 'My Planner',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -400,8 +400,8 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketName: 'Planner Bucket A',
-        planTitle: 'My Planner Plan'
+      bucketName: 'Planner Bucket A',
+      planTitle: 'My Planner Plan'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -416,71 +416,71 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        bucketName: 'Planner Bucket A',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group'
+      bucketName: 'Planner Bucket A',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      ownerGroupName: 'My Planner Group'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when owner group id is not a valid guid', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: 'Invalid'
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: 'Invalid'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when valid planId is specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      bucketName: 'Planner Bucket A'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid planTitle and ownerGroupId are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid planTitle and ownerGroupName are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupName: 'My Planner Group'
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupName: 'My Planner Group'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName and planId are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      bucketName: 'Planner Bucket A'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName, planTitle, and ownerGroupId are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName, planTitle, and ownerGroupName are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupName: 'My Planner Group'
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupName: 'My Planner Group'
     });
     assert.strictEqual(actual.success, true);
   });
@@ -500,8 +500,8 @@ describe(commands.TASK_LIST, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        planTitle: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+      planTitle: 'My Planner Plan',
+      ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
     });
     assert.strictEqual(actual.success, false);
   });

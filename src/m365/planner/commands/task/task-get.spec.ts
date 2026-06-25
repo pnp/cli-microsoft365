@@ -208,8 +208,8 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        id: validTaskId,
-        bucketName: validBucketName
+      id: validTaskId,
+      bucketName: validBucketName
     });
     assert.strictEqual(actual.success, false);
   });
@@ -224,7 +224,7 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle
+      title: validTaskTitle
     });
     assert.strictEqual(actual.success, false);
   });
@@ -239,9 +239,9 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketId: validBucketId,
-        bucketName: validBucketName
+      title: validTaskTitle,
+      bucketId: validBucketId,
+      bucketName: validBucketName
     });
     assert.strictEqual(actual.success, false);
   });
@@ -256,8 +256,8 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName
+      title: validTaskTitle,
+      bucketName: validBucketName
     });
     assert.strictEqual(actual.success, false);
   });
@@ -272,11 +272,11 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planId: validPlanId,
-        planTitle: validPlanTitle,
-        rosterId: validRosterId
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planId: validPlanId,
+      planTitle: validPlanTitle,
+      rosterId: validRosterId
     });
     assert.strictEqual(actual.success, false);
   });
@@ -291,9 +291,9 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle
     });
     assert.strictEqual(actual.success, false);
   });
@@ -308,46 +308,46 @@ describe(commands.TASK_GET, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        ownerGroupId: validOwnerGroupId
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName,
+      ownerGroupId: validOwnerGroupId
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when id and plan details are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: validBucketId,
-        planId: validPlanId
+      id: validBucketId,
+      planId: validPlanId
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when owner group id is not a guid', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupId: invalidOwnerGroupId
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupId: invalidOwnerGroupId
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('validates for a correct input with id', async () => {
     const actual = commandOptionsSchema.safeParse({
-        id: validTaskId
+      id: validTaskId
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('validates for a correct input with name', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName
     });
     assert.strictEqual(actual.success, true);
   });

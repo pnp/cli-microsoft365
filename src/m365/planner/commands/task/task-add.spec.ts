@@ -213,8 +213,8 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -229,11 +229,11 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        planTitle: 'My Planner',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      planTitle: 'My Planner',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -248,9 +248,9 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planTitle: 'My Planner Plan',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planTitle: 'My Planner Plan',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -265,50 +265,50 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      ownerGroupName: 'My Planner Group',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when valid title, planId, and bucketId specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid title, planTitle, and ownerGroupId are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid title, planTitle, ownerGroupName, and bucketId are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planTitle: 'My Planner Plan',
-        ownerGroupName: 'My Planner Group',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planTitle: 'My Planner Plan',
+      ownerGroupName: 'My Planner Group',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+      title: 'My Planner Task',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -323,8 +323,8 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -339,60 +339,60 @@ describe(commands.TASK_ADD, () => {
     });
 
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        bucketName: 'My Bucket'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      bucketName: 'My Bucket'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if startDateTime contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        startDateTime: '2021-99-99'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      startDateTime: '2021-99-99'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if dueDateTime contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        dueDateTime: '2021-99-99'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      dueDateTime: '2021-99-99'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if percentComplete contains invalid format.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        percentComplete: 'Not A Number'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      percentComplete: 'Not A Number'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if percentComplete is not between 0 and 100.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        percentComplete: '599'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      percentComplete: '599'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if assignedToUserIds contains invalid guid.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-test"
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-test"
     });
     assert.strictEqual(actual.success, false);
   });
@@ -400,81 +400,81 @@ describe(commands.TASK_ADD, () => {
   it('fails validation if assignedToUserNames contains invalid user principal name', async () => {
     const assignedToUserNames = ['john.doe@contoso.com', 'foo'];
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        assignedToUserNames: assignedToUserNames.join(',')
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      assignedToUserNames: assignedToUserNames.join(',')
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when both assignedToUserIds and assignedToUserNames are specified', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-eb6030e1a09e",
-        assignedToUserNames: "Allan.Carroll@contoso.onmicrosoft.com,Ida.Stevens@contoso.onmicrosoft.com"
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-eb6030e1a09e",
+      assignedToUserNames: "Allan.Carroll@contoso.onmicrosoft.com,Ida.Stevens@contoso.onmicrosoft.com"
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if incorrect appliedCategory is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        appliedCategories: "category1,category9"
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      appliedCategories: "category1,category9"
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority lower than 0 is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        priority: '-1'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: '-1'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if incorrect previewType is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        previewType: "test"
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      previewType: "test"
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority higher than 10 is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        priority: '11'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: '11'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if priority is specified which is a number with decimals.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        priority: '5.6'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: '5.6'
     });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if unknown priority label is specified.', async () => {
     const actual = commandOptionsSchema.safeParse({
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        priority: 'invalid'
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'invalid'
     });
     assert.strictEqual(actual.success, false);
   });
