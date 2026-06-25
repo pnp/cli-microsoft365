@@ -2233,6 +2233,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container permission set',
+              id: 'cmd/spe/container/container-permission-set'
+            },
+            {
+              type: 'doc',
               label: 'container recyclebinitem list',
               id: 'cmd/spe/container/container-recyclebinitem-list'
             },
