@@ -1,6 +1,7 @@
 import { PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -11,37 +12,95 @@ import { AppliedCategories } from '../../AppliedCategories.js';
 import commands from '../../commands.js';
 import { taskPriority } from '../../taskPriority.js';
 
+const allowedAppliedCategories = ['category1', 'category2', 'category3', 'category4', 'category5', 'category6'];
+const allowedPreviewTypes = ['automatic', 'nopreview', 'checklist', 'description', 'reference'];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  planId: z.string().optional(),
+  planTitle: z.string().optional(),
+  rosterId: z.string().optional(),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional(),
+  bucketId: z.string().optional(),
+  bucketName: z.string().optional(),
+  startDateTime: z.string()
+    .refine(val => validation.isValidISODateTime(val), {
+      message: 'The startDateTime is not a valid ISO date string.'
+    })
+    .optional(),
+  dueDateTime: z.string()
+    .refine(val => validation.isValidISODateTime(val), {
+      message: 'The dueDateTime is not a valid ISO date string.'
+    })
+    .optional(),
+  percentComplete: z.string()
+    .refine(val => !isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100, {
+      message: 'percentComplete should be between 0 and 100.'
+    })
+    .optional(),
+  assignedToUserIds: z.string()
+    .superRefine((val, ctx) => {
+      const result = validation.isValidGuidArray(val);
+      if (result !== true) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `The following GUIDs are invalid for the option 'assignedToUserIds': ${typeof result === 'string' ? result : val}.`
+        });
+      }
+    })
+    .optional(),
+  assignedToUserNames: z.string()
+    .superRefine((val, ctx) => {
+      const result = validation.isValidUserPrincipalNameArray(val);
+      if (result !== true) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `The following user principal names are invalid for the option 'assignedToUserNames': ${typeof result === 'string' ? result : val}.`
+        });
+      }
+    })
+    .optional(),
+  assigneePriority: z.string().optional(),
+  description: z.string().optional(),
+  appliedCategories: z.string()
+    .refine(val => val.split(',').every(cat => allowedAppliedCategories.includes(cat.toLocaleLowerCase().trim())), {
+      message: `The appliedCategories contains invalid value. Specify either ${allowedAppliedCategories.join(', ')} as properties.`
+    })
+    .optional(),
+  previewType: z.string()
+    .refine(val => allowedPreviewTypes.includes(val.toLocaleLowerCase()), {
+      message: `The value is not a valid preview type. Allowed values are ${allowedPreviewTypes.join(', ')}.`
+    })
+    .optional(),
+  orderHint: z.string().optional(),
+  priority: z.string()
+    .refine(val => {
+      const num = Number(val);
+      if (!isNaN(num)) {
+        return num >= 0 && num <= 10 && Number.isInteger(num);
+      }
+      return taskPriority.priorityValues.map(l => l.toLowerCase()).includes(val.toLowerCase());
+    }, {
+      message: `The value is not a valid priority. Allowed values are 0-10 or ${taskPriority.priorityValues.join('|')}.`
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  planId?: string;
-  planTitle?: string;
-  rosterId?: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
-  bucketId?: string;
-  bucketName?: string;
-  title: string;
-  startDateTime?: string;
-  dueDateTime?: string;
-  percentComplete?: number;
-  assignedToUserIds?: string;
-  assignedToUserNames?: string;
-  assigneePriority?: string;
-  description?: string;
-  appliedCategories?: string;
-  previewType?: string;
-  orderHint?: string;
-  priority?: number | string;
 }
 
 class PlannerTaskAddCommand extends GraphCommand {
   private planId: string | undefined;
   private bucketId: string | undefined;
-  private allowedAppliedCategories: string[] = ['category1', 'category2', 'category3', 'category4', 'category5', 'category6'];
-  private allowedPreviewTypes: string[] = ['automatic', 'nopreview', 'checklist', 'description', 'reference'];
 
   public get name(): string {
     return commands.TASK_ADD;
@@ -51,151 +110,28 @@ class PlannerTaskAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner Task';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        planId: typeof args.options.planId !== 'undefined',
-        planTitle: typeof args.options.planTitle !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined',
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        bucketId: typeof args.options.bucketId !== 'undefined',
-        bucketName: typeof args.options.bucketName !== 'undefined',
-        startDateTime: typeof args.options.startDateTime !== 'undefined',
-        dueDateTime: typeof args.options.dueDateTime !== 'undefined',
-        percentComplete: typeof args.options.percentComplete !== 'undefined',
-        assignedToUserIds: typeof args.options.assignedToUserIds !== 'undefined',
-        assignedToUserNames: typeof args.options.assignedToUserNames !== 'undefined',
-        assigneePriority: typeof args.options.assigneePriority !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        appliedCategories: typeof args.options.appliedCategories !== 'undefined',
-        previewType: typeof args.options.previewType !== 'undefined',
-        orderHint: typeof args.options.orderHint !== 'undefined',
-        priority: typeof args.options.priority !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.planId, opts.planTitle, opts.rosterId].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'planId', 'planTitle' or 'rosterId'.`,
+        params: { customCode: 'optionSet', options: ['planId', 'planTitle', 'rosterId'] }
+      })
+      .refine(opts => [opts.bucketId, opts.bucketName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'bucketId' or 'bucketName'.`,
+        params: { customCode: 'optionSet', options: ['bucketId', 'bucketName'] }
+      })
+      .refine(opts => !opts.planTitle || [opts.ownerGroupId, opts.ownerGroupName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId' or 'ownerGroupName'.`,
+        params: { customCode: 'optionSet', options: ['ownerGroupId', 'ownerGroupName'] }
+      })
+      .refine(opts => !(opts.assignedToUserIds && opts.assignedToUserNames), {
+        message: 'Specify either assignedToUserIds or assignedToUserNames but not both.',
+        params: { customCode: 'optionSet', options: ['assignedToUserIds', 'assignedToUserNames'] }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-t, --title <title>' },
-      { option: '--planId [planId]' },
-      { option: '--planTitle [planTitle]' },
-      { option: '--rosterId [rosterId]' },
-      { option: '--ownerGroupId [ownerGroupId]' },
-      { option: '--ownerGroupName [ownerGroupName]' },
-      { option: '--bucketId [bucketId]' },
-      { option: '--bucketName [bucketName]' },
-      { option: '--startDateTime [startDateTime]' },
-      { option: '--dueDateTime [dueDateTime]' },
-      { option: '--percentComplete [percentComplete]' },
-      { option: '--assignedToUserIds [assignedToUserIds]' },
-      { option: '--assignedToUserNames [assignedToUserNames]' },
-      { option: '--assigneePriority [assigneePriority]' },
-      { option: '--description [description]' },
-      {
-        option: '--appliedCategories [appliedCategories]',
-        autocomplete: this.allowedAppliedCategories
-      },
-      {
-        option: '--previewType [previewType]',
-        autocomplete: this.allowedPreviewTypes
-      },
-      { option: '--orderHint [orderHint]' },
-      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-
-        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-          return 'The startDateTime is not a valid ISO date string';
-        }
-
-        if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
-          return 'The dueDateTime is not a valid ISO date string';
-        }
-
-        if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
-          return `percentComplete is not a number`;
-        }
-
-        if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-          return `percentComplete should be between 0 and 100`;
-        }
-
-        if (args.options.assignedToUserIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.assignedToUserIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'assignedToUserIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
-          return 'Specify either assignedToUserIds or assignedToUserNames but not both';
-        }
-
-        if (args.options.assignedToUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.assignedToUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'assignedToUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
-          return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
-        }
-
-        if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
-          return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
-        }
-
-        if (args.options.priority !== undefined) {
-          if (typeof args.options.priority === "number") {
-            if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
-              return 'priority should be an integer between 0 and 10.';
-            }
-          }
-          else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
-            return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['planId', 'planTitle', 'rosterId'] },
-      { options: ['bucketId', 'bucketName'] },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.planTitle !== undefined;
-        }
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('title', 'planId', 'planTitle', 'rosterId', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'startDateTime', 'dueDateTime', 'assignedToUserIds', 'assignedToUserNames', 'appliedCategories', 'previewType', 'description', 'assigneePriority', 'orderHint');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -218,7 +154,7 @@ class PlannerTaskAddCommand extends GraphCommand {
           title: args.options.title,
           startDateTime: args.options.startDateTime,
           dueDateTime: args.options.dueDateTime,
-          percentComplete: args.options.percentComplete,
+          percentComplete: args.options.percentComplete ? Number(args.options.percentComplete) : undefined,
           assignments: assignments,
           orderHint: args.options.orderHint,
           assigneePriority: args.options.assigneePriority,
@@ -260,7 +196,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     const categories: AppliedCategories = {};
-    options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
+    options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x.trim()] = true);
     return categories;
   }
 
@@ -342,7 +278,6 @@ class PlannerTaskAddCommand extends GraphCommand {
       return options.assignedToUserIds.split(',');
     }
 
-    // Hitting this section means assignedToUserNames won't be undefined
     const userNames = options.assignedToUserNames as string;
     const userArr: string[] = userNames.split(',').map(o => o.trim());
 
@@ -365,7 +300,6 @@ class PlannerTaskAddCommand extends GraphCommand {
     userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
     const userIds = usersRes.map(res => res.value[0]?.id as string);
 
-    // Find the members where no graph response was found
     const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
     if (invalidUsers && invalidUsers.length > 0) {

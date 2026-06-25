@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,70 +11,73 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-checklistitem-list.js';
+import command, { options } from './task-checklistitem-list.js';
 
 describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = {
-    "checklist": {
-      "33224": {
-        "isChecked": false,
-        "title": "Some checklist",
-        "orderHint": "8585576049720396756P(",
-        "lastModifiedDateTime": "2022-02-04T19:12:53.4692149Z",
-        "lastModifiedBy": {
-          "user": {
-            "displayName": null,
-            "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+    checklist: {
+      '33224': {
+        isChecked: false,
+        title: 'Some checklist',
+        orderHint: '8585576049720396756P(',
+        lastModifiedDateTime: '2022-02-04T19:12:53.4692149Z',
+        lastModifiedBy: {
+          user: {
+            displayName: null,
+            id: '88e85b64-e687-4e0b-bbf4-f42f5f8e674e'
           }
         }
       },
-      "69115": {
-        "isChecked": false,
-        "title": "Some checklist more",
-        "orderHint": "85855760494@",
-        "lastModifiedDateTime": "2022-02-04T19:12:55.4735671Z",
-        "lastModifiedBy": {
-          "user": {
-            "displayName": null,
-            "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+      '69115': {
+        isChecked: false,
+        title: 'Some checklist more',
+        orderHint: '85855760494@',
+        lastModifiedDateTime: '2022-02-04T19:12:55.4735671Z',
+        lastModifiedBy: {
+          user: {
+            displayName: null,
+            id: '88e85b64-e687-4e0b-bbf4-f42f5f8e674e'
           }
         }
       }
     }
   };
   const textOutput = {
-    "checklist": [{
-      "id": "33224",
-      "isChecked": false,
-      "title": "Some checklist",
-      "orderHint": "8585576049720396756P(",
-      "lastModifiedDateTime": "2022-02-04T19:12:53.4692149Z",
-      "lastModifiedBy": {
-        "user": {
-          "displayName": null,
-          "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+    checklist: [{
+      id: '33224',
+      isChecked: false,
+      title: 'Some checklist',
+      orderHint: '8585576049720396756P(',
+      lastModifiedDateTime: '2022-02-04T19:12:53.4692149Z',
+      lastModifiedBy: {
+        user: {
+          displayName: null,
+          id: '88e85b64-e687-4e0b-bbf4-f42f5f8e674e'
         }
       }
     },
     {
-      "id": "69115",
-      "isChecked": false,
-      "title": "Some checklist more",
-      "orderHint": "85855760494@",
-      "lastModifiedDateTime": "2022-02-04T19:12:55.4735671Z",
-      "lastModifiedBy": {
-        "user": {
-          "displayName": null,
-          "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+      id: '69115',
+      isChecked: false,
+      title: 'Some checklist more',
+      orderHint: '85855760494@',
+      lastModifiedDateTime: '2022-02-04T19:12:55.4735671Z',
+      lastModifiedBy: {
+        user: {
+          displayName: null,
+          id: '88e85b64-e687-4e0b-bbf4-f42f5f8e674e'
         }
       }
     }
     ]
   };
+  const validTaskId = 'vzCcZoOv-U27PwydxHB8opcADJo-';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -84,6 +89,8 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -127,9 +134,17 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('successfully handles item found(JSON)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}/details?$select=checklist`) {
         return jsonOutput;
       }
 
@@ -137,16 +152,17 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
-        taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-', debug: true
-      }
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        debug: true
+      })
     });
     assert(loggerLogSpy.calledWith(jsonOutput.checklist));
   });
 
   it('successfully handles item found(TEXT)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}/details?$select=checklist`) {
         return jsonOutput;
       }
 
@@ -154,9 +170,11 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
-        taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-', debug: true, output: 'text'
-      }
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        debug: true,
+        output: 'text'
+      })
     });
     assert(loggerLogSpy.calledWith(textOutput.checklist));
   });
@@ -165,13 +183,21 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('The requested item is not found.'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('The requested item is not found.'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId
+      })
+    }), new CommandError('The requested item is not found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId
+      })
+    }), new CommandError('An error has occurred'));
   });
 });
