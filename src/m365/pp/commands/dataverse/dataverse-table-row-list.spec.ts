@@ -123,6 +123,16 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if both entitySetName and tableName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName, tableName: validTableName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither entitySetName nor tableName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves dataverse table rows with the entitySetName parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 

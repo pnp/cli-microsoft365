@@ -38,7 +38,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.entitySetName, opts.tableName].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'entitySetName' or 'tableName', but not both.`,
+        error: `Specify either 'entitySetName' or 'tableName', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['entitySetName', 'tableName']

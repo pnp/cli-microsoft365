@@ -113,6 +113,16 @@ describe(commands.COPILOT_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, name: validName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither id nor name is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the specified copilot owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
       options: commandOptionsSchema.parse({

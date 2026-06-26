@@ -119,6 +119,16 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if both entitySetName and tableName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName, tableName: validTableName, id: validId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither entitySetName nor tableName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the specified row from a dataverse table owned by the currently signed-in user when force option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
