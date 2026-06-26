@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,7 +12,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './solution-publisher-list.js';
+import command, { options } from './solution-publisher-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISHER_LIST, () => {
@@ -40,6 +42,8 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     ]
   };
 
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,6 +55,8 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,6 +99,11 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['publisherid', 'uniquename', 'friendlyname']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves publishers from power platform environment', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -106,7 +117,7 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironment } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: validEnvironment }) });
     assert(loggerLogSpy.calledWith(publisherResponse.value));
   });
 
@@ -123,7 +134,7 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, withMicrosoftPublishers: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: validEnvironment, withMicrosoftPublishers: true }) });
     assert(loggerLogSpy.calledWith(publisherResponse.value));
   });
 
@@ -148,7 +159,7 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

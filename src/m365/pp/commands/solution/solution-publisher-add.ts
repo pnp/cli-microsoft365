@@ -1,21 +1,37 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  name: z.string()
+    .refine(val => /^[a-zA-Z_][A-Za-z0-9_]+$/.test(val), {
+      error: 'Option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.'
+    }).alias('n'),
+  displayName: z.string(),
+  prefix: z.string()
+    .refine(val => /^(?!mscrm.*$)[a-zA-Z][A-Za-z0-9]{1,7}$/.test(val), {
+      error: `Option prefix may only consist of alphanumeric characters. The first character cannot be a number and may not start with 'mscrm'. It must be between 2 and 8 characters long.`
+    }),
+  choiceValuePrefix: z.string()
+    .refine(val => {
+      const num = Number(val);
+      return Number.isInteger(num) && num >= 10000 && num <= 99999;
+    }, {
+      error: 'Option choiceValuePrefix should be an integer between 10000 and 99999.'
+    }),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  name: string;
-  displayName: string;
-  prefix: string;
-  choiceValuePrefix: number;
-  asAdmin?: boolean;
 }
 
 class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
@@ -27,68 +43,11 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
     return 'Adds a specified publisher in a given environment';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--displayName <displayName>'
-      },
-      {
-        option: '--prefix <prefix>'
-      },
-      {
-        option: '--choiceValuePrefix <choiceValuePrefix>'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (isNaN(args.options.choiceValuePrefix) || args.options.choiceValuePrefix < 10000 || args.options.choiceValuePrefix > 99999 || !Number.isInteger(args.options.choiceValuePrefix)) {
-          return 'Option choiceValuePrefix should be an integer between 10000 and 99999.';
-        }
-
-        const nameRegEx = new RegExp(/^[a-zA-Z_][A-Za-z0-9_]+$/);
-        if (!nameRegEx.test(args.options.name)) {
-          return 'Option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.';
-        }
-
-        const prefixRegEx = new RegExp(/^(?!mscrm.*$)[a-zA-Z][A-Za-z0-9]{1,7}$/);
-        if (!prefixRegEx.test(args.options.prefix)) {
-          return `Option prefix may only consist of alphanumeric characters. The first character cannot be a number and may not start with 'mscrm'. It must be between 2 and 8 characters long.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Adding new publisher '${args.options.name}'...`);
     }
@@ -105,7 +64,7 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
           uniquename: args.options.name,
           friendlyname: args.options.displayName,
           customizationprefix: args.options.prefix,
-          customizationoptionvalueprefix: args.options.choiceValuePrefix
+          customizationoptionvalueprefix: Number(args.options.choiceValuePrefix)
         }
       };
 

@@ -12,11 +12,12 @@ import { session } from '../../../../utils/session.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './solution-get.js';
+import command, { options } from './solution-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_GET, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = 'ee62fd63-e49e-4c09-80de-8fae1b9a427e';
   const validName = 'Default';
@@ -56,6 +57,7 @@ describe(commands.SOLUTION_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -95,43 +97,46 @@ describe(commands.SOLUTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation when no solution found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
     sinon.stub(powerPlatform, 'getSolutionByName').rejects(new Error(`The specified solution '${validName}' does not exist.`));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     }), new CommandError(`The specified solution '${validName}' does not exist.`));
   });
 
-  it('fails validation if the id is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves a specific solution from power platform environment with the name parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
     sinon.stub(powerPlatform, 'getSolutionByName').callsFake(async () => solutionResponse.value[0]);
 
-    await command.action(logger, { options: { verbose: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' }) });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
@@ -139,7 +144,7 @@ describe(commands.SOLUTION_GET, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
     sinon.stub(powerPlatform, 'getSolutionByName').callsFake(async () => solutionResponse.value[0]);
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'text' }) });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -156,7 +161,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e' }) });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
@@ -173,7 +178,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', output: 'text' }) });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -190,7 +195,7 @@ describe(commands.SOLUTION_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

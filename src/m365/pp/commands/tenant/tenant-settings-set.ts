@@ -1,41 +1,55 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  walkMeOptOut: z.boolean().optional(),
+  disableNPSCommentsReachout: z.boolean().optional(),
+  disableNewsletterSendout: z.boolean().optional(),
+  disableEnvironmentCreationByNonAdminUsers: z.boolean().optional(),
+  disablePortalsCreationByNonAdminUsers: z.boolean().optional(),
+  disableSurveyFeedback: z.boolean().optional(),
+  disableTrialEnvironmentCreationByNonAdminUsers: z.boolean().optional(),
+  disableCapacityAllocationByEnvironmentAdmins: z.boolean().optional(),
+  disableSupportTicketsVisibleByAllUsers: z.boolean().optional(),
+  disableDocsSearch: z.boolean().optional(),
+  disableCommunitySearch: z.boolean().optional(),
+  disableBingVideoSearch: z.boolean().optional(),
+  shareWithColleaguesUserLimit: z.string().refine(val => {
+    const num = Number(val);
+    return Number.isInteger(num) && num >= 0;
+  }, {
+    error: 'The value must be a non-negative integer.'
+  }).optional(),
+  disableShareWithEveryone: z.boolean().optional(),
+  enableGuestsToMake: z.boolean().optional(),
+  disableMembersIndicator: z.boolean().optional(),
+  disableMakerMatch: z.boolean().optional(),
+  disablePreferredDataLocationForTeamsEnvironment: z.boolean().optional(),
+  disableAdminDigest: z.boolean().optional(),
+  disableDeveloperEnvironmentCreationByNonAdminUsers: z.boolean().optional(),
+  disableBillingPolicyCreationByNonAdminUsers: z.boolean().optional(),
+  storageCapacityConsumptionWarningThreshold: z.string().refine(val => {
+    const num = Number(val);
+    return Number.isInteger(num) && num >= 0;
+  }, {
+    error: 'The value must be a non-negative integer.'
+  }).optional(),
+  disableChampionsInvitationReachout: z.boolean().optional(),
+  disableSkillsMatchInvitationReachout: z.boolean().optional(),
+  disableCopilot: z.boolean().optional(),
+  enableOpenAiBotPublishing: z.boolean().optional(),
+  enableModelDataSharing: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  walkMeOptOut?: boolean;
-  disableNPSCommentsReachout?: boolean;
-  disableNewsletterSendout?: boolean;
-  disableEnvironmentCreationByNonAdminUsers?: boolean;
-  disablePortalsCreationByNonAdminUsers?: boolean;
-  disableSurveyFeedback?: boolean;
-  disableTrialEnvironmentCreationByNonAdminUsers?: boolean;
-  disableCapacityAllocationByEnvironmentAdmins?: boolean;
-  disableSupportTicketsVisibleByAllUsers?: boolean;
-  disableDocsSearch?: boolean;
-  disableCommunitySearch?: boolean;
-  disableBingVideoSearch?: boolean;
-  shareWithColleaguesUserLimit?: number;
-  disableShareWithEveryone?: boolean;
-  enableGuestsToMake?: boolean;
-  disableMembersIndicator?: boolean;
-  disableMakerMatch?: boolean;
-  disablePreferredDataLocationForTeamsEnvironment?: boolean;
-  disableAdminDigest?: boolean;
-  disableDeveloperEnvironmentCreationByNonAdminUsers?: boolean;
-  disableBillingPolicyCreationByNonAdminUsers?: boolean;
-  storageCapacityConsumptionWarningThreshold?: number;
-  disableChampionsInvitationReachout?: boolean;
-  disableSkillsMatchInvitationReachout?: boolean;
-  disableCopilot?: boolean;
-  enableOpenAiBotPublishing?: boolean;
-  enableModelDataSharing?: boolean;
 }
 
 class PpTenantSettingsSetCommand extends PowerPlatformCommand {
@@ -47,235 +61,45 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
     return 'Sets the global Power Platform configuration of the tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        walkMeOptOut: typeof args.options.walkMeOptOut !== 'undefined',
-        disableNPSCommentsReachout: typeof args.options.disableNPSCommentsReachout !== 'undefined',
-        disableNewsletterSendout: typeof args.options.disableNewsletterSendout !== 'undefined',
-        disableEnvironmentCreationByNonAdminUsers: typeof args.options.disableEnvironmentCreationByNonAdminUsers !== 'undefined',
-        disablePortalsCreationByNonAdminUsers: typeof args.options.disablePortalsCreationByNonAdminUsers !== 'undefined',
-        disableSurveyFeedback: typeof args.options.disableSurveyFeedback !== 'undefined',
-        disableTrialEnvironmentCreationByNonAdminUsers: typeof args.options.disableTrialEnvironmentCreationByNonAdminUsers !== 'undefined',
-        disableCapacityAllocationByEnvironmentAdmins: typeof args.options.disableCapacityAllocationByEnvironmentAdmins !== 'undefined',
-        disableSupportTicketsVisibleByAllUsers: typeof args.options.disableSupportTicketsVisibleByAllUsers !== 'undefined',
-        disableDocsSearch: typeof args.options.disableDocsSearch !== 'undefined',
-        disableCommunitySearch: typeof args.options.disableCommunitySearch !== 'undefined',
-        disableBingVideoSearch: typeof args.options.disableBingVideoSearch !== 'undefined',
-        shareWithColleaguesUserLimit: typeof args.options.shareWithColleaguesUserLimit !== 'undefined',
-        disableShareWithEveryone: typeof args.options.disableShareWithEveryone !== 'undefined',
-        enableGuestsToMake: typeof args.options.enableGuestsToMake !== 'undefined',
-        disableMembersIndicator: typeof args.options.disableMembersIndicator !== 'undefined',
-        disableMakerMatch: typeof args.options.disableMakerMatch !== 'undefined',
-        disablePreferredDataLocationForTeamsEnvironment: typeof args.options.disablePreferredDataLocationForTeamsEnvironment !== 'undefined',
-        disableAdminDigest: typeof args.options.disableAdminDigest !== 'undefined',
-        disableDeveloperEnvironmentCreationByNonAdminUsers: typeof args.options.disableDeveloperEnvironmentCreationByNonAdminUsers !== 'undefined',
-        disableBillingPolicyCreationByNonAdminUsers: typeof args.options.disableBillingPolicyCreationByNonAdminUsers !== 'undefined',
-        storageCapacityConsumptionWarningThreshold: typeof args.options.storageCapacityConsumptionWarningThreshold !== 'undefined',
-        disableChampionsInvitationReachout: typeof args.options.disableChampionsInvitationReachout !== 'undefined',
-        disableSkillsMatchInvitationReachout: typeof args.options.disableSkillsMatchInvitationReachout !== 'undefined',
-        disableCopilot: typeof args.options.disableCopilot !== 'undefined',
-        enableOpenAiBotPublishing: typeof args.options.enableOpenAiBotPublishing !== 'undefined',
-        enableModelDataSharing: typeof args.options.enableModelDataSharing !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts =>
+        opts.walkMeOptOut !== undefined ||
+        opts.disableNPSCommentsReachout !== undefined ||
+        opts.disableNewsletterSendout !== undefined ||
+        opts.disableEnvironmentCreationByNonAdminUsers !== undefined ||
+        opts.disablePortalsCreationByNonAdminUsers !== undefined ||
+        opts.disableSurveyFeedback !== undefined ||
+        opts.disableTrialEnvironmentCreationByNonAdminUsers !== undefined ||
+        opts.disableCapacityAllocationByEnvironmentAdmins !== undefined ||
+        opts.disableSupportTicketsVisibleByAllUsers !== undefined ||
+        opts.disableDocsSearch !== undefined ||
+        opts.disableCommunitySearch !== undefined ||
+        opts.disableBingVideoSearch !== undefined ||
+        opts.shareWithColleaguesUserLimit !== undefined ||
+        opts.disableShareWithEveryone !== undefined ||
+        opts.enableGuestsToMake !== undefined ||
+        opts.disableMembersIndicator !== undefined ||
+        opts.disableMakerMatch !== undefined ||
+        opts.disablePreferredDataLocationForTeamsEnvironment !== undefined ||
+        opts.disableAdminDigest !== undefined ||
+        opts.disableDeveloperEnvironmentCreationByNonAdminUsers !== undefined ||
+        opts.disableBillingPolicyCreationByNonAdminUsers !== undefined ||
+        opts.storageCapacityConsumptionWarningThreshold !== undefined ||
+        opts.disableChampionsInvitationReachout !== undefined ||
+        opts.disableSkillsMatchInvitationReachout !== undefined ||
+        opts.disableCopilot !== undefined ||
+        opts.enableOpenAiBotPublishing !== undefined ||
+        opts.enableModelDataSharing !== undefined, {
+        error: 'Specify at least one option.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--walkMeOptOut [walkMeOptOut]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableNPSCommentsReachout [disableNPSCommentsReachout]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableNewsletterSendout [disableNewsletterSendout]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableEnvironmentCreationByNonAdminUsers [disableEnvironmentCreationByNonAdminUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disablePortalsCreationByNonAdminUsers [disablePortalsCreationByNonAdminUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableSurveyFeedback [disableSurveyFeedback]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableTrialEnvironmentCreationByNonAdminUsers [disableTrialEnvironmentCreationByNonAdminUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableCapacityAllocationByEnvironmentAdmins [disableCapacityAllocationByEnvironmentAdmins]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableSupportTicketsVisibleByAllUsers [disableSupportTicketsVisibleByAllUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableDocsSearch [disableDocsSearch]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableCommunitySearch [disableCommunitySearch]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableBingVideoSearch [disableBingVideoSearch]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--shareWithColleaguesUserLimit [shareWithColleaguesUserLimit]'
-      },
-      {
-        option: '--disableShareWithEveryone [disableShareWithEveryone]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableGuestsToMake [enableGuestsToMake]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableMembersIndicator [disableMembersIndicator]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableMakerMatch [disableMakerMatch]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disablePreferredDataLocationForTeamsEnvironment [disablePreferredDataLocationForTeamsEnvironment]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableAdminDigest [disableAdminDigest]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableDeveloperEnvironmentCreationByNonAdminUsers [disableDeveloperEnvironmentCreationByNonAdminUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableBillingPolicyCreationByNonAdminUsers [disableBillingPolicyCreationByNonAdminUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--storageCapacityConsumptionWarningThreshold [storageCapacityConsumptionWarningThreshold]'
-      },
-      {
-        option: '--disableChampionsInvitationReachout [disableChampionsInvitationReachout]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableSkillsMatchInvitationReachout [disableSkillsMatchInvitationReachout]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableCopilot [disableCopilot]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableOpenAiBotPublishing [enableOpenAiBotPublishing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--enableModelDataSharing [enableModelDataSharing]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push(
-      'walkMeOptOut',
-      'disableNPSCommentsReachout',
-      'disableNewsletterSendout',
-      'disableEnvironmentCreationByNonAdminUsers',
-      'disablePortalsCreationByNonAdminUsers',
-      'disableSurveyFeedback',
-      'disableTrialEnvironmentCreationByNonAdminUsers',
-      'disableCapacityAllocationByEnvironmentAdmins',
-      'disableSupportTicketsVisibleByAllUsers',
-      'disableDocsSearch',
-      'disableCommunitySearch',
-      'disableBingVideoSearch',
-      'disableShareWithEveryone',
-      'enableGuestsToMake',
-      'disableMembersIndicator',
-      'disableMakerMatch',
-      'disablePreferredDataLocationForTeamsEnvironment',
-      'disableAdminDigest',
-      'disableDeveloperEnvironmentCreationByNonAdminUsers',
-      'disableBillingPolicyCreationByNonAdminUsers',
-      'disableChampionsInvitationReachout',
-      'disableSkillsMatchInvitationReachout',
-      'disableCopilot',
-      'enableOpenAiBotPublishing',
-      'enableModelDataSharing'
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-
-        if (args.options.shareWithColleaguesUserLimit !== undefined && (!Number.isInteger(args.options.shareWithColleaguesUserLimit) || args.options.shareWithColleaguesUserLimit < 0)) {
-          return `'${args.options.shareWithColleaguesUserLimit}' is not a valid number.`;
-        }
-
-        if (args.options.storageCapacityConsumptionWarningThreshold !== undefined && (!Number.isInteger(args.options.storageCapacityConsumptionWarningThreshold) || args.options.storageCapacityConsumptionWarningThreshold < 0)) {
-          return `'${args.options.storageCapacityConsumptionWarningThreshold}' is not a valid number.`;
-        }
-
-        if (typeof args.options.walkMeOptOut === 'undefined' &&
-          typeof args.options.disableNPSCommentsReachout === 'undefined' &&
-          typeof args.options.disableNewsletterSendout === 'undefined' &&
-          typeof args.options.disableEnvironmentCreationByNonAdminUsers === 'undefined' &&
-          typeof args.options.disablePortalsCreationByNonAdminUsers === 'undefined' &&
-          typeof args.options.disableSurveyFeedback === 'undefined' &&
-          typeof args.options.disableTrialEnvironmentCreationByNonAdminUsers === 'undefined' &&
-          typeof args.options.disableCapacityAllocationByEnvironmentAdmins === 'undefined' &&
-          typeof args.options.disableSupportTicketsVisibleByAllUsers === 'undefined' &&
-          typeof args.options.disableDocsSearch === 'undefined' &&
-          typeof args.options.disableCommunitySearch === 'undefined' &&
-          typeof args.options.disableBingVideoSearch === 'undefined' &&
-          typeof args.options.shareWithColleaguesUserLimit === 'undefined' &&
-          typeof args.options.disableShareWithEveryone === 'undefined' &&
-          typeof args.options.enableGuestsToMake === 'undefined' &&
-          typeof args.options.disableMembersIndicator === 'undefined' &&
-          typeof args.options.disableMakerMatch === 'undefined' &&
-          typeof args.options.disablePreferredDataLocationForTeamsEnvironment === 'undefined' &&
-          typeof args.options.disableAdminDigest === 'undefined' &&
-          typeof args.options.disableDeveloperEnvironmentCreationByNonAdminUsers === 'undefined' &&
-          typeof args.options.disableBillingPolicyCreationByNonAdminUsers === 'undefined' &&
-          typeof args.options.storageCapacityConsumptionWarningThreshold === 'undefined' &&
-          typeof args.options.disableChampionsInvitationReachout === 'undefined' &&
-          typeof args.options.disableSkillsMatchInvitationReachout === 'undefined' &&
-          typeof args.options.disableCopilot === 'undefined' &&
-          typeof args.options.enableOpenAiBotPublishing === 'undefined' &&
-          typeof args.options.enableModelDataSharing === 'undefined') {
-          return 'Specify at least one option.';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -296,7 +120,7 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
           disableBingVideoSearch: args.options.disableBingVideoSearch
         },
         teamsIntegration: {
-          shareWithColleaguesUserLimit: args.options.shareWithColleaguesUserLimit
+          shareWithColleaguesUserLimit: args.options.shareWithColleaguesUserLimit !== undefined ? Number(args.options.shareWithColleaguesUserLimit) : undefined
         },
         powerApps: {
           disableShareWithEveryone: args.options.disableShareWithEveryone,
@@ -313,7 +137,7 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
         },
         licensing: {
           disableBillingPolicyCreationByNonAdminUsers: args.options.disableBillingPolicyCreationByNonAdminUsers,
-          storageCapacityConsumptionWarningThreshold: args.options.storageCapacityConsumptionWarningThreshold
+          storageCapacityConsumptionWarningThreshold: args.options.storageCapacityConsumptionWarningThreshold !== undefined ? Number(args.options.storageCapacityConsumptionWarningThreshold) : undefined
         },
         champions: {
           disableChampionsInvitationReachout: args.options.disableChampionsInvitationReachout,
