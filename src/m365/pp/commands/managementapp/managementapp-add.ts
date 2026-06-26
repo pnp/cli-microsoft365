@@ -10,10 +10,10 @@ import { entraApp } from '../../../../utils/entraApp.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   appId: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).optional(),
   objectId: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).optional(),
   name: z.string().optional()
 });
@@ -40,7 +40,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.appId, opts.objectId, opts.name].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'appId', 'objectId', or 'name', but not multiple.`,
+        error: `Specify either 'appId', 'objectId', or 'name', but not multiple.`,
         params: {
           customCode: 'optionSet',
           options: ['appId', 'objectId', 'name']

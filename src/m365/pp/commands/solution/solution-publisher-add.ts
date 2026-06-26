@@ -11,19 +11,19 @@ export const options = z.strictObject({
   environmentName: z.string().alias('e'),
   name: z.string()
     .refine(val => /^[a-zA-Z_][A-Za-z0-9_]+$/.test(val), {
-      message: 'Option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.'
+      error: 'Option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.'
     }).alias('n'),
   displayName: z.string(),
   prefix: z.string()
     .refine(val => /^(?!mscrm.*$)[a-zA-Z][A-Za-z0-9]{1,7}$/.test(val), {
-      message: `Option prefix may only consist of alphanumeric characters. The first character cannot be a number and may not start with 'mscrm'. It must be between 2 and 8 characters long.`
+      error: `Option prefix may only consist of alphanumeric characters. The first character cannot be a number and may not start with 'mscrm'. It must be between 2 and 8 characters long.`
     }),
   choiceValuePrefix: z.string()
     .refine(val => {
       const num = Number(val);
       return Number.isInteger(num) && num >= 10000 && num <= 99999;
     }, {
-      message: 'Option choiceValuePrefix should be an integer between 10000 and 99999.'
+      error: 'Option choiceValuePrefix should be an integer between 10000 and 99999.'
     }),
   asAdmin: z.boolean().optional()
 });

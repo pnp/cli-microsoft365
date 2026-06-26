@@ -23,7 +23,7 @@ export const options = z.strictObject({
     const num = Number(val);
     return Number.isInteger(num) && num >= 0;
   }, {
-    message: 'The value must be a non-negative integer.'
+    error: 'The value must be a non-negative integer.'
   }).optional(),
   disableShareWithEveryone: z.boolean().optional(),
   enableGuestsToMake: z.boolean().optional(),
@@ -37,7 +37,7 @@ export const options = z.strictObject({
     const num = Number(val);
     return Number.isInteger(num) && num >= 0;
   }, {
-    message: 'The value must be a non-negative integer.'
+    error: 'The value must be a non-negative integer.'
   }).optional(),
   disableChampionsInvitationReachout: z.boolean().optional(),
   disableSkillsMatchInvitationReachout: z.boolean().optional(),
@@ -95,7 +95,7 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
         opts.disableCopilot !== undefined ||
         opts.enableOpenAiBotPublishing !== undefined ||
         opts.enableModelDataSharing !== undefined, {
-        message: 'Specify at least one option.',
+        error: 'Specify at least one option.',
         params: {
           customCode: 'required'
         }
