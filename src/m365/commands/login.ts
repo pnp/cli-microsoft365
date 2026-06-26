@@ -44,7 +44,7 @@ class LoginCommand extends Command {
   }
 
   public get description(): string {
-    return 'Log in to Microsoft 365';
+    return 'Logs in to Microsoft 365';
   }
 
   public get schema(): z.ZodType | undefined {

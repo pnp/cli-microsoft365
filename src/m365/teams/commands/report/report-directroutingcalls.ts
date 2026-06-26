@@ -25,7 +25,7 @@ class TeamsReportDirectroutingcallsCommand extends GraphApplicationCommand {
   }
 
   public get description(): string {
-    return 'Get details about direct routing calls made within a given time period';
+    return 'Gets details about direct routing calls made within a given time period';
   }
 
   public defaultProperties(): string[] | undefined {

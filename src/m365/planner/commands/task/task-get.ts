@@ -32,7 +32,7 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the specified planner task';
+    return 'Retrieves the specified planner task';
   }
 
   constructor() {

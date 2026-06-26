@@ -20,7 +20,7 @@ class PpAiBuilderModelListCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'List available AI builder models in the specified Power Platform environment.';
+    return 'Lists available AI builder models in the specified Power Platform environment.';
   }
 
   public defaultProperties(): string[] | undefined {

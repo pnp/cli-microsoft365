@@ -28,7 +28,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Connect a hub site to a parent hub site';
+    return 'Connects a hub site to a parent hub site';
   }
 
   constructor() {

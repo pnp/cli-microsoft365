@@ -31,7 +31,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get a ListView Command Set that is added to a site.';
+    return 'Gets a ListView Command Set that is added to a site.';
   }
 
   constructor() {

@@ -28,7 +28,7 @@ class ConnectionSetCommand extends Command {
   }
 
   public get description(): string {
-    return 'Rename the specified connection';
+    return 'Renames the specified connection';
   }
 
   public get schema(): z.ZodType {

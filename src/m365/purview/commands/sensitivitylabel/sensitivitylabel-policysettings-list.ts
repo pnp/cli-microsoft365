@@ -22,7 +22,7 @@ class PurviewSensitivityLabelPolicySettingsListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of policy settings for a sensitivity label';
+    return 'Gets a list of policy settings for a sensitivity label';
   }
 
   constructor() {

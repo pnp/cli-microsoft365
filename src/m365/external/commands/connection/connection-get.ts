@@ -24,7 +24,7 @@ class ExternalConnectionGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a specific external connection';
+    return 'Allows the administrator to get a specific external connection';
   }
 
   public alias(): string[] | undefined {

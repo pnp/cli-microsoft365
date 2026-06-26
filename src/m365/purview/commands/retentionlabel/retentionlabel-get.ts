@@ -19,7 +19,7 @@ class PurviewRetentionLabelGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the specified retention label';
+    return 'Gets a retention label';
   }
 
   constructor() {

@@ -21,7 +21,7 @@ class SpoWebRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Delete specified subsite';
+    return 'Deletes specified subsite';
   }
 
   constructor() {

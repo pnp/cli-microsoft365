@@ -27,7 +27,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get specified meeting details';
+    return 'Gets specified meeting details';
   }
 
   constructor() {

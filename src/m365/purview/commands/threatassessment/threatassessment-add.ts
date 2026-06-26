@@ -32,7 +32,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Create a threat assessment';
+    return 'Creates a threat assessment';
   }
 
   constructor() {
