@@ -13,7 +13,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   environmentName: z.string().alias('e'),
   id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).optional().alias('i'),
   name: z.string().optional().alias('n'),
   asAdmin: z.boolean().optional(),
@@ -47,7 +47,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'id' or 'name', but not both.`,
+        error: `Specify either 'id' or 'name', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['id', 'name']
@@ -57,7 +57,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
       const solutionId = await this.getSolutionId(args, dynamicsApiUrl, logger);
       const solutionComponents = await this.getSolutionComponents(dynamicsApiUrl, solutionId, logger);
       const parameterXml = await this.buildXmlRequestObject(solutionComponents, logger);
