@@ -17,7 +17,7 @@ export const options = z.strictObject({
   behaviorDuringRetentionPeriod: z.enum(behaviorDuringRetentionPeriods),
   actionAfterRetentionPeriod: z.enum(actionAfterRetentionPeriods),
   retentionDuration: z.string().refine(val => !isNaN(Number(val)), {
-    message: 'retentionDuration must be a number'
+    error: 'retentionDuration must be a number'
   }),
   retentionTrigger: z.enum(retentionTriggers).optional().alias('t'),
   defaultRecordBehavior: z.enum(defaultRecordBehaviors).optional(),
@@ -55,7 +55,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
         }
         return true;
       }, {
-        message: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
+        error: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['eventTypeId', 'eventTypeName']

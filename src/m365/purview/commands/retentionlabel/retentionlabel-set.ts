@@ -14,12 +14,12 @@ const defaultRecordBehaviorValues = ['startLocked', 'startUnlocked'] as const;
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).alias('i'),
   behaviorDuringRetentionPeriod: z.enum(behaviorDuringRetentionPeriodValues).optional(),
   actionAfterRetentionPeriod: z.enum(actionAfterRetentionPeriodValues).optional(),
   retentionDuration: z.string().refine(val => !isNaN(Number(val)), {
-    message: 'retentionDuration must be a number'
+    error: 'retentionDuration must be a number'
   }).optional(),
   retentionTrigger: z.enum(retentionTriggerValues).optional().alias('t'),
   defaultRecordBehavior: z.enum(defaultRecordBehaviorValues).optional(),
@@ -50,7 +50,8 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => opts.behaviorDuringRetentionPeriod || opts.actionAfterRetentionPeriod || opts.retentionDuration || opts.retentionTrigger || opts.defaultRecordBehavior || opts.descriptionForUsers || opts.descriptionForAdmins || opts.labelToBeApplied, {
-        message: 'Specify at least one property to update.',
+        error: 'Specify at least one property to update.',
+        path: ['behaviorDuringRetentionPeriod'],
         params: {
           customCode: 'required'
         }
@@ -98,7 +99,7 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
     if (options.retentionDuration) {
       requestBody['retentionDuration'] = {
         '@odata.type': 'microsoft.graph.security.retentionDurationInDays',
-        'days': options.retentionDuration
+        'days': Number(options.retentionDuration)
       };
     }
     return requestBody;

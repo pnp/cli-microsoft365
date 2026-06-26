@@ -11,13 +11,13 @@ import commands from '../../commands.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).alias('i'),
   userId: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).optional(),
   userName: z.string().refine(val => validation.isValidUserPrincipalName(val), {
-    message: 'The value must be a valid user principal name (UPN).'
+    error: 'The value must be a valid user principal name (UPN).'
   }).optional()
 });
 

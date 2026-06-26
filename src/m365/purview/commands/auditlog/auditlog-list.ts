@@ -14,19 +14,19 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   contentType: z.enum(contentTypeOptions),
   startTime: z.string().refine(val => validation.isValidISODateTime(val), {
-    message: 'The value is not a valid ISO date time string.'
+    error: 'The value is not a valid ISO date time string.'
   }).refine(val => {
     const lowerDateLimit = new Date();
     lowerDateLimit.setDate(lowerDateLimit.getDate() - 7);
     lowerDateLimit.setHours(lowerDateLimit.getHours() - 1);
     return new Date(val) >= lowerDateLimit;
   }, {
-    message: 'startTime value cannot be more than 7 days in the past.'
+    error: 'startTime value cannot be more than 7 days in the past.'
   }).optional(),
   endTime: z.string().refine(val => validation.isValidISODateTime(val), {
-    message: 'The value is not a valid ISO date time string.'
+    error: 'The value is not a valid ISO date time string.'
   }).refine(val => new Date(val) <= new Date(), {
-    message: 'endTime value cannot be in the future.'
+    error: 'endTime value cannot be in the future.'
   }).optional()
 });
 
@@ -57,7 +57,7 @@ class PurviewAuditLogListCommand extends O365MgmtCommand {
         }
         return true;
       }, {
-        message: 'startTime value must be before endTime.'
+        error: 'startTime value must be before endTime.'
       });
   }
 

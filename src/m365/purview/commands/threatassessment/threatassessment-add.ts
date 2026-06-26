@@ -19,7 +19,7 @@ export const options = z.strictObject({
   expectedAssessment: z.enum(allowedExpectedAssessments).alias('e'),
   category: z.enum(allowedCategories).alias('c'),
   path: z.string().refine(val => fs.existsSync(val), {
-    message: 'Specified file does not exist.'
+    error: 'Specified file does not exist.'
   }).optional().alias('p'),
   url: z.string().optional().alias('u')
 });
@@ -51,7 +51,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         }
         return true;
       }, {
-        message: `'path' is required when type is 'file'.`,
+        error: `'path' is required when type is 'file'.`,
         path: ['path'],
         params: {
           customCode: 'required'
@@ -63,7 +63,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         }
         return true;
       }, {
-        message: `'url' is required when type is 'url'.`,
+        error: `'url' is required when type is 'url'.`,
         path: ['url'],
         params: {
           customCode: 'required'
