@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-list.js';
+import command, { options } from './task-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_LIST, () => {
@@ -196,6 +196,7 @@ describe(commands.TASK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -208,6 +209,7 @@ describe(commands.TASK_LIST, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -288,6 +290,19 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      bucketId: 'value',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'startDateTime', 'dueDateTime', 'completedDateTime']);
   });
@@ -301,13 +316,11 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
-        bucketName: 'Planner Bucket A'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
+      bucketName: 'Planner Bucket A'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when bucketName is specified without planId, planTitle, or rosterId', async () => {
@@ -319,12 +332,10 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketName: 'Planner Bucket A'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketName: 'Planner Bucket A'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when bucketName is specified with planId, planTitle, and rosterId', async () => {
@@ -336,15 +347,13 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketName: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner Plan',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketName: 'Planner Bucket A',
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      planTitle: 'My Planner Plan',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when bucketName is specified with neither the planId, planTitle, nor rosterId', async () => {
@@ -356,13 +365,11 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        debug: true,
-        bucketName: 'Planner Bucket A'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      debug: true,
+      bucketName: 'Planner Bucket A'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when planId, planTitle, and rosterId are specified', async () => {
@@ -374,15 +381,13 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketName: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner',
-        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketName: 'Planner Bucket A',
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      planTitle: 'My Planner',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', async () => {
@@ -394,13 +399,11 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketName: 'Planner Bucket A',
-        planTitle: 'My Planner Plan'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketName: 'Planner Bucket A',
+      planTitle: 'My Planner Plan'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', async () => {
@@ -412,97 +415,79 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        bucketName: 'Planner Bucket A',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      bucketName: 'Planner Bucket A',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      ownerGroupName: 'My Planner Group'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when owner group id is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when valid planId is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      bucketName: 'Planner Bucket A'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid planTitle and ownerGroupId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when valid planTitle and ownerGroupName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupName: 'My Planner Group'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName and planId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      bucketName: 'Planner Bucket A'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName, planTitle, and ownerGroupId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when bucketName, planTitle, and ownerGroupName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        bucketName: 'Planner Bucket A',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      bucketName: 'Planner Bucket A',
+      ownerGroupName: 'My Planner Group'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when no arguments are specified', async () => {
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
@@ -514,13 +499,11 @@ describe(commands.TASK_LIST, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        planTitle: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      planTitle: 'My Planner Plan',
+      ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when ownerGroupName not found', async () => {
@@ -533,10 +516,10 @@ describe(commands.TASK_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
-      }
+      })
     }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
@@ -577,16 +560,18 @@ describe(commands.TASK_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         bucketName: 'foo',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
-      }
+      })
     }), new CommandError(`The specified bucket 'foo' does not exist.`));
   });
 
   it('lists planner tasks of the current logged in user', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({})
+    });
     assert(loggerLogSpy.called);
   });
 
@@ -596,7 +581,7 @@ describe(commands.TASK_LIST, () => {
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -606,7 +591,7 @@ describe(commands.TASK_LIST, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -615,7 +600,7 @@ describe(commands.TASK_LIST, () => {
       bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -626,7 +611,7 @@ describe(commands.TASK_LIST, () => {
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -637,7 +622,7 @@ describe(commands.TASK_LIST, () => {
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -648,7 +633,7 @@ describe(commands.TASK_LIST, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -658,7 +643,7 @@ describe(commands.TASK_LIST, () => {
       rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
@@ -666,6 +651,8 @@ describe(commands.TASK_LIST, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({})
+    }), new CommandError('An error has occurred'));
   });
 });
