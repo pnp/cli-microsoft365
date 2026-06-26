@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionevent-get.js';
+import command, { options } from './retentionevent-get.js';
 
 describe(commands.RETENTIONEVENT_GET, () => {
   const retentionEventId = 'c37d695e-d581-4ae9-82a0-9364eba4291e';
@@ -63,6 +63,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -75,6 +76,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -114,14 +116,19 @@ describe(commands.RETENTIONEVENT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if a correct id is entered', async () => {
-    const actual = await command.validate({ options: { id: retentionEventId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if a correct id is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ id: retentionEventId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: retentionEventId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves retention event by specified id', async () => {
@@ -133,7 +140,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: retentionEventId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: retentionEventId, verbose: true }) });
     assert(loggerLogSpy.calledWith(retentionEventGetResponse));
   });
 
@@ -148,9 +155,9 @@ describe(commands.RETENTIONEVENT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: retentionEventId
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

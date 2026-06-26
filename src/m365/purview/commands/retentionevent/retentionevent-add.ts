@@ -1,23 +1,30 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { odata } from '../../../../utils/odata.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().alias('n'),
+  eventTypeId: z.string().optional().alias('i'),
+  eventTypeName: z.string().optional().alias('e'),
+  description: z.string().optional().alias('d'),
+  triggerDateTime: z.string().optional()
+    .refine(val => val === undefined || validation.isValidISODateTime(val), {
+      message: 'The triggerDateTime is not a valid ISO date string'
+    }),
+  assetIds: z.string().optional().alias('a'),
+  keywords: z.string().optional().alias('k')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName: string;
-  eventTypeId?: string;
-  eventTypeName?: string;
-  description?: string;
-  triggerDateTime?: string;
-  assetIds?: string;
-  keywords?: string;
 }
 
 class PurviewRetentionEventAddCommand extends GraphCommand {
@@ -29,74 +36,26 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     return 'Create a retention event';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-i, --eventTypeId [eventTypeId]'
-      },
-      {
-        option: '-e, --eventTypeName [eventTypeName]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--triggerDateTime [triggerDateTime]'
-      },
-      {
-        option: '-a, --assetIds [assetIds]'
-      },
-      {
-        option: '-k, --keywords [keywords]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.triggerDateTime && !validation.isValidISODateTime(args.options.triggerDateTime)) {
-          return 'The triggerDateTime is not a valid ISO date string';
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.eventTypeId, opts.eventTypeName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['eventTypeId', 'eventTypeName']
         }
-
-        if (!args.options.assetIds && !args.options.keywords) {
-          return 'Specify assetIds and/or keywords, but at least one.';
+      })
+      .refine(opts => opts.assetIds || opts.keywords, {
+        error: 'Specify assetIds and/or keywords, but at least one.',
+        path: ['assetIds'],
+        params: {
+          customCode: 'required'
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        triggerDateTime: typeof args.options.triggerDateTime !== 'undefined',
-        eventTypeId: typeof args.options.eventTypeId !== 'undefined',
-        eventTypeName: typeof args.options.eventTypeName !== 'undefined',
-        assetIds: typeof args.options.assetIds !== 'undefined',
-        keywords: typeof args.options.keywords !== 'undefined'
-      });
-    });
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['eventTypeId', 'eventTypeName'] }
-    );
+      }) as any;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
