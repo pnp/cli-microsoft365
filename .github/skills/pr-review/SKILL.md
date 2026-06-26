@@ -40,7 +40,7 @@ Review the diff against **all three categories** below. Not every checklist item
 
 Walk through each applicable item in the checklist and verify it against the diff. Key items to check:
 
-- **Single quotes** for strings (not double quotes).
+- **Single quotes** for strings in command files (not double quotes). For test files, this is less strictly enforced.
 - **Command class naming**: `[Service][Command]Command` pattern.
 - **Command name in `commands.ts`**: Must be placed in alphabetical order.
 - **`force` option** on remove commands.
