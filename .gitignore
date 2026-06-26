@@ -87,4 +87,4 @@ docs/.env.production.local
 
 docs/npm-debug.log*
 docs/yarn-debug.log*
-docs/yarn-error.log*
+docs/yarn-error.log*.impeccable/

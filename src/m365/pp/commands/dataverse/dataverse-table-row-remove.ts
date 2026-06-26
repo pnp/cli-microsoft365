@@ -12,7 +12,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   environmentName: z.string().alias('e'),
   id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
+    error: 'The value must be a valid GUID.'
   }).alias('i'),
   entitySetName: z.string().optional(),
   tableName: z.string().optional(),
@@ -43,7 +43,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.entitySetName, opts.tableName].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'entitySetName' or 'tableName', but not both.`,
+        error: `Specify either 'entitySetName' or 'tableName', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['entitySetName', 'tableName']
