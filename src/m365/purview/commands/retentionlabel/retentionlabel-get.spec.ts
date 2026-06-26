@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionlabel-get.js';
+import command, { options } from './retentionlabel-get.js';
 
 describe(commands.RETENTIONLABEL_GET, () => {
 
@@ -51,6 +51,7 @@ describe(commands.RETENTIONLABEL_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -63,6 +64,7 @@ describe(commands.RETENTIONLABEL_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,6 +104,21 @@ describe(commands.RETENTIONLABEL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if a correct id is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ id: retentionLabelId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: retentionLabelId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves retention label specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${retentionLabelId}`) {
@@ -111,7 +128,7 @@ describe(commands.RETENTIONLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: retentionLabelId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: retentionLabelId, verbose: true }) });
     assert(loggerLogSpy.calledWith(retentionLabelGetResponse));
   });
 
@@ -124,16 +141,6 @@ describe(commands.RETENTIONLABEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: retentionLabelId } }), new CommandError(`Error: The operation couldn't be performed because object '${retentionLabelId}' couldn't be found on 'FfoConfigurationSession'.`));
-  });
-
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if a correct id is entered', async () => {
-    const actual = await command.validate({ options: { id: retentionLabelId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: retentionLabelId }) }), new CommandError(`Error: The operation couldn't be performed because object '${retentionLabelId}' couldn't be found on 'FfoConfigurationSession'.`));
   });
 });

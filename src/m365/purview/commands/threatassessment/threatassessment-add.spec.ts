@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import fs from 'fs';
 import commands from '../../commands.js';
-import command from './threatassessment-add.js';
+import command, { options } from './threatassessment-add.js';
 
 describe(commands.THREATASSESSMENT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.THREATASSESSMENT_ADD, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -106,7 +108,7 @@ describe(commands.THREATASSESSMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'file', expectedAssessment: 'block', category: 'malware', path: 'C:\\Temp\\DummyFile.txt', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'file', expectedAssessment: 'block', category: 'malware', path: 'C:\\Temp\\DummyFile.txt', verbose: true }) });
     assert.strictEqual(postStub.lastCall.args[0].data['@odata.type'], '#microsoft.graph.fileAssessmentRequest');
     assert(loggerLogSpy.calledWith(fileThreatAssessmentRequest));
   });
@@ -139,42 +141,47 @@ describe(commands.THREATASSESSMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'url', expectedAssessment: 'block', category: 'phishing', url: 'https://phisingurl.be', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'url', expectedAssessment: 'block', category: 'phishing', url: 'https://phisingurl.be', verbose: true }) });
     assert.strictEqual(postStub.lastCall.args[0].data['@odata.type'], '#microsoft.graph.urlAssessmentRequest');
     assert(loggerLogSpy.calledWith(urlThreatAssessmentRequest));
   });
 
-  it('passes validation if all options are passed propertly', async () => {
-    const actual = await command.validate({ options: { type: 'url', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are passed propertly', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'url', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if type is not a valid type', async () => {
-    const actual = await command.validate({ options: { type: 'invalid', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if type is not a valid type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'invalid', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if expectedAssessment is not a valid expectedAssessment', async () => {
-    const actual = await command.validate({ options: { type: 'url', expectedAssessment: 'invalid', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if expectedAssessment is not a valid expectedAssessment', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'url', expectedAssessment: 'invalid', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if category is not a valid category', async () => {
-    const actual = await command.validate({ options: { type: 'url', expectedAssessment: 'block', category: 'invalid', url: 'https://pnp.github.io/cli-microsoft365/' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if category is not a valid category', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'url', expectedAssessment: 'block', category: 'invalid', url: 'https://pnp.github.io/cli-microsoft365/' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if path is specified and file does not exist', async () => {
+  it('fails validation if path is specified and file does not exist', () => {
     sinonUtil.restore(fs.existsSync);
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { type: 'file', expectedAssessment: 'block', category: 'malware', path: 'C:\\Path\\That\\Does\\Not\\Exist' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ type: 'file', expectedAssessment: 'block', category: 'malware', path: 'C:\\Path\\That\\Does\\Not\\Exist' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'url', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws an error when we execute the command using application permissions', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { type: 'url', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: 'url', expectedAssessment: 'block', category: 'spam', url: 'https://pnp.github.io/cli-microsoft365/' }) }),
       new CommandError('This command currently does not support app only permissions.'));
   });
 });

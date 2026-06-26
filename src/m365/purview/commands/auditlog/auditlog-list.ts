@@ -1,25 +1,42 @@
+import { z } from 'zod';
 import Auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
 import O365MgmtCommand from '../../../base/O365MgmtCommand.js';
 import commands from '../../commands.js';
 
+const contentTypeOptions = ['AzureActiveDirectory', 'Exchange', 'SharePoint', 'General', 'DLP'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  contentType: z.enum(contentTypeOptions),
+  startTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    error: 'The value is not a valid ISO date time string.'
+  }).refine(val => {
+    const lowerDateLimit = new Date();
+    lowerDateLimit.setDate(lowerDateLimit.getDate() - 7);
+    lowerDateLimit.setHours(lowerDateLimit.getHours() - 1);
+    return new Date(val) >= lowerDateLimit;
+  }, {
+    error: 'startTime value cannot be more than 7 days in the past.'
+  }).optional(),
+  endTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    error: 'The value is not a valid ISO date time string.'
+  }).refine(val => new Date(val) <= new Date(), {
+    error: 'endTime value cannot be in the future.'
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  contentType: string;
-  startTime?: string;
-  endTime?: string;
-}
-
 class PurviewAuditLogListCommand extends O365MgmtCommand {
-  private readonly contentTypeOptions = ['AzureActiveDirectory', 'Exchange', 'SharePoint', 'General', 'DLP'];
-
   public get name(): string {
     return commands.AUDITLOG_LIST;
   }
@@ -28,79 +45,24 @@ class PurviewAuditLogListCommand extends O365MgmtCommand {
     return 'List audit logs within your tenant';
   }
 
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
+  }
+
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.startTime && opts.endTime) {
+          return new Date(opts.startTime) < new Date(opts.endTime);
+        }
+        return true;
+      }, {
+        error: 'startTime value must be before endTime.'
+      });
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['CreationTime', 'UserId', 'Operation', 'ObjectId'];
-  }
-
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        startTime: typeof args.options.startTime !== 'undefined',
-        endTime: typeof args.options.endTime !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--contentType <contentType>',
-        autocomplete: this.contentTypeOptions
-      },
-      {
-        option: '--startTime [startTime]'
-      },
-      {
-        option: '--endTime [endTime]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (this.contentTypeOptions.indexOf(args.options.contentType) === -1) {
-          return `'${args.options.contentType}' is not a valid contentType value. Allowed values: ${this.contentTypeOptions}.`;
-        }
-
-        if (args.options.startTime) {
-          if (!validation.isValidISODateTime(args.options.startTime)) {
-            return `'${args.options.startTime}' is not a valid ISO date time string.`;
-          }
-
-          const lowerDateLimit = new Date();
-          lowerDateLimit.setDate(lowerDateLimit.getDate() - 7);
-          lowerDateLimit.setHours(lowerDateLimit.getHours() - 1); // Min date is 7 days ago, however there seems to be an 1h margin
-          if (new Date(args.options.startTime) < lowerDateLimit) {
-            return 'startTime value cannot be more than 7 days in the past.';
-          }
-        }
-
-        if (args.options.endTime) {
-          if (!validation.isValidISODateTime(args.options.endTime)) {
-            return `'${args.options.endTime}' is not a valid ISO date time string.`;
-          }
-
-          if (new Date(args.options.endTime) > new Date()) {
-            return 'endTime value cannot be in the future.';
-          }
-        }
-
-        if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'startTime value must be before endTime.';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
