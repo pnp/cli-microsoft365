@@ -43,14 +43,15 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.eventTypeId, opts.eventTypeName].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
+        error: `Specify either 'eventTypeId' or 'eventTypeName', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['eventTypeId', 'eventTypeName']
         }
       })
       .refine(opts => opts.assetIds || opts.keywords, {
-        message: 'Specify assetIds and/or keywords, but at least one.',
+        error: 'Specify assetIds and/or keywords, but at least one.',
+        path: ['assetIds'],
         params: {
           customCode: 'required'
         }
