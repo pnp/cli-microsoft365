@@ -3,6 +3,7 @@
 ## General guidelines
 
 - Ensure the build passes.
+- No ESLint errors.
 - Achieve 100% code coverage.
 - The submission should match the specification.
 - Maintain a single commit, or squash multiple commits.
