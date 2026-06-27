@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './applicationcustomizer-list.js';
+import command, { options } from './applicationcustomizer-list.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
 
   //#region Mocked Responses
@@ -59,6 +60,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -100,34 +102,33 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Name', 'Location', 'Scope', 'Id']);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the scope is not a valid scope', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: validWebUrl, scope: 'Invalid Scope'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope is not a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl, scope: 'Invalid Scope'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when a valid webUrl specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when a valid webUrl specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves applicationcustomizers', async () => {
@@ -143,7 +144,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: validWebUrl }) });
     assert(loggerLogSpy.calledWith([
       ...applicationcustomizerResponse.value,
       ...applicationcustomizerResponse.value
@@ -159,7 +160,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, scope: 'Site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Site' }) });
     assert(loggerLogSpy.calledWith(applicationcustomizerResponse.value));
   });
 
@@ -172,7 +173,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, scope: 'Web' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Web' }) });
     assert(loggerLogSpy.calledWith(applicationcustomizerResponse.value));
   });
 
@@ -185,7 +186,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, scope: 'Site' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Site' }) }),
       new CommandError(error));
   });
 });

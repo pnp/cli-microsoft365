@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -9,22 +10,23 @@ import { spo } from '../../../../utils/spo.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { CustomAction } from '../../commands/customaction/customaction.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u'),
+  title: z.string().optional().alias('t'),
+  id: z.string().optional().alias('i'),
+  clientSideComponentId: z.string().optional().alias('c'),
+  scope: z.enum(['Site', 'Web', 'All']).optional().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  title?: string;
-  id?: string;
-  clientSideComponentId?: string;
-  scope?: string;
-  force?: boolean;
-}
-
 class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
-  private readonly allowedScopes: string[] = ['Site', 'Web', 'All'];
-
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_REMOVE;
   }
@@ -33,74 +35,31 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
     return 'Removes an application customizer that is added to a site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-c, --clientSideComponentId [clientSideComponentId]'
-      },
-      {
-        option: '-s, --scope [scope]', autocomplete: this.allowedScopes
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
+        error: () => 'SharePoint Online site URL must be a string.',
+        path: ['webUrl']
+      })
+      .refine(args => !args.id || validation.isValidGuid(args.id), {
+        error: () => 'id is not a valid GUID',
+        path: ['id']
+      })
+      .refine(args => !args.clientSideComponentId || validation.isValidGuid(args.clientSideComponentId), {
+        error: () => 'clientSideComponentId is not a valid GUID',
+        path: ['clientSideComponentId']
+      })
+      .refine(args => [args.id, args.title, args.clientSideComponentId].filter(value => value !== undefined).length === 1, {
+        error: `Specify either 'id', 'title', or 'clientSideComponentId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'clientSideComponentId']
+        }
       });
-    });
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'title', 'clientSideComponentId'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
