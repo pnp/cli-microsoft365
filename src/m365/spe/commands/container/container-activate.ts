@@ -1,16 +1,20 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
 }
 
 class SpeContainerActivateCommand extends GraphCommand {
@@ -22,21 +26,8 @@ class SpeContainerActivateCommand extends GraphCommand {
     return 'Activates a container';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-i, --id <id>' }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id');
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
