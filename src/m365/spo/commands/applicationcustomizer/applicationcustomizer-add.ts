@@ -1,28 +1,54 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CustomAction } from '../customaction/customaction.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    error: e => `${e.input} is not a valid SharePoint URL`
+  }).alias('u'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `${e.input} is not a valid GUID`
+  }).alias('i'),
+  description: z.string().optional(),
+  clientSideComponentProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: e => `An error has occurred while parsing clientSideComponentProperties: ${e.input}`
+  }).optional(),
+  hostProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: e => `An error has occurred while parsing hostProperties: ${e.input}`
+  }).optional(),
+  scope: z.enum(['Site', 'Web']).optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  title: string;
-  webUrl: string;
-  clientSideComponentId: string;
-  description?: string;
-  clientSideComponentProperties?: string;
-  hostProperties?: string;
-  scope?: string;
-}
-
 class SpoApplicationCustomizerAddCommand extends SpoCommand {
-  private static readonly scopes: string[] = ['Site', 'Web'];
-
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_ADD;
   }
@@ -31,90 +57,8 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
     return 'Add an application customizer to a site.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --clientSideComponentId <clientSideComponentId>'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '--hostProperties [hostProperties]'
-      },
-      {
-        option: '-s, --scope [scope]', autocomplete: SpoApplicationCustomizerAddCommand.scopes
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        hostProperties: typeof args.options.hostProperties !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
-      });
-    });
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.webUrl) {
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-        }
-
-        if (!validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentProperties) {
-          try {
-            JSON.parse(args.options.clientSideComponentProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
-          }
-        }
-
-        if (args.options.hostProperties) {
-          try {
-            JSON.parse(args.options.hostProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing hostProperties: ${e}`;
-          }
-        }
-
-        if (args.options.scope && SpoApplicationCustomizerAddCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid value for allowedMembers. Valid values are ${SpoApplicationCustomizerAddCommand.scopes.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
