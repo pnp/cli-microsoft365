@@ -1,19 +1,33 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u'),
+  title: z.string().alias('t'),
+  webPartData: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: 'Specified webPartData is not a valid JSON string.'
+  }).alias('d'),
+  addToQuickLaunch: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  title: string;
-  webPartData: string;
-  addToQuickLaunch: boolean;
 }
 
 class SpoAppPageAddCommand extends SpoCommand {
@@ -25,55 +39,15 @@ class SpoAppPageAddCommand extends SpoCommand {
     return 'Creates a single-part app page';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        addToQuickLaunch: args.options.addToQuickLaunch
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-d, --webPartData <webPartData>'
-      },
-      {
-        option: '--addToQuickLaunch'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        try {
-          JSON.parse(args.options.webPartData);
-        }
-        catch (e) {
-          return `Specified webPartData is not a valid JSON string. Error: ${e}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    Object.assign(this.telemetryProperties, {
+      addToQuickLaunch: args.options.addToQuickLaunch
+    });
+
     const createPageRequestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/sitepages/Pages/CreateAppPage`,
       headers: {
