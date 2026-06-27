@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import { odata } from '../../../../utils/odata.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpeContainerTypeListCommand extends GraphDelegatedCommand {
 
@@ -11,6 +15,10 @@ class SpeContainerTypeListCommand extends GraphDelegatedCommand {
 
   public get description(): string {
     return 'Lists all container types';
+  }
+
+  public get schema(): z.ZodTypeAny {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
