@@ -26,7 +26,7 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.';
+    return 'Gets a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -33,7 +33,7 @@ class EntraAdministrativeUnitMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a member (user, group, device) to an administrative unit';
+    return 'Adds a member (user, group, or device) to an administrative unit';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -22,7 +22,7 @@ class TenantReportSettingsSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Update tenant-level settings for Microsoft 365 reports';
+    return 'Updates tenant-level settings for Microsoft 365 reports';
   }
 
   public get schema(): z.ZodType | undefined {

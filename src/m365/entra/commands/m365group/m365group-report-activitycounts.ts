@@ -7,7 +7,7 @@ class M365GroupReportActivityCountsCommand extends PeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Get the number of group activities across group workloads';
+    return 'Gets the number of group activities across group workloads';
   }
 
   public get usageEndpoint(): string {

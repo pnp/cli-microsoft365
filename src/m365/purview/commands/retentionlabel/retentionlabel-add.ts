@@ -34,7 +34,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Create a retention label';
+    return 'Creates a retention label';
   }
 
   constructor() {

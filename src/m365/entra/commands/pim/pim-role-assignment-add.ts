@@ -49,7 +49,7 @@ class EntraPimRoleAssignmentAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Request activation of an Entra role assignment for a user or group';
+    return 'Requests activation of an Entra role assignment for a user or group';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -19,7 +19,7 @@ class PlannerTaskReferenceListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the references of the specified planner task';
+    return 'Retrieves the references associated to a Planner task';
   }
 
   constructor() {

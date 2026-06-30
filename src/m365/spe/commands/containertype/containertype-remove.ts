@@ -34,7 +34,7 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove a specific container type';
+    return 'Removes a specific container type';
   }
 
   public get schema(): z.ZodType {

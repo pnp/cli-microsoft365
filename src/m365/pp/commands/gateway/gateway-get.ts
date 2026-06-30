@@ -12,7 +12,7 @@ class PpGatewayGetCommand extends PowerBICommand {
   }
 
   public get description(): string {
-    return "Get information about the specified gateway.";
+    return "Gets information about the specified gateway.";
   }
 
   constructor() {

@@ -20,7 +20,7 @@ class SpoCdnOriginListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List CDN origins settings for the current SharePoint Online tenant';
+    return 'Lists CDN origins settings for the current SharePoint Online tenant';
   }
 
   constructor() {

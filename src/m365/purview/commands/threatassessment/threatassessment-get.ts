@@ -20,7 +20,7 @@ class PurviewThreatAssessmentGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a threat assessment';
+    return 'Gets a threat assessment';
   }
 
   constructor() {
