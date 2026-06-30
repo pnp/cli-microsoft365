@@ -114,6 +114,16 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if both entitySetName and tableName options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName, tableName: validTableName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither entitySetName nor tableName option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       environmentName: validEnvironment,

@@ -109,6 +109,16 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if both entitySetName and tableName options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, entitySetName: validEntitySetName, tableName: validTableName, id: validId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither entitySetName nor tableName option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       environmentName: validEnvironment,

@@ -146,6 +146,16 @@ describe(commands.AIBUILDERMODEL_GET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if both id and name options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, name: validName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither id nor name option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       environmentName: validEnvironment,
