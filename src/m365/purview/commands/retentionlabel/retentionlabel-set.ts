@@ -51,9 +51,9 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
     return schema
       .refine(opts => opts.behaviorDuringRetentionPeriod || opts.actionAfterRetentionPeriod || opts.retentionDuration || opts.retentionTrigger || opts.defaultRecordBehavior || opts.descriptionForUsers || opts.descriptionForAdmins || opts.labelToBeApplied, {
         error: 'Specify at least one property to update.',
-        path: ['behaviorDuringRetentionPeriod'],
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['behaviorDuringRetentionPeriod', 'actionAfterRetentionPeriod', 'retentionDuration', 'retentionTrigger', 'defaultRecordBehavior', 'descriptionForUsers', 'descriptionForAdmins', 'labelToBeApplied']
         }
       });
   }
