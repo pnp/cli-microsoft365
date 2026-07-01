@@ -25,7 +25,7 @@ class SpeContainerListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists all Container Types';
+    return 'Lists containers of a specific Container Type';
   }
 
   public get schema(): z.ZodTypeAny {
@@ -34,8 +34,8 @@ class SpeContainerListCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(opts => [opts.containerTypeId, opts.containerTypeName].filter(o => o !== undefined).length <= 1, {
-        message: 'Specify either containerTypeId or containerTypeName, but not both.',
+      .refine(opts => [opts.containerTypeId, opts.containerTypeName].filter(o => o !== undefined).length === 1, {
+        message: 'Specify one of the following options: containerTypeId, containerTypeName.',
         params: {
           customCode: 'optionSet',
           options: ['containerTypeId', 'containerTypeName']
