@@ -93,6 +93,27 @@ describe(commands.CONTAINER_LIST, () => {
     assert.strictEqual(result.success, false);
   });
 
+  it('fails validation when neither containerTypeId nor containerTypeName is specified', () => {
+    const result = commandOptionsSchema.safeParse({});
+    assert.strictEqual(result.success, false);
+  });
+
+  it('fails validation when both containerTypeId and containerTypeName are specified', () => {
+    const result = commandOptionsSchema.safeParse({
+      containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082',
+      containerTypeName: 'standard container'
+    });
+    assert.strictEqual(result.success, false);
+  });
+
+  it('fails validation when unknown option is specified', () => {
+    const result = commandOptionsSchema.safeParse({
+      containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(result.success, false);
+  });
+
   it('passes validation if valid containerTypeId is specified', () => {
     const result = commandOptionsSchema.safeParse({ containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082" });
     assert.strictEqual(result.success, true);
