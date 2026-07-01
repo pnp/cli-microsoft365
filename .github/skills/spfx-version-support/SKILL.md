@@ -113,6 +113,14 @@ Note: the region label and test project directory prefix use the **source** vers
 
 ### Phase 3: Test Project Scaffolding (⚠️ Human Operator Required — STOP)
 
+> **Future toolchain note:** The SPFx CLI (`@microsoft/spfx-cli`) is currently in pre-release and is the planned replacement for the Yeoman generator (`@microsoft/generator-sharepoint`). See: https://learn.microsoft.com/en-us/sharepoint/dev/spfx/toolchain/sharepoint-framework-cli
+>
+> Once the SPFx CLI reaches general availability, this phase will need to be updated:
+> - Replace `yo @microsoft/generator-sharepoint` with `spfx create --template <type> --library-name spfx --component-name "HelloWorld" --spfx-version <version>`
+> - Map existing project type names to the new template names (e.g. `webpart-react`, `extension-application-customizer`, `extension-fieldcustomizer-react`, `extension-formcustomizer-noframework`, `extension-formcustomizer-react`, `extension-listviewcommandset`, `ace-generic-card`)
+> - Update the "Required tooling" section — `yo` and the generator package are replaced by `npm install -g @microsoft/spfx-cli`
+> - The new CLI uses `--spfx-version` to target a version branch instead of requiring a specific generator version to be installed
+
 **STOP here.** The following test projects must be manually scaffolded by the human operator using `yo @microsoft/generator-sharepoint` with the **prior minor's** SPFx packages installed. Claude cannot run interactive generators.
 
 #### Required tooling
