@@ -44,10 +44,6 @@ class SpoAppPageAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    Object.assign(this.telemetryProperties, {
-      addToQuickLaunch: args.options.addToQuickLaunch
-    });
-
     const createPageRequestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/sitepages/Pages/CreateAppPage`,
       headers: {

@@ -42,7 +42,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
-        error: () => 'SharePoint Online site URL must be a string.',
+        error: e => validation.isValidSharePointUrl((e.input as Options).webUrl) as string,
         path: ['webUrl']
       })
       .refine(args => !args.id || validation.isValidGuid(args.id), {

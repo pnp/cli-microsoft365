@@ -26,7 +26,7 @@ export const options = z.strictObject({
       return false;
     }
   }, {
-    error: e => `An error has occurred while parsing clientSideComponentProperties: ${e.input}`
+    error: 'Specified clientSideComponentProperties is not a valid JSON string.'
   }).optional(),
   hostProperties: z.string().refine(val => {
     try {
@@ -37,7 +37,7 @@ export const options = z.strictObject({
       return false;
     }
   }, {
-    error: e => `An error has occurred while parsing hostProperties: ${e.input}`
+    error: 'Specified hostProperties is not a valid JSON string.'
   }).optional(),
   scope: z.enum(['Site', 'Web']).optional().alias('s')
 });
