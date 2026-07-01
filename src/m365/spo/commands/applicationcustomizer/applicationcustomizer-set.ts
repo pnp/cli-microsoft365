@@ -27,7 +27,7 @@ export const options = z.strictObject({
       return false;
     }
   }, {
-    error: e => `An error has occurred while parsing clientSideComponentProperties: ${e.input}`
+    error: 'Specified clientSideComponentProperties is not a valid JSON string.'
   }).optional().alias('p'),
   hostProperties: z.string().refine(val => {
     try {
@@ -38,7 +38,7 @@ export const options = z.strictObject({
       return false;
     }
   }, {
-    error: e => `An error has occurred while parsing hostProperties: ${e.input}`
+    error: 'Specified hostProperties is not a valid JSON string.'
   }).optional(),
   scope: z.enum(['Site', 'Web', 'All']).optional().alias('s')
 });
@@ -65,7 +65,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
-        error: () => 'SharePoint Online site URL must be a string.',
+        error: e => validation.isValidSharePointUrl((e.input as Options).webUrl) as string,
         path: ['webUrl']
       })
       .refine(args => !args.id || validation.isValidGuid(args.id), {
