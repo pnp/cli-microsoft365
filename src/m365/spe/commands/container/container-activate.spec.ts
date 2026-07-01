@@ -66,6 +66,21 @@ describe(commands.CONTAINER_ACTIVATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation when id is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      verbose: true
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: containerId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('activates container by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/activate`) {
