@@ -465,6 +465,11 @@ describe(commands.CDN_SET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation when required enabled option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
   it('accepts true SharePoint Online CDN enabled state', () => {
     const actual = commandOptionsSchema.safeParse({ enabled: true });
     assert.strictEqual(actual.success, true);

@@ -225,6 +225,21 @@ describe(commands.CDN_POLICY_SET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation when required origin option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when required policy option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ value: 'CSS' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when required value option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ policy: 'IncludeFileExtensions' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('accepts IncludeFileExtensions SharePoint Online CDN policy', () => {
     const actual = commandOptionsSchema.safeParse({ policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' });
     assert.strictEqual(actual.success, true);
