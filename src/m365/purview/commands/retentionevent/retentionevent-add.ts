@@ -49,11 +49,11 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
           options: ['eventTypeId', 'eventTypeName']
         }
       })
-      .refine(opts => opts.assetIds || opts.keywords, {
+      .refine(opts => opts.assetIds !== undefined || opts.keywords !== undefined, {
         error: 'Specify assetIds and/or keywords, but at least one.',
-        path: ['assetIds'],
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['assetIds', 'keywords']
         }
       }) as any;
   }

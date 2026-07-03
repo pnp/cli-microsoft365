@@ -35,11 +35,11 @@ class PurviewRetentionEventTypeSetCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(opts => opts.description, {
+      .refine(opts => opts.description !== undefined, {
         error: 'Specify at least one option to update.',
-        path: ['description'],
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['description']
         }
       }) as any;
   }
