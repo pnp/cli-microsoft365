@@ -1666,17 +1666,16 @@ describe('cli', () => {
     assert.strictEqual(actual, JSON.stringify(o, null, 2));
   });
 
-  it('properly handles new line characters in JSON output', async () => {
+  it('preserves newline characters in JSON output values', async () => {
     const input = {
-      "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\nSiteProperties\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"
+      crlf: 'line1\r\nline2',
+      lf: 'line1\nline2',
+      literalBackslashN: 'line1\\nline2'
     };
-    const expected = [
-      '{',
-      '  "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\\\\\\nSiteProperties\\\\\\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"',
-      '}'
-    ].join('\n');
     const actual = await cli.formatOutput(mockCommand, input, { output: 'json' });
-    assert.strictEqual(actual, expected);
+
+    assert.strictEqual(actual, JSON.stringify(input, null, 2));
+    assert.deepStrictEqual(JSON.parse(actual), input);
   });
 
   it('formats object with array as csv', async () => {

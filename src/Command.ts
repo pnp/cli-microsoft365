@@ -643,10 +643,7 @@ export default abstract class Command {
   }
 
   public getJsonOutput(logStatement: any): string {
-    return JSON
-      .stringify(logStatement, null, 2)
-      // replace unescaped newlines with escaped newlines #2807
-      .replace(/([^\\])\\n/g, '$1\\\\\\n');
+    return JSON.stringify(logStatement, null, 2);
   }
 
   public async getCsvOutput(logStatement: any[], options: GlobalOptions): Promise<string> {
