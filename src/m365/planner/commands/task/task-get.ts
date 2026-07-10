@@ -1,6 +1,7 @@
 import { PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -10,20 +11,27 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  bucketId: z.string().optional(),
+  bucketName: z.string().optional(),
+  planId: z.string().optional(),
+  planTitle: z.string().optional(),
+  rosterId: z.string().optional(),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  bucketId?: string;
-  bucketName?: string;
-  planId?: string;
-  planTitle?: string;
-  rosterId?: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
 }
 
 class PlannerTaskGetCommand extends GraphCommand {
@@ -35,98 +43,35 @@ class PlannerTaskGetCommand extends GraphCommand {
     return 'Retrieves the specified planner task';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        bucketId: typeof args.options.bucketId !== 'undefined',
-        bucketName: typeof args.options.bucketName !== 'undefined',
-        planId: typeof args.options.planId !== 'undefined',
-        planTitle: typeof args.options.planTitle !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined',
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'id' or 'title'.`,
+        params: { customCode: 'optionSet', options: ['id', 'title'] }
+      })
+      .refine(opts => opts.id !== undefined || opts.bucketId !== undefined || [opts.planId, opts.planTitle, opts.rosterId].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'planId', 'planTitle' or 'rosterId'.`,
+        params: { customCode: 'optionSet', options: ['planId', 'planTitle', 'rosterId'] }
+      })
+      .refine(opts => opts.id !== undefined || [opts.bucketId, opts.bucketName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'bucketId' or 'bucketName'.`,
+        params: { customCode: 'optionSet', options: ['bucketId', 'bucketName'] }
+      })
+      .refine(opts => !(opts.bucketName && !opts.rosterId) || [opts.planId, opts.planTitle].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'planId' or 'planTitle'.`,
+        params: { customCode: 'optionSet', options: ['planId', 'planTitle'] }
+      })
+      .refine(opts => !opts.planTitle || [opts.ownerGroupId, opts.ownerGroupName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId' or 'ownerGroupName'.`,
+        params: { customCode: 'optionSet', options: ['ownerGroupId', 'ownerGroupName'] }
+      })
+      .refine(opts => !opts.id || !(opts.bucketId || opts.bucketName || opts.planId || opts.planTitle || opts.rosterId || opts.ownerGroupId || opts.ownerGroupName), {
+        message: `Don't specify bucketId, bucketName, planId, planTitle, rosterId, ownerGroupId or ownerGroupName when using id.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-i, --id [id]' },
-      { option: '-t, --title [title]' },
-      { option: '--bucketId [bucketId]' },
-      { option: '--bucketName [bucketName]' },
-      { option: '--planId [planId]' },
-      { option: '--planTitle [planTitle]' },
-      { option: '--rosterId [rosterId]' },
-      { option: '--ownerGroupId [ownerGroupId]' },
-      { option: '--ownerGroupName [ownerGroupName]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id) {
-          if (args.options.bucketId || args.options.bucketName ||
-            args.options.planId || args.options.planTitle || args.options.rosterId ||
-            args.options.ownerGroupId || args.options.ownerGroupName) {
-            return 'Don\'t specify bucketId, bucketName, planId, planTitle, rosterId, ownerGroupId or ownerGroupName when using id';
-          }
-        }
-
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'title'] },
-      {
-        options: ['planId', 'planTitle', 'rosterId'],
-        runsWhen: (args) => {
-          return args.options.id === undefined;
-        }
-      },
-      {
-        options: ['bucketId', 'bucketName'],
-        runsWhen: (args) => {
-          return args.options.title !== undefined;
-        }
-      },
-      {
-        options: ['planId', 'planTitle'],
-        runsWhen: (args) => {
-          return args.options.bucketName !== undefined && args.options.rosterId === undefined;
-        }
-      },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.planTitle !== undefined;
-        }
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

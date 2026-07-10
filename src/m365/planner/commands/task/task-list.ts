@@ -1,6 +1,7 @@
 import { PlannerTask } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -9,18 +10,25 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  bucketId: z.string().optional(),
+  bucketName: z.string().optional(),
+  planId: z.string().optional(),
+  planTitle: z.string().optional(),
+  rosterId: z.string().optional(),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  bucketId?: string;
-  bucketName?: string;
-  planId?: string;
-  planTitle?: string;
-  rosterId?: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
 }
 
 class PlannerTaskListCommand extends GraphCommand {
@@ -32,97 +40,28 @@ class PlannerTaskListCommand extends GraphCommand {
     return 'Lists planner tasks in a bucket, plan, or tasks for the currently logged in user';
   }
 
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'startDateTime', 'dueDateTime', 'completedDateTime'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        bucketId: typeof args.options.bucketId !== 'undefined',
-        bucketName: typeof args.options.bucketName !== 'undefined',
-        planId: typeof args.options.planId !== 'undefined',
-        planTitle: typeof args.options.planTitle !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined',
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => !(opts.bucketId && opts.bucketName), {
+        message: `Specify either 'bucketId' or 'bucketName', but not both.`,
+        params: { customCode: 'optionSet', options: ['bucketId', 'bucketName'] }
+      })
+      .refine(opts => !(opts.bucketName && !opts.rosterId) || [opts.planId, opts.planTitle].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'planId' or 'planTitle'.`,
+        params: { customCode: 'optionSet', options: ['planId', 'planTitle'] }
+      })
+      .refine(opts => !opts.planTitle || [opts.ownerGroupId, opts.ownerGroupName].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId' or 'ownerGroupName'.`,
+        params: { customCode: 'optionSet', options: ['ownerGroupId', 'ownerGroupName'] }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--bucketId [bucketId]'
-      },
-      {
-        option: '--bucketName [bucketName]'
-      },
-      {
-        option: '--planId [planId]'
-      },
-      {
-        option: '--planTitle [planTitle]'
-      },
-      {
-        option: '--rosterId [rosterId]'
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['bucketId', 'bucketName'],
-        runsWhen: (args) => {
-          return args.options.bucketId !== undefined || args.options.bucketName !== undefined;
-        }
-      },
-      {
-        options: ['planId', 'planTitle'],
-        runsWhen: (args) => {
-          return args.options.bucketName !== undefined && args.options.rosterId === undefined;
-        }
-      },
-      {
-        options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.planTitle !== undefined;
-        }
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
