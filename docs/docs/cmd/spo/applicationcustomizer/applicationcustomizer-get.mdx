@@ -36,6 +36,25 @@ m365 spo applicationcustomizer get [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Remarks
 
 This command can be used for retrieving an application customizer from a specific site. To retrieve an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer get](../tenant/tenant-applicationcustomizer-get.mdx) command.
