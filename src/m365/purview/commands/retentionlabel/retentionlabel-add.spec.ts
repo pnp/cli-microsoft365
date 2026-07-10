@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionlabel-add.js';
+import command, { options } from './retentionlabel-add.js';
 
 describe(commands.RETENTIONLABEL_ADD, () => {
   const invalid = 'invalid';
@@ -86,6 +86,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -98,6 +99,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -138,83 +140,82 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if retentionDuration is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: invalid
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if retentionDuration is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: invalid
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
-        retentionTrigger: retentionTrigger,
-        defaultRecordBehavior: defaultRecordBehavior,
-        descriptionForUsers: descriptionForUsers,
-        descriptionForAdmins: descriptionForAdmins,
-        labelToBeApplied: labelToBeApplied
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: retentionDuration.toString(),
+      retentionTrigger: retentionTrigger,
+      defaultRecordBehavior: defaultRecordBehavior,
+      descriptionForUsers: descriptionForUsers,
+      descriptionForAdmins: descriptionForAdmins,
+      labelToBeApplied: labelToBeApplied
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid behaviorDuringRetentionPeriod', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: invalid,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid behavior of a document with the label. Allowed values are doNotRetain, retain, retainAsRecord, retainAsRegulatoryRecord`);
+  it('rejects invalid behaviorDuringRetentionPeriod', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: invalid,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: retentionDuration.toString()
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('rejects invalid actionAfterRetentionPeriod', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: invalid,
-        retentionDuration: retentionDuration
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid action to take on a document with the label. Allowed values are none, delete, startDispositionReview`);
+  it('rejects invalid actionAfterRetentionPeriod', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: invalid,
+      retentionDuration: retentionDuration.toString()
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('rejects invalid retentionTrigger', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
-        retentionTrigger: invalid
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid action retention duration calculation. Allowed values are dateLabeled, dateCreated, dateModified, dateOfEvent`);
+  it('rejects invalid retentionTrigger', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: retentionDuration.toString(),
+      retentionTrigger: invalid
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('rejects invalid defaultRecordBehavior', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
-        defaultRecordBehavior: invalid
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid state of a record label. Allowed values are startLocked, startUnlocked`);
+  it('rejects invalid defaultRecordBehavior', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: retentionDuration.toString(),
+      defaultRecordBehavior: invalid
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+      actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+      retentionDuration: retentionDuration.toString(),
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws error when no retention event type found with name', async () => {
@@ -227,14 +228,14 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: displayName,
         behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
         actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
+        retentionDuration: retentionDuration.toString(),
         retentionTrigger: "dateOfEvent",
         eventTypeName: eventTypeName
-      }
+      })
     }), new CommandError(`The specified retention event type '${eventTypeName}' does not exist.`));
   });
 
@@ -248,19 +249,19 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         displayName: displayName,
         behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
         actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
+        retentionDuration: retentionDuration.toString(),
         retentionTrigger: retentionTrigger,
         defaultRecordBehavior: defaultRecordBehavior,
         descriptionForUsers: descriptionForUsers,
         descriptionForAdmins: descriptionForAdmins,
         labelToBeApplied: labelToBeApplied
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(requestResponse));
@@ -284,20 +285,20 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         displayName: displayName,
         behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
         actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
+        retentionDuration: retentionDuration.toString(),
         retentionTrigger: "dateOfEvent",
         defaultRecordBehavior: defaultRecordBehavior,
         descriptionForUsers: descriptionForUsers,
         descriptionForAdmins: descriptionForAdmins,
         labelToBeApplied: labelToBeApplied,
         eventTypeName: eventTypeName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(requestResponse));
@@ -313,20 +314,20 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         displayName: displayName,
         behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
         actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
+        retentionDuration: retentionDuration.toString(),
         retentionTrigger: "dateOfEvent",
         defaultRecordBehavior: defaultRecordBehavior,
         descriptionForUsers: descriptionForUsers,
         descriptionForAdmins: descriptionForAdmins,
         labelToBeApplied: labelToBeApplied,
         eventTypeId: eventTypeId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(requestResponse));
@@ -336,12 +337,12 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: displayName,
         behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
         actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration
-      }
+        retentionDuration: retentionDuration.toString()
+      })
     }), new CommandError("An error has occurred"));
   });
 });
