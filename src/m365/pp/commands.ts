@@ -29,5 +29,6 @@ export default {
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`,
   TENANT_SETTINGS_SET: `${prefix} tenant settings set`,
   WEBSITE_GET: `${prefix} website get`,
+  WEBSITE_REMOVE: `${prefix} website remove`,
   WEBSITE_WEBROLE_LIST: `${prefix} website webrole list`
 };
