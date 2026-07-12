@@ -25,13 +25,19 @@ export class AuthServer {
     return this.httpServer;
   }
 
-  public initializeServer = (connection: Connection, resource: string, resolve: (result: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void, logger: Logger, debug: boolean = false): void => {
+  public initializeServer = (connection: Connection, resource: string, resolve: (result: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void, logger: Logger, debug: boolean = false, token?: string): void => {
     this.connection = connection;
     this.resolve = resolve;
     this.reject = reject;
     this.logger = logger;
     this.debug = debug;
     this.resource = resource;
+
+    if (token) {
+      this.logger.logToStderr("Using token from environment or file.");
+      this.resolve({ code: token, redirectUri: '' });
+      return;
+    }
 
     this.httpServer = http.createServer(this.httpRequest).listen(0, this.httpListener);
   };

@@ -12,6 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   environmentName: string;
   asAdmin?: boolean;
+  token?: string;
 }
 
 class PpCopilotListCommand extends PowerPlatformCommand {
@@ -37,7 +38,8 @@ class PpCopilotListCommand extends PowerPlatformCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
+        asAdmin: !!args.options.asAdmin,
+        token: !!args.options.token
       });
     });
   }
@@ -49,6 +51,9 @@ class PpCopilotListCommand extends PowerPlatformCommand {
       },
       {
         option: '--asAdmin'
+      },
+      {
+        option: '-t, --token [token]'
       }
     );
   }
@@ -100,7 +105,7 @@ class PpCopilotListCommand extends PowerPlatformCommand {
     `;
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin, args.options.token);
 
       const items = await odata.getAllItems<any>(`${dynamicsApiUrl}/api/data/v9.1/bots?fetchXml=${fetchXml}`);
       await logger.log(items);
