@@ -2059,6 +2059,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'website remove',
               id: 'cmd/pp/website/website-remove'
+            },
+            {
+              type: 'doc',
+              label: 'website webrole list',
+              id: 'cmd/pp/website/website-webrole-list'
             }
           ]
         }
