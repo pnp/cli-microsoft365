@@ -2054,6 +2054,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'website get',
               id: 'cmd/pp/website/website-get'
+            },
+            {
+              type: 'doc',
+              label: 'website remove',
+              id: 'cmd/pp/website/website-remove'
             }
           ]
         }
