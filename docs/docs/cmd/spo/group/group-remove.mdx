@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo group remove
 
@@ -27,6 +29,25 @@ m365 spo group remove [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions     |
+  |------------|-----------------|
+  | SharePoint | AllSites.Manage |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions      |
+  |------------|------------------|
+  | SharePoint | Sites.Manage.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

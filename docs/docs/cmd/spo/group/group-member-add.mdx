@@ -46,6 +46,25 @@ m365 spo group member add [options]
 
 For the `userIds`, `userNames`, `emails`, `entraGroupIds`, or `entraGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions     |
+  |------------|-----------------|
+  | SharePoint | AllSites.Manage |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions      |
+  |------------|------------------|
+  | SharePoint | Sites.Manage.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Add a user with the userNames parameter to a SharePoint group with the groupId parameter.
