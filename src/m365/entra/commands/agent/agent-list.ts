@@ -38,7 +38,8 @@ class EntraAgentListCommand extends GraphCommand {
     if (args.options.properties) {
       const allProperties = args.options.properties
         .split(',')
-        .map(prop => prop.replace(/['"]/g, '').trim());
+        .map(prop => prop.replace(/['"]/g, '').trim())
+        .filter(prop => prop.length > 0);
       const selectProperties = allProperties.filter(prop => !prop.includes('/'));
 
       if (selectProperties.length > 0) {
