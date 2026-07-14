@@ -250,6 +250,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          agent: [
+            {
+              type: 'doc',
+              label: 'agent list',
+              id: 'cmd/entra/agent/agent-list'
+            }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',

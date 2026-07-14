@@ -1,0 +1,209 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra agent list
+
+Retrieves a list of agents
+
+## Usage
+
+```sh
+m365 entra agent list [options]
+```
+
+## Options
+
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to be returned.
+```
+
+<Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of app properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | User.ReadBasic.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | User.ReadBasic.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve all agents.
+
+```sh
+m365 entra agent list
+```
+
+Retrieve id and name of all agents
+
+```sh
+m365 entra agent list --properties 'id,displayName'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "819f4e7f-a913-448a-9b5c-2cae064cabe7",
+      "deletedDateTime": null,
+      "accountEnabled": true,
+      "ageGroup": null,
+      "businessPhones": [],
+      "city": null,
+      "companyName": null,
+      "consentProvidedForMinor": null,
+      "country": null,
+      "createdDateTime": "2026-07-14T04:19:25Z",
+      "creationType": null,
+      "department": null,
+      "displayName": "Sales Agent",
+      "employeeId": null,
+      "employeeHireDate": null,
+      "employeeLeaveDateTime": null,
+      "employeeType": null,
+      "externalUserState": null,
+      "externalUserStateChangeDateTime": null,
+      "faxNumber": null,
+      "givenName": null,
+      "isLicenseReconciliationNeeded": false,
+      "jobTitle": null,
+      "legalAgeGroupClassification": null,
+      "mail": null,
+      "mailNickname": "SalesAgent",
+      "mobilePhone": null,
+      "onPremisesDistinguishedName": null,
+      "onPremisesDomainName": null,
+      "onPremisesImmutableId": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSyncEnabled": null,
+      "onPremisesUserPrincipalName": null,
+      "otherMails": [],
+      "passwordPolicies": null,
+      "officeLocation": null,
+      "postalCode": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [],
+      "refreshTokensValidFromDateTime": null,
+      "imAddresses": [],
+      "isResourceAccount": null,
+      "showInAddressList": null,
+      "securityIdentifier": "S-1-12-1-2174701183-1149937939-2922142875-3869985798",
+      "signInSessionsValidFromDateTime": null,
+      "state": null,
+      "streetAddress": null,
+      "surname": null,
+      "usageLocation": null,
+      "userPrincipalName": "SalesAgent@contoso.com",
+      "externalUserConvertedOn": null,
+      "userType": "Member",
+      "identityParentId": "54d8c728-decb-477b-beb6-19570d8a51ab",
+      "agentIdentityBlueprintId": "822c92e8-29d7-4f83-903a-744d00628003",
+      "employeeOrgData": null,
+      "passwordProfile": null,
+      "identityParent": {
+        "id": "54d8c728-decb-477b-beb6-19570d8a51ab"
+      },
+      "assignedLicenses": [],
+      "assignedPlans": [],
+      "authorizationInfo": {
+        "certificateUserIds": []
+      },
+      "identities": [
+        {
+          "signInType": "userPrincipalName",
+          "issuer": "contoso.com",
+          "issuerAssignedId": "SalesAgent@contoso.com"
+        }
+      ],
+      "onPremisesProvisioningErrors": [],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": null,
+        "extensionAttribute2": null,
+        "extensionAttribute3": null,
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": null
+      },
+      "provisionedPlans": [],
+      "serviceProvisioningErrors": []
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  displayName: Sales Agent
+  id         : 819f4e7f-a913-448a-9b5c-2cae064cabe7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,deletedDateTime,accountEnabled,ageGroup,city,companyName,consentProvidedForMinor,country,createdDateTime,creationType,department,displayName,employeeId,employeeHireDate,employeeLeaveDateTime,employeeType,externalUserState,externalUserStateChangeDateTime,faxNumber,givenName,isLicenseReconciliationNeeded,jobTitle,legalAgeGroupClassification,mail,mailNickname,mobilePhone,onPremisesDistinguishedName,onPremisesDomainName,onPremisesImmutableId,onPremisesLastSyncDateTime,onPremisesSecurityIdentifier,onPremisesSamAccountName,onPremisesSyncEnabled,onPremisesUserPrincipalName,passwordPolicies,officeLocation,postalCode,preferredDataLocation,preferredLanguage,refreshTokensValidFromDateTime,isResourceAccount,showInAddressList,securityIdentifier,signInSessionsValidFromDateTime,state,streetAddress,surname,usageLocation,userPrincipalName,externalUserConvertedOn,userType,identityParentId,agentIdentityBlueprintId,employeeOrgData,passwordProfile
+  819f4e7f-a913-448a-9b5c-2cae064cabe7,,1,,,,,,2026-07-14T04:19:25Z,,,Sales Agent,,,,,,,,,0,,,,SalesAgent,,,,,,,,,,,,,,,,,,S-1-12-1-2174701183-1149937939-2922142875-3869985798,,,,,,SalesAgent@contoso.com,,Member,54d8c728-decb-477b-beb6-19570d8a51ab,822c92e8-29d7-4f83-903a-744d00628003,,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra agent list --debug "false" --verbose "false"
+
+  Date: 7/14/2026
+
+  ## Sales Agent (819f4e7f-a913-448a-9b5c-2cae064cabe7)
+
+  Property | Value
+  ---------|-------
+  id | 819f4e7f-a913-448a-9b5c-2cae064cabe7
+  accountEnabled | true
+  createdDateTime | 2026-07-14T04:19:25Z
+  displayName | Sales Agent
+  isLicenseReconciliationNeeded | false
+  mailNickname | SalesAgent
+  securityIdentifier | S-1-12-1-2174701183-1149937939-2922142875-3869985798
+  userPrincipalName | SalesAgent@contoso.com
+  userType | Member
+  identityParentId | 54d8c728-decb-477b-beb6-19570d8a51ab
+  agentIdentityBlueprintId | 822c92e8-29d7-4f83-903a-744d00628003
+  ```
+
+  </TabItem>
+</Tabs>
