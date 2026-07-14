@@ -50,7 +50,6 @@ Walk through each applicable item in the checklist and verify it against the dif
 - **Custom Zod validation** for mutually exclusive options.
 - **Verbose logging**: Every command should include at least one verbose log message that provides useful execution context.
 - **User input escaped** in XML and URLs using `formatting.encodeQueryParameter()` or `formatting.escapeXml()`.
-- **`GetFileByServerRelativePath`/`GetFolderByServerRelativePath`** in `spo` commands (not `...Url` variants).
 - **No `any` types**, no commented-out code.
 - **Bug fixes** include a test for the fixed case.
 - **Documentation** included where needed.
