@@ -46,6 +46,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 - `fail` will throw an error when the destination folder already exists.
 - `rename` will add a suffix (e.g. Folder1) when the destination folder already exists.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Copy a folder a folder to another location using server-relative URLs
