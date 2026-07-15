@@ -10,7 +10,7 @@ jobs:
     if: github.repository_owner == 'pnp'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@1e223db275d687790206a7acac4d1a11bd6fe629 # v10.4.0
         with:
             days-before-issue-stale: 335
             days-before-issue-close: 30
