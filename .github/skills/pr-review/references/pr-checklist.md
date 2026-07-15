@@ -37,6 +37,5 @@
 - Reference the `mdx` help page in the sidebar navigation.
 - Start all code samples with `m365`.
 - Ensure samples use long names of options rather than short ones.
-- Include the marker to incorporate global options rather than listing them explicitly.
 - If there is an option modifying the output, include responses for both default and modified output.
 - For a command page, ensure it includes the following sections: title, description, usage, options, examples, permissions, and response. In some cases a remarks section is also allowed.
