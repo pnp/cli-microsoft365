@@ -1,4 +1,4 @@
-FROM FROM waldekm/powershell:alpine-3.23
+FROM waldekm/powershell:alpine-3.23
 
 LABEL name="CLI for Microsoft 365 Development" \
   description="Development container for contributing to CLI for Microsoft 365" \
