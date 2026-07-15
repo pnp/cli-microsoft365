@@ -113,8 +113,6 @@ Always ask the user for confirmation before posting any comments on the PR. Pres
 
 Post inline comments and the summary as a single review submission. Always target the actual line where the issue exists.
 
-**API limitation**: The GitHub API can only target lines within diff hunk ranges (changed lines + surrounding context lines). If the target line falls in a gap between hunks, do **not** post it on a nearby line. Instead, include that finding in the summary (the review body) with the file path and line number. Only use `suggestion` blocks for findings posted on the exact target line.
-
 **Line number accuracy**: When posting inline comments, verify line numbers against the actual diff hunk content. The line number refers to the **new file** line number (RIGHT side). Count lines in the diff hunk carefully — off-by-one errors cause comments to land on the wrong line and suggestion blocks to replace the wrong code.
 
 ```bash
