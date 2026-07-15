@@ -4317,16 +4317,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web rule list',
-              id: 'cmd/spo/web/web-rule-list'
-            },
-            {
-              type: 'doc',
-              label: 'web rule remove',
-              id: 'cmd/spo/web/web-rule-remove'
-            },
-            {
-              type: 'doc',
               label: 'web clientsidewebpart list',
               id: 'cmd/spo/web/web-clientsidewebpart-list'
             },
@@ -4359,6 +4349,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web roleinheritance reset',
               id: 'cmd/spo/web/web-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'web rule list',
+              id: 'cmd/spo/web/web-rule-list'
+            },
+            {
+              type: 'doc',
+              label: 'web rule remove',
+              id: 'cmd/spo/web/web-rule-remove'
             }
           ]
         }
