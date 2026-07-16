@@ -2,14 +2,14 @@ import Global from '../../_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo web alert get
+# spo web rule get
 
-Retrieves details of a specific alert from a SharePoint site list
+Retrieves details of a specific rule from a SharePoint site list
 
 ## Usage
 
 ```sh
-m365 spo web alert get [options]
+m365 spo web rule get [options]
 ```
 
 ## Options
@@ -19,7 +19,7 @@ m365 spo web alert get [options]
 : The URL of the SharePoint site.
 
 `--id <id>`
-: The ID of the alert.
+: The ID of the rule.
 ```
 
 <Global />
@@ -45,10 +45,10 @@ m365 spo web alert get [options]
 
 ## Examples
 
-Retrieve an alert by ID
+Retrieve a rule by ID
 
 ```sh
-m365 spo web alert get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+m365 spo web rule get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
 ```
 
 ## Response

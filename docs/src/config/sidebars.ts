@@ -4282,11 +4282,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web alert get',
-              id: 'cmd/spo/web/web-alert-get'
-            },
-            {
-              type: 'doc',
               label: 'web alert list',
               id: 'cmd/spo/web/web-alert-list'
             },
@@ -4309,6 +4304,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web retentionlabel list',
               id: 'cmd/spo/web/web-retentionlabel-list'
+            },
+            {
+              type: 'doc',
+              label: 'web rule get',
+              id: 'cmd/spo/web/web-rule-get'
             },
             {
               type: 'doc',

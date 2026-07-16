@@ -12,9 +12,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command, { options } from './web-alert-get.js';
+import command, { options } from './web-rule-get.js';
 
-describe(commands.WEB_ALERT_GET, () => {
+describe(commands.WEB_RULE_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -95,7 +95,7 @@ describe(commands.WEB_ALERT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.WEB_ALERT_GET);
+    assert.strictEqual(command.name, commands.WEB_RULE_GET);
   });
 
   it('has a description', () => {
@@ -117,7 +117,7 @@ describe(commands.WEB_ALERT_GET, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it('retrieves an alert by id', async () => {
+  it('retrieves a rule by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/Alerts/GetById('${formatting.encodeQueryParameter(alertId)}')?$expand=List,User,List/Rootfolder&$select=*,List/Id,List/Title,List/Rootfolder/ServerRelativeUrl`) {
         return alertResponse;
@@ -134,7 +134,7 @@ describe(commands.WEB_ALERT_GET, () => {
     sinon.stub(request, 'get').resolves(alertResponse);
 
     await command.action(logger, { options: { webUrl, id: alertId, verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith(`Retrieving alert with id '${alertId}' from site '${webUrl}'...`));
+    assert(loggerLogToStderrSpy.calledWith(`Retrieving rule with id '${alertId}' from site '${webUrl}'...`));
   });
 
   it('handles error correctly', async () => {

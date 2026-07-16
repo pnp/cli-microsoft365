@@ -22,13 +22,13 @@ interface CommandArgs {
   options: Options;
 }
 
-class SpoWebAlertGetCommand extends SpoCommand {
+class SpoWebRuleGetCommand extends SpoCommand {
   public get name(): string {
-    return commands.WEB_ALERT_GET;
+    return commands.WEB_RULE_GET;
   }
 
   public get description(): string {
-    return 'Retrieves details of a specific alert from a SharePoint site list';
+    return 'Retrieves details of a specific rule from a SharePoint site list';
   }
 
   public get schema(): z.ZodTypeAny | undefined {
@@ -38,7 +38,7 @@ class SpoWebAlertGetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Retrieving alert with id '${args.options.id}' from site '${args.options.webUrl}'...`);
+        await logger.logToStderr(`Retrieving rule with id '${args.options.id}' from site '${args.options.webUrl}'...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -58,4 +58,4 @@ class SpoWebAlertGetCommand extends SpoCommand {
   }
 }
 
-export default new SpoWebAlertGetCommand();
+export default new SpoWebRuleGetCommand();
