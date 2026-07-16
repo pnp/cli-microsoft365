@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './applicationcustomizer-add.js';
+import command, { options } from './applicationcustomizer-add.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -48,6 +48,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -57,6 +58,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -103,7 +105,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
       Title: title,
       Name: title,
@@ -124,7 +126,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, clientSideComponentProperties: clientSideComponentProperties, verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
       Title: title,
       Name: title,
@@ -146,7 +148,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, hostProperties: clientSideComponentProperties, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, description: description, hostProperties: clientSideComponentProperties, verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
       Title: title,
       Name: title,
@@ -158,33 +160,38 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', title: title, clientSideComponentId: clientSideComponentId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', title: title, clientSideComponentId: clientSideComponentId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the scope option is not a valid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Invalid scope' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope option is not a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Invalid scope' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the hostProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, hostProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: 'invalid json string' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if all options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, hostProperties: clientSideComponentProperties, scope: 'Site' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the hostProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, hostProperties: 'invalid json string' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('passes validation if all options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, hostProperties: clientSideComponentProperties, scope: 'Site' });
+    assert.strictEqual(actual.success, true);
   });
 }); 
