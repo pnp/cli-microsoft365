@@ -8,7 +8,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './container-list.js';
+import command, { options } from './container-list.js';
 import { CommandError } from '../../../../Command.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
@@ -19,6 +19,7 @@ describe(commands.CONTAINER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const containersList = [{
     "id": "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z",
@@ -41,6 +42,7 @@ describe(commands.CONTAINER_LIST, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -86,14 +88,35 @@ describe(commands.CONTAINER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'containerTypeId', 'createdDateTime']);
   });
 
-  it('fails validation if the containerTypeId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { containerTypeId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the containerTypeId is not a valid guid', () => {
+    const result = commandOptionsSchema.safeParse({ containerTypeId: 'abc' });
+    assert.strictEqual(result.success, false);
   });
 
-  it('passes validation if valid containerTypeId is specified', async () => {
-    const actual = await command.validate({ options: { containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082" } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when neither containerTypeId nor containerTypeName is specified', () => {
+    const result = commandOptionsSchema.safeParse({});
+    assert.strictEqual(result.success, false);
+  });
+
+  it('fails validation when both containerTypeId and containerTypeName are specified', () => {
+    const result = commandOptionsSchema.safeParse({
+      containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082',
+      containerTypeName: 'standard container'
+    });
+    assert.strictEqual(result.success, false);
+  });
+
+  it('fails validation when unknown option is specified', () => {
+    const result = commandOptionsSchema.safeParse({
+      containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(result.success, false);
+  });
+
+  it('passes validation if valid containerTypeId is specified', () => {
+    const result = commandOptionsSchema.safeParse({ containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082" });
+    assert.strictEqual(result.success, true);
   });
 
   it('retrieves list of container type by id', async () => {
@@ -105,7 +128,7 @@ describe(commands.CONTAINER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082", verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082", verbose: true }) });
     assert(loggerLogSpy.calledWith(containersList));
   });
 
@@ -118,7 +141,7 @@ describe(commands.CONTAINER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { containerTypeName: "standard container", verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeName: "standard container", verbose: true }) });
     assert(loggerLogSpy.calledWith(containersList));
   });
 
@@ -128,10 +151,10 @@ describe(commands.CONTAINER_LIST, () => {
     sinon.stub(spe, 'getContainerTypeIdByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         containerTypeName: "nonexisting container",
         verbose: true
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 });
