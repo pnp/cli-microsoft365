@@ -13,9 +13,10 @@ import { formatting } from '../../../../utils/formatting.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './owner-remove.js';
+import command, { options } from './owner-remove.js';
 
 describe(commands.OWNER_REMOVE, () => {
   const environmentName = 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6';
@@ -32,6 +33,7 @@ describe(commands.OWNER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -39,8 +41,10 @@ describe(commands.OWNER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -98,7 +102,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -112,7 +116,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -127,7 +131,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupId: groupId, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -141,7 +145,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -170,9 +174,9 @@ describe(commands.OWNER_REMOVE, () => {
     sinon.stub(request, 'post').rejects('POST request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true
-      }
+      })
     }), new CommandError(`Multiple groups with name 'Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -200,7 +204,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -213,12 +217,12 @@ describe(commands.OWNER_REMOVE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userId: userId, force: true }) } as any),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the specified owner from a flow when force option not passed', async () => {
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userName: userName }) });
 
     assert(promptIssued);
   });
@@ -228,32 +232,42 @@ describe(commands.OWNER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ environmentName: environmentName, flowName: flowName, userName: userName }) });
     assert(postSpy.notCalled);
   });
 
-  it('fails validation if flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid', userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if flowName is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: 'invalid', userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if username is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if username is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if groupName passed', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, groupName: groupName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when no owner identifier is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when multiple owner identifiers are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, userId: userId, groupId: groupId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if groupName passed', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, groupName: groupName });
+    assert.strictEqual(actual.success, true);
   });
 });

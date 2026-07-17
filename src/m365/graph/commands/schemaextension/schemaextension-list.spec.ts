@@ -1,8 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { cli } from '../../../../cli/cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,13 +9,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './schemaextension-list.js';
+import command, { options } from './schemaextension-list.js';
 
 describe(commands.SCHEMAEXTENSION_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,7 +23,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -98,7 +96,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     try {
       assert(loggerLogSpy.calledWith([{
@@ -178,7 +176,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     });
     try {
       assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
@@ -225,9 +223,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
-      }
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -300,9 +298,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
-        pageNumber: 1
-      }
+      options: commandOptionsSchema.parse({
+        pageNumber: '1'
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -375,10 +373,10 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
-        pageNumber: 1,
-        pageSize: 1
-      }
+      options: commandOptionsSchema.parse({
+        pageNumber: '1',
+        pageSize: '1'
+      })
     });
     try {
       assert(loggerLogSpy.calledWith([
@@ -446,9 +444,9 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([
       {
@@ -478,39 +476,39 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(errorMessage));
   });
 
-  it('passes validation if the owner is a valid GUID', async () => {
-    const actual = await command.validate({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the owner is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ owner: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
-  it('fails validation if the owner is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { owner: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the owner is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ owner: '123' });
+    assert.notStrictEqual(actual.success, true);
   });
-  it('fails validation if the status is not a valid status', async () => {
-    const actual = await command.validate({ options: { status: 'test' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the status is not a valid status', () => {
+    const actual = commandOptionsSchema.safeParse({ status: 'test' });
+    assert.notStrictEqual(actual.success, true);
   });
-  it('passes validation if the status is a valid status', async () => {
-    const actual = await command.validate({ options: { status: 'InDevelopment' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the status is a valid status', () => {
+    const actual = commandOptionsSchema.safeParse({ status: 'InDevelopment' });
+    assert.strictEqual(actual.success, true);
   });
-  it('fails validation if the pageNumber is not positive number', async () => {
-    const actual = await command.validate({ options: { pageNumber: '-1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the pageNumber is not positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageNumber: '-1' });
+    assert.notStrictEqual(actual.success, true);
   });
-  it('passes validation if the pageNumber is a positive number', async () => {
-    const actual = await command.validate({ options: { pageNumber: '2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the pageNumber is a positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageNumber: '2' });
+    assert.strictEqual(actual.success, true);
   });
-  it('fails validation if the pageSize is not positive number', async () => {
-    const actual = await command.validate({ options: { pageSize: '-1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the pageSize is not positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '-1' });
+    assert.notStrictEqual(actual.success, true);
   });
-  it('passes validation if the pageSize is a positive number', async () => {
-    const actual = await command.validate({ options: { pageSize: '2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the pageSize is a positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '2' });
+    assert.strictEqual(actual.success, true);
   });
 });

@@ -1,25 +1,52 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types/microsoft-graph';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const contentTypes = ['text', 'html'] as const;
+
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  id: z.string(),
+  externalConnectionId: z.string(),
+  content: z.string(),
+  contentType: z.enum(contentTypes).optional(),
+  acls: z.string()
+    .refine(val => {
+      const acls = val.split(';');
+      return acls.every(acl => acl.split(',').length === 3);
+    }, {
+      message: 'The value for option acls is not in the correct format. The correct format is "accessType,type,value", eg. "grant,everyone,everyone"'
+    })
+    .refine(val => {
+      const acls = val.split(';');
+      const accessTypeValues = ['grant', 'deny'];
+      return acls.every(acl => accessTypeValues.includes(acl.split(',')[0]));
+    }, {
+      message: 'The accessType value for option acls is not valid. Allowed values are grant, deny'
+    })
+    .refine(val => {
+      const acls = val.split(';');
+      const aclTypeValues = ['user', 'group', 'everyone', 'everyoneExceptGuests', 'externalGroup'];
+      return acls.every(acl => {
+        const parts = acl.split(',');
+        return parts.length >= 2 && aclTypeValues.includes(parts[1]);
+      });
+    }, {
+      message: 'The type value for option acls is not valid. Allowed values are user, group, everyone, everyoneExceptGuests, externalGroup'
+    })
+}).passthrough();
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id: string;
-  externalConnectionId: string;
-  content: string;
-  contentType?: string;
-  acls: string;
-}
-
 class ExternalItemAddCommand extends GraphCommand {
-  private static contentType: string[] = ['text', 'html'];
-
   public get name(): string {
     return commands.ITEM_ADD;
   }
@@ -28,75 +55,8 @@ class ExternalItemAddCommand extends GraphCommand {
     return 'Creates external item';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        contentType: typeof args.options.contentType
-      });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--externalConnectionId <externalConnectionId>'
-      },
-      {
-        option: '--content <content>'
-      },
-      {
-        option: '--contentType [contentType]',
-        autocomplete: ExternalItemAddCommand.contentType
-      },
-      {
-        option: '--acls <acls>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.contentType &&
-          ExternalItemAddCommand.contentType.indexOf(args.options.contentType) < 0) {
-          return `${args.options.contentType} is not a valid value for contentType. Allowed values are ${ExternalItemAddCommand.contentType.join(', ')}`;
-        }
-
-        // verify that each value for ACLs consists of three parts
-        // and that the values are correct
-        const acls: string[] = args.options.acls.split(';');
-        for (let i = 0; i < acls.length; i++) {
-          const acl: string[] = acls[i].split(',');
-          if (acl.length !== 3) {
-            return `The value ${acls[i]} for option acls is not in the correct format. The correct format is "accessType,type,value", eg. "grant,everyone,everyone"`;
-          }
-
-          const accessTypeValues = ['grant', 'deny'];
-          if (accessTypeValues.indexOf(acl[0]) < 0) {
-            return `The value ${acl[0]} for option acls is not valid. Allowed values are ${accessTypeValues.join(', ')}}`;
-          }
-
-          const aclTypeValues = ['user', 'group', 'everyone', 'everyoneExceptGuests', 'externalGroup'];
-          if (aclTypeValues.indexOf(acl[1]) < 0) {
-            return `The value ${acl[1]} for option acls is not valid. Allowed values are ${aclTypeValues.join(', ')}}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -128,7 +88,7 @@ class ExternalItemAddCommand extends GraphCommand {
     // we need to rewrite the @odata properties to the correct format
     // to extract multiple values for collections into arrays
     this.rewriteCollectionProperties(args.options);
-    this.addUnknownOptionsToPayload(requestBody.properties, args.options);
+    this.addUnknownOptionsToPayloadZod(requestBody.properties, args.options);
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/external/connections/${args.options.externalConnectionId}/items/${args.options.id}`,

@@ -138,8 +138,8 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     const options: EntraUserGetCommandOptions = {
       email: args.options.email,
       output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
+      debug: args.options.debug as boolean,
+      verbose: args.options.verbose as boolean
     };
 
     const userGetOutput: CommandOutput = await cli.executeCommandWithOutput(entraUserGetCommand as Command, { options: { ...options, _: [] } });

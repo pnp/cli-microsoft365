@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './siteclassification-set.js';
+import command, { options } from './siteclassification-set.js';
 
 describe(commands.SITECLASSIFICATION_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,30 +64,21 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if none of the options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if none of the options are specified', () => {
+    const result = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(result.success, true);
   });
 
-  it('passes validation if at least one option is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        classifications: "Confidential"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if at least one option is specified', () => {
+    const result = commandOptionsSchema.safeParse({ classifications: "Confidential" });
+    assert.strictEqual(result.success, true);
   });
 
-  it('passes validation if all options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are passed', () => {
+    const result = commandOptionsSchema.safeParse({
+      classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
+    });
+    assert.strictEqual(result.success, true);
   });
 
   it('handles Microsoft 365 Tenant siteclassification has not been enabled', async () => {
@@ -99,7 +92,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" }) }),
       new CommandError("There is no previous defined site classification which can updated."));
   });
 
@@ -187,7 +180,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" }) });
     assert(updateRequestIssued);
   });
 
@@ -275,7 +268,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" }) });
     assert(updateRequestIssued);
   });
 
@@ -363,7 +356,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ usageGuidelinesUrl: "http://aka.ms/pnp" }) });
     assert(updateRequestIssued);
   });
 
@@ -451,7 +444,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ guestUsageGuidelinesUrl: "http://aka.ms/pnp" }) });
     assert(updateRequestIssued);
   });
 
@@ -539,7 +532,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "top secret,high,middle,low" }) });
     assert(updateRequestIssued);
   });
 
@@ -626,7 +619,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { defaultClassification: "low" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ defaultClassification: "low" }) });
     assert(updateRequestIssued);
   });
 
@@ -714,7 +707,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "area 51,high,middle,low", defaultClassification: "high" }) });
     assert(updateRequestIssued);
   });
 
@@ -802,7 +795,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" }) });
     assert(updateRequestIssued);
   });
 });

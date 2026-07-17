@@ -1,26 +1,61 @@
 import { Group } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { entraUser } from '../../../../utils/entraUser.js';
+import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { validation } from '../../../../utils/validation.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+
+const GroupTypeEnum = {
+  microsoft365: 'microsoft365',
+  security: 'security'
+} as const;
+
+const VisibilityEnum = {
+  Public: 'Public',
+  Private: 'Private',
+  HiddenMembership: 'HiddenMembership'
+} as const;
+
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().max(256, `The maximum amount of characters for 'displayName' is 256.`).alias('n'),
+  description: z.string().optional().alias('d'),
+  type: zod.coercedEnum(GroupTypeEnum).alias('t'),
+  mailNickname: z.string()
+    .refine(val => validation.isValidMailNickname(val), {
+      error: `Value for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`
+    })
+    .refine(val => val.length <= 64, {
+      error: `The maximum amount of characters for 'mailNickname' is 64.`
+    })
+    .optional().alias('m'),
+  ownerIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'ownerIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  ownerUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'ownerUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  memberIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'memberIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  memberUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'memberUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  visibility: zod.coercedEnum(VisibilityEnum).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName: string;
-  description?: string;
-  type: string;
-  mailNickname?: string;
-  ownerIds?: string;
-  ownerUserNames?: string;
-  memberIds?: string;
-  memberUserNames?: string;
-  visibility?: string;
 }
 
 class EntraGroupAddCommand extends GraphCommand {
@@ -36,125 +71,15 @@ class EntraGroupAddCommand extends GraphCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-t, --type <type>',
-        autocomplete: ['microsoft365', 'security']
-      },
-      {
-        option: '-m, --mailNickname [mailNickname]'
-      },
-      {
-        option: '--ownerIds [ownerIds]'
-      },
-      {
-        option: '--ownerUserNames [ownerUserNames]'
-      },
-      {
-        option: '--memberIds [memberIds]'
-      },
-      {
-        option: '--memberUserNames [memberUserNames]'
-      },
-      {
-        option: '--visibility [visibility]',
-        autocomplete: ['Public', 'Private', 'HiddenMembership']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.displayName.length > 256) {
-          return `The maximum amount of characters for 'displayName' is 256.`;
-        }
-
-        if (args.options.mailNickname) {
-          if (!validation.isValidMailNickname(args.options.mailNickname)) {
-            return `Value for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`;
-          }
-
-          if (args.options.mailNickname.length > 64) {
-            return `The maximum amount of characters for 'mailNickname' is 64.`;
-          }
-        }
-
-        if (args.options.ownerIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.ownerUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (['microsoft365', 'security'].indexOf(args.options.type) === -1) {
-          return `Option 'type' must be one of the following values: microsoft365, security.`;
-        }
-
-        if (args.options.type === 'microsoft365' && !args.options.visibility) {
-          return `Option 'visibility' must be specified if the option 'type' is set to microsoft365`;
-        }
-
-        if (args.options.visibility && ['Public', 'Private', 'HiddenMembership'].indexOf(args.options.visibility!) === -1) {
-          return `Option 'visibility' must be one of the following values: Public, Private, HiddenMembership.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        type: typeof args.options.type !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined',
-        ownerIds: typeof args.options.ownerIds !== 'undefined',
-        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
-        memberIds: typeof args.options.memberIds !== 'undefined',
-        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
-        visibility: typeof args.options.visibility !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.type !== 'microsoft365' || options.visibility !== undefined, {
+        error: `Option 'visibility' must be specified if the option 'type' is set to microsoft365`
       });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -202,7 +127,7 @@ class EntraGroupAddCommand extends GraphCommand {
       securityEnabled: true
     };
 
-    this.addUnknownOptionsToPayload(requestBody, options);
+    this.addUnknownOptionsToPayloadZod(requestBody, options);
 
     return requestBody;
   }

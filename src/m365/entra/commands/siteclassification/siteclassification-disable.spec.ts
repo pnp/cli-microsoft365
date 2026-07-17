@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,11 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './siteclassification-disable.js';
+import command, { options } from './siteclassification-disable.js';
 
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -23,6 +26,8 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,7 +74,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   it('prompts before disabling siteclassification when force option not passed', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(promptIssued);
   });
@@ -83,7 +88,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }),
       new CommandError('Site classification is not enabled.'));
   });
 
@@ -158,7 +163,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
@@ -233,7 +238,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }),
       new CommandError("Missing UnifiedGroupSettting id"));
   });
 
@@ -308,7 +313,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }),
       new CommandError("Missing UnifiedGroupSettting id"));
   });
 
@@ -393,7 +398,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ force: true }) });
     assert(deleteRequestIssued);
   });
 
@@ -478,7 +483,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) });
     assert(deleteRequestIssued);
   });
 
@@ -487,7 +492,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(postSpy.notCalled);
   });
 
@@ -576,7 +581,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(deleteRequestIssued);
   });
 });

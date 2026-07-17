@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-permission-list.js';
+import command, { options } from './app-permission-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_PERMISSION_LIST, () => {
@@ -73,6 +73,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -82,6 +83,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -131,7 +133,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: appName, asAdmin: true, environmentName: environmentName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, asAdmin: true, environmentName: environmentName, verbose: true }) });
     assert(loggerLogSpy.calledWith(permissionsResponseFormatted));
   });
 
@@ -147,14 +149,14 @@ describe(commands.APP_PERMISSION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: appName, roleName: roleName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, roleName: roleName, verbose: true }) });
     assert(loggerLogSpy.calledWith(permissionsResponseFormatted));
   });
 
   it('correctly handles no permissions found', async () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
-    await command.action(logger, { options: { appName: appName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, verbose: true }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -162,7 +164,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     const roleName = 'CanEdit';
     sinon.stub(request, 'get').resolves({ value: permissionsResponse });
 
-    await command.action(logger, { options: { appName: appName, roleName: roleName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, roleName: roleName, verbose: true }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -175,37 +177,42 @@ describe(commands.APP_PERMISSION_LIST, () => {
     };
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { appName: appName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: appName }) }),
       new CommandError(error.error.message));
   });
 
-  it('passes validation if asAdmin specified with environment', async () => {
-    const actual = await command.validate({ options: { appName: appName, asAdmin: true, environmentName: environmentName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if asAdmin specified with environment', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, asAdmin: true, environmentName: environmentName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if roleName is a valid roleName', async () => {
-    const actual = await command.validate({ options: { appName: appName, roleName: roleName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if roleName is a valid roleName', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, roleName: roleName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if roleName is not a valid roleName', async () => {
-    const actual = await command.validate({ options: { appName: appName, roleName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if roleName is not a valid roleName', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, roleName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appName is not a valid guid', async () => {
-    const actual = await command.validate({ options: { appName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appName is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if asAdmin specified without environmentName', async () => {
-    const actual = await command.validate({ options: { appName: appName, asAdmin: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if asAdmin specified without environmentName', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, asAdmin: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if environmentName specified without asAdmin', async () => {
-    const actual = await command.validate({ options: { appName: appName, environmentName: environmentName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if environmentName specified without asAdmin', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, environmentName: environmentName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: appName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -12,7 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './group-remove.js';
+import command, { options } from './group-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -23,6 +23,7 @@ describe(commands.GROUP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +32,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,7 +83,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, id: groupId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: groupId, force: true }) });
     assert(deleteRequestStub.called);
   });
 
@@ -98,7 +100,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, displayName: displayName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: displayName, force: true }) });
     assert(deleteRequestStub.called);
     assert(confirmationStub.notCalled);
   });
@@ -116,7 +118,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, displayName: displayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: displayName }) });
     assert(deleteRequestStub.called);
     assert(confirmationStub.calledOnce);
   });
@@ -144,14 +146,14 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, id: groupId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: groupId, force: true }) }),
       new CommandError(error.error.message));
   });
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { id: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) });
 
     assert(confirmationStub.calledOnce);
   });
@@ -181,10 +183,10 @@ describe(commands.GROUP_REMOVE, () => {
     sinon.stub(request, 'delete').rejects('DELETE request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: displayName,
         force: true
-      }
+      })
     }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -212,7 +214,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: displayName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName, force: true }) });
     assert(deleteRequestStub.called);
   });
 
@@ -221,17 +223,17 @@ describe(commands.GROUP_REMOVE, () => {
 
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId }) });
     assert(deleteSpy.notCalled);
   });
 
   it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: groupId });
+    assert.strictEqual(actual.success, true);
   });
 });

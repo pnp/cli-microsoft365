@@ -1,21 +1,24 @@
-import GlobalOptions from '../../../GlobalOptions.js';
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
-import { validation } from '../../../utils/validation.js';
 import commands from '../commands.js';
 import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.uuid().alias('n'),
+  environmentName: z.string().alias('e'),
+  asAdmin: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  name: string;
-  asAdmin?: boolean;
-  force?: boolean;
 }
 
 class FlowRemoveCommand extends PowerAutomateCommand {
@@ -27,50 +30,8 @@ class FlowRemoveCommand extends PowerAutomateCommand {
     return 'Removes the specified Microsoft Flow';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin,
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

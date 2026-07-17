@@ -1,25 +1,30 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appName: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for appName.'
+    }),
+  asAdmin: z.boolean().optional(),
+  environmentName: z.string().optional().alias('e'),
+  roleName: z.enum(['Owner', 'CanEdit', 'CanView']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  appName: string;
-  asAdmin?: boolean;
-  environmentName?: string;
-  roleName?: string;
-}
-
 class PaAppPermissionListCommand extends PowerAppsCommand {
-  private readonly allowedRoleNames = ['Owner', 'CanEdit', 'CanView'];
-
   public get name(): string {
     return commands.APP_PERMISSION_LIST;
   }
@@ -32,64 +37,18 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
     return ['roleName', 'principalId', 'principalType'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin,
-        environmentName: typeof args.options.environmentName !== 'undefined',
-        roleName: typeof args.options.roleName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.asAdmin || opts.environmentName, {
+        message: 'Specifying the environmentName is required when using asAdmin.'
+      })
+      .refine(opts => !opts.environmentName || opts.asAdmin, {
+        message: 'Specifying environmentName is only allowed when using asAdmin.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--appName <appName>'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-e, --environmentName [environmentName]'
-      },
-      {
-        option: '--roleName [roleName]',
-        autocomplete: this.allowedRoleNames
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.appName)) {
-          return `${args.options.appName} is not a valid GUID for appName.`;
-        }
-
-        if (args.options.roleName && !this.allowedRoleNames.includes(args.options.roleName)) {
-          return `${args.options.roleName} is not a valid roleName. Allowed values are ${this.allowedRoleNames.join(',')}`;
-        }
-
-        if (args.options.asAdmin && !args.options.environmentName) {
-          return 'Specifying the environmentName is required when using asAdmin';
-        }
-
-        if (!args.options.asAdmin && args.options.environmentName) {
-          return 'Specifying environmentName is only allowed when using asAdmin';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -10,7 +10,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './pim-role-assignment-list.js';
+import command, { options } from './pim-role-assignment-list.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { CommandError } from '../../../../Command.js';
@@ -119,6 +119,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -127,6 +128,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -170,33 +172,38 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   });
 
   it('passes validation when userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when startDateTime is a valid ISO 8601 date', async () => {
-    const actual = await command.validate({ options: { startDateTime: '2024-02-20T08:00:00Z' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ startDateTime: '2024-02-20T08:00:00Z' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ userId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ groupId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation when userName is not a valid UPN', async () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when startDateTime is not a valid ISO 8601 date', async () => {
-    const actual = await command.validate({ options: { startDateTime: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ startDateTime: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('should get a list of role assignments', async () => {
@@ -210,7 +217,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleInstanceResponse));
   });
@@ -228,7 +235,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[0]]));
   });
@@ -247,7 +254,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[0]]));
   });
@@ -265,7 +272,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[1]]));
   });
@@ -284,7 +291,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName, verbose: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[1]]));
   });
@@ -302,7 +309,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { startDateTime: startDateTime } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ startDateTime: startDateTime }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[1]]));
   });
@@ -320,7 +327,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId, startDateTime: startDateTime } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, startDateTime: startDateTime }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([unifiedRoleAssignmentScheduleInstanceResponse[1]]));
   });
@@ -336,7 +343,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { withPrincipalDetails: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ withPrincipalDetails: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleInstanceWithPrincipalResponse));
   });
@@ -353,7 +360,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: groupName, startDateTime: startDateTime, withPrincipalDetails: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName, startDateTime: startDateTime, withPrincipalDetails: true }) });
 
     assert(loggerLogSpy.calledOnceWithExactly(unifiedRoleAssignmentScheduleInstanceWithPrincipalResponse));
   });
@@ -367,7 +374,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });

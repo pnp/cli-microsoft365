@@ -1,21 +1,29 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import request,  { CliRequestOptions } from '../../../../request.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { ODataResponse } from '../../../../utils/odata.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional().alias('i'),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid user principal name.`
+  }).optional().alias('n'),
+  userEmail: z.string().refine(email => validation.isValidUserPrincipalName(email), {
+    error: e => `'${e.input}' is not a valid user email.`
+  }).optional().alias('e'),
+  securityEnabledOnly: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  userEmail?: string;
-  securityEnabledOnly?: boolean;
 }
 
 interface UserGroupMembership {
@@ -31,65 +39,19 @@ class EntraUserGroupmembershipListCommand extends GraphCommand {
     return 'Retrieves all groups where the user is a member of';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        userEmail: typeof args.options.userEmail !== 'undefined',
-        securityEnabledOnly: !!args.options.securityEnabledOnly
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.userId, options.userName, options.userEmail].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'userId', 'userName', or 'userEmail'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'userEmail']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --userId [userId]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '-e, --userEmail [userEmail]'
-      },
-      {
-        option: '--securityEnabledOnly [securityEnabledOnly]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName as string)) {
-          return `${args.options.userName} is not a valid user principal name`;
-        }
-
-        if (args.options.userEmail && !validation.isValidUserPrincipalName(args.options.userEmail as string)) {
-          return `${args.options.userEmail} is not a valid user email`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName', 'userEmail'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

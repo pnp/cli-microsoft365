@@ -1,7 +1,7 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod, CommandError } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,17 +9,32 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  ownerGroupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  ownerGroupName: z.string().optional(),
+  rosterId: z.string().optional(),
+  shareWithUserIds: z.string()
+    .refine(val => validation.isValidGuidArray(val) === true, {
+      message: 'The value contains invalid GUIDs.'
+    })
+    .optional(),
+  shareWithUserNames: z.string()
+    .refine(val => validation.isValidUserPrincipalNameArray(val) === true, {
+      message: 'The value contains invalid user principal names.'
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title: string;
-  ownerGroupId?: string;
-  ownerGroupName?: string;
-  rosterId?: string;
-  shareWithUserIds?: string;
-  shareWithUserNames?: string;
 }
 
 class PlannerPlanAddCommand extends GraphCommand {
@@ -31,86 +46,22 @@ class PlannerPlanAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner plan';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        shareWithUserIds: typeof args.options.shareWithUserIds !== 'undefined',
-        shareWithUserNames: typeof args.options.shareWithUserNames !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.ownerGroupId, opts.ownerGroupName, opts.rosterId].filter(x => x !== undefined).length === 1, {
+        message: `Specify exactly one of the following options: 'ownerGroupId', 'ownerGroupName' or 'rosterId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerGroupId', 'ownerGroupName', 'rosterId']
+        }
+      })
+      .refine(opts => !opts.shareWithUserIds || !opts.shareWithUserNames, {
+        message: 'Specify either shareWithUserIds or shareWithUserNames but not both'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: "--ownerGroupId [ownerGroupId]"
-      },
-      {
-        option: "--ownerGroupName [ownerGroupName]"
-      },
-      {
-        option: "--rosterId [rosterId]"
-      },
-      {
-        option: '--shareWithUserIds [shareWithUserIds]'
-      },
-      {
-        option: '--shareWithUserNames [shareWithUserNames]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-
-        if (args.options.shareWithUserIds && args.options.shareWithUserNames) {
-          return 'Specify either shareWithUserIds or shareWithUserNames but not both';
-        }
-
-        if (args.options.shareWithUserIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.shareWithUserIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'shareWithUserIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.shareWithUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.shareWithUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'shareWithUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName', 'rosterId'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('title', 'ownerGroupId', 'ownerGroupName', 'rosterId', 'shareWithUserIds', 'shareWithUserNames');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

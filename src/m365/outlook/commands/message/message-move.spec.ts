@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-move.js';
+import command, { options } from './message-move.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
@@ -19,6 +19,7 @@ describe(commands.MESSAGE_MOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.MESSAGE_MOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,7 +79,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' }) });
   });
 
   it('moves message from source folder specified using a well-known name to the target folder specified using a well-known name (name in name)', async () => {
@@ -89,7 +91,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'inbox', targetFolderName: 'archive' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'inbox', targetFolderName: 'archive' }) });
   });
 
   it('moves message from one folder to another both specified using an ID', async () => {
@@ -101,7 +103,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' }) });
   });
 
   it('moves message from one folder to another both specified using an ID (debug)', async () => {
@@ -113,7 +115,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' }) });
   });
 
   it('moves message from one folder to another both specified using a name', async () => {
@@ -147,7 +149,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) });
   });
 
   it('correctly handles error when message not found', async () => {
@@ -168,7 +170,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=' }) }),
       new CommandError(`Id is malformed.`));
   });
 
@@ -197,7 +199,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) }),
       new CommandError(`Folder with name 'Inbox' not found`));
   });
 
@@ -224,7 +226,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) }),
       new CommandError(`Folder with name 'Archive' not found`));
   });
 
@@ -270,7 +272,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) }),
       new CommandError("Multiple folders with name 'Inbox' found. Found: AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=, AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAA0=."));
   });
 
@@ -316,7 +318,7 @@ describe(commands.MESSAGE_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) }),
       new CommandError("Multiple folders with name 'Archive' found. Found: AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=, AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAA0=."));
   });
 
@@ -362,91 +364,67 @@ describe(commands.MESSAGE_MOVE, () => {
       "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
     });
 
-    await command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderName: 'Inbox', targetFolderName: 'Archive' }) });
     assert(postRequestIssued);
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('passes validation if all required options specified', async () => {
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if neither sourceFolderId nor sourceFolderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', targetFolderId: 'archive' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines schema', () => {
+    assert.notStrictEqual(command.schema, undefined);
   });
 
-  it('fails validation if both sourceFolderId and sourceFolderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', sourceFolderName: 'Inbox', targetFolderId: 'archive' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines refined schema', () => {
+    assert.notStrictEqual(command.getRefinedSchema(command.schema as any), undefined);
   });
 
-  it('fails validation if neither targetFolderId nor targetFolderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither sourceFolderId nor sourceFolderName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', targetFolderId: 'archive' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both targetFolderId and targetFolderName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive', targetFolderName: 'archive' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both sourceFolderId and sourceFolderName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', sourceFolderName: 'Inbox', targetFolderId: 'archive' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if sourceFolderId specified using a well-know-name', async () => {
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if neither targetFolderId nor targetFolderName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if targetFolderId specified using a well-know-name', async () => {
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if both targetFolderId and targetFolderName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive', targetFolderName: 'archive' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if sourceFolderId specified using an ID', async () => {
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'archive' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if sourceFolderId specified using a well-know-name', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if targetFolderId specified using an ID', async () => {
-    const actual = await command.validate({ options: { id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if targetFolderId specified using a well-know-name', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if sourceFolderId specified using an ID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'archive' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if targetFolderId specified using an ID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', targetFolderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' });
+    assert.strictEqual(actual.success, true);
   });
 });

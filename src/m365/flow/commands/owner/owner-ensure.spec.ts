@@ -12,9 +12,10 @@ import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './owner-ensure.js';
+import command, { options } from './owner-ensure.js';
 
 describe(commands.OWNER_ENSURE, () => {
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
@@ -28,14 +29,17 @@ describe(commands.OWNER_ENSURE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,34 +81,44 @@ describe(commands.OWNER_ENSURE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: 'invalid', userId: validUserId, roleName: validRoleName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if flowName is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: 'invalid', userId: validUserId, roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userId: 'invalid', roleName: validRoleName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userId: 'invalid', roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, groupId: 'invalid', roleName: validRoleName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, groupId: 'invalid', roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if username is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: 'invalid', roleName: validRoleName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if username is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userName: 'invalid', roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if roleName is not a valid role name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if roleName is not a valid role name', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when required parameters are provided', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when no owner identifier is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when multiple owner identifiers are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, groupId: validGroupId, roleName: validRoleName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when required parameters are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds owner to a flow with userId', async () => {
@@ -130,7 +144,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, roleName: 'CanView' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, roleName: 'CanView' }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -159,7 +173,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -186,7 +200,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupId: validGroupId, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupId: validGroupId, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -215,7 +229,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -257,7 +271,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -269,7 +283,7 @@ describe(commands.OWNER_ENSURE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId }) } as any),
       new CommandError(error.error.message));
   });
 });

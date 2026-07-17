@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './notebook-list.js';
+import command, { options } from './notebook-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -20,6 +20,7 @@ describe(commands.NOTEBOOK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let accessTokenStub: sinon.SinonStub;
 
   before(() => {
@@ -29,6 +30,7 @@ describe(commands.NOTEBOOK_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,35 +74,35 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'displayName', 'id']);
   });
 
-  it('fails validation if webUrl is not a valid webUrl', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid webUrl', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if no option specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no option specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if multiple targeting options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '2609af39-7775-4f94-a3dc-0dd67657e900', groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('enforces the user to use delegated permissions', async () => {
     sinon.stub(request, 'get').resolves([]);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(accessTokenStub.calledOnceWithExactly('delegated'));
   });
 
@@ -128,7 +130,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -169,7 +171,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: '2609af39-7775-4f94-a3dc-0dd67657e900' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -210,7 +212,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -236,7 +238,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'MyGroup' }) } as any), new CommandError('An error has occurred'));
   });
 
   it('lists Microsoft OneNote notebooks in group by name', async () => {
@@ -275,7 +277,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'MyGroup' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'MyGroup' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -301,7 +303,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/testsite' }) } as any), new CommandError('An error has occurred'));
   });
 
   it('lists Microsoft OneNote notebooks for site', async () => {
@@ -343,7 +345,7 @@ describe(commands.NOTEBOOK_LIST, () => {
         throw 'Invalid request';
       });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -384,7 +386,7 @@ describe(commands.NOTEBOOK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: 'user1@contoso.onmicrosoft.com' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",

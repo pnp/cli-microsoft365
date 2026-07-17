@@ -12,14 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './plan-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './plan-add.js';
 
 describe(commands.PLAN_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const validId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTitle = 'Plan name';
@@ -98,6 +98,7 @@ describe(commands.PLAN_ADD, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -140,122 +141,97 @@ describe(commands.PLAN_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: 'no guid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the ownerGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: 'no guid'
     });
-
-    const actual = await command.validate({
-      options: {
-        title: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle
     });
-
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if shareWithUserIds contains invalid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        shareWithUserIds: "no guid"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both ownerGroupId and ownerGroupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if shareWithUserNames contains invalid user principal name', async () => {
+  it('fails validation if shareWithUserIds contains invalid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserIds: 'no guid'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if shareWithUserNames contains invalid user principal name', () => {
     const shareWithUserNames = ['john.doe@contoso.com', 'foo'];
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        shareWithUserNames: shareWithUserNames.join(',')
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserNames: shareWithUserNames.join(',')
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        shareWithUserIds: validShareWithUserIds,
-        shareWithUserNames: validShareWithUserNames
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserIds: validShareWithUserIds,
+      shareWithUserNames: validShareWithUserNames
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid title and ownerGroupId specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        shareWithUserIds: validShareWithUserIds
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid title and ownerGroupId specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        shareWithUserNames: validShareWithUserNames
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserIds: validShareWithUserIds
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserNames: validShareWithUserNames
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly adds planner plan with given title with available ownerGroupId', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planResponse;
       }
 
@@ -263,17 +239,17 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         ownerGroupId: validOwnerGroupId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(planResponse));
   });
 
   it('correctly adds planner plan with given title with available rosterId', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planRosterResponse;
       }
 
@@ -281,10 +257,10 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         rosterId: validRosterId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(planRosterResponse));
   });
@@ -299,7 +275,7 @@ describe(commands.PLAN_ADD, () => {
     };
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         throw multipleRostersError;
       }
 
@@ -307,11 +283,11 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         rosterId: validRosterId
-      }
-    }), new CommandError(`You can only add 1 plan to a Roster`));
+      })
+    }), new CommandError('You can only add 1 plan to a Roster'));
   });
 
   it('correctly adds planner plan with given title with available ownerGroupName', async () => {
@@ -324,7 +300,7 @@ describe(commands.PLAN_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planResponse;
       }
 
@@ -332,10 +308,10 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(planResponse));
@@ -351,7 +327,7 @@ describe(commands.PLAN_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planResponse;
       }
 
@@ -367,11 +343,11 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserIds: validShareWithUserIds
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -394,7 +370,7 @@ describe(commands.PLAN_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planResponse;
       }
 
@@ -410,11 +386,11 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserNames: validShareWithUserNames
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -437,7 +413,7 @@ describe(commands.PLAN_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/planner/plans') {
         return planResponse;
       }
 
@@ -453,17 +429,22 @@ describe(commands.PLAN_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserNames: validShareWithUserNames
-      }
+      })
     }), new CommandError(`Cannot proceed with planner plan creation. The following users provided are invalid : ${user1}`));
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: validTitle,
+        ownerGroupName: validOwnerGroupName
+      })
+    }), new CommandError('An error has occurred.'));
   });
 });

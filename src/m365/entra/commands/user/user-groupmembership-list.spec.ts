@@ -4,7 +4,7 @@ import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './user-groupmembership-list.js';
+import command, { options } from './user-groupmembership-list.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -40,6 +40,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -48,6 +49,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -87,29 +89,29 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if userEmail is a valid email', async () => {
-    const actual = await command.validate({ options: { userEmail: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userEmail is a valid email', () => {
+    const actual = commandOptionsSchema.safeParse({ userEmail: userName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { userName: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('retrieves groups memberships for a user specified by id', async () => {
@@ -124,7 +126,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) });
     assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
@@ -141,7 +143,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName }) });
     assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
@@ -158,7 +160,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userEmail: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userEmail: userName }) });
     assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
@@ -174,19 +176,19 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId, securityEnabledOnly: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, securityEnabledOnly: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(groupMembershipResults));
   });
 
-  it('fails validation if userEmail is not a valid email', async () => {
-    const actual = await command.validate({ options: { userEmail: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userEmail is not a valid email', () => {
+    const actual = commandOptionsSchema.safeParse({ userEmail: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'post').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { userId: userId } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) }), new CommandError(errorMessage));
   });
 });

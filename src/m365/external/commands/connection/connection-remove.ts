@@ -1,19 +1,23 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional(),
+  name: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
-  force?: boolean;
 }
 
 class ExternalConnectionRemoveCommand extends GraphCommand {
@@ -29,34 +33,19 @@ class ExternalConnectionRemoveCommand extends GraphCommand {
     return [commands.EXTERNALCONNECTION_REMOVE];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.name].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'id' or 'name', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--id [id]' },
-      { option: '--name [name]' },
-      { option: '-f, --force' }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private async getExternalConnectionId(args: CommandArgs): Promise<string> {

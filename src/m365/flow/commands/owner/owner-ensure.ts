@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -8,24 +9,31 @@ import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  flowName: z.uuid(),
+  environmentName: z.string().alias('e'),
+  roleName: z.enum(['CanView', 'CanEdit']),
+  userId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid userName.`
+  }).optional(),
+  groupId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
+  groupName: z.string().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  flowName: string;
-  environmentName: string;
-  roleName: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  asAdmin?: boolean;
-}
-
 class FlowOwnerEnsureCommand extends PowerAutomateCommand {
-  private static readonly allowedRoleNames: string[] = ['CanView', 'CanEdit'];
-
   public get name(): string {
     return commands.OWNER_ENSURE;
   }
@@ -34,85 +42,19 @@ class FlowOwnerEnsureCommand extends PowerAutomateCommand {
     return 'Assigns/updates permissions to a Power Automate flow';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin,
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(
+      options => [options.userId, options.userName, options.groupId, options.groupName].filter(x => x !== undefined).length === 1,
       {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--flowName <flowName>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--roleName <roleName>',
-        autocomplete: FlowOwnerEnsureCommand.allowedRoleNames
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName'] });
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.flowName)) {
-          return `${args.options.flowName} is not a valid GUID.`;
+        error: 'Specify either userId, userName, groupId, or groupName, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName']
         }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName.`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID.`;
-        }
-
-        if (FlowOwnerEnsureCommand.allowedRoleNames.indexOf(args.options.roleName) === -1) {
-          return `${args.options.roleName} is not a valid roleName. Valid values are: ${FlowOwnerEnsureCommand.allowedRoleNames.join(', ')}`;
-        }
-
-        return true;
       }
     );
   }
@@ -174,4 +116,4 @@ class FlowOwnerEnsureCommand extends PowerAutomateCommand {
   }
 }
 
-export default new FlowOwnerEnsureCommand(); 
+export default new FlowOwnerEnsureCommand();

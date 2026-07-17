@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './approleassignment-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './approleassignment-list.js';
 
 class ServicePrincipalAppRoleAssignments {
   private static AppRoleAssignments: any = {
@@ -414,6 +413,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = [
     {
@@ -443,6 +443,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -488,28 +489,28 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified appDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'json', appDisplayName: CommandActionParameters.appNameWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', appDisplayName: CommandActionParameters.appNameWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appId', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appId and outputs text', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('retrieves App Role assignments for the specified appObjectId and outputs text', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await command.action(logger, { options: { output: 'text', appObjectId: CommandActionParameters.objectIdWithRoleAssignments } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text', appObjectId: CommandActionParameters.objectIdWithRoleAssignments }) });
     assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
@@ -522,13 +523,13 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('correctly handles a service principal that does not have any app role assignments', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: CommandActionParameters.objectIdNoRoleAssignments } } as any), new CommandError('no app role assignments found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: CommandActionParameters.objectIdNoRoleAssignments }) }), new CommandError('no app role assignments found'));
   });
 
   it('correctly handles no app role assignments for the specified app', async () => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    await assert.rejects(command.action(logger, { options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } } as any), new CommandError('app registration not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: CommandActionParameters.appIdWithNoRoleAssignments }) }), new CommandError('app registration not found'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -543,83 +544,37 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: '021d971f-779d-439b-8006-9f084423f344' }) }), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId nor appDisplayName are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, appObjectId, nor appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appObjectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both appId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, appDisplayName: CommandActionParameters.appNameWithRoleAssignments } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both appId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: CommandActionParameters.appIdWithNoRoleAssignments, appDisplayName: CommandActionParameters.appNameWithRoleAssignments });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appObjectId and appDisplayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appDisplayName: CommandActionParameters.appNameWithRoleAssignments, appObjectId: CommandActionParameters.objectIdWithRoleAssignments } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appObjectId and appDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appDisplayName: CommandActionParameters.appNameWithRoleAssignments, appObjectId: CommandActionParameters.objectIdWithRoleAssignments });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the appId option specified', async () => {
-    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying appId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying appDisplayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--appDisplayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when the appId option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: CommandActionParameters.appIdWithNoRoleAssignments });
+    assert.strictEqual(actual.success, true);
   });
 });
 

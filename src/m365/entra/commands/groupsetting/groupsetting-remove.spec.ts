@@ -1,5 +1,4 @@
 import assert from 'assert';
-import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
@@ -12,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './groupsetting-remove.js';
+import command, { options } from './groupsetting-remove.js';
 
 describe(commands.GROUPSETTING_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -25,9 +25,9 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(fs, 'readFileSync').returns('abc');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,7 +81,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true }) });
     assert(deleteRequestStub.called);
   });
 
@@ -94,18 +94,18 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true }) });
     assert(deleteRequestStub.called);
   });
 
   it('prompts before removing the specified group setting when force option not passed', async () => {
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified group setting when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
 
     assert(promptIssued);
   });
@@ -113,14 +113,14 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('aborts removing the group setting when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
     assert(postSpy.notCalled);
   });
 
   it('aborts removing the group setting when prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
     assert(postSpy.notCalled);
   });
 
@@ -130,7 +130,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
     assert(postStub.called);
   });
 
@@ -140,7 +140,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
     assert(deleteStub.called);
   });
 
@@ -149,39 +149,17 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       error: { 'odata.error': { message: { value: 'File Not Found.' } } }
     });
 
-    await assert.rejects(command.action(logger, { options: { force: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' }) } as any),
       new CommandError('File Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying confirmation flag', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--force') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 });
