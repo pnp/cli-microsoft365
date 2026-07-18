@@ -179,6 +179,49 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
+  it('creates a pipeline with heft for SPFx version that requires heft', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
+        return true;
+      }
+
+      throw `Invalid path: ${fakePath}`;
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.22.0');
+
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
+
+    await command.action(logger, { options: {} } as any);
+
+    assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
+    const writtenContent: string = writeFileSyncStub.args[0][1] as string;
+    assert(writtenContent.includes('Heft build and package'), 'Heft step not found in pipeline');
+    assert(!writtenContent.includes('Gulp bundle'), 'Gulp bundle step should be removed');
+    assert(!writtenContent.includes('Gulp package'), 'Gulp package step should be removed');
+  });
+
   it('handles error with unknown minor version of SPFx when missing minor version', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
