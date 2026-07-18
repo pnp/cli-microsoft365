@@ -13,8 +13,8 @@ m365 spo storageentity remove [options]
 ## Options
 
 ```md definition-list
-`-u, --appCatalogUrl <appCatalogUrl>`
-: URL of the app catalog site
+`-u, --appCatalogUrl [appCatalogUrl]`
+: URL of the app catalog site. If not specified, the tenant app catalog URL will be used.
 
 `-k, --key <key>`
 : Name of the tenant property to retrieve
@@ -27,7 +27,7 @@ m365 spo storageentity remove [options]
 
 ## Remarks
 
-Tenant properties are stored in the app catalog site associated with that tenant. To remove a property, you have to specify the absolute URL of the app catalog site. If you specify the URL of a site different than the app catalog, you will get an access denied error.
+Tenant properties are stored in the app catalog site associated with that tenant. To remove a property, you can specify the absolute URL of the app catalog site. If not specified, the command will automatically resolve the tenant app catalog URL. If you specify the URL of a site different than the app catalog, you will get an access denied error.
 
 :::info
 
@@ -37,13 +37,13 @@ To use this command you must be either **SharePoint Administrator** or **Global 
     
 ## Examples
 
-Remove the _AnalyticsId_ tenant property. Yields a confirmation prompt before actually removing the property
+Remove the _AnalyticsId_ tenant property using the tenant app catalog. Yields a confirmation prompt before actually removing the property
 
 ```sh
-m365 spo storageentity remove -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
+m365 spo storageentity remove -k AnalyticsId
 ```
 
-Remove the _AnalyticsId_ tenant property. Suppresses the confirmation prompt
+Remove the _AnalyticsId_ tenant property from a specific app catalog. Suppresses the confirmation prompt
 
 ```sh
 m365 spo storageentity remove -k AnalyticsId --force -u https://contoso.sharepoint.com/sites/appcatalog
