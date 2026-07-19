@@ -8,6 +8,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SiteDesign } from './SiteDesign.js';
+import { getBuiltInSiteDesignTemplateName } from './BuiltInSiteDesigns.js';
 
 interface CommandArgs {
   options: Options;
@@ -16,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
+  builtIn?: boolean;
 }
 
 class SpoSiteDesignGetCommand extends SpoCommand {
@@ -40,7 +42,8 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        title: typeof args.options.title !== 'undefined',
+        builtIn: args.options.builtIn || false
       });
     });
   }
@@ -52,6 +55,9 @@ class SpoSiteDesignGetCommand extends SpoCommand {
       },
       {
         option: '--title [title]'
+      },
+      {
+        option: '-b, --builtIn'
       }
     );
   }
@@ -104,9 +110,48 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     return matchingSiteDesigns[0].Id;
   }
 
+  private async getBuiltInSiteDesign(args: CommandArgs, spoUrl: string): Promise<SiteDesign> {
+    const requestOptions: CliRequestOptions = {
+      url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
+      headers: {
+        'content-type': 'application/json;charset=utf-8',
+        accept: 'application/json;odata=nometadata'
+      },
+      data: { store: 1 },
+      responseType: 'json'
+    };
+
+    const response: { value: SiteDesign[] } = await request.post<{ value: SiteDesign[] }>(requestOptions);
+
+    const matchingSiteDesigns: SiteDesign[] = args.options.id
+      ? response.value.filter(x => x.Id.toLowerCase() === (args.options.id as string).toLowerCase())
+      : response.value.filter(x => x.Title === args.options.title);
+
+    if (matchingSiteDesigns.length === 0) {
+      throw `The specified site design does not exist`;
+    }
+
+    if (matchingSiteDesigns.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', matchingSiteDesigns);
+      return cli.handleMultipleResultsFound<SiteDesign>(`Multiple site designs with title '${args.options.title}' found.`, resultAsKeyValuePair);
+    }
+
+    return matchingSiteDesigns[0];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+
+      if (args.options.builtIn) {
+        const siteDesign: SiteDesign = await this.getBuiltInSiteDesign(args, spoUrl);
+        await logger.log({
+          ...siteDesign,
+          Template: getBuiltInSiteDesignTemplateName(siteDesign.Id)
+        });
+        return;
+      }
+
       const siteDesignId: string = await this.getSiteDesignId(args, spoUrl);
       const requestOptions: any = {
         url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`,

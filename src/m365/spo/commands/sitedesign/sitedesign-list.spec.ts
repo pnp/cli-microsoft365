@@ -62,7 +62,7 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate', 'Template']);
   });
 
   it('lists available site designs', async () => {
@@ -276,5 +276,52 @@ describe(commands.SITEDESIGN_LIST, () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+  });
+
+  it('lists built-in Microsoft site designs and enriches them with the matching template name', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({ store: 1 })) {
+        return {
+          value: [
+            {
+              "Title": "Event",
+              "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42"
+            },
+            {
+              "Title": "Department",
+              "Id": "73495f08-0140-499b-8927-dd26a546f26a"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { builtIn: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Title": "Event",
+        "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42",
+        "Template": "Event"
+      },
+      {
+        "Title": "Department",
+        "Id": "73495f08-0140-499b-8927-dd26a546f26a",
+        "Template": "Department"
+      }
+    ]));
+  });
+
+  it('supports specifying builtIn', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--builtIn') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 });
