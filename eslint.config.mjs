@@ -14,6 +14,7 @@ const dictionary = [
   'activations',
   'adaptive',
   'administrative',
+  'agent',
   'ai',
   'app',
   'application',
