@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,10 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './aibuildermodel-list.js';
+import command, { options } from './aibuildermodel-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.AIBUILDERMODEL_LIST, () => {
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   const validEnvironment = "4be50206-9576-4237-8b17-38d8aadfaa36";
@@ -73,6 +77,8 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -115,6 +121,14 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['msdyn_name', 'msdyn_aimodelid', 'createdon', 'modifiedon']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves AI Builder models', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -130,7 +144,7 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, environmentName: validEnvironment }) });
     assert(loggerLogSpy.calledWith(modelsResponse.value));
 
   });
@@ -155,7 +169,7 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });
