@@ -1,0 +1,145 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra agent blueprintprincipal list
+
+Retrieves a list of agent blueprint principals
+
+## Usage
+
+```sh
+m365 entra agent blueprintprincipal list [options]
+```
+
+## Options
+
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
+<Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of agent blueprint principal properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                              |
+  |-----------------|------------------------------------------|
+  | Microsoft Graph | AgentIdentityBlueprintPrincipal.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                              |
+  |-----------------|------------------------------------------|
+  | Microsoft Graph | AgentIdentityBlueprintPrincipal.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve all agent blueprint principals
+
+```sh
+m365 entra agent blueprintprincipal list
+```
+
+Retrieve id and name of agent blueprint principals
+
+```sh
+m365 entra agent blueprintprincipal list --properties 'id,appDisplayName'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "accountEnabled": true,
+      "appDescription": null,
+      "appDisplayName": "OcnAgentBluePrint02",
+      "appId": "0e81af7f-b058-470a-84be-3a4f5a8014ca",
+      "appOwnerOrganizationId": "70cf0eca-e1e8-4d78-9d03-62ecf811dfc2",
+      "appRoleAssignmentRequired": false,
+      "createdByAppId": "14d82eec-204b-4c2f-b7e8-296a70dab67e",
+      "disabledByMicrosoftStatus": null,
+      "displayName": "OcnAgentBluePrint02",
+      "servicePrincipalNames": [
+        "0e81af7f-b058-470a-84be-3a4f5a8014ca"
+      ],
+      "servicePrincipalType": "Application",
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "id": "59246ef4-b832-48eb-a5e0-87748132e12c",
+      "appRoles": [],
+      "info": {
+        "logoUrl": null,
+        "marketingUrl": null,
+        "privacyStatementUrl": null,
+        "supportUrl": null,
+        "termsOfServiceUrl": null
+      },
+      "oauth2PermissionScopes": [],
+      "verifiedPublisher": {
+        "displayName": null,
+        "verifiedPublisherId": null,
+        "addedDateTime": null
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    appDisplayName       appId
+  ------------------------------------  -------------------  ------------------------------------
+  59246ef4-b832-48eb-a5e0-87748132e12c  OcnAgentBluePrint02  0e81af7f-b058-470a-84be-3a4f5a8014ca
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  accountEnabled,appDescription,appDisplayName,appId,appOwnerOrganizationId,appRoleAssignmentRequired,createdByAppId,disabledByMicrosoftStatus,displayName,servicePrincipalType,signInAudience,id
+  1,,OcnAgentBluePrint02,0e81af7f-b058-470a-84be-3a4f5a8014ca,70cf0eca-e1e8-4d78-9d03-62ecf811dfc2,0,14d82eec-204b-4c2f-b7e8-296a70dab67e,,OcnAgentBluePrint02,Application,AzureADMyOrg,59246ef4-b832-48eb-a5e0-87748132e12c
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra agent blueprintprincipal list --debug "false" --verbose "false"
+
+  Date: 6/5/2026
+
+  ## OcnAgentBluePrint02 (59246ef4-b832-48eb-a5e0-87748132e12c)
+
+  Property | Value
+  ---------|-------
+  accountEnabled | true
+  appDisplayName | OcnAgentBluePrint02
+  appId | 0e81af7f-b058-470a-84be-3a4f5a8014ca
+  appOwnerOrganizationId | 70cf0eca-e1e8-4d78-9d03-62ecf811dfc2
+  appRoleAssignmentRequired | false
+  createdByAppId | 14d82eec-204b-4c2f-b7e8-296a70dab67e
+  displayName | OcnAgentBluePrint02
+  servicePrincipalType | Application
+  signInAudience | AzureADMyOrg
+  id | 59246ef4-b832-48eb-a5e0-87748132e12c
+  ```
+
+  </TabItem>
+</Tabs>
