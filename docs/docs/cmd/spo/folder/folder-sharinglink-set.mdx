@@ -38,16 +38,18 @@ m365 spo folder sharinglink set [options]
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource   | Permissions     |
-  |------------|-----------------|
-  | SharePoint | Files.ReadWrite |
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Files.ReadWrite |
+  | SharePoint      | AllSites.Read   |
 
   </TabItem>
   <TabItem value="Application">
 
-  | Resource   | Permissions         |
-  |------------|---------------------|
-  | SharePoint | Files.ReadWrite.All |
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Files.ReadWrite.All |
+  | SharePoint      | Sites.Read.All      |
 
   </TabItem>
 </Tabs>
