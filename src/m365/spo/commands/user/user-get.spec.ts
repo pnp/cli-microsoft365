@@ -448,6 +448,16 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if id is a negative number', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, id: -1 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if id is a float number', async () => {
+    const actual = await command.validate({ options: { webUrl: validWebUrl, id: 1.5 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if userName is not a valid user principal name', async () => {
     const actual = await command.validate({ options: { webUrl: validWebUrl, userName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
