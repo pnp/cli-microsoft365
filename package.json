@@ -267,65 +267,39 @@
     "Zachariassen Laksafoss, Trygvi <trygvi.laksafoss@gmail.com>"
   ],
   "overrides": {
+    "@opentelemetry/core": ">=2.8.0",
+    "protobufjs": ">=7.6.5",
+    "serialize-javascript": ">=7.0.7",
+    "diff": ">=8.0.3",
     "adaptive-expressions": {
-      "fast-xml-parser": "5.7.0",
-      "lodash": "4.18.0",
-      "@xmldom/xmldom": "^0.8.13",
-      "uuid": "11.1.1"
-    },
-    "adaptivecards": {
-      "swiper": "12.1.3"
-    },
-    "mocha": {
-      "diff": "8.0.4",
-      "serialize-javascript": "7.0.5"
-    },
-    "jsonwebtoken": {
-      "jws": "3.2.3"
-    },
-    "axios": {
-      "follow-redirects": "1.16.0"
-    },
-    "@grpc/proto-loader": {
-      "protobufjs": "7.6.0"
-    },
-    "@opentelemetry/otlp-transformer": {
-      "protobufjs": "7.6.0"
-    },
-    "@azure/monitor-opentelemetry": {
-      "@opentelemetry/sdk-node": "0.217.0",
-      "@opentelemetry/exporter-prometheus": "0.217.0"
-    },
-    "protobufjs": "7.6.0",
-    "applicationinsights": {
-      "uuid": "11.1.1"
+      "uuid": ">=11.1.1"
     }
   },
   "dependencies": {
-    "@azure/msal-common": "^16.6.2",
-    "@azure/msal-node": "^5.2.2",
-    "@inquirer/confirm": "^6.1.0",
-    "@inquirer/input": "^5.1.0",
-    "@inquirer/select": "^5.2.0",
+    "@azure/msal-common": "^16.11.1",
+    "@azure/msal-node": "^5.4.0",
+    "@inquirer/confirm": "^6.1.1",
+    "@inquirer/input": "^5.1.2",
+    "@inquirer/select": "^5.2.1",
     "@xmldom/xmldom": "^0.9.10",
     "adaptive-expressions": "^4.23.3",
     "adaptivecards": "^3.0.6",
     "adaptivecards-templating": "^2.3.1",
-    "adm-zip": "^0.5.17",
-    "applicationinsights": "^3.14.0",
-    "axios": "^1.16.1",
+    "adm-zip": "^0.6.0",
+    "applicationinsights": "^3.15.1",
+    "axios": "^1.18.1",
     "chalk": "^5.6.2",
     "clipboardy": "^5.3.1",
     "configstore": "^8.0.0",
     "csv-parse": "^6.2.1",
-    "csv-stringify": "^6.7.0",
+    "csv-stringify": "^6.8.1",
     "easy-table": "^1.2.0",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
     "node-forge": "^1.4.0",
     "omelette": "^0.4.17",
     "open": "^11.0.0",
-    "semver": "^7.8.1",
+    "semver": "^7.8.5",
     "strip-json-comments": "^5.0.3",
     "typescript": "^5.9.3",
     "update-notifier": "^7.3.1",
@@ -344,7 +318,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/json-to-ast": "^2.1.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.12.4",
+    "@types/node": "^24.13.3",
     "@types/node-forge": "^1.3.14",
     "@types/omelette": "^0.4.5",
     "@types/semver": "^7.7.1",
@@ -352,16 +326,16 @@
     "@types/update-notifier": "^6.0.8",
     "@types/uuid": "^10.0.0",
     "@types/yargs-parser": "^21.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
-    "@typescript-eslint/parser": "^8.58.0",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
     "c8": "^11.0.0",
-    "eslint": "^10.4.0",
+    "eslint": "^10.7.0",
     "eslint-plugin-mocha": "^11.3.0",
-    "globals": "^17.6.0",
+    "globals": "^17.7.0",
     "mocha": "^11.7.6",
     "rimraf": "^6.1.3",
     "sinon": "^22.0.0",
     "source-map-support": "^0.5.21",
-    "tsc-watch": "^7.2.0"
+    "tsc-watch": "^7.2.1"
   }
 }
