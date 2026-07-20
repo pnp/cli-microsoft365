@@ -9,6 +9,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FileProperties } from './FileProperties.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -212,14 +213,10 @@ class SpoFileGetCommand extends SpoCommand {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
 
           if (args.options.withPermissions) {
-            requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
-            const response = await request.get<{ value: any[] }>(requestOptions);
-            response.value.forEach((r: any) => {
-              r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
-            });
-            fileProperties.RoleAssignments = response.value;
+            const fileRoleAssignments = await spo.getFileRoleAssignments(args.options.webUrl, file.ServerRelativeUrl);
+            fileProperties.RoleAssignments = fileRoleAssignments;
             if (args.options.asListItem) {
-              fileProperties.ListItemAllFields.RoleAssignments = response.value;
+              fileProperties.ListItemAllFields.RoleAssignments = fileRoleAssignments;
             }
           }
 
