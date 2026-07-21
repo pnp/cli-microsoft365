@@ -477,7 +477,7 @@ spo hidedefaultthemes set|Sets the value of the HideDefaultThemes setting
 spo homesite add|Adds a home site
 spo homesite get|Gets information about a home site
 spo homesite list|Lists all home sites
-spo homesite remove|Removes a Home Site
+spo homesite remove|Removes a home site
 spo homesite set|Updates an existing SharePoint home site.
 spo hubsite connect|Connect a hub site to a parent hub site
 spo hubsite data get|Get hub site data for the specified site

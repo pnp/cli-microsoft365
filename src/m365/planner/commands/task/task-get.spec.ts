@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-get.js';
+import command, { options } from './task-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_GET, () => {
@@ -20,6 +20,7 @@ describe(commands.TASK_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTaskTitle = 'Task name';
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
@@ -141,6 +142,7 @@ describe(commands.TASK_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -188,6 +190,13 @@ describe(commands.TASK_GET, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'value',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 
   it('fails validation when bucket name is used without id', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -198,13 +207,11 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        id: validTaskId,
-        bucketName: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: validTaskId,
+      bucketName: validBucketName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when title is used without bucket id', async () => {
@@ -216,12 +223,10 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when title is used with both bucket id and bucketname', async () => {
@@ -233,14 +238,12 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketId: validBucketId,
-        bucketName: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketId: validBucketId,
+      bucketName: validBucketName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when bucket name is used without plan title, plan id, or roster id', async () => {
@@ -252,13 +255,11 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when bucket name is used with both plan title, plan id, and roster id', async () => {
@@ -270,16 +271,14 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planId: validPlanId,
-        planTitle: validPlanTitle,
-        rosterId: validRosterId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planId: validPlanId,
+      planTitle: validPlanTitle,
+      rosterId: validRosterId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when plan title is used without owner group name or owner group id', async () => {
@@ -291,14 +290,12 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when plan title is used with both owner group name and owner group id', async () => {
@@ -310,59 +307,49 @@ describe(commands.TASK_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName,
+      ownerGroupId: validOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when id and plan details are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        planId: validPlanId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: validBucketId,
+      planId: validPlanId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when owner group id is not a guid', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupId: invalidOwnerGroupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validTaskId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: validTaskId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('validates for a correct input with name', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: validTaskTitle,
+      bucketName: validBucketName,
+      planTitle: validPlanTitle,
+      ownerGroupName: validOwnerGroupName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails validation when no groups found', async () => {
@@ -375,12 +362,12 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
 
@@ -402,12 +389,12 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -421,11 +408,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId
-      }
+      })
     }), new CommandError(`The specified bucket '${validBucketName}' does not exist.`));
   });
 
@@ -447,11 +434,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId
-      }
+      })
     }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
@@ -482,18 +469,45 @@ describe(commands.TASK_GET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
+      })
+    });
+    assert(loggerLogSpy.calledWith(outputResponse));
+  });
+
+  it('gets a task by title and bucketId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return singleTaskByTitleResponse;
       }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
+        return taskResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
+        return taskDetailsResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: validTaskTitle,
+        bucketId: validBucketId
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
   it('fails validation when no tasks found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return { "value": [{ "id": "" }] };
       }
@@ -502,10 +516,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
-        bucketId: validBucketId
-      }
+        bucketName: validBucketName,
+        planId: validPlanId
+      })
     }), new CommandError(`The specified task ${validTaskTitle} does not exist`));
   });
 
@@ -519,6 +534,9 @@ describe(commands.TASK_GET, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return multipleTasksByTitleResponse;
       }
@@ -527,10 +545,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
-        bucketId: validBucketId
-      }
+        bucketName: validBucketName,
+        planId: validPlanId
+      })
     }), new CommandError("Multiple tasks with title 'Task name' found. Found: 2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2."));
   });
 
@@ -561,12 +580,12 @@ describe(commands.TASK_GET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleTaskByTitleResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -596,12 +615,12 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -628,12 +647,12 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -651,9 +670,9 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validTaskId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -680,11 +699,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: validTaskTitle,
         bucketName: validBucketName,
         rosterId: validRosterId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
@@ -693,13 +712,17 @@ describe(commands.TASK_GET, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('The requested item is not found.'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('The requested item is not found.'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({ id: validTaskId })
+    }), new CommandError('The requested item is not found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({ id: validTaskId })
+    }), new CommandError('An error has occurred'));
   });
 });

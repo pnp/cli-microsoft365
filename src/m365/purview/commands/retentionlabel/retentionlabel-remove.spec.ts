@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionlabel-remove.js';
+import command, { options } from './retentionlabel-remove.js';
 
 describe(commands.RETENTIONLABEL_REMOVE, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
@@ -20,6 +20,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,30 +78,23 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified retention label when force option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        id: validId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
 
 
     assert(promptIssued);
@@ -107,11 +102,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
 
   it('aborts removing the specified retention label when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    await command.action(logger, {
-      options: {
-        id: validId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
     assert(deleteSpy.notCalled);
   });
 
@@ -127,11 +118,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        id: validId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
   });
 
   it('Correctly deletes retention label by id when prompt confirmed', async () => {
@@ -143,22 +130,17 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, {
-      options: {
-        id: validId,
-        force: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, force: true }) });
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId,
         force: true
-      }
+      })
     }), new CommandError("An error has occurred"));
   });
 });

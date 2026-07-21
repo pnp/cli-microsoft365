@@ -12,41 +12,42 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-reference-remove.js';
+import command, { options } from './task-reference-remove.js';
 
 describe(commands.TASK_REFERENCE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validUrl = 'https://www.microsoft.com';
   const validAlias = 'Test';
 
   const referenceResponse = {
-    "https%3A//www%2Emicrosoft%2Ecom": {
-      "alias": "Test",
-      "type": "Word"
+    'https%3A//www%2Emicrosoft%2Ecom': {
+      alias: 'Test',
+      type: 'Word'
     }
   };
 
   const multiReferencesResponseNoAlias = {
-    "https%3A//www%2Emicrosoft%2Ecom": {
-      "type": "Word"
+    'https%3A//www%2Emicrosoft%2Ecom': {
+      type: 'Word'
     },
-    "https%3A//www%2Emicrosoft2%2Ecom": {
-      "type": "Word"
+    'https%3A//www%2Emicrosoft2%2Ecom': {
+      type: 'Word'
     }
   };
 
   const multiReferencesResponse = {
-    "https%3A//www%2Emicrosoft%2Ecom": {
-      "alias": "Test",
-      "type": "Word"
+    'https%3A//www%2Emicrosoft%2Ecom': {
+      alias: 'Test',
+      type: 'Word'
     },
-    "https%3A//www%2Emicrosoft2%2Ecom": {
-      "alias": "Test",
-      "type": "Word"
+    'https%3A//www%2Emicrosoft2%2Ecom': {
+      alias: 'Test',
+      type: 'Word'
     }
   };
 
@@ -62,6 +63,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     };
     sinon.stub(cli.getConfig(), 'all').value({});
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -108,34 +110,37 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if url does not contain http or https', async () => {
-    const actual = await command.validate({
-      options: {
-        taskId: validTaskId,
-        url: 'www.microsoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url does not contain http or https', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      url: 'www.microsoft.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid url with http specified', async () => {
-    const actual = await command.validate({
-      options: {
-        taskId: validTaskId,
-        url: 'http://www.microsoft.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid url with http specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      url: 'http://www.microsoft.com'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid url with https specified', async () => {
-    const actual = await command.validate({
-      options: {
-        taskId: validTaskId,
-        url: 'https://www.microsoft.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid url with https specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      url: 'https://www.microsoft.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      url: validUrl,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removal when force option not passed', async () => {
@@ -146,23 +151,21 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         url: validUrl
-      }
+      })
     });
 
     assert(promptIssued);
   });
 
-  it('passes validation when valid options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        taskId: validTaskId,
-        url: validUrl
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      url: validUrl
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly removes reference', async () => {
@@ -177,21 +180,21 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
+          accept: 'application/json'
         })) {
-        return { "@odata.etag": "TestEtag" };
+        return { '@odata.etag': 'TestEtag' };
       }
 
       throw 'Invalid Request';
     });
 
-    const options: any = {
-      taskId: validTaskId,
-      url: validUrl,
-      force: true
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        url: validUrl,
+        force: true
+      })
+    });
   });
 
   it('correctly removes reference by alias with prompting', async () => {
@@ -206,10 +209,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
+          accept: 'application/json'
         })) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           references: referenceResponse
         };
       }
@@ -217,22 +220,22 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    const options: any = {
-      taskId: validTaskId,
-      alias: validAlias
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        alias: validAlias
+      })
+    });
   });
 
   it('fails validation when no references found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
+          accept: 'application/json'
         })) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           references: {}
         };
       }
@@ -241,10 +244,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         alias: validAlias
-      }
+      })
     }), new CommandError(`The specified reference with alias ${validAlias} does not exist`));
   });
 
@@ -252,10 +255,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
+          accept: 'application/json'
         })) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           references: multiReferencesResponseNoAlias
         };
       }
@@ -264,10 +267,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         alias: validAlias
-      }
+      })
     }), new CommandError(`The specified reference with alias ${validAlias} does not exist`));
   });
 
@@ -275,10 +278,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
+          accept: 'application/json'
         })) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           references: multiReferencesResponse
         };
       }
@@ -287,16 +290,22 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         alias: validAlias
-      }
+      })
     }), new CommandError(`Multiple references with alias ${validAlias} found. Pass one of the following urls within the "--url" option : https://www.microsoft.com,https://www.microsoft2.com`));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        url: validUrl,
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
   });
 });
