@@ -1808,6 +1808,11 @@ const sidebars: SidebarsConfig = {
           id: 'cmd/flow/flow-remove'
         },
         {
+          type: 'doc',
+          label: 'set',
+          id: 'cmd/flow/flow-set'
+        },
+        {
           connector: [
             {
               type: 'doc',
