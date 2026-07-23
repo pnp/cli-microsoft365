@@ -1,67 +1,38 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const allowedTypes = ['mail', 'file', 'emailFile', 'url'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(allowedTypes).optional().alias('t')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  type?: string;
-}
-
 class PurviewThreatAssessmentListCommand extends GraphCommand {
-  private static readonly allowedTypes: string[] = ['mail', 'file', 'emailFile', 'url'];
-
   public get name(): string {
     return commands.THREATASSESSMENT_LIST;
   }
 
   public get description(): string {
-    return 'Get a list of threat assessments';
+    return 'Gets a list of threat assessments';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'type', 'category'];
-  }
-
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: typeof args.options.type !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type [type]',
-        autocomplete: PurviewThreatAssessmentListCommand.allowedTypes
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type && PurviewThreatAssessmentListCommand.allowedTypes.indexOf(args.options.type) < 0) {
-          return `${args.options.type} is not a valid type. Allowed values are ${PurviewThreatAssessmentListCommand.allowedTypes.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

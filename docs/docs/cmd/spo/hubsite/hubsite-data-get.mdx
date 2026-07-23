@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo hubsite data get
 
-Get hub site data for the specified site
+Gets hub site data for the specified site
 
 ## Usage
 
@@ -29,6 +29,25 @@ m365 spo hubsite data get [options]
 By default, the hub site data is returned from the server's cache. To refresh the data with the latest updates, use the `--forceRefresh` option. Use this option, if you just made changes and need to see them right away.
 
 If the specified site is not connected to a hub site site and is not a hub site itself, no data will be retrieved.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

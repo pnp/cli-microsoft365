@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentioneventtype-set.js';
+import command, { options } from './retentioneventtype-set.js';
 
 describe(commands.RETENTIONEVENTTYPE_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
@@ -20,6 +20,7 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,19 +71,24 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid', description: description });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation with valid id but no other option specified', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with valid id but no other option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation with valid id and a single option specified', async () => {
-    const actual = await command.validate({ options: { id: validId, description: description } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with valid id and a single option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, description: description });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, description: description, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly sets description of a specific retention event type by id', async () => {
@@ -97,7 +104,7 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, description: description, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, description: description, verbose: true }) });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
@@ -117,9 +124,10 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        id: validId
-      }
+      options: commandOptionsSchema.parse({
+        id: validId,
+        description: description
+      })
     }), new CommandError(`There is no rule matching identity 'ca0e1f8d-4e42-4a81-be85-022502d70c4f'.`));
   });
 });

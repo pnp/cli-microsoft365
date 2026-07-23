@@ -34,7 +34,7 @@ class VivaEngageRoleMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Assign a Viva Engage role to a user';
+    return 'Assigns a Viva Engage role to a user';
   }
 
   public get schema(): z.ZodType<Options> {

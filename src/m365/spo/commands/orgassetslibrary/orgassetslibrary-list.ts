@@ -12,7 +12,7 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List all libraries that are assigned as asset library';
+    return 'Lists all libraries that are assigned as asset library';
   }
 
   public async commandAction(logger: Logger): Promise<void> {

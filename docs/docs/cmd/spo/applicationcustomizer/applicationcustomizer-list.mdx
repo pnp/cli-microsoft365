@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo applicationcustomizer list
 
-Get a list of application customizers that are added to a site
+Gets a list of application customizers that are added to a site
 
 ## Usage
 
@@ -23,6 +23,25 @@ m365 spo applicationcustomizer list [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
 
 ## Remarks
 

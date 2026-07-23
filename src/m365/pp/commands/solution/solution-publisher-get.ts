@@ -24,7 +24,7 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Get information about the specified publisher in a given environment.';
+    return 'Gets information about the specified publisher in a given environment.';
   }
 
   constructor() {

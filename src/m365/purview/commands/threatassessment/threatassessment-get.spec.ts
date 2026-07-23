@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './threatassessment-get.js';
+import command, { options } from './threatassessment-get.js';
 
 describe(commands.THREATASSESSMENT_GET, () => {
   const threatAssessmentId = 'c37d695e-d581-4ae9-82a0-9364eba4291e';
@@ -50,6 +50,7 @@ describe(commands.THREATASSESSMENT_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -58,6 +59,7 @@ describe(commands.THREATASSESSMENT_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,14 +99,19 @@ describe(commands.THREATASSESSMENT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if a correct id is entered and withResults is specified', async () => {
-    const actual = await command.validate({ options: { id: threatAssessmentId, withResults: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if a correct id is entered and withResults is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: threatAssessmentId, withResults: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: threatAssessmentId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves threat assessment by specified id', async () => {
@@ -116,7 +123,7 @@ describe(commands.THREATASSESSMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: threatAssessmentId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: threatAssessmentId, verbose: true }) });
     assert(loggerLogSpy.calledWith(threatAssessmentGetResponse));
   });
 
@@ -129,7 +136,7 @@ describe(commands.THREATASSESSMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: threatAssessmentId, withResults: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: threatAssessmentId, withResults: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(threatAssessmentGetResponseIncludingResults));
   });
 
@@ -153,6 +160,6 @@ describe(commands.THREATASSESSMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: threatAssessmentId } }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: threatAssessmentId }) }), new CommandError(error.error.message));
   });
 });

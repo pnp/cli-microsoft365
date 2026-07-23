@@ -23,7 +23,7 @@ class ConnectionUseCommand extends Command {
   }
 
   public get description(): string {
-    return 'Activate the specified Microsoft 365 tenant connection';
+    return 'Activates the specified Microsoft 365 tenant connection';
   }
 
   public get schema(): z.ZodType | undefined {

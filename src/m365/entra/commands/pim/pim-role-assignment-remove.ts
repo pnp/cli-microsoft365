@@ -41,7 +41,7 @@ class EntraPimRoleAssignmentRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Request deactivation of an Entra role assignment for a user or group';
+    return 'Requests deactivation of an Entra role assignment for a user or group';
   }
 
   public get schema(): z.ZodType | undefined {

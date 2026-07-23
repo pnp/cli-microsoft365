@@ -16,7 +16,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   }
 
   public get description(): string {
-    return 'Grant API permissions defined in the current SPFx project';
+    return 'Grants API permissions defined in the current SPFx project';
   }
 
   constructor() {

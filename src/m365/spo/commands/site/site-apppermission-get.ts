@@ -22,7 +22,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a specific application permissions for the site';
+    return 'Gets a specific application permissions for the site';
   }
 
   constructor() {

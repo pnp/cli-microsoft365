@@ -1359,6 +1359,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'event get',
+              id: 'cmd/outlook/event/event-get'
+            },
+            {
+              type: 'doc',
               label: 'event list',
               id: 'cmd/outlook/event/event-list'
             },
@@ -2054,6 +2059,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'website get',
               id: 'cmd/pp/website/website-get'
+            },
+            {
+              type: 'doc',
+              label: 'website remove',
+              id: 'cmd/pp/website/website-remove'
+            },
+            {
+              type: 'doc',
+              label: 'website webrole list',
+              id: 'cmd/pp/website/website-webrole-list'
             }
           ]
         }
@@ -4317,16 +4332,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web alert list',
-              id: 'cmd/spo/web/web-alert-list'
-            },
-            {
-              type: 'doc',
-              label: 'web alert remove',
-              id: 'cmd/spo/web/web-alert-remove'
-            },
-            {
-              type: 'doc',
               label: 'web clientsidewebpart list',
               id: 'cmd/spo/web/web-clientsidewebpart-list'
             },
@@ -4359,6 +4364,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web roleinheritance reset',
               id: 'cmd/spo/web/web-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'web rule list',
+              id: 'cmd/spo/web/web-rule-list'
+            },
+            {
+              type: 'doc',
+              label: 'web rule remove',
+              id: 'cmd/spo/web/web-rule-remove'
             }
           ]
         }

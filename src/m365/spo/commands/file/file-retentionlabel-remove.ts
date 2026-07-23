@@ -27,7 +27,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Clear the retention label from a file';
+    return 'Clears the retention label from a file';
   }
 
   constructor() {
