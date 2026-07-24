@@ -4,6 +4,12 @@ import path from 'path';
 import os from 'os';
 import { fsUtil } from './fsUtil.js';
 
+// Resolve the OS temp directory once, at module load time, before any test runs.
+// On Windows, os.tmpdir() reads process.env directly, so tests that replace
+// process.env (e.g. Auth.spec.ts) can make a later os.tmpdir() call resolve to an
+// invalid 'undefined\temp' path. Capturing it here keeps this suite immune to that.
+const tmpBaseDir = os.tmpdir();
+
 describe('utils/fsUtil', () => {
   it('should get safe filename when file\'name.txt', () => {
     const result = fsUtil.getSafeFileName('file\'name.txt');
@@ -14,7 +20,7 @@ describe('utils/fsUtil', () => {
     let tmpDir: string;
 
     beforeEach(() => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fsUtil-test-'));
+      tmpDir = fs.mkdtempSync(path.join(tmpBaseDir, 'fsUtil-test-'));
     });
 
     afterEach(() => {
