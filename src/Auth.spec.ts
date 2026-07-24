@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { Auth, AuthType, CertificateType, CloudType, Connection, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse } from './Auth.js';
 import authServer from './AuthServer.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
+import { msalCachePlugin } from './auth/msalCachePlugin.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
@@ -96,6 +97,8 @@ describe('Auth', () => {
   beforeEach(() => {
     log = [];
     auth = new Auth();
+    sinon.stub(msalCachePlugin, 'getCachePlugin').resolves(mockTokenCachePlugin);
+    sinon.stub(msalCachePlugin, 'clearMsalCache').resolves();
     response = {
       deviceCode: "",
       expiresIn: 0,
@@ -142,7 +145,9 @@ describe('Auth', () => {
       publicApplication.acquireTokenByDeviceCode,
       publicApplication.acquireTokenByUsernamePassword,
       publicApplication.acquireTokenByCode,
-      tokenCache.getAllAccounts
+      tokenCache.getAllAccounts,
+      msalCachePlugin.getCachePlugin,
+      msalCachePlugin.clearMsalCache
     ]);
     openStub.restore();
     clipboardStub.restore();
@@ -1696,12 +1701,6 @@ describe('Auth', () => {
     assert(actual instanceof FileTokenStorage);
   });
 
-  it('configures MSAL cache storage as token storage', async () => {
-    const actual = (auth as any).getMsalCacheStorage();
-    assert(actual instanceof FileTokenStorage);
-    assert.strictEqual((actual as any).filePath, FileTokenStorage.msalCacheFilePath());
-  });
-
   it('restores authentication', async () => {
     await auth.restoreAuth();
     assert.strictEqual(auth.connection.active, true);
@@ -1766,18 +1765,15 @@ describe('Auth', () => {
   it('clears connection information in the configured token storage', async () => {
     const mockStorage1 = new MockTokenStorage();
     const mockStorage2 = new MockTokenStorage();
-    const mockStorage3 = new MockTokenStorage();
     const mockStorageRemoveStub1 = sinon.stub(mockStorage1, 'remove').resolves();
     const mockStorageRemoveStub2 = sinon.stub(mockStorage2, 'remove').resolves();
-    const mockStorageRemoveStub3 = sinon.stub(mockStorage3, 'remove').resolves();
     sinon.stub(auth, 'getConnectionStorage').returns(mockStorage1);
     sinon.stub(auth, 'getAllConnectionsStorage').returns(mockStorage2);
-    sinon.stub(auth as any, 'getMsalCacheStorage').callsFake(() => mockStorage3);
 
     await auth.clearConnectionInfo();
     assert(mockStorageRemoveStub1.called, 'Active connection Storage not cleared');
     assert(mockStorageRemoveStub2.called, 'All connections Storage not cleared');
-    assert(mockStorageRemoveStub3.called, 'token storage or MSAL cache not cleared');
+    assert((msalCachePlugin.clearMsalCache as sinon.SinonStub).called, 'MSAL cache not cleared');
   });
 
   it('removes a connection from the configured token storage', async () => {
