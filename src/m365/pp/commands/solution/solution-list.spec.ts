@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './solution-list.js';
+import command, { options } from './solution-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_LIST, () => {
@@ -74,6 +76,8 @@ describe(commands.SOLUTION_LIST, () => {
       "publisher": "Dynamics 365"
     }
   ];
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -85,6 +89,8 @@ describe(commands.SOLUTION_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -126,6 +132,11 @@ describe(commands.SOLUTION_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['uniquename', 'version', 'publisher']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves solutions from power platform environment', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
@@ -147,7 +158,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' }) });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -172,7 +183,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'json' }) });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -197,7 +208,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -223,7 +234,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'text' }) });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -240,7 +251,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} }),
+    await assert.rejects(command.action(logger, { options: {} as any }),
       new CommandError(`The environment 'undefined' could not be retrieved. See the inner exception for more details: undefined`));
   });
 
@@ -272,7 +283,7 @@ describe(commands.SOLUTION_LIST, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });
