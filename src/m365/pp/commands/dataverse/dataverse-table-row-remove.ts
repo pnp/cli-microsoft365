@@ -1,23 +1,29 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    error: 'The value must be a valid GUID.'
+  }).alias('i'),
+  entitySetName: z.string().optional(),
+  tableName: z.string().optional(),
+  asAdmin: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  id: string;
-  entitySetName?: string;
-  tableName?: string;
-  asAdmin?: boolean;
-  force?: boolean;
 }
 
 class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
@@ -30,65 +36,19 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
     return 'Removes a specific row from a dataverse table in the specified Power Platform environment.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        entitySetName: typeof args.options.entitySetName !== 'undefined',
-        tableName: typeof args.options.tableName !== 'undefined',
-        asAdmin: !!args.options.asAdmin,
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--entitySetName [entitySetName]'
-      },
-      {
-        option: '--tableName [tableName]'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.entitySetName, opts.tableName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'entitySetName' or 'tableName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['entitySetName', 'tableName']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['entitySetName', 'tableName'] }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
