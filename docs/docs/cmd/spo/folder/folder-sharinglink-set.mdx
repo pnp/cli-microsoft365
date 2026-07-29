@@ -33,6 +33,27 @@ m365 spo folder sharinglink set [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Files.ReadWrite |
+  | SharePoint      | AllSites.Read   |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Files.ReadWrite.All |
+  | SharePoint      | Sites.Read.All      |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Updates the expiration datetime of an anonymous sharing link for a folder specific by folder ID.
