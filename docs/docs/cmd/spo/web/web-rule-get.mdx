@@ -1,0 +1,106 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo web rule get
+
+Retrieves details of a specific rule from a SharePoint site list
+
+## Usage
+
+```sh
+m365 spo web rule get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the SharePoint site.
+
+`--id <id>`
+: The ID of the rule.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve a rule by ID
+
+```sh
+m365 spo web rule get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AlertFrequency": 0,
+    "AlertTemplateName": "SPAlertTemplateType.DocumentLibrary",
+    "AlertType": 0,
+    "AlwaysNotify": false,
+    "DeliveryChannels": 1,
+    "EventType": -1,
+    "Filter": "",
+    "ID": "7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e",
+    "Status": 0,
+    "Title": "Marketing documents",
+    "UserId": 8,
+    "List": {
+      "Id": "39d9e102-9e8f-4e74-8f17-84a92f972fcf",
+      "Title": "Documents",
+      "RootFolder": {
+        "ServerRelativeUrl": "/sites/Marketing/Shared Documents"
+      }
+    },
+    "User": {
+      "Id": 8,
+      "UserPrincipalName": "jane.doe@contoso.com"
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AlertFrequency   : 0
+  AlertTemplateName: SPAlertTemplateType.DocumentLibrary
+  AlertType        : 0
+  AlwaysNotify     : false
+  DeliveryChannels : 1
+  EventType        : -1
+  Filter           : 
+  ID               : 7cbb4c8d-8e4d-4d2e-9c6f-3f1d8b2e6a0e
+  Status           : 0
+  Title            : Marketing documents
+  UserId           : 8
+  List             : {"Id":"39d9e102-9e8f-4e74-8f17-84a92f972fcf","Title":"Documents","RootFolder":{"ServerRelativeUrl":"/sites/Marketing/Shared Documents"}}
+  User             : {"Id":8,"UserPrincipalName":"jane.doe@contoso.com"}
+  ```
+
+  </TabItem>
+</Tabs>
