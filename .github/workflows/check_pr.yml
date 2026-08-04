@@ -69,7 +69,7 @@ jobs:
     steps:
       - name: Configure pagefile
         if: matrix.os == 'windows-latest'
-        uses: al-cheb/configure-pagefile-action@v1.5
+        uses: al-cheb/configure-pagefile-action@9b6da52fb72a3c6147c1aad2df22d8d905681adc  # v1.5
         with:
           minimum-size: 16GB
           disk-root: "C:"
