@@ -1,8 +1,13 @@
 {
   // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@tsconfig/docusaurus/tsconfig.json",
+  "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
     "jsx": "react",
-    "baseUrl": "."
+    // 'baseUrl' was removed in TypeScript 7, so clear the value inherited from '@docusaurus/tsconfig'
+    // and redeclare its 'paths' relative to this file
+    "baseUrl": null,
+    "paths": {
+      "@site/*": ["./*"]
+    }
   }
 }
