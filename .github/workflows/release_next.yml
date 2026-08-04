@@ -64,7 +64,7 @@ jobs:
             nodeRun: 22
             nodeBuild: *node_version
           - os: ubuntu-latest
-            nodeRun: 25
+            nodeRun: 26
             nodeBuild: *node_version
 
     steps:
