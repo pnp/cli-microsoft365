@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "^3.10.1",
-    "@docusaurus/faster": "^3.10.1",
+    "@docusaurus/faster": "^3.10.2",
     "@docusaurus/plugin-client-redirects": "^3.10.1",
     "@docusaurus/preset-classic": "^3.10.1",
     "@docusaurus/theme-mermaid": "^3.10.1",
@@ -26,14 +26,14 @@
     "docusaurus-plugin-sass": "^0.2.6",
     "mdast-util-from-markdown": "^2.0.3",
     "prism-react-renderer": "^2.4.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.10.1",
-    "@docusaurus/tsconfig": "^3.10.1",
-    "asciinema-player": "^3.16.0",
+    "@docusaurus/tsconfig": "^3.10.2",
+    "asciinema-player": "^3.17.0",
     "typescript": "^5.9.3"
   },
   "browserslist": {
