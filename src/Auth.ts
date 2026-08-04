@@ -64,6 +64,7 @@ export class Connection {
   certificateType: CertificateType = CertificateType.Unknown;
   certificate?: string;
   thumbprint?: string;
+  tokenFile?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   // SharePoint tenantId used to execute CSOM requests
@@ -71,7 +72,7 @@ export class Connection {
   // ID of the Microsoft Entra ID app used to authenticate
   appId?: string;
   // ID of the tenant where the Microsoft Entra app is registered; common if multi-tenant
-  tenant: string = 'common';
+  tenant?: string;
   cloudType: CloudType = CloudType.Public;
 
   constructor() {
@@ -93,6 +94,7 @@ export class Connection {
     this.cloudType = CloudType.Public;
     this.certificate = undefined;
     this.thumbprint = undefined;
+    this.tokenFile = undefined;
     this.spoUrl = undefined;
     this.spoTenantId = undefined;
     this.appId = cli.getClientId();
@@ -107,7 +109,8 @@ export enum AuthType {
   Identity = 'identity',
   FederatedIdentity = 'federatedIdentity',
   Browser = 'browser',
-  Secret = 'secret'
+  Secret = 'secret',
+  Token = 'token'
 }
 
 export enum CertificateType {
@@ -229,7 +232,8 @@ export class Auth {
     if (this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
       this.connection.authType !== AuthType.Identity &&
-      this.connection.authType !== AuthType.FederatedIdentity) {
+      this.connection.authType !== AuthType.FederatedIdentity &&
+      this.connection.authType !== AuthType.Token) {
       this.clientApplication = await this.getPublicClient(logger, debug);
       if (this.clientApplication) {
         const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
@@ -262,6 +266,9 @@ export class Auth {
           break;
         case AuthType.Secret:
           getTokenPromise = this.ensureAccessTokenWithSecret.bind(this);
+          break;
+        case AuthType.Token:
+          getTokenPromise = this.ensureAccessTokenWithToken.bind(this);
           break;
       }
     }
@@ -848,6 +855,18 @@ export class Auth {
     });
   }
 
+  private async ensureAccessTokenWithToken(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+    if (debug) {
+      await logger.logToStderr(`Retrieving access token from token file...`);
+    }
+
+    if (!this.connection.tokenFile) {
+      throw new CommandError('Token file is not specified.');
+    }
+
+    return accessTokenUtil.accessToken.readAccessTokenFromFile(this.connection.tokenFile);
+  }
+
   private async calculateThumbprint(certificate: NodeForge.pki.Certificate): Promise<string> {
     const nodeForge = (await import('node-forge')).default;
     const { md, asn1, pki } = nodeForge;
@@ -935,7 +954,8 @@ export class Auth {
     if (this.connection.authType !== AuthType.Certificate &&
       this.connection.authType !== AuthType.Secret &&
       this.connection.authType !== AuthType.Identity &&
-      this.connection.authType !== AuthType.FederatedIdentity) {
+      this.connection.authType !== AuthType.FederatedIdentity &&
+      this.connection.authType !== AuthType.Token) {
       this.clientApplication = await this.getPublicClient(logger, debug);
 
       if (this.clientApplication) {

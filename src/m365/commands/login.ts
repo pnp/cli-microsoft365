@@ -25,6 +25,10 @@ export const options = z.strictObject({
   appId: z.string().optional(),
   tenant: z.string().optional(),
   secret: z.string().optional().alias('s'),
+  tokenFile: z.string().optional()
+    .refine(filePath => !filePath || fs.existsSync(filePath), {
+      error: e => `Token file ${e.input} does not exist`
+    }),
   connectionName: z.string()
     .refine(async name => !(await auth.getAllConnections()).some(c => c.name === name), {
       error: e => `Connection with name '${e.input}' already exists.`
@@ -53,7 +57,7 @@ class LoginCommand extends Command {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity' || options.authType === 'federatedIdentity', {
+      .refine(options => typeof options.appId !== 'undefined' || cli.getClientId() || options.authType === 'identity' || options.authType === 'federatedIdentity' || options.authType === 'token', {
         error: `appId is required. TIP: use the "m365 setup" command to configure the default appId.`,
         path: ['appId'],
         params: {
@@ -99,6 +103,13 @@ class LoginCommand extends Command {
         cli.getConfig().get(settingsNames.clientSecret), {
         error: 'Secret is required when using secret authentication.',
         path: ['secret'],
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(options => options.authType !== 'token' || options.tokenFile, {
+        error: 'Token file is required when using token authentication.',
+        path: ['tokenFile'],
         params: {
           customCode: 'required'
         }
@@ -149,12 +160,14 @@ class LoginCommand extends Command {
       return true;
     }
 
-    if (options.appId && options.appId !== auth.connection.appId) {
-      return true;
-    }
+    if (authType !== AuthType.Token) {
+      if (options.appId && options.appId !== auth.connection.appId) {
+        return true;
+      }
 
-    if (options.tenant && options.tenant !== auth.connection.tenant) {
-      return true;
+      if (options.tenant && options.tenant !== auth.connection.tenant) {
+        return true;
+      }
     }
 
     if (authType === AuthType.Password && (options.password && options.userName !== auth.connection.userName)) {
@@ -170,6 +183,10 @@ class LoginCommand extends Command {
     }
 
     if (authType === AuthType.Secret && (options.secret && options.secret !== auth.connection.secret)) {
+      return true;
+    }
+
+    if (authType === AuthType.Token && (options.tokenFile && options.tokenFile !== auth.connection.tokenFile)) {
       return true;
     }
 
@@ -223,8 +240,14 @@ class LoginCommand extends Command {
     }
 
     const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
-    auth.connection.appId = args.options.appId || cli.getClientId();
-    auth.connection.tenant = args.options.tenant || cli.getTenant();
+    if (authType === 'token') {
+      auth.connection.appId = undefined;
+      auth.connection.tenant = undefined;
+    }
+    else {
+      auth.connection.appId = args.options.appId || cli.getClientId();
+      auth.connection.tenant = args.options.tenant || cli.getTenant();
+    }
     auth.connection.name = args.options.connectionName;
 
     switch (authType) {
@@ -252,6 +275,10 @@ class LoginCommand extends Command {
       case 'secret':
         auth.connection.authType = AuthType.Secret;
         auth.connection.secret = args.options.secret || cli.getConfig().get(settingsNames.clientSecret);
+        break;
+      case 'token':
+        auth.connection.authType = AuthType.Token;
+        auth.connection.tokenFile = args.options.tokenFile;
         break;
     }
 

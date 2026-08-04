@@ -1,3 +1,5 @@
+import fs from 'fs';
+import type { AccessToken } from "../Auth.js";
 import auth from "../Auth.js";
 import { CommandError } from "../Command.js";
 
@@ -134,6 +136,60 @@ export const accessToken = {
     }
 
     return scopes;
+  },
+
+  readAccessTokenFromFile(filePath: string): AccessToken {
+    const contents = fs.readFileSync(filePath, 'utf8').trim();
+    let accessTokenString: string | undefined;
+    let expiresOn: Date | null = null;
+
+    try {
+      const parsed: any = JSON.parse(contents);
+      if (typeof parsed === 'string') {
+        accessTokenString = parsed;
+      }
+      else {
+        accessTokenString = parsed.access_token || parsed.accessToken;
+        if (parsed.expires_on) {
+          expiresOn = new Date(parseInt(parsed.expires_on, 10) * 1000);
+        }
+        else if (parsed.expiresOn) {
+          expiresOn = typeof parsed.expiresOn === 'number' ?
+            new Date(parsed.expiresOn * 1000) :
+            new Date(parsed.expiresOn);
+        }
+      }
+    }
+    catch {
+      accessTokenString = contents;
+    }
+
+    if (!accessTokenString) {
+      throw new CommandError('Token file does not contain a valid access token.');
+    }
+
+    const chunks = accessTokenString.split('.');
+    if (chunks.length !== 3) {
+      throw new CommandError('Token file does not contain a valid access token.');
+    }
+
+    if (!expiresOn) {
+      try {
+        const payloadString = Buffer.from(chunks[1], 'base64').toString();
+        const payload: any = JSON.parse(payloadString);
+        if (payload.exp) {
+          expiresOn = new Date(payload.exp * 1000);
+        }
+      }
+      catch {
+        // Do nothing
+      }
+    }
+
+    return {
+      accessToken: accessTokenString,
+      expiresOn
+    };
   },
 
   /**

@@ -566,6 +566,46 @@ describe(commands.DOCTOR, () => {
     }));
   });
 
+  it('omits tenant information in diagnostic output when using token authentication', async () => {
+    const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
+      scp: 'Sites.Read.All'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
+    sinon.stub(auth.connection, 'accessTokens').value({
+      'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
+    });
+    sinon.stub(os, 'platform').returns('win32');
+    sinon.stub(os, 'version').returns('Windows 10 Pro');
+    sinon.stub(os, 'release').returns('10.0.19043');
+    sinon.stub(packageJSON, 'version').value('3.11.0');
+    sinon.stub(process, 'version').value('v14.17.0');
+    auth.connection.appId = undefined;
+    sinon.stub(auth.connection, 'tenant').value(undefined);
+    sinon.stub(auth.connection, 'authType').value(AuthType.Token);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'token',
+      cliEntraAppId: undefined,
+      cliEntraAppTenant: undefined,
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: {
+        'https://graph.microsoft.com': [
+          'Sites.Read.All'
+        ]
+      }
+    }));
+  });
+
   it('retrieves CLI Configuration in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       aud: 'https://graph.microsoft.com',

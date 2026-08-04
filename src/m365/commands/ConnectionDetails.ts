@@ -3,6 +3,6 @@ export interface ConnectionDetails {
   connectedAs: string;
   authType: string;
   appId?: string;
-  appTenant: string;
+  appTenant?: string;
   cloudType: string;
 }

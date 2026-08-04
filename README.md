@@ -103,6 +103,7 @@
   - Client Secret
   - Device Code
   - Federated identity
+  - Token
   - Username and Password
 - Manage your SharePoint Framework projects
   - Upgrade your projects

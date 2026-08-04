@@ -358,6 +358,40 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.secret, 'unBrEakaBle@123', 'Incorrect secret set');
   });
 
+  it('logs in to Microsoft 365 using token when authType token set', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        authType: 'token',
+        tokenFile: '/tmp/token.json'
+      })
+    });
+    assert.strictEqual(auth.connection.authType, AuthType.Token, 'Incorrect authType set');
+    assert.strictEqual(auth.connection.tokenFile, '/tmp/token.json', 'Incorrect tokenFile set');
+  });
+
+  it('does not set appId and tenant when authType token set even if configured in CLI', async () => {
+    sinonUtil.restore(config.get);
+    sinon.stub(config, 'get').callsFake(setting => {
+      if (setting === settingsNames.clientId) {
+        return '00000000-0000-0000-0000-000000000000';
+      }
+      if (setting === settingsNames.tenantId) {
+        return '11111111-1111-1111-1111-111111111111';
+      }
+      return undefined;
+    });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        authType: 'token',
+        tokenFile: '/tmp/token.json'
+      })
+    });
+    assert.strictEqual(auth.connection.appId, undefined, 'appId should not be set for token auth');
+    assert.strictEqual(auth.connection.tenant, undefined, 'tenant should not be set for token auth');
+  });
+
   it('logs in to Microsoft 365 using client secret authType "secret" with secret set in CLI config', async () => {
     sinonUtil.restore(config.get);
     sinon.stub(config, 'get').callsFake(setting => {
@@ -454,6 +488,22 @@ describe(commands.LOGIN, () => {
     const actual = commandOptionsSchema.safeParse({
       authType: 'certificate',
       certificateFile: 'certificate'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if authType is set to token and tokenFile not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      authType: 'token'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if authType is set to token and tokenFile does not exist', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({
+      authType: 'token',
+      tokenFile: '/tmp/token.json'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -963,6 +1013,34 @@ describe(commands.LOGIN, () => {
         ensure: true,
         authType: 'secret',
         secret: 'topSeCr3t@008'
+      })
+    });
+
+    assert(deactivateStub.called);
+  });
+
+  it(`starts the login flow again when using a different token file`, async () => {
+    const future = new Date();
+    future.setSeconds(future.getSeconds() + 10);
+    Object.assign(auth.connection, {
+      active: true,
+      authType: AuthType.Token,
+      tokenFile: '/tmp/token1.json',
+      appId: '00000000-0000-0000-0000-000000000000',
+      tenant: '00000000-0000-0000-0000-000000000000'
+    });
+    auth.connection.accessTokens[auth.defaultResource] = {
+      expiresOn: future.toISOString(),
+      accessToken: 'abc'
+    };
+
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        ensure: true,
+        authType: 'token',
+        tokenFile: '/tmp/token2.json'
       })
     });
 

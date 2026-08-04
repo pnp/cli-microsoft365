@@ -18,7 +18,7 @@ interface CliDiagnosticInfo {
   };
   authMode: string;
   cliEntraAppId?: string;
-  cliEntraAppTenant: string;
+  cliEntraAppTenant?: string;
   cliEnvironment: string;
   nodeVersion: string;
   cliVersion: string;
@@ -63,7 +63,9 @@ class CliDoctorCommand extends Command {
       cliVersion: app.packageJson().version,
       nodeVersion: process.version,
       cliEntraAppId: auth.connection.appId,
-      cliEntraAppTenant: validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant,
+      cliEntraAppTenant: auth.connection.tenant
+        ? (validation.isValidGuid(auth.connection.tenant) ? 'single' : auth.connection.tenant)
+        : undefined,
       authMode: auth.connection.authType,
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
       cliConfig: cli.getConfig().all,

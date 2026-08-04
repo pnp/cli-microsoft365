@@ -22,7 +22,7 @@ m365 login [options]
 : ID of the tenant from which accounts should authenticate. Use `common` or `organization` for multitenant apps. Defaults to `common` if not specified and if the config value `tenantId` and the environment variable `CLIMICROSOFT365_TENANT` are also not set.
 
 `-t, --authType [authType]`
-: The type of authentication to use. Allowed values `certificate`, `deviceCode`, `password`, `identity`, `federatedIdentity`, `browser`, `secret`. Default `deviceCode`
+: The type of authentication to use. Allowed values `certificate`, `deviceCode`, `password`, `identity`, `federatedIdentity`, `browser`, `secret`, `token`. Default `deviceCode`
 
 `-u, --userName [userName]`
 : Name of the user to authenticate. Required when `authType` is set to `password`
@@ -41,6 +41,9 @@ m365 login [options]
 
 `-s, --secret [secret]`
 : Client Secret of the Microsoft Entra application to use for authentication. Required when `authType` is set to `secret`.
+
+`--tokenFile [tokenFile]`
+: Path to the file containing a pre-obtained access token. Required when `authType` is set to `token`. The file can be a JSON file with an `access_token` or `accessToken` property, or a plain-text file containing the JWT.
 
 `--cloud [cloud]`
 : Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
@@ -64,7 +67,7 @@ The CLI determines the `appId` and `tenant` values in the following order of pre
 2. The `clientId` or `tenantId` value set in the configuration.
 3. The `CLIMICROSOFT365_ENTRAAPPID` or `CLIMICROSOFT365_TENANT` environment variable.
 
-For `appId`, it is **required** that at least one of the options is specified during login.
+For `appId`, it is **required** that at least one of the options is specified during login, except when using `authType` `identity`, `federatedIdentity`, or `token`.
 
 For `tenant`, if none are specified, the CLI will default to `common`.
 
@@ -79,6 +82,8 @@ When logging in to Microsoft 365 using the user name and password, next to the a
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.mdx) command.  
 
 Federated Identity is currently supported in GitHub Actions. To use this you need to set `authType` to `federatedIdentity` and specify `appId` and `tenant` to the values of the app registration you've configured a federated credential on. 
+
+To log in to Microsoft 365 using a pre-obtained access token, set `authType` to `token` and specify the path to the token file using the `tokenFile` option. The CLI reads the token from the file and skips all interactive and non-interactive login flows. When the cached token expires, the CLI re-reads the token file.
 
 To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Microsoft Entra application](../user-guide/using-own-identity.mdx). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Microsoft Entra tenant, where you created the Microsoft Entra application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.mdx).
 
@@ -224,6 +229,12 @@ Log in to Microsoft 365 using a client secret by providing the application and t
 
 ```sh
 m365 login --authType secret --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a --secret topSeCr3t@007
+```
+
+Log in to Microsoft 365 using a pre-obtained access token from a JSON file.
+
+```sh
+m365 login --authType token --tokenFile /Users/user/dev/token.json
 ```
 
 Ensures that the user is signed in, initiates the login flow if the user isn't signed in

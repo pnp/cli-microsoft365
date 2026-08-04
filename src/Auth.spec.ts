@@ -1929,6 +1929,83 @@ describe('Auth', () => {
     assert(acquireTokenByClientCredentialStub.called);
   });
 
+  it('retrieves token from token file when authType token specified', async () => {
+    const jwtPayload = Buffer.from(JSON.stringify({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      oid: identityId,
+      upn: identityName,
+      tid: identityTenantId
+    })).toString('base64');
+    const jwt = `abc.${jwtPayload}.def`;
+    auth.connection.authType = AuthType.Token;
+    auth.connection.tokenFile = '/tmp/token.json';
+    readFileSyncStub.returns(JSON.stringify({ access_token: jwt }));
+
+    const accessTokenValue = await auth.ensureAccessToken(resource, logger);
+
+    assert.strictEqual(accessTokenValue, jwt);
+    assert.strictEqual(auth.connection.accessTokens[resource].accessToken, jwt);
+  });
+
+  it('retrieves token from token file when authType token specified (debug)', async () => {
+    const jwtPayload = Buffer.from(JSON.stringify({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      oid: identityId,
+      upn: identityName,
+      tid: identityTenantId
+    })).toString('base64');
+    const jwt = `abc.${jwtPayload}.def`;
+    auth.connection.authType = AuthType.Token;
+    auth.connection.tokenFile = '/tmp/token.json';
+    readFileSyncStub.returns(JSON.stringify({ access_token: jwt }));
+
+    await auth.ensureAccessToken(resource, logger, true);
+
+    assert(loggerLogToStderrSpy.calledWith('Retrieving access token from token file...'));
+  });
+
+  it('re-reads token file when cached token expired and authType token specified', async () => {
+    const expiredJwtPayload = Buffer.from(JSON.stringify({
+      exp: Math.floor(Date.now() / 1000) - 3600,
+      oid: identityId,
+      upn: identityName,
+      tid: identityTenantId
+    })).toString('base64');
+    const expiredJwt = `abc.${expiredJwtPayload}.def`;
+    const freshJwtPayload = Buffer.from(JSON.stringify({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      oid: identityId,
+      upn: identityName,
+      tid: identityTenantId
+    })).toString('base64');
+    const freshJwt = `abc.${freshJwtPayload}.def`;
+    auth.connection.authType = AuthType.Token;
+    auth.connection.tokenFile = '/tmp/token.json';
+    auth.connection.active = true;
+    auth.connection.accessTokens[resource] = {
+      accessToken: expiredJwt,
+      expiresOn: new Date(Date.now() - 1000)
+    };
+    readFileSyncStub.returns(JSON.stringify({ access_token: freshJwt }));
+
+    const accessTokenValue = await auth.ensureAccessToken(resource, logger);
+
+    assert.strictEqual(accessTokenValue, freshJwt);
+    assert.strictEqual(readFileSyncStub.called, true);
+  });
+
+  it('fails when token file is not specified and authType token specified', async () => {
+    auth.connection.authType = AuthType.Token;
+
+    try {
+      await auth.ensureAccessToken(resource, logger);
+      assert.fail('Expected error');
+    }
+    catch (err: any) {
+      assert.strictEqual(err.message, 'Token file is not specified.');
+    }
+  });
+
   it('configures cloud for auth to AzureChina for China cloud', async () => {
     auth.connection.cloudType = CloudType.China;
     const actual: msal.Configuration = await (auth as any).getAuthClientConfiguration(logger, false);
