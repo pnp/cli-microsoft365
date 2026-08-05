@@ -204,10 +204,21 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       const deployAction = this.getDeployAction(workflow);
       deployAction.with!.APP_FILE_PATH = deployAction.with!.APP_FILE_PATH!.replace('{{ sppkgPath }}', sppkgPath);
     }
+
+    if (versionRequirements.heft !== undefined) {
+      const bundleAndPackageStep = this.getBundleAndPackageStep(workflow);
+      bundleAndPackageStep.run = `npm install -g @rushstack/heft@latest\nheft build --production\nheft package-solution --production\n`;
+      bundleAndPackageStep.name = 'Build & Package';
+    }
   }
 
   private assignNodeVersion(workflow: GitHubWorkflow, nodeVersion: string): void {
     workflow.jobs['build-and-deploy'].env.NodeVersion = nodeVersion;
+  }
+
+  private getBundleAndPackageStep(workflow: GitHubWorkflow): GitHubWorkflowStep {
+    const steps = this.getWorkFlowSteps(workflow);
+    return steps.find(step => step.run && step.name === 'Bundle & Package')!;
   }
 
   private getLoginAction(workflow: GitHubWorkflow): GitHubWorkflowStep {
