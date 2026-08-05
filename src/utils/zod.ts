@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { JSONSchema } from 'zod/v4/core';
-import { EnumLike } from 'zod/v4/core/util.cjs';
+import { JSONSchema, util } from 'zod/v4/core';
 import { CommandOptionInfo } from '../cli/CommandOptionInfo';
 import { CommandOption } from '../Command';
 
@@ -147,7 +146,7 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
+  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
     z.preprocess(val => {
       const target = String(val)?.toLowerCase();
       for (const k of Object.values(e)) {
