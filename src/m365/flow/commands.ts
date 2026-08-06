@@ -19,5 +19,6 @@ export default {
   RUN_CANCEL: `${prefix} run cancel`,
   RUN_GET: `${prefix} run get`,
   RUN_LIST: `${prefix} run list`,
-  RUN_RESUBMIT: `${prefix} run resubmit`
+  RUN_RESUBMIT: `${prefix} run resubmit`,
+  SET: `${prefix} set`
 };

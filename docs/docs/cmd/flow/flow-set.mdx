@@ -1,0 +1,81 @@
+import Global from '../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# flow set
+
+Sets the specified Power Automate flow
+
+## Usage
+
+```sh
+m365 flow set [options]
+```
+
+## Options
+
+```md definition-list
+`-n, --name <name>`
+: The name (GUID) of the Power Automate flow to update
+
+`-e, --environmentName <environmentName>`
+: The name of the environment that contains the flow
+
+`--definition <definition>`
+: A JSON string containing the new flow definition to set
+
+`--publish`
+: Publishes the flow after updating it. Without this flag, the flow is saved as a draft
+
+`-f, --force`
+: Don't prompt for confirmation when warnings or errors occur
+```
+
+<Global />
+
+## Remarks
+
+When updating a flow, the CLI checks the flow definition for errors and warnings. If any are found, you will be prompted to confirm whether you want to proceed with the update. Use the `--force` flag to skip this prompt and update without checking.
+
+If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource                  | Permissions        |
+  |---------------------------|--------------------|
+  | Azure Service Management  | user_impersonation |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Set a new definition for the specified flow and save it as a draft
+
+```sh
+m365 flow set --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --definition '{"properties":{"definition":{"$schema":"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#","actions":{"Compose":{"type":"Compose","inputs":"test","runAfter":{},"metadata":{"operationMetadataId":"4f25ab1c-549e-4eaf-9980-c03020e55378"}}},"parameters":{"$authentication":{"defaultValue":{},"type":"SecureObject"}},"triggers":{"manual":{"type":"Request","kind":"Button","inputs":{"schema":{"type":"object","properties":{},"required":[]}},"metadata":{"operationMetadataId":"1b2caf01-8e22-45eb-8646-77168ad14bdd"}}},"contentVersion":"1.0.0.0","outputs":{}},"connectionReferences":{},"displayName":"Test Flow","templateName":"","environment":{"name":"Default-d87a7535-dd31-4437-bfe1-95340acd55c5"}}}'
+```
+
+Set a new definition for the specified flow and publish it
+
+```sh
+m365 flow set --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --definition '{"properties":{"definition":{"$schema":"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#","actions":{"Compose":{"type":"Compose","inputs":"test","runAfter":{},"metadata":{"operationMetadataId":"4f25ab1c-549e-4eaf-9980-c03020e55378"}}},"parameters":{"$authentication":{"defaultValue":{},"type":"SecureObject"}},"triggers":{"manual":{"type":"Request","kind":"Button","inputs":{"schema":{"type":"object","properties":{},"required":[]}},"metadata":{"operationMetadataId":"1b2caf01-8e22-45eb-8646-77168ad14bdd"}}},"contentVersion":"1.0.0.0","outputs":{}},"connectionReferences":{},"displayName":"Test Flow","templateName":"","environment":{"name":"Default-d87a7535-dd31-4437-bfe1-95340acd55c5"}}}' --publish
+```
+
+Set a new definition for the specified flow without being prompted for confirmation even when issues are found
+
+```sh
+m365 flow set --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --definition '{"properties":{"definition":{"$schema":"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#","actions":{},"parameters":{},"triggers":{},"contentVersion":"1.0.0.0","outputs":{}},"connectionReferences":{},"displayName":"Test Flow","environment":{"name":"Default-d87a7535-dd31-4437-bfe1-95340acd55c5"}}}' --force
+```
+
+## Response
+
+The command won't return a response on success.
