@@ -250,6 +250,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          agent: [
+            {
+              type: 'doc',
+              label: 'agent blueprint list',
+              id: 'cmd/entra/agent/agent-blueprint-list'
+            }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
