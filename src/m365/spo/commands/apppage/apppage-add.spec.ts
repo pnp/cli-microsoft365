@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './apppage-add.js';
+import command, { options } from './apppage-add.js';
 
 describe(commands.APPPAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.APPPAGE_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -143,7 +145,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" }) });
   });
 
   it('creates a single-part app page showing on quicklaunch', async () => {
@@ -228,7 +230,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" }) });
   });
 
   it('fails to create a single-part app page if creating page failed', async () => {
@@ -239,7 +241,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) }) }),
       new CommandError(`Failed to create a single-part app page`));
   });
 
@@ -259,7 +261,7 @@ describe(commands.APPPAGE_ADD, () => {
     });
 
 
-    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) }) }),
       new CommandError(`Page not found`));
   });
 
@@ -337,48 +339,22 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('supports specifying title', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--title') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if webPartData is not a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying webUrl', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--webUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying webPartData', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--webPartData') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-  it('fails validation if webPartData is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-  it('validation passes on all required options', async () => {
-    const actual = await command.validate({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validation passes on all required options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 });
