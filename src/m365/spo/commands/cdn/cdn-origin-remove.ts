@@ -1,21 +1,25 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(['Public', 'Private']).optional().alias('t'),
+  origin: z.string().alias('r'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  type: string;
-  origin: string;
-  force?: boolean;
 }
 
 class SpoCdnOriginRemoveCommand extends SpoCommand {
@@ -27,51 +31,8 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return 'Removes CDN origin for the current SharePoint Online tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        cdnType: args.options.type || 'Public',
-        force: (!(!args.options.force)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private']
-      },
-      {
-        option: '-r, --origin <origin>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type) {
-          if (args.options.type !== 'Public' &&
-            args.options.type !== 'Private') {
-            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
