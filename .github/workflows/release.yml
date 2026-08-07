@@ -8,7 +8,7 @@ on:
       - "v*"
 
 env:
-  NODE_VERSION: &node_version 24
+  NODE_VERSION: 24
 
 jobs:
   build:
