@@ -697,4 +697,24 @@ describe('validation/validation', () => {
     const expected = true;
     assert.strictEqual(actual, expected);
   });
+
+  it('isValidGraphDateTime returns true for a valid Graph API date time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00:00');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGraphDateTime returns false when the seconds component is missing', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for a UTC date time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00:00Z');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for an invalid time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T24:00:00');
+    assert.strictEqual(result, false);
+  });
 });
