@@ -64,7 +64,7 @@ class SpoFolderAddCommand extends SpoCommand {
         autocomplete: Object.keys(FolderColorValues)
       },
       {
-        option: '--ensureParentFolders [ensureParentFolders]'
+        option: '--ensureParentFolders'
       }
     );
   }
