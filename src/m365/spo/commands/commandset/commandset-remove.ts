@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -8,23 +8,27 @@ import { CustomAction } from '../customaction/customaction.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { cli } from '../../../../cli/cli.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: 'Invalid SharePoint URL'
+  }).alias('u'),
+  title: z.string().optional().alias('t'),
+  id: z.string().refine(validation.isValidGuid, { message: 'The value must be a valid GUID.' }).optional().alias('i'),
+  clientSideComponentId: z.string().refine(validation.isValidGuid, { message: 'The value must be a valid GUID.' }).optional().alias('c'),
+  scope: z.enum(['All', 'Site', 'Web']).optional().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  title?: string;
-  id?: string;
-  clientSideComponentId?: string;
-  scope?: string;
-  force?: boolean;
-}
-
 class SpoCommandSetRemoveCommand extends SpoCommand {
-  private static readonly scopes: string[] = ['All', 'Site', 'Web'];
-
   public get name(): string {
     return commands.COMMANDSET_REMOVE;
   }
@@ -33,74 +37,15 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
     return 'Removes a ListView Command Set that is added to a site.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        force: !!args.options.force
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => [opts.title, opts.id, opts.clientSideComponentId].filter(x => x !== undefined).length === 1, {
+      message: `Specify either 'title', 'id' or 'clientSideComponentId', but not multiple.`,
+      params: { customCode: 'optionSet', options: ['title', 'id', 'clientSideComponentId'] }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-c, --clientSideComponentId  [clientSideComponentId]'
-      },
-      {
-        option: '-s, --scope [scope]', autocomplete: SpoCommandSetRemoveCommand.scopes
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId as string)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && SpoCommandSetRemoveCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandSetRemoveCommand.scopes.join(', ')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'title', 'clientSideComponentId'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
