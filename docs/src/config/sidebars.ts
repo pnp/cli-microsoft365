@@ -3580,6 +3580,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'page unpublish',
+              id: 'cmd/spo/page/page-unpublish'
+            },
+            {
+              type: 'doc',
               label: 'page clientsidewebpart add',
               id: 'cmd/spo/page/page-clientsidewebpart-add'
             },
