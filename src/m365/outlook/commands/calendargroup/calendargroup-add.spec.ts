@@ -110,7 +110,7 @@ describe(commands.CALENDARGROUP_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if name is specified', () => {
+  it('fails validation if name is not specified', () => {
     const actual = commandOptionsSchema.safeParse({ userId: userId });
     assert.notStrictEqual(actual.success, true);
   });
