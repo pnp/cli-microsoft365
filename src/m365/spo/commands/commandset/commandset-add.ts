@@ -11,7 +11,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   title: z.string().alias('t'),
   webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
-    error: 'Invalid SharePoint URL'
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
   }).alias('u'),
   listType: z.enum(['List', 'Library', 'SitePages']).alias('l'),
   clientSideComponentId: z.string().refine(validation.isValidGuid, { message: 'The value must be a valid GUID.' }).alias('i'),

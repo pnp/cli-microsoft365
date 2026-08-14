@@ -13,7 +13,7 @@ import { z } from 'zod';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
-    error: 'Invalid SharePoint URL'
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
   }).alias('u'),
   title: z.string().optional().alias('t'),
   id: z.string().refine(validation.isValidGuid, { message: 'The value must be a valid GUID.' }).optional().alias('i'),
@@ -53,8 +53,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
         params: { customCode: 'optionSet', options: ['title', 'id', 'clientSideComponentId'] }
       })
       .refine(opts => !!opts.newTitle || opts.description !== undefined || !!opts.listType || !!opts.clientSideComponentProperties || !!opts.location || !!opts.newClientSideComponentId, {
-        message: 'Please specify option to be updated',
-        params: { customCode: 'required' }
+        message: 'Please specify option to be updated'
       });
   }
 
