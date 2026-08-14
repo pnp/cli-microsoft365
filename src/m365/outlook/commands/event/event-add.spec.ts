@@ -206,13 +206,18 @@ describe(commands.EVENT_ADD, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation with skypeForBusinnes online meeting provider', () => {
-    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'skypeForBusinnes' });
+  it('passes validation with skypeForBusiness online meeting provider', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'skypeForBusiness' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with skypeForConsumer online meeting provider', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'skypeForConsumer' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with unknown online meeting provider', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'unknown' });
     assert.strictEqual(actual.success, true);
   });
 
@@ -238,6 +243,11 @@ describe(commands.EVENT_ADD, () => {
 
   it('passes validation for working elsewhere status', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, showAs: 'workingElsewhere' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation for unknown status', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, showAs: 'unknown' });
     assert.strictEqual(actual.success, true);
   });
 
@@ -497,7 +507,7 @@ describe(commands.EVENT_ADD, () => {
       start: start,
       end: end,
       optionalAttendees: 'user1@contoso.com,user2@contoso.com',
-      requiredAttendees: 'user3@contoso.com,user4@contoso.com',
+      requiredAttendees: 'user3@contoso.com, user4@contoso.com',
       resources: 'meetingRoom1@contoso.com,meetingRoom2@contoso.com',
       verbose: true
     });
@@ -514,27 +524,39 @@ describe(commands.EVENT_ADD, () => {
       },
       attendees: [
         {
-          emailAddress: 'user1@contoso.com',
+          emailAddress: {
+            address: 'user1@contoso.com'
+          },
           type: 'optional'
         },
         {
-          emailAddress: 'user2@contoso.com',
+          emailAddress: {
+            address: 'user2@contoso.com'
+          },
           type: 'optional'
         },
         {
-          emailAddress: 'user3@contoso.com',
+          emailAddress: {
+            address: 'user3@contoso.com'
+          },
           type: 'required'
         },
         {
-          emailAddress: 'user4@contoso.com',
+          emailAddress: {
+            address: 'user4@contoso.com'
+          },
           type: 'required'
         },
         {
-          emailAddress: 'meetingRoom1@contoso.com',
+          emailAddress: {
+            address: 'meetingRoom1@contoso.com'
+          },
           type: 'resource'
         },
         {
-          emailAddress: 'meetingRoom2@contoso.com',
+          emailAddress: {
+            address: 'meetingRoom2@contoso.com'
+          },
           type: 'resource'
         }
       ]
@@ -572,11 +594,15 @@ describe(commands.EVENT_ADD, () => {
       },
       attendees: [
         {
-          emailAddress: 'user1@contoso.com',
+          emailAddress: {
+            address: 'user1@contoso.com'
+          },
           type: 'required'
         },
         {
-          emailAddress: 'user2@contoso.com',
+          emailAddress: {
+            address: 'user2@contoso.com'
+          },
           type: 'required'
         }
       ],
@@ -720,8 +746,8 @@ describe(commands.EVENT_ADD, () => {
 
     const parsedSchema = commandOptionsSchema.safeParse({
       subject: subject,
-      start: start,
-      end: end,
+      start: '2026-08-06T00:00:00',
+      end: '2026-08-07T00:00:00',
       isOnlineMeeting: true,
       isAllDay: true,
       onlineMeetingProvider: 'teamsForBusiness',
@@ -731,11 +757,11 @@ describe(commands.EVENT_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       subject: 'CLI sync',
       start: {
-        dateTime: '2026-08-06T10:00:00',
+        dateTime: '2026-08-06T00:00:00',
         timeZone: 'UTC'
       },
       end: {
-        dateTime: '2026-08-06T11:00:00',
+        dateTime: '2026-08-07T00:00:00',
         timeZone: 'UTC'
       },
       isOnlineMeeting: true,

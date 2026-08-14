@@ -13,9 +13,9 @@ import auth from '../../../../Auth.js';
 
 const bodyContentTypes = ['Text', 'HTML'] as const;
 const importances = ['low', 'normal', 'high'] as const;
-const onlineMeetingProviders = ['teamsForBusiness', 'skypeForBusinnes', 'skypeForConsumer'] as const;
+const onlineMeetingProviders = ['teamsForBusiness', 'skypeForBusiness', 'skypeForConsumer', 'unknown'] as const;
 const sensitivities = ['normal', 'personal', 'private', 'confidential'] as const;
-const showAsStatuses = ['free', 'tentative', 'busy', 'oof', 'workingElsewhere'] as const;
+const showAsStatuses = ['free', 'tentative', 'busy', 'oof', 'workingElsewhere', 'unknown'] as const;
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -57,7 +57,7 @@ export const options = z.strictObject({
   onlineMeetingProvider: z.preprocess(val => {
     const target = String(val).toLowerCase();
     return onlineMeetingProviders.find(t => t.toLowerCase() === target) ?? val;
-  }, z.enum(onlineMeetingProviders)).optional(),
+  }, z.enum(onlineMeetingProviders)).optional().default('unknown'),
   optionalAttendees: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
       error: e => `The following attendees names are invalid for the option 'optionalAttendees': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
@@ -82,7 +82,7 @@ export const options = z.strictObject({
   showAs: z.preprocess(val => {
     const target = String(val).toLowerCase();
     return showAsStatuses.find(t => t.toLowerCase() === target) ?? val;
-  }, z.enum(showAsStatuses)).optional(),
+  }, z.enum(showAsStatuses)).optional().default('busy'),
   timeZone: z.string().optional().default('UTC'),
   transactionId: z.string().optional()
 });
@@ -117,10 +117,10 @@ class OutlookEventAddCommand extends GraphCommand {
       .refine(options => !(options.userId && options.userName), {
         error: 'Specify either userId or userName, but not both.'
       })
-      .refine(options => !(options.isAllDay && (options.start.endsWith('T00:00:00') || options.end.endsWith('T00:00:00'))), {
+      .refine(options => !options.isAllDay || (options.start.endsWith('T00:00:00') && options.end.endsWith('T00:00:00')), {
         error: 'When isAllDay is true, start and end must be set to midnight.'
       })
-      .refine(options => !(options.reminderMinutesBeforeStart && !options.isReminderOn), {
+      .refine(options => !(options.reminderMinutesBeforeStart !== undefined && !options.isReminderOn), {
         error: 'When reminderMinutesBeforeStart is specified, isReminderOn must be true.'
       })
       .refine(options => !(options.locationEmailAddress && !options.location), {
@@ -265,7 +265,7 @@ class OutlookEventAddCommand extends GraphCommand {
       body['locations'] = locations;
     }
 
-    if (args.options.onlineMeetingProvider) {
+    if (args.options.onlineMeetingProvider !== 'unknown') {
       body['onlineMeetingProvider'] = args.options.onlineMeetingProvider;
     }
 
@@ -276,7 +276,9 @@ class OutlookEventAddCommand extends GraphCommand {
       if (args.options.optionalAttendees) {
         args.options.optionalAttendees.forEach(value =>
           attendees.push({
-            emailAddress: value,
+            emailAddress: {
+              address: value.trim()
+            },
             type: 'optional'
           }));
       }
@@ -284,7 +286,9 @@ class OutlookEventAddCommand extends GraphCommand {
       if (args.options.requiredAttendees) {
         args.options.requiredAttendees.forEach(value =>
           attendees.push({
-            emailAddress: value,
+            emailAddress: {
+              address: value.trim()
+            },
             type: 'required'
           }));
       }
@@ -292,7 +296,9 @@ class OutlookEventAddCommand extends GraphCommand {
       if (args.options.resources) {
         args.options.resources.forEach(value =>
           attendees.push({
-            emailAddress: value,
+            emailAddress: {
+              address: value.trim()
+            },
             type: 'resource'
           }));
       }
@@ -322,7 +328,7 @@ class OutlookEventAddCommand extends GraphCommand {
       body['sensitivity'] = args.options.sensitivity;
     }
 
-    if (args.options.showAs) {
+    if (args.options.showAs !== 'busy') {
       body['showAs'] = args.options.showAs;
     }
 
