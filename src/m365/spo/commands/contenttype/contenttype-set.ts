@@ -50,21 +50,21 @@ class SpoContentTypeSetCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'id' or 'name', but not both.`,
+        error: `Specify either 'id' or 'name', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['id', 'name']
         }
       })
       .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(x => x !== undefined).length <= 1, {
-        message: `Specify either listTitle, listId or listUrl.`,
+        error: `Specify either listTitle, listId or listUrl.`,
         params: {
           customCode: 'optionSet',
           options: ['listId', 'listTitle', 'listUrl']
         }
       })
       .refine(opts => !(opts.listId || opts.listTitle || opts.listUrl) || !opts.updateChildren, {
-        message: 'It is impossible to pass updateChildren when trying to update a list content type.',
+        error: 'It is impossible to pass updateChildren when trying to update a list content type.',
         path: ['updateChildren'],
         params: {
           customCode: 'required'

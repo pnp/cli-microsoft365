@@ -53,14 +53,14 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => [opts.contentTypeId, opts.contentTypeName].filter(x => x !== undefined).length === 1, {
-        message: `Specify either 'contentTypeId' or 'contentTypeName', but not both.`,
+        error: `Specify either 'contentTypeId' or 'contentTypeName', but not both.`,
         params: {
           customCode: 'optionSet',
           options: ['contentTypeId', 'contentTypeName']
         }
       })
       .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(x => x !== undefined).length <= 1, {
-        message: `Specify either 'listId', 'listTitle' or 'listUrl'.`,
+        error: `Specify either 'listId', 'listTitle' or 'listUrl'.`,
         params: {
           customCode: 'optionSet',
           options: ['listId', 'listTitle', 'listUrl']
