@@ -46,7 +46,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema.refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
-      message: `Specify either 'id' or 'name', but not both.`,
+      error: `Specify either 'id' or 'name', but not both.`,
       params: {
         customCode: 'optionSet',
         options: ['id', 'name']
