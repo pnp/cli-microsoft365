@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -7,18 +8,28 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  contentTypeId: z.string().optional().alias('i'),
+  contentTypeName: z.string().optional().alias('n'),
+  listTitle: z.string().optional().alias('l'),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID for option 'listId'.`
+    }).optional(),
+  listUrl: z.string().optional(),
+  properties: z.string().optional().alias('p')
+});
+
+export type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  contentTypeId?: string;
-  contentTypeName?: string;
-  listTitle?: string;
-  listId?: string;
-  listUrl?: string;
-  properties?: string;
 }
 
 class SpoContentTypeFieldListCommand extends SpoCommand {
@@ -35,86 +46,26 @@ class SpoContentTypeFieldListCommand extends SpoCommand {
   }
 
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        contentTypeId: typeof args.options.contentTypeId !== 'undefined',
-        contentTypeName: typeof args.options.contentTypeName !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.contentTypeId, opts.contentTypeName].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'contentTypeId' or 'contentTypeName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['contentTypeId', 'contentTypeName']
+        }
+      })
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(x => x !== undefined).length <= 1, {
+        message: `Specify either 'listId', 'listTitle' or 'listUrl'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --contentTypeId [contentTypeId]'
-      },
-      {
-        option: '-n, --contentTypeName [contentTypeName]'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID for option 'listId'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'contentTypeId', 'contentTypeName', 'listTitle', 'listId', 'listUrl', 'properties');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['contentTypeId', 'contentTypeName']
-      },
-      {
-        options: ['listId', 'listTitle', 'listUrl'],
-        runsWhen: (args) => args.options.listId || args.options.listTitle || args.options.listUrl
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

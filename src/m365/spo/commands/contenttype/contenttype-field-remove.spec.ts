@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './contenttype-field-remove.js';
+import command, { options } from './contenttype-field-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 const WEB_URL = 'https://contoso.sharepoint.com';
@@ -30,6 +30,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const getStubCalls = async (opts: any): Promise<{ Id: string }> => {
@@ -147,6 +148,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -204,25 +206,18 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('configures contentTypeId as string option', () => {
-    const types = command.types;
-    ['i', 'contentTypeId'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
-  });
-
   // WEB CT
   it('removes the field link from web content type', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
   it('removes the field link from web content type - prompt', async () => {
@@ -230,12 +225,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false
-      }
-    } as any);
+      })
+    });
 
     assert(promptIssued);
   });
@@ -246,11 +241,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
   it('doesnt remove the field link from web content type - prompt: declined', async () => {
@@ -261,11 +256,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -274,13 +269,13 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(promptIssued);
   });
 
@@ -292,12 +287,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -307,12 +302,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.notCalled);
   });
   it('removes the field link from web content type with update child content types - prompt', async () => {
@@ -320,11 +315,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true
-      }
-    } as any);
+      })
+    });
     assert(promptIssued);
   });
   it('removes the field link from web content type with update child content types - prompt: confirmed', async () => {
@@ -335,12 +330,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
   it('doesnt remove the field link from web content type with update child content types - prompt: declined', async () => {
@@ -351,12 +346,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -365,13 +360,13 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(promptIssued);
   });
 
@@ -383,13 +378,13 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
 
@@ -401,13 +396,13 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -417,11 +412,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
     assert(loggerLogSpy.notCalled);
   });
@@ -431,11 +426,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
     assert(loggerLogSpy.notCalled);
   });
@@ -445,11 +440,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
     assert(loggerLogSpy.notCalled);
   });
@@ -459,10 +454,10 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID
-      }
-    } as any);
+      })
+    });
 
     assert(promptIssued);
   });
@@ -475,12 +470,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
     assert(loggerLogSpy.notCalled);
   });
@@ -493,12 +488,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
     assert(loggerLogSpy.notCalled);
   });
@@ -509,13 +504,13 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         force: true,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
   it('removes the field link from list (retrieved by title) content type with debug - prompt', async () => {
@@ -523,11 +518,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         debug: true
-      }
-    } as any);
+      })
+    });
 
     assert(promptIssued);
   });
@@ -539,12 +534,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
 
@@ -556,12 +551,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
 
@@ -573,12 +568,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
   it('removes the field link from list (retrieved by title) content type with debug - prompt: declined', async () => {
@@ -589,12 +584,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -604,19 +599,19 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
-      }
-    } as any), new CommandError('Unknown Error'));
+      })
+    }), new CommandError('Unknown Error'));
   });
 
   it('handles error when remove the field link from web content type with update child content types (debug)', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID, updateChildContentTypes: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID, updateChildContentTypes: true, force: true }) }),
       new CommandError('Unknown Error'));
   });
 
@@ -628,12 +623,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: false
-      }
-    } as any), new CommandError('Unknown Error'));
+      })
+    }), new CommandError('Unknown Error'));
   });
 
   it('correctly handles a random API error', async () => {
@@ -641,16 +636,16 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID,
         updateChildContentTypes: true,
         force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   // Fails validation
-  it('fails validation if id is not passed', async () => {
+  it('fails validation if id is not passed', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -659,11 +654,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not passed', async () => {
+  it('fails validation if webUrl is not passed', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -672,28 +667,33 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not correct', async () => {
-    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not correct', () => {
+    const actual = commandOptionsSchema.safeParse({ id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listId is not correct', async () => {
-    const actual = await command.validate({ options: { id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId is not correct', () => {
+    const actual = commandOptionsSchema.safeParse({ id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, id: FIELD_LINK_ID, foo: 'bar' });
+    assert.strictEqual(actual.success, false);
   });
 
   // Passes validation
-  it('passes validation', async () => {
-    const actual = await command.validate({ options: { listTitle: 'List', id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation', () => {
+    const actual = commandOptionsSchema.safeParse({ listTitle: 'List', id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true });
+    assert.strictEqual(actual.success, true);
   });
 });

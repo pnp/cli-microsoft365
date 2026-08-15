@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -9,16 +10,26 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FieldLink } from './FieldLink.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  contentTypeId: z.string(),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    }).alias('i'),
+  hidden: z.boolean().optional(),
+  required: z.boolean().optional().alias('r'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u')
+});
+
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  contentTypeId: string;
-  id: string;
-  hidden?: boolean;
-  required?: boolean;
-  webUrl: string;
 }
 
 class SpoContentTypeFieldSetCommand extends SpoCommand {
@@ -35,66 +46,17 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return 'Adds or updates a site column reference in a site content type';
   }
 
+  public get schema(): z.ZodType {
+    return options;
+  }
+
   constructor() {
     super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
 
     this.requestDigest = '';
     this.siteId = '';
     this.webId = '';
     this.fieldLink = null;
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        hidden: args.options.hidden,
-        required: args.options.required
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--contentTypeId <contentTypeId>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-r, --required [required]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hidden [hidden]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
-    this.types.boolean.push('required', 'hidden');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
