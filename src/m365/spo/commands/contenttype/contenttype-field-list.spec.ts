@@ -9,7 +9,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './contenttype-field-list.js';
+import command, { options } from './contenttype-field-list.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -112,6 +112,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -120,6 +121,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -161,19 +163,24 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'InternalName', 'Hidden']);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', contentTypeId: contentTypeId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', contentTypeId: contentTypeId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listId is not a GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, contentTypeId: contentTypeId, listId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, contentTypeId: contentTypeId, listId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when webUrl, contentTypeId and listId are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, contentTypeId: contentTypeId, listId: listId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl, contentTypeId and listId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, contentTypeId: contentTypeId, listId: listId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, contentTypeId: contentTypeId, unknownOption: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves fields of a specific content type by name from a list identified by its title', async () => {
@@ -189,7 +196,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, contentTypeName: contentTypeName, listTitle: listTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeName: contentTypeName, listTitle: listTitle, verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(fieldResponse));
   });
 
@@ -208,7 +215,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, contentTypeName: contentTypeName, listUrl: listUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeName: contentTypeName, listUrl: listUrl, verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(fieldResponse));
   });
 
@@ -221,7 +228,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, contentTypeId: contentTypeId, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeId: contentTypeId, listId: listId, verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(fieldResponse));
   });
 
@@ -234,7 +241,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, contentTypeId: contentTypeId, properties: properties, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeId: contentTypeId, properties: properties, verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(fieldResponse));
   });
 
@@ -247,7 +254,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, contentTypeName: contentTypeName, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeName: contentTypeName, verbose: true }) }),
       new CommandError(`Content type with name ${contentTypeName} not found.`));
   });
 
@@ -267,7 +274,7 @@ describe(commands.CONTENTTYPE_FIELD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, contentTypeId: contentTypeId, properties: properties, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, contentTypeId: contentTypeId, properties: properties, verbose: true }) }),
       new CommandError(error.error.message));
   });
 });

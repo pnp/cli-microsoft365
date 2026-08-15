@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './contenttype-field-set.js';
+import command, { options } from './contenttype-field-set.js';
 
 describe(commands.CONTENTTYPE_FIELD_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -36,6 +37,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -164,7 +166,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -260,14 +262,14 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       "ErrorTypeName": "InvalidRequest"
     },
     "TraceCorrelationId": "59577d9e-70af-0000-22fb-870cf639feff"
-  }
+      }
 ]`;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -355,7 +357,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -436,7 +438,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -517,7 +519,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -561,7 +563,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -676,7 +678,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -723,7 +725,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -770,7 +772,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: false, hidden: true } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: false, hidden: true }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -817,7 +819,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: false } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: false }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -971,51 +973,49 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       new CommandError(`Unknown Error`));
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'site.com', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'site.com', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' });
+    assert.strictEqual(success, false);
   });
 
-  it('fails validation if the specified field ID is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified field ID is not a valid GUID', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: 'invalid' });
+    assert.strictEqual(success, false);
   });
 
-  it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' });
+    assert.strictEqual(success, true);
   });
 
-  it('passes validation when the required option is set to true', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the required option is set to true', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true });
+    assert.strictEqual(success, true);
   });
 
-  it('passes validation when the required option is set to false', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the required option is set to false', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: false });
+    assert.strictEqual(success, true);
   });
 
-  it('passes validation when the hidden option is set to true', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', hidden: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the hidden option is set to true', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', hidden: true });
+    assert.strictEqual(success, true);
   });
 
-  it('passes validation when the hidden option is set to false', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', hidden: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the hidden option is set to false', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', hidden: false });
+    assert.strictEqual(success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', unknownOption: true });
+    assert.strictEqual(success, false);
   });
 
   it('configures command types', () => {
     assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
-  });
-
-  it('configures contentTypeId as string option', () => {
-    const types = command.types;
-    ['contentTypeId', 'c'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
   });
 
   it('handles error while retrieving request digest', async () => {
@@ -1050,7 +1050,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true }) }),
       new CommandError('An error has occurred'));
   });
 });

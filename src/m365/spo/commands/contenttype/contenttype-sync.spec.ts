@@ -9,7 +9,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './contenttype-sync.js';
+import command, { options } from './contenttype-sync.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { odata } from '../../../../utils/odata.js';
@@ -56,6 +56,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -67,6 +68,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     sinon.stub(spo, 'getListId').resolves(listId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -113,7 +115,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: contentTypeId, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
@@ -134,7 +136,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: contentTypeName, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: contentTypeName, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
@@ -155,7 +157,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: contentTypeName, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: contentTypeName, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -177,7 +179,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: url, name: contentTypeName, listId: listId, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: url, name: contentTypeName, listId: listId, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
@@ -190,7 +192,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, listTitle: listTitle, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: contentTypeId, listTitle: listTitle, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
@@ -203,7 +205,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, listUrl: listUrl, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: contentTypeId, listUrl: listUrl, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(syncResponse));
   });
 
@@ -216,7 +218,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: contentTypeName, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: contentTypeName, verbose: true }) }),
       new CommandError(`Content type with name ${contentTypeName} not found.`));
   });
 
@@ -241,7 +243,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: contentTypeId, verbose: true }) }),
       new CommandError(error.error.message));
   });
 
@@ -266,27 +268,32 @@ describe(commands.CONTENTTYPE_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: contentTypeId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: contentTypeId, verbose: true }) }),
       new CommandError(error.error.message));
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', id: contentTypeId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: contentTypeId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: contentTypeId, listId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: contentTypeId, listId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when webUrl and id are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: contentTypeId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl and id are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: contentTypeId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when webUrl, id and listId are specified and listId is a valid guid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: contentTypeId, listId: listId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl, id and listId are specified and listId is a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: contentTypeId, listId: listId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: contentTypeId, invalidOption: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 });

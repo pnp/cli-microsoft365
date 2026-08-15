@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -9,18 +10,28 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.string().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  listTitle: z.string().optional(),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID.`
+    }).optional(),
+  listUrl: z.string().optional(),
+  updateChildren: z.boolean().optional()
+}).catchall(z.unknown());
+
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  name?: string;
-  listTitle?: string;
-  listId: string;
-  listUrl: string;
-  updateChildren: boolean;
 }
 
 class SpoContentTypeSetCommand extends SpoCommand {
@@ -32,88 +43,33 @@ class SpoContentTypeSetCommand extends SpoCommand {
     return 'Updates an existing content type';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initOptionSets();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        updateChildren: args.options.updateChildren
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'id' or 'name', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
+      })
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(x => x !== undefined).length <= 1, {
+        message: `Specify either listTitle, listId or listUrl.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
+      })
+      .refine(opts => !(opts.listId || opts.listTitle || opts.listUrl) || !opts.updateChildren, {
+        message: 'It is impossible to pass updateChildren when trying to update a list content type.',
+        path: ['updateChildren'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--updateChildren'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `'${args.options.listId}' is not a valid GUID.`;
-        }
-
-        if ((args.options.listId && (args.options.listTitle || args.options.listUrl)) || (args.options.listTitle && args.options.listUrl)) {
-          return `Specify either listTitle, listId or listUrl.`;
-        }
-
-        if ((args.options.listId || args.options.listTitle || args.options.listUrl) && args.options.updateChildren) {
-          return 'It is impossible to pass updateChildren when trying to update a list content type.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'i');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'name'] }
-    );
   }
 
   public allowUnknownOptions(): boolean | undefined {

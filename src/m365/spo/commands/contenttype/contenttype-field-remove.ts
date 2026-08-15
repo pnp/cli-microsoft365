@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -8,19 +9,32 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  contentTypeId: z.string(),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    }).alias('i'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    }).optional(),
+  listTitle: z.string().optional().alias('l'),
+  listUrl: z.string().optional(),
+  updateChildContentTypes: z.boolean().optional().alias('c'),
+  force: z.boolean().optional().alias('f')
+});
+
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  contentTypeId: string;
-  id: string;
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  updateChildContentTypes?: boolean;
-  force?: boolean;
 }
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
@@ -32,74 +46,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     return 'Removes a column from a site- or list content type';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        updateChildContentTypes: !!args.options.updateChildContentTypes,
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--contentTypeId <contentTypeId>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-c, --updateChildContentTypes'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('i', 'contentTypeId');
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
