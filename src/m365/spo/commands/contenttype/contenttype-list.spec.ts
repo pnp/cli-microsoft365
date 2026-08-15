@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './contenttype-list.js';
+import command, { options } from './contenttype-list.js';
 
 describe(commands.CONTENTTYPE_LIST, () => {
   const ctResponse = {
@@ -87,6 +87,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options = options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -95,6 +96,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -136,19 +138,24 @@ describe(commands.CONTENTTYPE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['StringId', 'Name', 'Hidden', 'ReadOnly', 'Sealed']);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert(actual.success);
   });
 
-  it('passes validation if the category option is defined', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', category: 'List Content Types' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the category option is defined', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', category: 'List Content Types' });
+    assert(actual.success);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', unknownOption: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('command correctly handles reject request', async () => {
@@ -162,10 +169,10 @@ describe(commands.CONTENTTYPE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -183,10 +190,10 @@ describe(commands.CONTENTTYPE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/test'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(ctResponse.value));
   });
@@ -205,9 +212,9 @@ describe(commands.CONTENTTYPE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/test'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(ctResponse.value));
   });
@@ -226,11 +233,11 @@ describe(commands.CONTENTTYPE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         category: 'List Content Types',
         webUrl: 'https://contoso.sharepoint.com/sites/test'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(ctResponse.value));
   });
@@ -249,10 +256,10 @@ describe(commands.CONTENTTYPE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         category: 'List Content Types',
         webUrl: 'https://contoso.sharepoint.com/sites/test'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(ctResponse.value));
   });

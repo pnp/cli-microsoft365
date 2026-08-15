@@ -14,7 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './contenttype-set.js';
+import command, { options } from './contenttype-set.js';
 
 describe(commands.CONTENTTYPE_SET, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -43,6 +43,7 @@ describe(commands.CONTENTTYPE_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,6 +52,7 @@ describe(commands.CONTENTTYPE_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -89,64 +91,63 @@ describe(commands.CONTENTTYPE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if id is specified and is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listTitle is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: listId, listTitle: listTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: listId, listUrl: listUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle and listUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listTitle: listTitle, listUrl: listUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId, listUrl and is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: listId, listUrl: listUrl, listTitle: listTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId is specified together with updateChildren', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: listId, updateChildren: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle is specified together with updateChildren', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listTitle: listTitle, updateChildren: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listUrl is specified together with updateChildren', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listUrl: listUrl, updateChildren: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when webUrl, id and listId are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, listId: listId } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when webUrl, name are specified together with updateChildren', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, name: name, updateChildren: true } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
   it('allows unknown options', () => {
-    const allowUnknownOptions = command.allowUnknownOptions();
-    assert.strictEqual(allowUnknownOptions, true);
+    assert.strictEqual(command.allowUnknownOptions(), true);
+  });
+
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id is specified and is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listId and listTitle is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: listId, listTitle: listTitle });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listId and listUrl is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: listId, listUrl: listUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listTitle and listUrl is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listTitle: listTitle, listUrl: listUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listId, listUrl and is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: listId, listUrl: listUrl, listTitle: listTitle });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listId is specified together with updateChildren', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: listId, updateChildren: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listTitle is specified together with updateChildren', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listTitle: listTitle, updateChildren: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listUrl is specified together with updateChildren', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listUrl: listUrl, updateChildren: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when webUrl, id and listId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: listId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when webUrl, name are specified together with updateChildren', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, name: name, updateChildren: true });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly updates content type with id', async () => {
@@ -176,7 +177,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, Name: newName } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, Name: newName, updateChildren: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -210,7 +211,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: name, Name: newName } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: name, Name: newName, updateChildren: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -244,7 +245,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: name, listId: listId, Name: newName } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: name, listId: listId, Name: newName, updateChildren: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -281,7 +282,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: name, listTitle: listTitle, Name: newName } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: name, listTitle: listTitle, Name: newName, updateChildren: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -319,7 +320,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, name: name, listUrl: listUrl, Name: newName } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, name: name, listUrl: listUrl, Name: newName, updateChildren: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -350,7 +351,7 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, Name: newName, updateChildren: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, Name: newName, updateChildren: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -364,7 +365,7 @@ describe(commands.CONTENTTYPE_SET, () => {
     });
     const patchStub = sinon.stub(request, 'patch').resolves();
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: name, Name: newName } } as any), new CommandError(`The specified content type '${name}' does not exist`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: name, Name: newName }) }), new CommandError(`The specified content type '${name}' does not exist`));
     assert(patchStub.notCalled);
   });
 
@@ -397,6 +398,6 @@ describe(commands.CONTENTTYPE_SET, () => {
       throw `Invalid POST-request ${JSON.stringify(opts)}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id, Name: newName } } as any), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, Name: newName }) }), new CommandError('Unknown Error'));
   });
 });
