@@ -120,6 +120,22 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     "membershipType": "private"
   };
 
+  const singleSharedChannelResponse: any = {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
+    "@odata.count": 1,
+    "value": [
+      {
+        "id": "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+        "displayName": "Shared Channel",
+        "description": null,
+        "isFavoriteByDefault": null,
+        "email": "",
+        "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Shared+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
+        "membershipType": "shared"
+      }
+    ]
+  };
+
   const singleUserResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
     "value": [
@@ -443,6 +459,27 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert(loggerLogSpy.notCalled);
   });
 
+  it('adds conversation members to a shared channel using teamId, channelName, and userIds', async () => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Shared Channel')}'`) {
+        return singleSharedChannelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelName: "Shared Channel",
+        userIds: "admin@contoso.com",
+        owner: true
+      }
+    });
+    assert(loggerLogSpy.notCalled);
+  });
+
   it('fails adding conversation members with invalid channelName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -469,7 +506,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     } as any), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
   });
 
-  it('fails to get channel when channel does is not private', async () => {
+  it('fails to get channel when channel is not a private or shared channel', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
@@ -495,7 +532,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Other Channel"
       }
-    } as any), new CommandError('The specified channel is not a private channel'));
+    } as any), new CommandError('The specified channel is not a private or shared channel'));
   });
 
   it('fails when group has no team', async () => {
