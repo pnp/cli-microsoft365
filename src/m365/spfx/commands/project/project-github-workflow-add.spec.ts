@@ -180,6 +180,53 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
+  it('uses heft build and package for newer version of SPFx', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, '.github')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.github', 'workflows')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.yo-rc.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, '.yo-rc.json') && options === 'utf-8') {
+        return '{"@microsoft/generator-sharepoint": {"version": "1.22.0"}}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').returns();
+
+    await command.action(logger, { options: {} } as any);
+
+    assert(writeFileSyncStub.calledOnce, 'writeFileSync not called');
+    const writtenContent: string = writeFileSyncStub.args[0][1];
+    assert(writtenContent.includes('heft build --production'), 'heft build not found in workflow');
+    assert(writtenContent.includes('heft package-solution --production'), 'heft package-solution not found in workflow');
+  });
+
   it('handles error with unknown version of SPFx', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
