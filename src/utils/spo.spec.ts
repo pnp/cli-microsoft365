@@ -34,7 +34,7 @@ const stubGetResponses: any = (
   getFolderByServerRelativeUrlResp: any = null
 ) => {
   return sinon.stub(request, 'get').callsFake(async (opts) => {
-    if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
+    if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(decodedUrl=') > -1) {
       if (getFolderByServerRelativeUrlResp) {
         throw getFolderByServerRelativeUrlResp;
       }
@@ -618,7 +618,7 @@ describe('utils/spo', () => {
     stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
     await spo.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3", logger, true);
-    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
+    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
   });
 
   it('should have the correct url including uppercase letters when calling AddSubFolderUsingPath', async () => {
@@ -627,7 +627,7 @@ describe('utils/spo', () => {
     stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
     await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
-    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+    assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
   it('should call two times AddSubFolderUsingPath when folderUrl is folder2/folder3', async () => {
@@ -635,8 +635,8 @@ describe('utils/spo', () => {
     stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
     await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
-    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
   it('should handle end slashes in the command options for webUrl and for folder', async () => {
@@ -644,8 +644,8 @@ describe('utils/spo', () => {
     stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
     await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/", logger, true);
-    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
   });
 
   it('should have the correct url when folder option has uppercase letters when calling AddSubFolderUsingPath', async () => {
@@ -653,8 +653,8 @@ describe('utils/spo', () => {
     stubGetResponses(JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not found." } } }));
 
     await spo.ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/", logger, true);
-    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
-    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
+    assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
+    assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(decodedUrl=@a1)/AddSubFolderUsingPath(decodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
   });
 
   it('should call GetFolderByServerRelativeUrl with the correct url OData values', async () => {
@@ -662,8 +662,8 @@ describe('utils/spo', () => {
     const getStubs: sinon.SinonStub = stubGetResponses();
 
     await spo.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true);
-    assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2\')');
-    assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
+    assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=\'%2Fsites%2FSite1%2Ffolder2\')');
+    assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(decodedUrl=\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
   });
 
   //#region Custom Action Mock Responses
@@ -961,7 +961,7 @@ describe('utils/spo', () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { menuState: topNavigation });
   });
 
-  it(`retrieves spo group by name sucessfully`, async () => {
+  it(`retrieves spo group by name successfully`, async () => {
     const groupResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -989,7 +989,7 @@ describe('utils/spo', () => {
     assert.deepEqual(group, groupResponse);
   });
 
-  it(`retrieves roledefinition by name sucessfully`, async () => {
+  it(`retrieves roledefinition by name successfully`, async () => {
     const roledefinitionResponse: RoleDefinition = {
       BasePermissions: {
         High: 176,
@@ -1927,7 +1927,7 @@ describe('utils/spo', () => {
   });
 
 
-  it(`retrieves spo group by name sucessfully`, async () => {
+  it(`retrieves spo group by name successfully`, async () => {
     const groupResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -1955,7 +1955,7 @@ describe('utils/spo', () => {
     assert.deepEqual(group, groupResponse);
   });
 
-  it(`retrieves spo user by email sucessfully`, async () => {
+  it(`retrieves spo user by email successfully`, async () => {
     const userResponse = {
       Id: 11,
       IsHiddenInUI: false,
@@ -2131,7 +2131,7 @@ describe('utils/spo', () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fsales%2FDocuments%2FTest1.docx'`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fsales%2FDocuments%2FTest1.docx'`) {
         return fileResponse;
       }
 
@@ -2714,7 +2714,7 @@ describe('utils/spo', () => {
     assert.strictEqual(result, primaryAdminLoginName);
   });
 
-  it(`retrieves a file with its properties sucessfully`, async () => {
+  it(`retrieves a file by id with its properties successfully`, async () => {
     const id = 'b2307a39-e878-458b-bc90-03bc578531d6';
     const fileResponse = {
       ListItemAllFields: {
@@ -2766,8 +2766,103 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const group = await spo.getFileById(webUrl, id, logger, true);
-    assert.deepEqual(group, fileResponse);
+    const file = await spo.getFileById(webUrl, id, logger, true);
+    assert.deepEqual(file, fileResponse);
+  });
+
+  it(`retrieves a file by url with its properties successfully`, async () => {
+    const serverRelativeUrl = '/sites/sales/Documents/Test1.docx';
+    const fileResponse = {
+      ListItemAllFields: {
+        FileSystemObjectType: 0,
+        Id: 4,
+        ServerRedirectedEmbedUri: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ServerRedirectedEmbedUrl: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ContentTypeId: '0x0101008E462E3ACE8DB844B3BEBF9473311889',
+        ComplianceAssetId: null,
+        Title: null,
+        ID: 4,
+        Created: '2018-02-05T09:42:36',
+        AuthorId: 1,
+        Modified: '2018-02-05T09:44:03',
+        EditorId: 1,
+        'OData__CopySource': null,
+        CheckoutUserId: null,
+        'OData__UIVersionString': '3.0',
+        GUID: '2054f49e-0f76-46d4-ac55-50e1c057941c'
+      },
+      CheckInComment: '',
+      CheckOutType: 2,
+      ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+      CustomizedPageStatus: 0,
+      ETag: '\'{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\'',
+      Exists: true,
+      IrmEnabled: false,
+      Length: '331673',
+      Level: 1,
+      LinkingUri: 'https://contoso.sharepoint.com/sites/sales/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      LinkingUrl: 'https://contoso.sharepoint.com/sites/sales/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      MajorVersion: 3,
+      MinorVersion: 0,
+      Name: 'Opendag maart 2018.docx',
+      ServerRelativeUrl: '/sites/sales/Documents/Test1.docx',
+      TimeCreated: '2018-02-05T08:42:36Z',
+      TimeLastModified: '2018-02-05T08:44:03Z',
+      Title: '',
+      UIVersion: 1536,
+      UIVersionLabel: '3.0',
+      UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const file = await spo.getFileByUrl(webUrl, serverRelativeUrl, logger, true);
+    assert.deepEqual(file, fileResponse);
+  });
+
+  it(`retrieves file role assignments`, async () => {
+    const serverRelativeUrl = '/sites/sales/Documents/Test1.docx';
+    const roleAssignmentsResponse = {
+      value: [
+        {
+          Member: {
+            Id: 3,
+            LoginName: 'i:0#.f|membership|user@contoso.com'
+          },
+          RoleDefinitionBindings: [
+            {
+              BasePermissions: {
+                High: "2147483647",
+                Low: "4294967295"
+              },
+              Description: "Has full control.",
+              Hidden: false,
+              Id: 1073741829,
+              Name: "Full Control",
+              Order: 1,
+              RoleTypeKind: 5
+            }
+          ]
+        }
+      ]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`) {
+        return roleAssignmentsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const roleAssignments = await spo.getFileRoleAssignments(webUrl, serverRelativeUrl, logger, true);
+    assert.deepEqual(roleAssignments, roleAssignmentsResponse.value);
   });
 
   it('correctly outputs result when calling createFileCopyJob', async () => {

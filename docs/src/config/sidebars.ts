@@ -2803,6 +2803,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file roleassignment list',
+              id: 'cmd/spo/file/file-roleassignment-list'
+            },
+            {
+              type: 'doc',
               label: 'file roleassignment remove',
               id: 'cmd/spo/file/file-roleassignment-remove'
             },
