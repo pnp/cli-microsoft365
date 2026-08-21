@@ -1,24 +1,26 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(['Public', 'Private', 'Both']).optional().alias('t'),
+  enabled: z.boolean().alias('e'),
+  noDefaultOrigins: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  type: string;
-  enabled: boolean;
-  noDefaultOrigins?: boolean;
-}
-
 class SpoCdnSetCommand extends SpoCommand {
-  private readonly validTypes: string[] = ['Public', 'Private', 'Both'];
-
   public get name(): string {
     return commands.CDN_SET;
   }
@@ -27,59 +29,8 @@ class SpoCdnSetCommand extends SpoCommand {
     return 'Enables or disables the specified Microsoft 365 CDN';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        cdnType: args.options.type || 'Public',
-        enabled: args.options.enabled,
-        noDefaultOrigins: !!args.options.noDefaultOrigins
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --enabled <enabled>',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: this.validTypes
-      },
-      {
-        option: '--noDefaultOrigins'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('enabled', 'noDefaultOrigins');
-    this.types.string.push('type');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type) {
-          if (args.options.type !== 'Public' && args.options.type !== 'Both' &&
-            args.options.type !== 'Private') {
-            return `${args.options.type} is not a valid CDN type. Allowed values are ${this.validTypes.join(', ')}.`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
