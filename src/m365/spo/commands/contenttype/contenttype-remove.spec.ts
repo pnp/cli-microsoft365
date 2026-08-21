@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './contenttype-remove.js';
+import command, { options } from './contenttype-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CONTENTTYPE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,8 +83,8 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: false }
-    } as any);
+      options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: false })
+    });
 
     assert(promptIssued);
   });
@@ -101,14 +103,14 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
         force: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.called);
   });
 
@@ -125,14 +127,14 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
         force: false
-      }
-    } as any);
+      })
+    });
     assert(postCallbackStub.notCalled);
   });
 
@@ -153,7 +155,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false }) });
 
     assert(promptIssued);
   });
@@ -179,7 +181,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, verbose: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false }) });
     assert(getCallbackStub.called);
     assert(postCallbackStub.called);
   });
@@ -204,7 +206,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false }) });
     assert(postCallbackStub.notCalled);
   });
 
@@ -225,7 +227,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', force: true }) });
     assert(getStub.called);
     assert(postStub.called);
   });
@@ -233,7 +235,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('correctly handles site content type not found by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B721F6A489A499DB361E1AE2F')`) > -1) {
         return {
           "odata.null": true
         };
@@ -242,7 +244,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B721F6A489A499DB361E1AE2F', force: true }) }),
       new CommandError('Content type not found'));
   });
 
@@ -266,7 +268,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true }) }),
       new CommandError('Content type not found'));
 
     assert(getRequestStub.called);
@@ -276,39 +278,16 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('configures id as string option', () => {
-    const types = command.types;
-    ['i', 'id'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
-  });
-
-  it('supports verbose mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--verbose') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the content type ID nor content type Name parameters are specified', async () => {
+  it('fails validation if neither the content type ID nor content type Name parameters are specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -317,31 +296,31 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when contenttype id parameter is provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contenttype id parameter is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when contenttype name parameter is provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contenttype name parameter is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when contenttype id and confirm parameters are provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contenttype id and confirm parameters are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when contenttype name and confirm parameters are provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when contenttype name and confirm parameters are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when neither name nor id are provided, but confirm is', async () => {
+  it('fails validation when neither name nor id are provided, but confirm is', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -350,11 +329,11 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both name and id are provided', async () => {
+  it('fails validation when both name and id are provided', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -363,7 +342,12 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', foo: 'bar', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
+    assert.strictEqual(actual.success, false);
   });
 });
