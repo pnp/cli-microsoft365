@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 import { Publisher } from './Solution.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  withMicrosoftPublishers: z.boolean().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  withMicrosoftPublishers?: boolean;
-  asAdmin: boolean;
 }
 
 class PpSolutionPublisherListCommand extends PowerPlatformCommand {
@@ -29,34 +33,8 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
     return ['publisherid', 'uniquename', 'friendlyname'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        withMicrosoftPublishers: typeof args.options.withMicrosoftPublishers !== 'undefined',
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--withMicrosoftPublishers'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
