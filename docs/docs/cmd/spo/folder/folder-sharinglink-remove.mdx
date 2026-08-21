@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo folder sharinglink remove
 
@@ -30,6 +32,27 @@ m365 spo folder sharinglink remove [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Files.ReadWrite |
+  | SharePoint      | AllSites.Read   |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Files.ReadWrite.All |
+  | SharePoint      | Sites.Read.All      |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
