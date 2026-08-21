@@ -4347,6 +4347,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'web rule get',
+              id: 'cmd/spo/web/web-rule-get'
+            },
+            {
+              type: 'doc',
               label: 'web roleassignment add',
               id: 'cmd/spo/web/web-roleassignment-add'
             },
