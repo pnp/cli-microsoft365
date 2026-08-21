@@ -34,6 +34,25 @@ m365 spo file rename [options]
 
 If you try to rename a file without the `--force` flag and a file with this name already exists, the operation will be cancelled.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Renames a file.
