@@ -57,6 +57,7 @@ export default {
     'https://graph.microsoft.com/TeamSettings.ReadWrite.All',
     'https://graph.microsoft.com/TeamsTab.ReadWrite.All',
     'https://graph.microsoft.com/User.Invite.All',
+    'https://graph.microsoft.com/User.ReadBasic.All',
     'https://manage.office.com/ActivityFeed.Read',
     'https://manage.office.com/ServiceHealth.Read',
     'https://analysis.windows.net/powerbi/api/Dataset.Read.All',
