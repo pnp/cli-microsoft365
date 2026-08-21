@@ -207,8 +207,8 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
       throw 'The specified channel does not exist in the Microsoft Teams team';
     }
 
-    if (channelItem.membershipType !== "private") {
-      throw 'The specified channel is not a private channel';
+    if (channelItem.membershipType !== "private" && channelItem.membershipType !== "shared") {
+      throw 'The specified channel is not a private or shared channel';
     }
 
     return channelItem.id!;
