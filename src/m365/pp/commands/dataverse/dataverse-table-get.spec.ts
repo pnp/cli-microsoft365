@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,10 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './dataverse-table-get.js';
+import command, { options } from './dataverse-table-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.DATAVERSE_TABLE_GET, () => {
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validName = "aaduser";
   const validEnvironment = "4be50206-9576-4237-8b17-38d8aadfaa36";
@@ -92,6 +96,8 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -130,6 +136,15 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      name: validName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves data for a specific dataverse table', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -145,7 +160,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, name: validName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: validEnvironment, name: validName }) });
     assert(loggerLogSpy.calledWith(tableResponse));
   });
 
@@ -164,7 +179,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, name: validName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, environmentName: validEnvironment, name: validName, asAdmin: true }) });
     assert(loggerLogSpy.calledWith(tableResponse));
   });
 
@@ -188,7 +203,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, name: validName }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

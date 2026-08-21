@@ -1,20 +1,24 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  name: z.string().alias('n'),
+  asAdmin: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  name: string;
-  force?: true;
-  asAdmin?: boolean;
 }
 
 class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
@@ -26,37 +30,8 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
     return 'Removes a dataverse table in a given environment';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin,
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
