@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -9,25 +10,46 @@ import { formatting } from '../../../../utils/formatting.js';
 import { CustomAction } from '../../commands/customaction/customaction.js';
 import { cli } from '../../../../cli/cli.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u'),
+  title: z.string().optional().alias('t'),
+  id: z.string().optional().alias('i'),
+  clientSideComponentId: z.string().optional().alias('c'),
+  newTitle: z.string().optional(),
+  description: z.string().optional(),
+  clientSideComponentProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: 'Specified clientSideComponentProperties is not a valid JSON string.'
+  }).optional().alias('p'),
+  hostProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: 'Specified hostProperties is not a valid JSON string.'
+  }).optional(),
+  scope: z.enum(['Site', 'Web', 'All']).optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  title?: string;
-  id?: string;
-  clientSideComponentId?: string;
-  newTitle?: string;
-  description?: string;
-  clientSideComponentProperties?: string;
-  hostProperties?: string;
-  scope?: string;
-}
-
 class SpoApplicationCustomizerSetCommand extends SpoCommand {
-  private readonly allowedScopes: string[] = ['Site', 'Web', 'All'];
-
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_SET;
   }
@@ -36,108 +58,34 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
     return 'Updates an existing Application Customizer on a site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-c, --clientSideComponentId [clientSideComponentId]'
-      },
-      {
-        option: '--newTitle [newTitle]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '--hostProperties [hostProperties]'
-      },
-      {
-        option: '-s, --scope [scope]', autocomplete: this.allowedScopes
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        newTitle: typeof args.options.newTitle !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        hostProperties: typeof args.options.hostProperties !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
+        error: e => validation.isValidSharePointUrl((e.input as Options).webUrl) as string,
+        path: ['webUrl']
+      })
+      .refine(args => !args.id || validation.isValidGuid(args.id), {
+        error: () => 'id is not a valid GUID',
+        path: ['id']
+      })
+      .refine(args => !args.clientSideComponentId || validation.isValidGuid(args.clientSideComponentId), {
+        error: () => 'clientSideComponentId is not a valid GUID',
+        path: ['clientSideComponentId']
+      })
+      .refine(args => [args.id, args.title, args.clientSideComponentId].filter(value => value !== undefined).length === 1, {
+        error: `Specify either 'id', 'title', or 'clientSideComponentId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'clientSideComponentId']
+        }
+      })
+      .refine(args => args.newTitle !== undefined || args.description !== undefined || args.clientSideComponentProperties !== undefined || args.hostProperties !== undefined, {
+        error: `Please specify an option to be updated`
       });
-    });
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
-        }
-
-        if (args.options.clientSideComponentProperties) {
-          try {
-            JSON.parse(args.options.clientSideComponentProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
-          }
-        }
-
-        if (args.options.hostProperties) {
-          try {
-            JSON.parse(args.options.hostProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing hostProperties: ${e}`;
-          }
-        }
-
-        if (!args.options.newTitle && args.options.description === undefined && !args.options.clientSideComponentProperties && args.options.hostProperties === undefined) {
-          return `Please specify an option to be updated`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'title', 'clientSideComponentId'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
