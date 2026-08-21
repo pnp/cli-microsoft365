@@ -11,10 +11,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './commandset-add.js';
+import command, { options } from './commandset-add.js';
 
 describe(commands.COMMANDSET_ADD, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -57,6 +58,7 @@ describe(commands.COMMANDSET_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,71 +96,66 @@ describe(commands.COMMANDSET_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        title: validTitle,
-        listType: validListType,
-        clientSideComponentId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      listType: validListType,
+      clientSideComponentId: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listType is not valid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        title: validTitle,
-        listType: 'Invalid list type',
-        clientSideComponentId: validClientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listType is not valid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      listType: 'Invalid list type',
+      clientSideComponentId: validClientSideComponentId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scope is not valid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        title: validTitle,
-        listType: validListType,
-        clientSideComponentId: validClientSideComponentId,
-        scope: 'Invalid scope'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scope is not valid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      listType: validListType,
+      clientSideComponentId: validClientSideComponentId,
+      scope: 'Invalid scope'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if location is not valid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        title: validTitle,
-        listType: validListType,
-        clientSideComponentId: validClientSideComponentId,
-        location: 'Invalid location'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if location is not valid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      title: validTitle,
+      listType: validListType,
+      clientSideComponentId: validClientSideComponentId,
+      location: 'Invalid location'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if web url is not valid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'Invalid web url',
-        title: validTitle,
-        listType: validListType,
-        clientSideComponentId: validClientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if web url is not valid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'Invalid web url',
+      title: validTitle,
+      listType: validListType,
+      clientSideComponentId: validClientSideComponentId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all required options specified', async () => {
-    const actual = await command.validate({ options: { title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, description: validDescription, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, description: validDescription, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds commandset with scope Web, list type list and location Both', async () => {
@@ -170,7 +167,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: validListType, scope: 'Web', location: 'Both' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: validListType, scope: 'Web', location: 'Both' }) });
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
@@ -183,7 +180,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: 'Library' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, listType: 'Library' }) });
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
@@ -199,7 +196,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: 'SitePages', location: 'ContextMenu' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: 'SitePages', location: 'ContextMenu' }) });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -215,7 +212,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType, location: 'CommandBar' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType, location: 'CommandBar' }) });
     assert(loggerLogSpy.calledWith(response));
   });
 
@@ -232,40 +229,8 @@ describe(commands.COMMANDSET_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, title: validTitle, description: validDescription, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType }) }),
       new CommandError(`Something went wrong adding the commandset`));
   });
 
-  it('offers autocomplete for the listType option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--listType') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('offers autocomplete for the scope option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--scope') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('offers autocomplete for the location option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--location') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
-  });
 });
