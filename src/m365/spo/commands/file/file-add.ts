@@ -5,7 +5,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { fsUtil } from '../../../../utils/fsUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
@@ -177,7 +176,7 @@ class SpoFileAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const folderPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
-    const fileName: string = fsUtil.getSafeFileName(args.options.fileName ?? path.basename(fullPath));
+    const fileName: string = args.options.fileName ?? path.basename(fullPath);
 
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
