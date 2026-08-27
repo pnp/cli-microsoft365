@@ -10,12 +10,13 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command from './spo-set.js';
+import command, { options } from './spo-set.js';
 
 describe(commands.SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,26 +64,26 @@ describe(commands.SET, () => {
   it('sets SPO URL when no URL was set previously', async () => {
     auth.connection.spoUrl = undefined;
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com' }) });
     assert.strictEqual(auth.connection.spoUrl, 'https://contoso.sharepoint.com');
   });
 
   it('sets SPO URL when other URL was set previously', async () => {
     auth.connection.spoUrl = 'https://northwind.sharepoint.com';
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com' }) });
     assert.strictEqual(auth.connection.spoUrl, 'https://contoso.sharepoint.com');
   });
 
   it('trims trailing slashes from the URL', async () => {
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/' }) });
     assert.strictEqual(auth.connection.spoUrl, 'https://contoso.sharepoint.com');
   });
 
   it('throws error when trying to set SPO URL when not logged in to M365', async () => {
     auth.connection.active = false;
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com' }) }), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.connection.spoUrl, undefined);
   });
 
@@ -90,16 +92,24 @@ describe(commands.SET, () => {
     sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth, 'storeConnectionInfo').rejects(new Error('An error has occurred while setting the password'));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred while setting the password'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com' }) }), new CommandError('An error has occurred while setting the password'));
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

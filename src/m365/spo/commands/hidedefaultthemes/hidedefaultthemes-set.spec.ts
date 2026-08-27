@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './hidedefaultthemes-set.js';
+import command, { options } from './hidedefaultthemes-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
 
   before(() => {
@@ -28,6 +29,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -85,9 +87,9 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         hideDefaultThemes: true
-      }
+      })
     });
 
     let correctRequestIssued = false;
@@ -112,10 +114,10 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         hideDefaultThemes: true
-      }
+      })
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -151,14 +153,14 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         hideDefaultThemes: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if hideDefaultThemes is not set', async () => {
+  it('fails validation if hideDefaultThemes is not set', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -167,17 +169,25 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when hideDefaultThemes is true', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: true } }, commandInfo);
-    assert(actual);
+  it('passes validation when hideDefaultThemes is true', () => {
+    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when hideDefaultThemes is false', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: false } }, commandInfo);
-    assert(actual);
+  it('passes validation when hideDefaultThemes is false', () => {
+    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: false });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      hideDefaultThemes: true,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
