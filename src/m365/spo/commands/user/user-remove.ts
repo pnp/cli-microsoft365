@@ -1,7 +1,7 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
@@ -9,6 +9,23 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(webUrl => validation.isValidSharePointUrl(webUrl) === true, {
+    error: e => validation.isValidSharePointUrl(e.input as string).toString()
+  }).alias('u'),
+  id: z.number().optional().alias('i'),
+  loginName: z.string().optional(),
+  email: z.string().refine(email => validation.isValidUserPrincipalName(email), { error: e => `${e.input} is not a valid email.` }).optional(),
+  userName: z.string().refine(userName => validation.isValidUserPrincipalName(userName), { error: e => `${e.input} is not a valid userName.` }).optional(),
+  entraGroupId: z.string().refine(id => validation.isValidGuid(id), { error: e => `${e.input} is not a valid GUID.` }).optional(),
+  entraGroupName: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface SpoUser {
   Id: number;
@@ -30,17 +47,6 @@ interface SpoUser {
 interface CommandArgs {
   options: Options;
 }
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  loginName?: string;
-  email?: string;
-  userName?: string;
-  entraGroupId?: string;
-  entraGroupName?: string;
-  force: boolean;
-}
-
 class SpoUserRemoveCommand extends SpoCommand {
   public get name(): string {
     return commands.USER_REMOVE;
@@ -50,89 +56,17 @@ class SpoUserRemoveCommand extends SpoCommand {
     return 'Removes user from specific web';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        loginName: typeof args.options.loginName !== 'undefined',
-        email: typeof args.options.email !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
-        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--loginName [loginName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '--entraGroupName [entraGroupName]'
-      },
-      {
-        option: '-f, --force'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => [opts.id, opts.loginName, opts.email, opts.userName, opts.entraGroupId, opts.entraGroupName].filter(value => value !== undefined).length === 1, {
+      error: 'Specify one of the following options: id, loginName, email, userName, entraGroupId, entraGroupName.',
+      params: {
+        customCode: 'optionSet',
+        options: ['id', 'loginName', 'email', 'userName', 'entraGroupId', 'entraGroupName']
       }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id && isNaN(parseInt(args.options.id))) {
-          return `Specified id ${args.options.id} is not a number`;
-        }
-
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `${args.options.entraId} is not a valid GUID.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName.`;
-        }
-
-        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
-          return `${args.options.email} is not a valid email.`;
-        }
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['id', 'loginName', 'email', 'userName', 'entraGroupId', 'entraGroupName']
     });
   }
 
@@ -149,7 +83,7 @@ class SpoUserRemoveCommand extends SpoCommand {
     }
   }
 
-  private async removeUser(logger: Logger, options: GlobalOptions): Promise<void> {
+  private async removeUser(logger: Logger, options: Options): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Removing user from  subsite ${options.webUrl} ...`);
     }
@@ -207,8 +141,8 @@ class SpoUserRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getUser(options: GlobalOptions): Promise<any> {
-    const requestUrl: string = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName)}')`;
+  private async getUser(options: Options): Promise<any> {
+    const requestUrl: string = `${options.webUrl}/_api/web/siteusers?$filter=UserPrincipalName eq ('${formatting.encodeQueryParameter(options.userName!)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
@@ -223,8 +157,8 @@ class SpoUserRemoveCommand extends SpoCommand {
     }).value[0];
   }
 
-  private async getEntraGroup(options: GlobalOptions): Promise<Group> {
-    return options.entraGroupId ? await entraGroup.getGroupById(options.entraGroupId) : await entraGroup.getGroupByDisplayName(options.entraGroupName);
+  private async getEntraGroup(options: Options): Promise<Group> {
+    return options.entraGroupId ? await entraGroup.getGroupById(options.entraGroupId) : await entraGroup.getGroupByDisplayName(options.entraGroupName!);
   }
 }
 

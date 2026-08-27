@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './user-get.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.USER_GET, () => {
@@ -109,6 +108,7 @@ describe(commands.USER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -117,6 +117,7 @@ describe(commands.USER_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -165,12 +166,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: validWebUrl,
         id: 10
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(userResponse));
@@ -186,12 +187,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: validWebUrl,
         email: validEmail
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(userResponse));
@@ -207,12 +208,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: validWebUrl,
         loginName: validLoginName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(userResponse));
@@ -234,12 +235,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: validWebUrl,
         userName: validUserName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(userResponse));
@@ -272,12 +273,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: validWebUrl,
         entraGroupId: validEntraGroupId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -323,12 +324,12 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: validWebUrl,
         entraGroupName: validEntraSecurityGroupName
-      }
-    } as any);
+      })
+    });
 
     assert(loggerLogSpy.calledWith({
       "Id": 31,
@@ -369,9 +370,9 @@ describe(commands.USER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -401,11 +402,11 @@ describe(commands.USER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         userName: validUserName
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -415,89 +416,80 @@ describe(commands.USER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: 1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if entraGroupId is not a valid id', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraGroupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if entraGroupId is not a valid id', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not a valid number', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if email is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, email: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if email is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, email: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id, email, loginName, userName, entraGroupId, and entraGroupName options are passed (multiple options)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, id: 1, email: validEmail, loginName: validLoginName, userName: validUserName, entraGroupId: validEntraGroupId, entraGroupName: validEntraGroupName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id, email, loginName, userName, entraGroupId, and entraGroupName options are passed (multiple options)', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: validWebUrl, id: 1, email: validEmail, loginName: validLoginName, userName: validUserName, entraGroupId: validEntraGroupId, entraGroupName: validEntraGroupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation url is valid and id is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, id: 1 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation url is valid and id is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, id: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and email is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, email: validEmail });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url is valid and email is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, email: validEmail } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and loginName is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, loginName: validLoginName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url is valid and loginName is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, loginName: validLoginName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and userName is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, userName: validUserName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url is valid and userName is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, userName: validUserName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and entraGroupName is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraGroupName: validEntraGroupName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url is valid and entraGroupName is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupName: validEntraGroupName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and entraGroupId is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraGroupId: validEntraGroupId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url is valid and entraGroupId is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, entraGroupId: validEntraGroupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation without a user selector', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
