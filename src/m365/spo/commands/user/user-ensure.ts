@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { Group } from '@microsoft/microsoft-graph-types';
@@ -7,18 +7,24 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(webUrl => validation.isValidSharePointUrl(webUrl) === true, {
+    error: e => validation.isValidSharePointUrl(e.input as string).toString()
+  }).alias('u'),
+  entraId: z.string().refine(id => validation.isValidGuid(id), { error: e => `${e.input} is not a valid GUID.` }).optional(),
+  userName: z.string().refine(userName => validation.isValidUserPrincipalName(userName), { error: e => `${e.input} is not a valid userName.` }).optional(),
+  loginName: z.string().optional(),
+  entraGroupId: z.string().refine(id => validation.isValidGuid(id), { error: e => `${e.input} is not a valid GUID for option 'entraGroupId'.` }).optional(),
+  entraGroupName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  entraId?: string;
-  userName?: string;
-  loginName?: string;
-  entraGroupId?: string;
-  entraGroupName?: string;
 }
 
 class SpoUserEnsureCommand extends SpoCommand {
@@ -30,82 +36,18 @@ class SpoUserEnsureCommand extends SpoCommand {
     return 'Ensures that a user is available on a specific site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        entraId: typeof args.options.entraId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        loginName: typeof args.options.loginName !== 'undefined',
-        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
-        entraGroupName: typeof args.options.entraGroupName !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => [opts.entraId, opts.userName, opts.loginName, opts.entraGroupId, opts.entraGroupName].filter(value => value !== undefined).length === 1, {
+      error: 'Specify one of the following options: entraId, userName, loginName, entraGroupId, entraGroupName.',
+      params: {
+        customCode: 'optionSet',
+        options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName']
+      }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--entraId [entraId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--loginName [loginName]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '--entraGroupName [entraGroupName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.entraId && !validation.isValidGuid(args.options.entraId)) {
-          return `${args.options.entraId} is not a valid GUID.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName.`;
-        }
-
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `${args.options.entraGroupId} is not a valid GUID for option 'entraGroupId'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'entraId', 'userName', 'loginName', 'entraGroupId', 'entraGroupName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

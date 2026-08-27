@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './web-add.js';
+import command, { options } from './web-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.WEB_ADD, () => {
@@ -20,6 +20,7 @@ describe(commands.WEB_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.WEB_ADD, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,15 +106,16 @@ describe(commands.WEB_ADD, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         locale: 1033,
         breakInheritance: true,
         inheritNavigation: false,
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       Configuration: 0,
@@ -168,13 +171,14 @@ describe(commands.WEB_ADD, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
         locale: 1033
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       Configuration: 0,
@@ -230,14 +234,15 @@ describe(commands.WEB_ADD, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
         locale: 1033,
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       Configuration: 0,
@@ -310,14 +315,15 @@ describe(commands.WEB_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
         locale: 1033,
         debug: true
-      }
+      })
     });
     assert.strictEqual(configuredNavigation, true);
   });
@@ -377,13 +383,14 @@ describe(commands.WEB_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
         locale: 1033
-      }
+      })
     });
     assert.strictEqual(configuredNavigation, true);
   });
@@ -433,14 +440,15 @@ describe(commands.WEB_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
-        local: 1033,
+        locale: 1033,
         debug: true
-      }
+      })
     } as any), new CommandError('An error has occurred.'));
   });
 
@@ -464,14 +472,15 @@ describe(commands.WEB_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com/sites/test",
+        webTemplate: "STS#0",
         inheritNavigation: true,
-        local: 1033,
+        locale: 1033,
         debug: true
-      }
+      })
     } as any), new CommandError("The Web site address \"/sites/test/subsite\" is already in use."));
   });
 
@@ -514,14 +523,15 @@ describe(commands.WEB_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
-        local: 1033,
+        locale: 1033,
         debug: true
-      }
+      })
     } as any), new CommandError('An error has occurred.'));
   });
 
@@ -530,14 +540,15 @@ describe(commands.WEB_ADD, () => {
     sinon.stub(spo, 'getRequestDigest').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
-        local: 1033,
+        locale: 1033,
         debug: true
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -546,38 +557,35 @@ describe(commands.WEB_ADD, () => {
     sinon.stub(spo, 'getRequestDigest').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: "subsite",
         url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
+        webTemplate: "STS#0",
         inheritNavigation: true,
-        local: 1033,
+        locale: 1033,
         debug: true
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
-  it('passes validation if all required options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: "subsite", url: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite", url: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if all required options and valid locale are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: "subsite", url: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options and valid locale are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite", url: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: '1033'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the parentWebUrl option not specified', async () => {
+  it('fails validation if the parentWebUrl option not specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -586,32 +594,33 @@ describe(commands.WEB_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        title: "subsite",
-        url: "subsite", webTemplate: "STS#0", locale: 1033
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite",
+      url: "subsite", webTemplate: "STS#0", locale: '1033'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the parentWebUrl option is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: {
-        title: "subsite",
-        url: "subsite", webTemplate: "STS#0", locale: 1033,
-        parentWebUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the parentWebUrl option is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite",
+      url: "subsite", webTemplate: "STS#0", locale: '1033',
+      parentWebUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the specified locale is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        title: "subsite", url: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified locale is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite", url: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: "subsite", url: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

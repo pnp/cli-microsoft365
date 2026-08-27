@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-roleassignment-remove.js';
+import command, { options } from './web-roleassignment-remove.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 
@@ -19,6 +19,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
 
@@ -119,6 +120,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -168,34 +170,39 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', principalId: 11 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', principalId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the principalId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the principalId option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the entreGroupId option is not a valid guid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entreGroupId option is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the entreGroupId option is a valid guid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'a449d6a5-1a05-4e79-b345-e2519fd66a99' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the entreGroupId option is a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'a449d6a5-1a05-4e79-b345-e2519fd66a99' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', principalId: 11, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('remove role assignment from web', async () => {
@@ -208,12 +215,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         principalId: 11,
         force: true
-      }
+      })
     });
   });
 
@@ -229,12 +236,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
+      })
     });
   });
 
@@ -251,12 +258,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
+      })
     } as any), new CommandError(error));
   });
 
@@ -272,12 +279,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup',
         force: true
-      }
+      })
     });
   });
 
@@ -294,33 +301,33 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup',
         force: true
-      }
+      })
     } as any), new CommandError(error));
   });
 
   it('aborts removing role assignment when prompt not confirmed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup'
-      }
+      })
     });
     assert(requests.length === 0);
   });
 
   it('prompts before removing role assignment when confirmation argument not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -341,11 +348,11 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup'
-      }
+      })
     });
   });
 
@@ -362,12 +369,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
         force: true
-      }
+      })
     });
   });
 
@@ -384,12 +391,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         entraGroupName: 'Marketing',
         force: true
-      }
+      })
     });
   });
 });

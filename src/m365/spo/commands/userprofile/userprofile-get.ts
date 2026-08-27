@@ -1,19 +1,25 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userName: z.string().refine(userName => validation.isValidUserPrincipalName(userName), {
+    error: e => `${e.input} is not a valid user principal name`
+  }).alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userName: string;
 }
 
 class SpoUserProfileGetCommand extends SpoCommand {
@@ -25,31 +31,8 @@ class SpoUserProfileGetCommand extends SpoCommand {
     return 'Gets user profile property for a SharePoint user';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userName <userName>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

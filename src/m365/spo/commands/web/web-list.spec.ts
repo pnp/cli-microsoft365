@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-list.js';
+import command, { options } from './web-list.js';
 
 describe(commands.WEB_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.WEB_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -112,11 +114,11 @@ describe(commands.WEB_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         url: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       "AllowRssFeeds": false,
@@ -165,10 +167,10 @@ describe(commands.WEB_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         url: 'https://contoso.sharepoint.com'
-      }
+      })
     } as any), new CommandError(err));
   });
 
@@ -184,32 +186,26 @@ describe(commands.WEB_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         url: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     assert('Correct Url');
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<url>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

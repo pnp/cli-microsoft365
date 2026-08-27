@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './userprofile-get.js';
+import command, { options } from './userprofile-get.js';
 
 describe(commands.USERPROFILE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.USERPROFILE_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -108,11 +110,11 @@ describe(commands.USERPROFILE_GET, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         userName: 'john.doe@contoso.onmicrosoft.com'
-      }
-    } as any);
+      })
+    });
     const loggedProfile = JSON.parse(JSON.stringify(profile));
     loggedProfile.UserProfileProperties = JSON.stringify(loggedProfile.UserProfileProperties);
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(loggedProfile));
@@ -142,12 +144,12 @@ describe(commands.USERPROFILE_GET, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         userName: 'john.doe@contoso.onmicrosoft.com'
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.calledWith({
       "AccountName": "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com",
       "DirectReports": [],
@@ -167,34 +169,28 @@ describe(commands.USERPROFILE_GET, () => {
     }));
   });
 
-  it('supports specifying userName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--userName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'john.doe@contoso.onmicrosoft.com'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the user principal name is not a valid', async () => {
-    const actual = await command.validate({ options: { userName: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the user principal name is not a valid', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the user principal name is a valid', async () => {
-    const actual = await command.validate({ options: { userName: 'john.doe@mytenant.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the user principal name is a valid', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'john.doe@mytenant.onmicrosoft.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'john.doe@mytenant.onmicrosoft.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

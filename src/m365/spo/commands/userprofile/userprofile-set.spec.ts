@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,12 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './userprofile-set.js';
+import command, { options } from './userprofile-set.js';
 
 describe(commands.USERPROFILE_SET, () => {
   let log: any[];
   let logger: Logger;
   const spoUrl = 'https://contoso.sharepoint.com';
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,6 +34,8 @@ describe(commands.USERPROFILE_SET, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,12 +90,12 @@ describe(commands.USERPROFILE_SET, () => {
     };
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
         propertyValue: 'Senior Developer',
         debug: true
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
@@ -112,11 +118,11 @@ describe(commands.USERPROFILE_SET, () => {
     };
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-Skills',
         propertyValue: 'CSS, HTML'
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
@@ -126,11 +132,21 @@ describe(commands.USERPROFILE_SET, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
         propertyValue: 'Senior Developer'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userName: 'john.doe@mytenant.onmicrosoft.com',
+      propertyName: 'SPS-JobTitle',
+      propertyValue: 'Senior Developer',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

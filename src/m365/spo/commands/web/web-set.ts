@@ -1,27 +1,35 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  description: z.string().optional().alias('d'),
+  headerEmphasis: z.enum(['0', '1', '2', '3'], {
+    error: e => `${e.input} is not a valid value for headerEmphasis. Allowed values are 0|1|2|3`
+  }).optional(),
+  headerLayout: z.enum(['standard', 'compact']).optional(),
+  megaMenuEnabled: z.boolean().optional(),
+  quickLaunchEnabled: z.boolean().optional(),
+  siteLogoUrl: z.string().optional(),
+  title: z.string().optional().alias('t'),
+  url: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  footerEnabled: z.boolean().optional(),
+  navAudienceTargetingEnabled: z.boolean().optional(),
+  searchScope: z.preprocess(value => String(value).toLowerCase(), z.enum(['defaultscope', 'tenant', 'hub', 'site'])).optional(),
+  welcomePage: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  description?: string;
-  headerEmphasis?: number;
-  headerLayout?: string;
-  megaMenuEnabled?: boolean;
-  quickLaunchEnabled?: boolean;
-  siteLogoUrl?: string;
-  title?: string;
-  url: string;
-  footerEnabled?: boolean;
-  navAudienceTargetingEnabled?: boolean;
-  searchScope?: string;
-  welcomePage?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
@@ -35,126 +43,14 @@ class SpoWebSetCommand extends SpoCommand {
     return 'Updates subsite properties';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        headerEmphasis: typeof args.options.headerEmphasis !== 'undefined',
-        headerLayout: typeof args.options.headerLayout !== 'undefined',
-        megaMenuEnabled: typeof args.options.megaMenuEnabled !== 'undefined',
-        siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        quickLaunchEnabled: typeof args.options.quickLaunchEnabled !== 'undefined',
-        footerEnabled: typeof args.options.footerEnabled !== 'undefined',
-        navAudienceTargetingEnabled: typeof args.options.navAudienceTargetingEnabled !== 'undefined',
-        searchScope: typeof args.options.searchScope !== 'undefined',
-        welcomePage: typeof args.options.welcomePage !== 'undefined'
-      });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--siteLogoUrl [siteLogoUrl]'
-      },
-      {
-        option: '--quickLaunchEnabled [quickLaunchEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--headerLayout [headerLayout]',
-        autocomplete: ['standard', 'compact']
-      },
-      {
-        option: '--headerEmphasis [headerEmphasis]',
-        autocomplete: ['0', '1', '2', '3']
-      },
-      {
-        option: '--megaMenuEnabled [megaMenuEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--footerEnabled [footerEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--navAudienceTargetingEnabled [navAudienceTargetingEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--searchScope [searchScope]',
-        autocomplete: SpoWebSetCommand.searchScopeOptions
-      },
-      {
-        option: '--welcomePage [welcomePage]'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('megaMenuEnabled', 'footerEnabled', 'quickLaunchEnabled', 'navAudienceTargetingEnabled');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (typeof args.options.headerEmphasis !== 'undefined') {
-          if (isNaN(args.options.headerEmphasis)) {
-            return `${args.options.headerEmphasis} is not a number`;
-          }
-
-          if ([0, 1, 2, 3].indexOf(args.options.headerEmphasis) < 0) {
-            return `${args.options.headerEmphasis} is not a valid value for headerEmphasis. Allowed values are 0|1|2|3`;
-          }
-        }
-
-        if (typeof args.options.headerLayout !== 'undefined') {
-          if (['standard', 'compact'].indexOf(args.options.headerLayout) < 0) {
-            return `${args.options.headerLayout} is not a valid value for headerLayout. Allowed values are standard|compact`;
-          }
-        }
-
-        if (typeof args.options.searchScope !== 'undefined') {
-          const searchScope = args.options.searchScope.toString().toLowerCase();
-          if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
-            return `${args.options.searchScope} is not a valid value for searchScope. Allowed values are DefaultScope|Tenant|Hub|Site`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const payload: any = {};
 
-    this.addUnknownOptionsToPayload(payload, args.options);
+    this.addUnknownOptionsToPayloadZod(payload, args.options);
 
     if (args.options.title) {
       payload.Title = args.options.title;
@@ -169,7 +65,7 @@ class SpoWebSetCommand extends SpoCommand {
       payload.QuickLaunchEnabled = args.options.quickLaunchEnabled;
     }
     if (typeof args.options.headerEmphasis !== 'undefined') {
-      payload.HeaderEmphasis = args.options.headerEmphasis;
+      payload.HeaderEmphasis = Number(args.options.headerEmphasis);
     }
     if (typeof args.options.headerLayout !== 'undefined') {
       payload.HeaderLayout = args.options.headerLayout === 'standard' ? 1 : 2;
