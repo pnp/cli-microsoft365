@@ -92,10 +92,6 @@ export const fsUtil = {
     }
   },
 
-  getSafeFileName(input: string): string {
-    return input.replace(/'/g, "''");
-  },
-
   getCopyCommand(command: string, shell: string): string {
     return (copyCommands as any)[shell][command];
   },
