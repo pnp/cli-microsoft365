@@ -2,6 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
+import yaml from 'yaml';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -13,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './project-azuredevops-pipeline-add.js';
+import { AzureDevOpsPipeline } from './project-azuredevops-pipeline-model.js';
 
 describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
   let log: any[];
@@ -179,7 +181,7 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
-  it('creates a pipeline with heft for SPFx version that requires heft', async () => {
+  it('creates a pipeline with npm run build for SPFx version that requires heft', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
       if (fakePath.toString() === path.join(projectPath, 'package.json')) {
@@ -216,10 +218,11 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     await command.action(logger, { options: {} } as any);
 
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
-    const writtenContent: string = writeFileSyncStub.args[0][1] as string;
-    assert(writtenContent.includes('Heft build and package'), 'Heft step not found in pipeline');
-    assert(!writtenContent.includes('Gulp bundle'), 'Gulp bundle step should be removed');
-    assert(!writtenContent.includes('Gulp package'), 'Gulp package step should be removed');
+    const writtenPipeline: AzureDevOpsPipeline = yaml.parse(writeFileSyncStub.args[0][1] as string);
+    const steps = writtenPipeline.stages[0].jobs[0].steps;
+    const buildStep = steps.find(step => step.displayName === 'Build and package');
+    assert.strictEqual(buildStep?.inputs?.customCommand, 'npm run build', 'Build and package step does not run npm run build');
+    assert.strictEqual(steps.some(step => step.task === 'Gulp@0'), false, 'Gulp steps should not be added');
   });
 
   it('handles error with unknown minor version of SPFx when missing minor version', async () => {

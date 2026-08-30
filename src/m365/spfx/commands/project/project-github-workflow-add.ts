@@ -135,8 +135,10 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
         await logger.logToStderr(`Adding GitHub workflow in the current SPFx project`);
       }
 
-      this.updateWorkflow(solutionName, sppkgPath, workflow, args.options);
-      this.saveWorkflow(workflow);
+      const workflowToSave: GitHubWorkflow = structuredClone(workflow);
+
+      this.updateWorkflow(solutionName, sppkgPath, workflowToSave, args.options);
+      this.saveWorkflow(workflowToSave);
     }
     catch (error: any) {
       this.handleError(error);
@@ -205,10 +207,10 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
       deployAction.with!.APP_FILE_PATH = deployAction.with!.APP_FILE_PATH!.replace('{{ sppkgPath }}', sppkgPath);
     }
 
-    if (versionRequirements.heft !== undefined) {
-      const bundleAndPackageStep = this.getBundleAndPackageStep(workflow);
-      bundleAndPackageStep.run = `npm install -g @rushstack/heft@latest\nheft build --production\nheft package-solution --production\n`;
-      bundleAndPackageStep.name = 'Build & Package';
+    if (versionRequirements.heft === undefined) {
+      const buildAndPackageStep = this.getBuildAndPackageStep(workflow);
+      buildAndPackageStep.run = `gulp bundle --ship\ngulp package-solution --ship\n`;
+      buildAndPackageStep.name = 'Bundle & Package';
     }
   }
 
@@ -216,9 +218,9 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     workflow.jobs['build-and-deploy'].env.NodeVersion = nodeVersion;
   }
 
-  private getBundleAndPackageStep(workflow: GitHubWorkflow): GitHubWorkflowStep {
+  private getBuildAndPackageStep(workflow: GitHubWorkflow): GitHubWorkflowStep {
     const steps = this.getWorkFlowSteps(workflow);
-    return steps.find(step => step.run && step.name === 'Bundle & Package')!;
+    return steps.find(step => step.run && step.name === 'Build & Package')!;
   }
 
   private getLoginAction(workflow: GitHubWorkflow): GitHubWorkflowStep {

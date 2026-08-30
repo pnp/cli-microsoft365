@@ -2,6 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
+import yaml from 'yaml';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -13,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './project-github-workflow-add.js';
+import { GitHubWorkflow } from './project-github-workflow-model.js';
 
 describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   let log: any[];
@@ -180,7 +182,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
-  it('uses heft build and package for newer version of SPFx', async () => {
+  it('uses npm run build and package for newer version of SPFx', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
@@ -221,10 +223,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     await command.action(logger, { options: {} } as any);
 
-    assert(writeFileSyncStub.calledOnce, 'writeFileSync not called');
-    const writtenContent: string = writeFileSyncStub.args[0][1];
-    assert(writtenContent.includes('heft build --production'), 'heft build not found in workflow');
-    assert(writtenContent.includes('heft package-solution --production'), 'heft package-solution not found in workflow');
+    assert(writeFileSyncStub.calledOnce, 'writeFileSync not called or called multiple times.');
+    const writtenWorkflow: GitHubWorkflow = yaml.parse(writeFileSyncStub.args[0][1] as string);
+    const buildStep = writtenWorkflow.jobs['build-and-deploy'].steps.find(step => step.name === 'Build & Package');
+    assert.strictEqual(buildStep?.run, 'npm run build', 'Build & Package step does not run npm run build');
   });
 
   it('handles error with unknown version of SPFx', async () => {

@@ -128,8 +128,10 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
 
       const sppkgPath = (project.packageSolutionJson as any)?.paths?.zippedPackage;
 
-      this.updatePipeline(sppkgPath, pipeline, args.options);
-      this.savePipeline(pipeline);
+      const pipelineToSave: AzureDevOpsPipeline = structuredClone(pipeline);
+
+      this.updatePipeline(sppkgPath, pipelineToSave, args.options);
+      this.savePipeline(pipelineToSave);
     }
     catch (error: any) {
       this.handleError(error);
@@ -215,29 +217,36 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
         script.script = script.script.replace(`m365 spo app deploy `, `m365 spo app deploy --skipFeatureDeployment `);
       }
 
-      if (versionRequirements.heft !== undefined) {
+      if (versionRequirements.heft === undefined) {
         let steps = this.getPipelineSteps(pipeline);
 
-        const bundleStep = steps.find(step => step.task && step.displayName === "Gulp bundle");
-        if (bundleStep) {
-          pipeline.stages[0].jobs[0].steps = steps.filter(step => step !== bundleStep);
+        const npmBuildScript = steps.find(step => step.task && step.displayName === "Build and package");
+        if (npmBuildScript) {
+          pipeline.stages[0].jobs[0].steps = steps.filter(step => step !== npmBuildScript);
         }
 
-        const packageStep = steps.find(step => step.task && step.displayName === "Gulp package");
-        if (packageStep) {
-          pipeline.stages[0].jobs[0].steps = pipeline.stages[0].jobs[0].steps.filter(step => step !== packageStep);
-        }
-
-        const installHeftStep: AzureDevOpsPipelineStep = {
-          task: "CmdLine@2",
-          displayName: "Heft build and package",
+        const gulpBundleStep: AzureDevOpsPipelineStep = {
+          task: "Gulp@0",
+          displayName: "Gulp bundle",
           inputs: {
-            script: `npm install -g @rushstack/heft@latest\nheft build --production\nheft package-solution --production\n`
+            gulpFile: "./gulpfile.js",
+            targets: "bundle",
+            arguments: "--ship"
           }
         };
+
+        const gulpPackageStep: AzureDevOpsPipelineStep = {
+          task: "Gulp@0",
+          displayName: "Gulp package",
+          inputs: {
+            targets: "package-solution",
+            arguments: "--ship"
+          }
+        };
+
         steps = this.getPipelineSteps(pipeline);
         const installCLIStepIndex = steps.findIndex(step => step.task === "Npm@1" && step.displayName === "Install CLI for Microsoft 365");
-        pipeline.stages[0].jobs[0].steps.splice(installCLIStepIndex, 0, installHeftStep);
+        pipeline.stages[0].jobs[0].steps.splice(installCLIStepIndex, 0, gulpBundleStep, gulpPackageStep);
       }
     }
   }
