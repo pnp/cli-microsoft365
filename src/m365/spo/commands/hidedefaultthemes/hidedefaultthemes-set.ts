@@ -1,16 +1,20 @@
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  hideDefaultThemes: z.boolean()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  hideDefaultThemes: boolean;
 }
 
 class SpoHideDefaultThemesSetCommand extends SpoCommand {
@@ -22,33 +26,8 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
     return 'Sets the value of the HideDefaultThemes setting';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        hideDefaultThemes: args.options.hideDefaultThemes
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--hideDefaultThemes <hideDefaultThemes>',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('hideDefaultThemes');
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

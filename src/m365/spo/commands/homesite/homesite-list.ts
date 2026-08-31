@@ -1,8 +1,12 @@
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = globalOptionsZod.strict();
 
 class SpoHomeSiteListCommand extends SpoCommand {
   public get name(): string {
@@ -11,6 +15,10 @@ class SpoHomeSiteListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists all home sites';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
