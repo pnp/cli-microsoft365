@@ -1,19 +1,31 @@
 import auth from '../../../../Auth.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  userName: z.string()
+    .refine(val => validation.isValidUserPrincipalName(val), {
+      message: 'The value is not a valid user principal name (UPN).'
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
 }
 
 class PlannerRosterPlanListCommand extends GraphCommand {
@@ -25,65 +37,23 @@ class PlannerRosterPlanListCommand extends GraphCommand {
     return 'Lists all Microsoft Planner Roster plans for a specific user';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => !opts.userId || !opts.userName, {
+        message: `Specify either 'userId' or 'userName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name (UPN)`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('userId', 'userName');
   }
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'createdDateTime', 'owner'];
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['userId', 'userName'],
-      runsWhen: (args) => args.options.userId || args.options.userName
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -106,7 +76,7 @@ class PlannerRosterPlanListCommand extends GraphCommand {
     else {
       requestUrl += 'me';
     }
-    requestUrl += `/planner/rosterPlans`;
+    requestUrl += '/planner/rosterPlans';
 
     try {
       const items = await odata.getAllItems(requestUrl);

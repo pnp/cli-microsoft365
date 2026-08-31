@@ -36,7 +36,7 @@ class EntraAdministrativeUnitMemberRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Remove a specific member (user, group, or device) from an administrative unit';
+    return 'Removes a member (user, group, or device) from an administrative unit';
   }
 
   public get schema(): z.ZodType | undefined {

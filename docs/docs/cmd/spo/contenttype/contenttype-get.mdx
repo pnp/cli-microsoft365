@@ -40,6 +40,25 @@ m365 spo contenttype get [options]
 
 If no content type with the specified is found in the site or the list, you will get the _Content type with ID 0x010012 not found_ error.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Retrieve site content type by id.

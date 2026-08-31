@@ -1,8 +1,10 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo file retentionlabel ensure
 
-Apply a retention label to a file
+Applies a retention label to a file
 
 ## Usage
 
@@ -36,6 +38,25 @@ m365 spo file retentionlabel ensure [options]
 You can also use [spo listitem retentionlabel remove](./../../../cmd/spo/listitem/listitem-retentionlabel-remove.mdx) for removing the retention label from a list item.
 
 The `--assetId` option has to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

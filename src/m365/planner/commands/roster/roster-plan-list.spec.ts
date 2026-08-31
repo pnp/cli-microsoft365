@@ -12,36 +12,36 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roster-plan-list.js';
+import command, { options } from './roster-plan-list.js';
 
 describe(commands.ROSTER_PLAN_LIST, () => {
   const userId = '59f80e08-24b1-41f8-8586-16765fd830d3';
   const userName = 'john.doe@contoso.com';
   const rosterUserPlanListResponse = {
-    "value": [
+    value: [
       {
-        "createdDateTime": "2023-04-06T14:41:49.8676617Z",
-        "owner": "59f80e08-24b1-41f8-8586-16765fd830d3",
-        "title": "My Planner Plan",
-        "creationSource": null,
-        "id": "_5GY9MJpZU2vb3DC46CP3MkACr8m",
-        "createdBy": {
-          "user": {
-            "displayName": null,
-            "id": "59f80e08-24b1-41f8-8586-16765fd830d3"
+        createdDateTime: '2023-04-06T14:41:49.8676617Z',
+        owner: '59f80e08-24b1-41f8-8586-16765fd830d3',
+        title: 'My Planner Plan',
+        creationSource: null,
+        id: '_5GY9MJpZU2vb3DC46CP3MkACr8m',
+        createdBy: {
+          user: {
+            displayName: null,
+            id: '59f80e08-24b1-41f8-8586-16765fd830d3'
           },
-          "application": {
-            "displayName": null,
-            "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+          application: {
+            displayName: null,
+            id: '31359c7f-bd7e-475c-86db-fdb8c937548e'
           }
         },
-        "container": {
-          "containerId": "_5GY9MJpZU2vb3DC46CP3MkACr8m",
-          "type": "unknownFutureValue",
-          "url": "https://graph.microsoft.com/beta/planner/rosters/_5GY9MJpZU2vb3DC46CP3MkACr8m"
+        container: {
+          containerId: '_5GY9MJpZU2vb3DC46CP3MkACr8m',
+          type: 'unknownFutureValue',
+          url: 'https://graph.microsoft.com/beta/planner/rosters/_5GY9MJpZU2vb3DC46CP3MkACr8m'
         },
-        "contexts": {},
-        "sharedWithContainers": []
+        contexts: {},
+        sharedWithContainers: []
       }
     ]
   };
@@ -50,6 +50,7 @@ describe(commands.ROSTER_PLAN_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -62,6 +63,7 @@ describe(commands.ROSTER_PLAN_LIST, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,24 +104,42 @@ describe(commands.ROSTER_PLAN_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with a userId defined', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userId defined', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with a userName defined', async () => {
-    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userName defined', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId, userName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('defines correct properties for the default output', () => {
@@ -129,14 +149,14 @@ describe(commands.ROSTER_PLAN_LIST, () => {
   it('retrieves all planner plans contained in roster where current logged in user is member of', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/planner/rosterPlans`) {
+      if (opts.url === 'https://graph.microsoft.com/beta/me/planner/rosterPlans') {
         return rosterUserPlanListResponse;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
@@ -150,7 +170,7 @@ describe(commands.ROSTER_PLAN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userName }) });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
@@ -164,7 +184,7 @@ describe(commands.ROSTER_PLAN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId }) });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
@@ -172,26 +192,26 @@ describe(commands.ROSTER_PLAN_LIST, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     }), new CommandError(`Specify at least 'userId' or 'userName' when using application permissions.`));
   });
 
   it('throws an error when passing userId using delegated permissions', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     await assert.rejects(command.action(logger, {
-      options: { userId: userId }
+      options: commandOptionsSchema.parse({ userId })
     }), new CommandError(`The options 'userId' or 'userName' cannot be used when obtaining Microsoft Planner Roster plans using delegated permissions.`));
   });
 
   it('handles error when retrieving all planner plans contained in roster', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/planner/rosterPlans`) {
+      if (opts.url === 'https://graph.microsoft.com/beta/me/planner/rosterPlans') {
         throw { error: { error: { message: 'An error has occurred' } } };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });

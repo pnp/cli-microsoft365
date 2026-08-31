@@ -28,7 +28,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Break inheritance of list item';
+    return 'Breaks inheritance of list item';
   }
 
   constructor() {

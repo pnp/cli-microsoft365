@@ -19,7 +19,7 @@ class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get details about users who have activated Microsoft 365.';
+    return 'Gets details about users who have activated Microsoft 365.';
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -21,7 +21,7 @@ class CliConsentCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Consent additional permissions for the Microsoft Entra application used by the CLI for Microsoft 365';
+    return 'Consents additional permissions for the Microsoft Entra application used by the CLI for Microsoft 365';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -25,7 +25,7 @@ class TeamsUserAppUpgradeCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Upgrade an app in the personal scope of the specified user';
+    return 'Upgrades an app in the personal scope of the specified user';
   }
 
   constructor() {

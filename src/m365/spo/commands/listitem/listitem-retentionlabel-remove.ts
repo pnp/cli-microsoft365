@@ -28,7 +28,7 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Clear the retention label from a list item';
+    return 'Clears the retention label from a list item';
   }
 
   constructor() {

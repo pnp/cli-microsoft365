@@ -22,7 +22,7 @@ class TenantPeoplePronounsSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Manage pronouns settings for an organization';
+    return 'Manages pronouns settings for an organization';
   }
 
   public get schema(): z.ZodType | undefined {

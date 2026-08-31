@@ -21,7 +21,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get details for the specified tenant property';
+    return 'Gets details for the specified tenant property';
   }
 
   constructor() {

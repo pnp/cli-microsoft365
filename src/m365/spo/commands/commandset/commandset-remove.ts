@@ -30,7 +30,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove a ListView Command Set that is added to a site.';
+    return 'Removes a ListView Command Set that is added to a site.';
   }
 
   constructor() {

@@ -20,7 +20,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
   }
 
   public get description(): string {
-    return 'Retrieve apps installed in a site';
+    return 'Retrieves apps installed in a site';
   }
 
   public defaultProperties(): string[] | undefined {

@@ -23,7 +23,7 @@ class SpoPageSectionListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List sections in the specific modern page';
+    return 'Lists sections in the specific modern page';
   }
 
   constructor() {

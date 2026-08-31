@@ -10,8 +10,8 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionlabel-set.js';
 import { session } from '../../../../utils/session.js';
+import command, { options } from './retentionlabel-set.js';
 
 describe(commands.RETENTIONLABEL_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
@@ -20,6 +20,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,44 +72,49 @@ describe(commands.RETENTIONLABEL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation with valid id but no other option specified', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with valid id but no other option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when specifying an invalid value for behaviorDuringRetentionPeriod', async () => {
-    const actual = await command.validate({ options: { id: validId, behaviorDuringRetentionPeriod: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when specifying an invalid value for behaviorDuringRetentionPeriod', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, behaviorDuringRetentionPeriod: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when specifying an invalid value for actionAfterRetentionPeriod', async () => {
-    const actual = await command.validate({ options: { id: validId, actionAfterRetentionPeriod: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when specifying an invalid value for actionAfterRetentionPeriod', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, actionAfterRetentionPeriod: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when specifying an invalid value for retentionTrigger', async () => {
-    const actual = await command.validate({ options: { id: validId, retentionTrigger: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when specifying an invalid value for retentionTrigger', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, retentionTrigger: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when specifying an invalid value for defaultRecordBehavior', async () => {
-    const actual = await command.validate({ options: { id: validId, defaultRecordBehavior: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when specifying an invalid value for defaultRecordBehavior', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, defaultRecordBehavior: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation with valid id and a single option specified', async () => {
-    const actual = await command.validate({ options: { id: validId, retentionDuration: 180 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with valid id and a single option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, retentionDuration: '180' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation with valid id and multipe options specified', async () => {
-    const actual = await command.validate({ options: { id: validId, retentionDuration: 180, actionAfterRetentionPeriod: 'none' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with valid id and multipe options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, retentionDuration: '180', actionAfterRetentionPeriod: 'none' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, retentionDuration: '180', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly sets field retentionDays and actionAfterRetentionPeriod of a specific retention label by id', async () => {
@@ -119,7 +126,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, retentionDuration: 180, actionAfterRetentionPeriod: 'none', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, retentionDuration: '180', actionAfterRetentionPeriod: 'none', verbose: true }) });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
@@ -132,7 +139,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, retentionTrigger: 'dateLabeled', defaultRecordBehavior: 'startLocked', behaviorDuringRetentionPeriod: 'retainAsRecord', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, retentionTrigger: 'dateLabeled', defaultRecordBehavior: 'startLocked', behaviorDuringRetentionPeriod: 'retainAsRecord', verbose: true }) });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
@@ -145,11 +152,11 @@ describe(commands.RETENTIONLABEL_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, descriptionForUsers: 'description for users', descriptionForAdmins: 'description for admins', labelToBeApplied: 'label to be applied', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId, descriptionForUsers: 'description for users', descriptionForAdmins: 'description for admins', labelToBeApplied: 'label to be applied', verbose: true }) });
     assert(loggerLogToStderrSpy.notCalled);
   });
 
-  it('fails to set field retentionDays of a specific retention label by id', async () => {
+  it('fails to set field retentionDuration of a specific retention label by id', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
         throw 'Error occurred when updating the retention label';
@@ -158,6 +165,6 @@ describe(commands.RETENTIONLABEL_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occurred when updating the retention label'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId, retentionDuration: '180', actionAfterRetentionPeriod: 'none' }) }), new CommandError('Error occurred when updating the retention label'));
   });
 });

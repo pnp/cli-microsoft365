@@ -25,6 +25,25 @@ m365 spo hubsite list [options]
 
 When using the text or csv output type, the command lists only the values of the `ID`, `SiteUrl` and `Title` properties of the hub site. With the output type as JSON, all available properties are included in the command output.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List hub sites in the current tenant

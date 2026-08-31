@@ -21,7 +21,7 @@ class SpoCommandSetListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get a list of ListView Command Sets that are added to a site.';
+    return 'Gets a list of ListView Command Sets that are added to a site.';
   }
 
   public defaultProperties(): string[] | undefined {

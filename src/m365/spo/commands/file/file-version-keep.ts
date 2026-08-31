@@ -33,7 +33,7 @@ class SpoFileVersionKeepCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Ensure that a specific file version will never expire';
+    return 'Ensures that a specific file version will never expire';
   }
 
   public get schema(): z.ZodType | undefined {

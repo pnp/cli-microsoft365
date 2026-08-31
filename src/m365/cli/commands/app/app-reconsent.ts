@@ -24,7 +24,7 @@ class CliAppReconsentCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Reconsent all permission scopes used in CLI for Microsoft 365';
+    return 'Reconsents all permission scopes used in CLI for Microsoft 365';
   }
 
   public get schema(): z.ZodType {

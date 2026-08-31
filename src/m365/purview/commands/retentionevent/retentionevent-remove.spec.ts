@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionevent-remove.js';
+import command, { options } from './retentionevent-remove.js';
 
 describe(commands.RETENTIONEVENT_REMOVE, () => {
   const validId = 'c37d695e-d581-4ae9-82a0-9364eba4291e';
@@ -20,6 +20,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,29 +78,33 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified retention event when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
 
 
@@ -108,9 +114,9 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   it('aborts removing the specified retention event when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
     assert(deleteSpy.notCalled);
   });
@@ -128,9 +134,9 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
   });
 
@@ -144,10 +150,10 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId,
         force: true
-      }
+      })
     });
   });
 
@@ -162,10 +168,10 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId,
         force: true
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });

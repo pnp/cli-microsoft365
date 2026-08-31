@@ -657,5 +657,20 @@ export const versions: { [version: string]: SpfxVersionPrerequisites } = {
       range: '^4 || ^5 || ^6 || ^7',
       fix: 'npm i -g yo@7'
     }
+  },
+  '1.23.2': {
+    heft: {
+      range: '^1',
+      fix: 'npm i -g @rushstack/heft@1'
+    },
+    node: {
+      range: '>=22.14.0 <23.0.0',
+      fix: 'Install Node.js >=22.14.0 <23.0.0'
+    },
+    sp: SharePointVersion.SPO,
+    yo: {
+      range: '^4 || ^5 || ^6 || ^7',
+      fix: 'npm i -g yo@7'
+    }
   }
 };

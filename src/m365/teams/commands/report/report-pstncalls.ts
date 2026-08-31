@@ -25,7 +25,7 @@ class TeamsReportPstncallsCommand extends GraphApplicationCommand {
   }
 
   public get description(): string {
-    return 'Get details about PSTN calls made within a given time period';
+    return 'Gets details about PSTN calls made within a given time period';
   }
 
   public defaultProperties(): string[] | undefined {

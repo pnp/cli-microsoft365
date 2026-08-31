@@ -1,0 +1,869 @@
+adaptivecard send|Sends adaptive card to the specified URL
+app get|Retrieves information about the current Microsoft Entra app
+app open|Opens Microsoft Entra app in the Microsoft Entra ID portal
+app permission add|Adds the specified application and/or delegated permissions to the current Microsoft Entra app API permissions
+app permission list|Lists API permissions for the current Microsoft Entra app
+booking business get|Retrieve the specified Microsoft Bookings business.
+booking business list|Lists all Microsoft Bookings businesses that are created for the tenant.
+cli app add|Creates a Microsoft Entra application registration for CLI for Microsoft 365
+cli app reconsent|Reconsent all permission scopes used in CLI for Microsoft 365
+cli completion clink update|Updates command completion for Clink (cmder)
+cli completion pwsh setup|Sets up command completion for PowerShell
+cli completion pwsh update|Updates command completion for PowerShell
+cli completion sh setup|Sets up command completion for Zsh, Bash and Fish
+cli completion sh update|Updates command completion for Zsh, Bash and Fish
+cli config get|Gets value of a CLI for Microsoft 365 configuration option
+cli config list|List all self set CLI for Microsoft 365 configurations
+cli config reset|Resets the specified CLI configuration option to its default value
+cli config set|Manage global configuration settings about the CLI for Microsoft 365
+cli consent|Consent additional permissions for the Microsoft Entra application used by the CLI for Microsoft 365
+cli doctor|Retrieves diagnostic information about the current environment
+cli issue|Returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc.
+connection list|Show the list of available connections
+connection remove|Remove the specified connection
+connection set|Rename the specified connection
+connection use|Activate the specified Microsoft 365 tenant connection
+context init|Initiates CLI for Microsoft 365 context in the current working folder
+context option list|List all options added to the context
+context option remove|Removes an already available name from local context file.
+context option set|Allows to add a new name for the option and value to the local context file.
+context remove|Removes the CLI for Microsoft 365 context in the current working folder
+docs|Returns the CLI for Microsoft 365 docs webpage URL
+entra administrativeunit add|Creates an administrative unit
+entra administrativeunit get|Gets information about a specific administrative unit
+entra administrativeunit list|Retrieves a list of administrative units
+entra administrativeunit member add|Adds a member (user, group, device) to an administrative unit
+entra administrativeunit member get|Retrieve a specific member (user, group, or device) of an administrative unit
+entra administrativeunit member list|Retrieves members (users, groups, or devices) of an administrative unit.
+entra administrativeunit member remove|Remove a specific member (user, group, or device) from an administrative unit
+entra administrativeunit remove|Removes an administrative unit
+entra administrativeunit roleassignment add|Assigns a Microsoft Entra role with administrative unit scope to a user
+entra app add|Creates new Entra app registration
+entra app get|Gets an Entra app registration
+entra app list|Retrieves a list of Entra app registrations
+entra app permission add|Adds the specified application and/or delegated permissions to a specified Microsoft Entra app
+entra app permission list|Lists the application and delegated permissions for a specified Entra Application Registration
+entra app permission remove|Removes the specified application and/or delegated permissions from a specified Microsoft Entra app
+entra app remove|Removes an Entra app registration
+entra app role add|Adds role to the specified Entra app registration
+entra app role list|Gets Entra app registration roles
+entra app role remove|Removes role from the specified Entra app registration
+entra app set|Updates Entra app registration
+entra approleassignment add|Adds service principal permissions also known as scopes and app role assignments for specified Microsoft Entra application registration
+entra approleassignment list|Lists app role assignments for the specified application registration
+entra approleassignment remove|Deletes an app role assignment for the specified Entra Application Registration
+entra enterpriseapp add|Creates an enterprise application (or service principal) for a registered Entra app
+entra enterpriseapp get|Gets information about an Enterprise Application
+entra enterpriseapp list|Lists the enterprise applications (or service principals) in Entra ID
+entra enterpriseapp remove|Deletes an enterprise application (or service principal)
+entra group add|Creates a Microsoft Entra group
+entra group get|Gets information about the specified Entra group
+entra group list|Lists all groups defined in Entra ID.
+entra group member add|Adds members to a Microsoft Entra group
+entra group member list|Lists members of a specific Entra group
+entra group member remove|Removes members from a Microsoft Entra group
+entra group member set|Updates the role of members in a Microsoft Entra ID group
+entra group remove|Removes an Entra group
+entra group set|Updates a Microsoft Entra group
+entra groupsetting add|Creates a group setting
+entra groupsetting get|Gets information about the particular group setting
+entra groupsetting list|Lists Entra group settings
+entra groupsetting remove|Removes the particular group setting
+entra groupsetting set|Updates the particular group setting
+entra groupsettingtemplate get|Gets information about the specified Entra group settings template
+entra groupsettingtemplate list|Lists Entra group settings templates
+entra license list|Lists commercial subscriptions that an organization has acquired
+entra m365group add|Creates a Microsoft 365 Group
+entra m365group conversation list|Lists conversations for the specified Microsoft 365 group
+entra m365group conversation post list|Lists conversation posts of a Microsoft 365 group
+entra m365group get|Gets information about the specified Microsoft 365 Group or Microsoft Teams team
+entra m365group list|Lists Microsoft 365 Groups in the current tenant
+entra m365group recyclebinitem clear|Clears all M365 Groups from recycle bin.
+entra m365group recyclebinitem list|Lists Microsoft 365 Groups deleted in the current tenant
+entra m365group recyclebinitem remove|Permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant
+entra m365group recyclebinitem restore|Restores a deleted Microsoft 365 Group
+entra m365group remove|Removes a Microsoft 365 Group
+entra m365group renew|Renews Microsoft 365 group's expiration
+entra m365group report activitycounts|Get the number of group activities across group workloads
+entra m365group report activitydetail|Get details about Microsoft 365 Groups activity by group
+entra m365group report activityfilecounts|Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group
+entra m365group report activitygroupcounts|Get the daily total number of groups and how many of them were active based on email conversations, Viva Engage posts, and SharePoint file activities
+entra m365group report activitystorage|Get the total storage used across all group mailboxes and group sites
+entra m365group set|Updates Microsoft 365 Group properties
+entra m365group teamify|Creates a new Microsoft Teams team under existing Microsoft 365 group
+entra m365group user add|Adds user to specified Microsoft 365 Group or Microsoft Teams team
+entra m365group user list|Lists users for the specified Microsoft 365 group
+entra m365group user remove|Removes the specified user from specified Microsoft 365 Group or Microsoft Teams team
+entra m365group user set|Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team
+entra multitenant add|Creates a new multitenant organization
+entra multitenant get|Gets properties of the multitenant organization
+entra multitenant remove|Removes a multitenant organization
+entra multitenant set|Updates the properties of a multitenant organization
+entra oauth2grant add|Grant the specified service principal OAuth2 permissions to the specified resource
+entra oauth2grant list|Lists OAuth2 permission grants for the specified service principal
+entra oauth2grant remove|Remove specified service principal OAuth2 permissions
+entra oauth2grant set|Update OAuth2 permissions for the service principal
+entra organization list|Lists all Microsoft Entra ID organizations
+entra organization set|Updates info about the organization
+entra pim role assignment add|Request activation of an Entra role assignment for a user or group
+entra pim role assignment eligibility list|Retrieves a list of eligible roles a user or group can be assigned to
+entra pim role assignment list|Retrieves a list of Entra role assignments for a user or group
+entra pim role assignment remove|Request deactivation of an Entra role assignment for a user or group
+entra pim role request list|Retrieves a list of PIM requests for roles
+entra policy list|Returns policies from Entra ID
+entra resourcenamespace list|Get a list of the RBAC resource namespaces and their properties
+entra roleassignment add|Assign a Entra ID role to a user and specify the scope for which the user has been granted access
+entra roledefinition add|Creates a custom Microsoft Entra ID role definition
+entra roledefinition get|Gets a specific Microsoft Entra ID role definition
+entra roledefinition list|Lists all Microsoft Entra ID role definitions
+entra roledefinition remove|Removes a specific Microsoft Entra ID role definition
+entra roledefinition set|Updates a custom Microsoft Entra ID role definition
+entra rolepermission list|Lists all Microsoft Entra ID role permissions
+entra siteclassification disable|Disables site classification
+entra siteclassification enable|Enables site classification configuration
+entra siteclassification get|Gets site classification configuration
+entra siteclassification set|Updates site classification configuration
+entra user add|Creates a new user
+entra user get|Gets information about the specified user
+entra user groupmembership list|Retrieves all groups where the user is a member of
+entra user guest add|Invite an external user to the organization
+entra user hibp|Allows you to retrieve all accounts that have been pwned with the specified username
+entra user license add|Assigns a license to a user
+entra user license list|Lists the license details for a given user
+entra user license remove|Removes a license from a user
+entra user list|Lists users matching specified criteria
+entra user password validate|Check a user's password against the organization's password validation policy
+entra user recyclebinitem clear|Removes all users from the tenant recycle bin
+entra user recyclebinitem list|Lists users from the recycle bin in the current tenant
+entra user recyclebinitem remove|Removes a user from the recycle bin in the current tenant
+entra user recyclebinitem restore|Restores a user from the tenant recycle bin
+entra user registrationdetails list|Retrieves a list of the authentication methods registered for users
+entra user remove|Removes a specific user
+entra user session revoke|Revokes all sign-in sessions for a given user
+entra user set|Updates information about the specified user
+entra user signin list|Retrieves the Entra ID user sign-ins for the tenant
+exo approleassignment add|Grant permissions to an application that's accessing data in Exchange Online and specify which mailboxes an app can access.
+external connection add|Adds a new external connection
+external connection doctor|Checks if the external connection is correctly configured for use with the specified Microsoft 365 experience
+external connection get|Get a specific external connection
+external connection list|Lists external connections defined in the Microsoft Search
+external connection remove|Removes a specific external connection
+external connection schema add|Allows the administrator to add a schema to a specific external connection
+external connection urltoitemresolver add|Adds a URL to item resolver to an external connection
+external item add|Creates external item
+file add|Uploads file to the specified site
+file convert pdf|Converts the specified file to PDF using Microsoft Graph
+file copy|Copies a file to another location using the Microsoft Graph
+file list|Retrieves files from the specified folder and site
+file move|Moves a file to another location using the Microsoft Graph
+flow disable|Disables specified Microsoft Flow
+flow enable|Enables specified Microsoft Flow
+flow environment get|Gets information about the specified Microsoft Flow environment
+flow environment list|Lists Microsoft Flow environments in the current tenant
+flow export|Exports the specified Microsoft Flow as a file
+flow get|Gets information about the specified Microsoft Flow
+flow list|Lists Power Automate flows in the given environment
+flow owner ensure|Assigns/updates permissions to a Power Automate flow
+flow owner list|Lists all owners of a Power Automate flow
+flow owner remove|Removes owner permissions to a Power Automate flow
+flow recyclebinitem list|Lists all soft-deleted Power Automate flows within an environment
+flow recyclebinitem restore|Restores a soft-deleted Power Automate flow
+flow remove|Removes the specified Microsoft Flow
+flow run cancel|Cancels a specific run of the specified Microsoft Flow
+flow run get|Gets information about a specific run of the specified Microsoft Flow
+flow run list|Lists runs of the specified Microsoft Flow
+flow run resubmit|Resubmits a specific flow run for the specified Microsoft Flow
+graph changelog list|Gets an overview of specific API-level changes in Microsoft Graph v1.0 and beta
+graph directoryextension add|Creates a new directory extension
+graph directoryextension get|Retrieves the definition of a directory extension
+graph directoryextension list|Retrieves a list of directory extensions
+graph directoryextension remove|Removes a directory extension
+graph openextension add|Adds an open extension to a resource
+graph openextension get|Retrieves a specific open extension for a resource
+graph openextension list|Retrieves all open extensions for a resource
+graph openextension remove|Removes a specific open extension for a resource
+graph openextension set|Updates an open extension for a resource
+graph schemaextension add|Creates a Microsoft Graph schema extension
+graph schemaextension get|Gets the properties of the specified schema extension definition
+graph schemaextension list|Get a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.
+graph schemaextension remove|Removes specified Microsoft Graph schema extension
+graph schemaextension set|Updates a Microsoft Graph schema extension
+graph subscription add|Creates a Microsoft Graph subscription
+login|Log in to Microsoft 365
+logout|Log out from Microsoft 365
+onedrive list|Retrieves a list of OneDrive sites
+onedrive report activityfilecounts|Gets the number of unique, licensed users that performed file interactions against any OneDrive account
+onedrive report activityusercounts|Gets the trend in the number of active OneDrive users
+onedrive report activityuserdetail|Gets details about OneDrive activity by user
+onedrive report usageaccountcounts|Gets the trend in the number of active OneDrive for Business sites
+onedrive report usageaccountdetail|Gets details about OneDrive usage by account
+onedrive report usagefilecounts|Gets the total number of files across all sites and how many are active files
+onedrive report usagestorage|Gets the trend on the amount of storage you are using in OneDrive for Business
+onenote notebook add|Create a new OneNote notebook
+onenote notebook list|Retrieve a list of notebooks
+onenote page list|Retrieve a list of OneNote pages.
+outlook calendar add|Creates a new calendar for a user
+outlook calendar get|Retrieves the calendar of a user or a group
+outlook calendar remove|Removes the calendar of a user
+outlook calendar set|Updates a calendar for a user
+outlook calendargroup get|Retrieve information about a calendar group for a user
+outlook calendargroup list|Retrieves calendar groups for a user
+outlook calendargroup remove|Removes a calendar group
+outlook calendargroup set|Updates a calendar group for a user
+outlook event cancel|Cancels a calendar event
+outlook event list|Retrieves a list of events from a specific calendar of a user.
+outlook event remove|Removes an event from a calendar
+outlook mail searchfolder add|Creates a new mail search folder in the user's mailbox
+outlook mail send|Sends an email
+outlook mailbox settings get|Get the user's mailbox settings
+outlook mailbox settings set|Updates user mailbox settings
+outlook message get|Retrieves specified message
+outlook message list|Gets all mail messages from the specified folder
+outlook message move|Moves message to the specified folder
+outlook message remove|Permanently removes a specific message from a mailbox
+outlook report mailactivitycounts|Enables you to understand the trends of email activity (like how many were sent, read, and received) in your organization
+outlook report mailactivityusercounts|Enables you to understand trends on the number of unique users who are performing email activities like send, read, and receive
+outlook report mailactivityuserdetail|Gets details about email activity users have performed
+outlook report mailappusageappsusercounts|Gets the count of unique users per email app
+outlook report mailappusageusercounts|Gets the count of unique users that connected to Exchange Online using any email app
+outlook report mailappusageuserdetail|Gets details about which activities users performed on the various email apps
+outlook report mailappusageversionsusercounts|Gets the count of unique users by Outlook desktop version.
+outlook report mailboxusagedetail|Gets details about mailbox usage
+outlook report mailboxusagemailboxcount|Gets the total number of user mailboxes in your organization and how many are active each day of the reporting period.
+outlook report mailboxusagequotastatusmailboxcounts|Gets the count of user mailboxes in each quota category
+outlook report mailboxusagestorage|Gets the amount of mailbox storage used in your organization
+outlook room list|Get a collection of all available rooms
+outlook roomlist list|Get a collection of available roomlists
+pa app consent set|Configures if users can bypass the API Consent window for the selected canvas app
+pa app export|Exports the specified Power App
+pa app get|Gets information about the specified Microsoft Power App
+pa app list|Lists all Power Apps apps
+pa app owner set|Sets a new owner for a Power Apps app
+pa app permission ensure|Assigns/updates permissions to a Power Apps app
+pa app permission list|Lists all permissions of a Power Apps app
+pa app permission remove|Removes permissions to a Power Apps app
+pa app remove|Removes the specified Microsoft Power App
+pa connector export|Exports the specified power automate or power apps custom connector
+pa connector list|Lists custom connectors in the given environment
+pa environment get|Gets information about the specified Microsoft Power Apps environment
+pa environment list|Lists Microsoft Power Apps environments in the current tenant
+planner bucket add|Adds a new Microsoft Planner bucket
+planner bucket get|Gets the Microsoft Planner bucket in a plan
+planner bucket list|Lists the Microsoft Planner buckets in a plan
+planner bucket remove|Removes the Microsoft Planner bucket from a plan
+planner bucket set|Updates a Microsoft Planner bucket
+planner plan add|Adds a new Microsoft Planner plan
+planner plan get|Get a Microsoft Planner plan
+planner plan list|Returns a list of plans associated with a specified group or roster
+planner plan remove|Removes the Microsoft Planner plan
+planner plan set|Updates a Microsoft Planner plan
+planner roster add|Creates a new Microsoft Planner Roster
+planner roster get|Retrieve information about a specific Microsoft Planner Roster
+planner roster member add|Adds a user to a Microsoft Planner Roster
+planner roster member get|Gets a member of the specified Microsoft Planner Roster
+planner roster member list|Lists members of the specified Microsoft Planner Roster
+planner roster member remove|Removes a member from a Microsoft Planner Roster
+planner roster plan list|Lists all Microsoft Planner Roster plans for a specific user
+planner roster remove|Removes a Microsoft Planner Roster
+planner task add|Adds a new Microsoft Planner Task
+planner task checklistitem add|Adds a new checklist item to a Planner task.
+planner task checklistitem list|Lists the checklist items of a Planner task.
+planner task checklistitem remove|Removes the checklist item from the planner task
+planner task get|Retrieve the specified planner task
+planner task list|Lists planner tasks in a bucket, plan, or tasks for the currently logged in user
+planner task reference add|Adds a new reference to a Planner task
+planner task reference list|Retrieve the references of the specified planner task
+planner task reference remove|Removes the reference from the Planner task
+planner task remove|Removes the Microsoft Planner task from a plan
+planner task set|Updates a Microsoft Planner Task
+planner tenant settings list|Lists the Microsoft Planner configuration of the tenant
+planner tenant settings set|Sets Microsoft Planner configuration of the tenant
+pp aibuildermodel get|Get an AI builder model in the specified Power Platform environment.
+pp aibuildermodel list|List available AI builder models in the specified Power Platform environment.
+pp aibuildermodel remove|Removes an AI builder model in the specified Power Platform environment.
+pp copilot get|Get information about the specified copilot
+pp copilot list|Lists Microsoft Power Platform copilots in the specified Power Platform environment
+pp copilot remove|Removes the specified copilot
+pp dataverse table get|Gets a dataverse table in a given environment
+pp dataverse table list|Lists dataverse tables in a given environment
+pp dataverse table remove|Removes a dataverse table in a given environment
+pp dataverse table row list|Lists table rows for the given Dataverse table
+pp dataverse table row remove|Removes a specific row from a dataverse table in the specified Power Platform environment.
+pp environment get|Gets information about the specified Power Platform environment
+pp environment list|Lists Microsoft Power Platform environments
+pp gateway get|Get information about the specified gateway.
+pp gateway list|Returns a list of gateways for which the user is an admin
+pp managementapp add|Register management application for Power Platform
+pp managementapp list|Lists management applications for Power Platform
+pp solution get|Gets a specific solution in a given environment.
+pp solution list|Lists solutions in a given environment.
+pp solution publisher add|Adds a specified publisher in a given environment
+pp solution publisher get|Get information about the specified publisher in a given environment.
+pp solution publisher list|Lists publishers in a given environment.
+pp solution publisher remove|Removes a specific publisher in the specified Power Platform environment.
+pp solution publish|Publishes the components of a solution in a given Power Platform environment
+pp solution remove|Removes a specific solution in the specified Power Platform environment.
+pp tenant settings list|Lists the global Power Platform tenant settings
+pp tenant settings set|Sets the global Power Platform configuration of the tenant
+pp website get|Gets information about the specified Power Pages website.
+purview auditlog list|List audit logs within your tenant
+purview retentionevent add|Create a retention event
+purview retentionevent get|Retrieve the specified retention event
+purview retentionevent list|Get a list of retention events
+purview retentionevent remove|Delete a retention event
+purview retentioneventtype add|Create a retention event type
+purview retentioneventtype get|Retrieve the specified retention event type
+purview retentioneventtype list|Get a list of retention event types
+purview retentioneventtype remove|Delete a retention event type
+purview retentioneventtype set|Update a retention event type
+purview retentionlabel add|Create a retention label
+purview retentionlabel get|Retrieve the specified retention label
+purview retentionlabel list|Get a list of retention labels
+purview retentionlabel remove|Delete a retention label
+purview retentionlabel set|Update a retention label
+purview sensitivitylabel get|Retrieve the specified sensitivity label
+purview sensitivitylabel list|Get a list of sensitivity labels
+purview sensitivitylabel policysettings list|Get a list of policy settings for a sensitivity label
+purview threatassessment add|Create a threat assessment
+purview threatassessment get|Get a threat assessment
+purview threatassessment list|Get a list of threat assessments
+request|Executes the specified web request using CLI for Microsoft 365
+search|Uses the Microsoft Search to query Microsoft 365 data
+setup|Sets up CLI for Microsoft 365 based on your preferences
+spe container activate|Activates a container
+spe container add|Creates a new container
+spe container get|Gets a container of a specific container type
+spe container list|Lists all Container Types
+spe container permission list|Lists permissions of a SharePoint Embedded Container
+spe container recyclebinitem list|Lists deleted containers of a specific container type
+spe container recyclebinitem remove|Permanently removes a container from the recycle bin
+spe container recyclebinitem restore|Restores a deleted container
+spe container remove|Removes a container
+spe containertype add|Creates a new container type
+spe containertype get|Gets a container type
+spe containertype list|Lists all container types
+spe containertype remove|Remove a specific container type
+spfx doctor|Verifies environment configuration for using the specific version of the SharePoint Framework
+spfx package generate|Generates SharePoint Framework solution package with a no-framework web part rendering the specified HTML snippet
+spfx project azuredevops pipeline add|Adds a Azure DevOps Pipeline for a SharePoint Framework project.
+spfx project doctor|Validates correctness of a SharePoint Framework project
+spfx project externalize|Externalizes SharePoint Framework project dependencies
+spfx project github workflow add|Adds a GitHub workflow for a SharePoint Framework project.
+spfx project permissions grant|Grant API permissions defined in the current SPFx project
+spfx project rename|Renames SharePoint Framework project
+spfx project upgrade|Upgrades SharePoint Framework project to the specified version
+spo agent add|Adds a new SharePoint agent
+spo app add|Adds an app to the specified SharePoint Online app catalog
+spo app deploy|Deploys the specified app in the specified app catalog
+spo app get|Gets information about the specific app from the specified app catalog
+spo app install|Installs an app from the specified app catalog in the site
+spo app instance list|Retrieve apps installed in a site
+spo app list|Lists apps from the specified app catalog
+spo app remove|Removes the specified app from the specified app catalog
+spo app retract|Retracts the specified app from the specified app catalog
+spo app teamspackage download|Downloads Teams app package for an SPFx solution deployed to tenant app catalog
+spo app uninstall|Uninstalls an app from the site
+spo app upgrade|Upgrades app in the specified site
+spo applicationcustomizer add|Add an application customizer to a site.
+spo applicationcustomizer get|Get an application customizer that is added to a site.
+spo applicationcustomizer list|Get a list of application customizers that are added to a site.
+spo applicationcustomizer remove|Removes an application customizer that is added to a site
+spo applicationcustomizer set|Updates an existing Application Customizer on a site
+spo apppage add|Creates a single-part app page
+spo apppage set|Updates the single-part app page
+spo brandcenter colors list|Lists the brand center colors
+spo brandcenter settings list|Lists the brand center configuration
+spo cdn get|View current status of the specified Microsoft 365 CDN
+spo cdn origin add|Adds CDN origin to the current SharePoint Online tenant
+spo cdn origin list|List CDN origins settings for the current SharePoint Online tenant
+spo cdn origin remove|Removes CDN origin for the current SharePoint Online tenant
+spo cdn policy list|Lists CDN policies settings for the current SharePoint Online tenant
+spo cdn policy set|Sets CDN policy value for the current SharePoint Online tenant
+spo cdn set|Enable or disable the specified Microsoft 365 CDN
+spo commandset add|Add a ListView Command Set to a site.
+spo commandset get|Get a ListView Command Set that is added to a site.
+spo commandset list|Get a list of ListView Command Sets that are added to a site.
+spo commandset remove|Remove a ListView Command Set that is added to a site.
+spo commandset set|Updates a ListView Command Set on a site.
+spo contenttype add|Adds a new list or site content type
+spo contenttype field list|Lists fields for a given site or list content type
+spo contenttype field remove|Removes a column from a site- or list content type
+spo contenttype field set|Adds or updates a site column reference in a site content type
+spo contenttype get|Retrieves information about the specified list or site content type
+spo contenttype list|Lists all available content types in the specified site
+spo contenttype remove|Deletes site content type
+spo contenttype set|Update an existing content type
+spo contenttype sync|Adds a published content type from the content type hub to a site or syncs its latest changes
+spo contenttypehub get|Returns the URL of the SharePoint Content Type Hub of the Tenant
+spo customaction add|Adds a user custom action for site or site collection
+spo customaction clear|Deletes all custom actions in the collection
+spo customaction get|Gets details for the specified custom action
+spo customaction list|Lists all user custom actions at the given scope
+spo customaction remove|Removes the specified custom action
+spo customaction set|Updates a user custom action for site or site collection
+spo eventreceiver get|Gets a specific event receiver attached to the web, site or list (if any of the list options are filled in) by receiver name of id
+spo eventreceiver list|Retrieves event receivers for the specified web, site or list.
+spo eventreceiver remove|Removes event receivers for the specified web, site, or list.
+spo externaluser list|Lists external users in the tenant
+spo feature disable|Disables feature for the specified site or web
+spo feature enable|Enables feature for the specified site or web
+spo feature list|Lists Features activated in the specified site or site collection
+spo field add|Adds a new list or site column using the CAML field definition
+spo field get|Retrieves information about the specified list- or site column
+spo field list|Retrieves columns for the specified list or site
+spo field remove|Removes the specified list- or site column
+spo field set|Updates existing list or site column
+spo file add|Uploads file to the specified folder
+spo file archive|Archives a file
+spo file checkin|Checks in specified file
+spo file checkout undo|Discards a checked out file
+spo file checkout|Checks out specified file
+spo file copy|Copies a file to another location
+spo file get|Gets information about the specified file
+spo file list|Lists all available files in the specified folder and site
+spo file move|Moves a file to another location
+spo file remove|Removes the specified file
+spo file rename|Renames a file
+spo file retentionlabel ensure|Apply a retention label to a file
+spo file retentionlabel remove|Clear the retention label from a file
+spo file roleassignment add|Adds a role assignment to the specified file.
+spo file roleassignment remove|Removes a role assignment from a file.
+spo file roleinheritance break|Breaks inheritance of a file. Keeping existing permissions is the default behavior.
+spo file roleinheritance reset|Restores the role inheritance of a file
+spo file sharinginfo get|Generates a sharing information report for the specified file
+spo file sharinglink add|Creates a new sharing link for a file
+spo file sharinglink clear|Removes sharing links of a file
+spo file sharinglink get|Gets details about a specific sharing link of a file
+spo file sharinglink list|Lists all the sharing links of a specific file
+spo file sharinglink remove|Removes a specific sharing link of a file
+spo file sharinglink set|Updates a sharing link of a file
+spo file version clear|Deletes all file version history of a file in a SharePoint Document library
+spo file version get|Get a specific version of a file in a SharePoint Document library
+spo file version keep|Ensure that a specific file version will never expire
+spo file version list|Retrieves all versions of a file
+spo file version remove|Removes a specific version of a file in a SharePoint Document library
+spo file version restore|Restores a specific version of a file in a SharePoint Document library
+spo folder add|Creates a folder within a parent folder
+spo folder archive|Archives a folder
+spo folder copy|Copies a folder to another location
+spo folder get|Gets information about the specified folder
+spo folder list|Returns all folders under the specified parent folder
+spo folder move|Moves a folder to another location
+spo folder remove|Deletes the specified folder
+spo folder retentionlabel ensure|Apply a retention label to a folder
+spo folder retentionlabel remove|Clear the retention label from a folder
+spo folder roleassignment add|Adds a role assignment to the specified folder.
+spo folder roleassignment remove|Removes a role assignment from the specified folder
+spo folder roleinheritance break|Breaks the role inheritance of a folder. Keeping existing permissions is the default behavior.
+spo folder roleinheritance reset|Restores the role inheritance of a folder
+spo folder set|Updates a folder
+spo folder sharinglink add|Creates a new sharing link to a folder
+spo folder sharinglink clear|Removes all sharing links of a folder
+spo folder sharinglink get|Gets details about a specific sharing link on a folder
+spo folder sharinglink list|Lists all the sharing links of a specific folder
+spo folder sharinglink remove|Removes a sharing link from a folder
+spo folder sharinglink set|Updates a specific sharing link to a folder
+spo get|Gets the context URL for the root SharePoint site collection and SharePoint tenant admin site
+spo group add|Creates group in the specified site
+spo group get|Gets site group
+spo group list|Lists all the groups within specific web
+spo group member add|Add members to a SharePoint Group
+spo group member list|List the members of a SharePoint Group
+spo group member remove|Removes the specified member from a SharePoint group
+spo group remove|Removes group from specific web
+spo group set|Updates a group in the specified site
+spo hidedefaultthemes get|Gets the current value of the HideDefaultThemes setting
+spo hidedefaultthemes set|Sets the value of the HideDefaultThemes setting
+spo homesite add|Adds a home site
+spo homesite get|Gets information about a home site
+spo homesite list|Lists all home sites
+spo homesite remove|Removes a home site
+spo homesite set|Updates an existing SharePoint home site.
+spo hubsite connect|Connect a hub site to a parent hub site
+spo hubsite data get|Get hub site data for the specified site
+spo hubsite disconnect|Disconnect a hub site from its parent hub site
+spo hubsite get|Gets information about the specified hub site
+spo hubsite list|Lists hub sites in the current tenant
+spo hubsite register|Registers the specified site collection as a hub site
+spo hubsite rights grant|Grants permissions to join the hub site for one or more principals
+spo hubsite rights revoke|Revokes rights to join sites to the specified hub site for one or more principals
+spo hubsite set|Updates properties of the specified hub site
+spo hubsite unregister|Unregisters the specified site collection as a hub site
+spo knowledgehub get|Gets the Knowledge Hub Site URL for your tenant
+spo knowledgehub remove|Removes the Knowledge Hub Site setting for your tenant
+spo knowledgehub set|Sets the Knowledge Hub Site for your tenant
+spo list add|Creates list in the specified site
+spo list contenttype add|Adds content type to list
+spo list contenttype default set|Sets the default content type for a list
+spo list contenttype list|Lists content types configured on the list
+spo list contenttype remove|Removes content type from list
+spo list defaultvalue clear|Clears default column values for a specific document library
+spo list defaultvalue get|Gets a specific default column value from a list
+spo list defaultvalue list|Retrieves default column values for a specific document library
+spo list defaultvalue remove|Removes a specific default column value for a specific document library
+spo list defaultvalue set|Sets default column values for a specific document library
+spo list get|Gets information about the specific list
+spo list list|Lists all available list in the specified site
+spo list remove|Removes the specified list
+spo list retentionlabel ensure|Sets a default retention label on the specified list or library.
+spo list retentionlabel get|Gets the default retention label set on the specified list or library.
+spo list retentionlabel remove|Clears the retention label on the specified list or library.
+spo list roleassignment add|Adds a role assignment to list permissions
+spo list roleassignment remove|Removes a role assignment from list permissions
+spo list roleinheritance break|Breaks role inheritance on list or library
+spo list roleinheritance reset|Restores role inheritance on list or library
+spo list sensitivitylabel ensure|Applies a default sensitivity label to the specified document library
+spo list set|Updates the settings of the specified list
+spo list sitescript get|Extracts a site script from a SharePoint list
+spo list view add|Adds a new view to a SharePoint list
+spo list view field add|Adds the specified field to list view
+spo list view field remove|Removes the specified field from list view
+spo list view field set|Updates existing column in an existing view (eg. move to a specific position).
+spo list view get|Gets information about specific list view
+spo list view list|Lists views configured on the specified list
+spo list view remove|Deletes the specified view from the list
+spo list view set|Updates existing list view
+spo list webhook add|Adds a new webhook to the specified list
+spo list webhook get|Gets information about the specific webhook
+spo list webhook list|Lists all webhooks for the specified list
+spo list webhook remove|Removes the specified webhook from the list
+spo list webhook set|Updates the specified webhook
+spo listitem add|Creates a list item in the specified list
+spo listitem attachment add|Adds an attachment to a list item
+spo listitem attachment get|Gets an attachment from a list item
+spo listitem attachment list|Gets the attachments associated to a list item
+spo listitem attachment remove|Removes an attachment from a list item
+spo listitem attachment set|Updates an attachment from a list item
+spo listitem batch add|Creates list items in a batch
+spo listitem batch remove|Removes items from a list in batch
+spo listitem batch set|Updates list items in a batch
+spo listitem get|Gets a list item from the specified list
+spo listitem isrecord|Checks if the specified list item is a record
+spo listitem list|Gets a list of items from the specified list
+spo listitem record declare|Declares the specified list item as a record
+spo listitem record lock|Locks the list item record
+spo listitem record undeclare|Undeclares list item as a record
+spo listitem record unlock|Unlocks the list item record
+spo listitem remove|Removes the specified list item
+spo listitem retentionlabel ensure|Apply a retention label to a list item
+spo listitem retentionlabel remove|Clear the retention label from a list item
+spo listitem roleassignment add|Adds a role assignment to a listitem.
+spo listitem roleassignment remove|Removes a role assignment from list item permissions
+spo listitem roleinheritance break|Break inheritance of list item
+spo listitem roleinheritance reset|Restores the role inheritance of list item, file, or folder
+spo listitem set|Updates a list item in the specified list
+spo navigation node add|Adds a navigation node to the specified site navigation
+spo navigation node get|Retrieve information about a specific navigation node
+spo navigation node list|Lists nodes from the specified site navigation
+spo navigation node remove|Removes the specified navigation node
+spo navigation node set|Adds a navigation node to the specified site navigation
+spo orgassetslibrary add|Promotes an existing library to become an organization assets library
+spo orgassetslibrary list|List all libraries that are assigned as asset library
+spo orgassetslibrary remove|Removes a library that was designated as a central location for organization assets across the tenant.
+spo orgnewssite list|Lists all organizational news sites
+spo orgnewssite remove|Removes a site from the list of organizational news sites
+spo orgnewssite set|Marks site as an organizational news site
+spo page add|Creates modern page
+spo page clientsidewebpart add|Adds a client-side web part to a modern page
+spo page column get|Get information about a specific column of a modern page
+spo page column list|Lists columns in the specific section of a modern page
+spo page control get|Gets information about the specific control on a modern page
+spo page control list|Lists controls on the specific modern page
+spo page control remove|Removes a control from a modern page
+spo page control set|Updates web part data or properties of a control on a modern page
+spo page copy|Creates a copy of a modern page or template
+spo page get|Gets information about the specific modern page
+spo page header set|Sets modern page header
+spo page list|Lists all modern pages in the given site
+spo page publish|Publishes a modern page
+spo page remove|Removes a modern page
+spo page section add|Adds section to modern page
+spo page section get|Get information about the specified modern page section
+spo page section list|List sections in the specific modern page
+spo page section remove|Removes the specified section from the modern page
+spo page set|Updates modern page properties
+spo page template list|Lists all page templates in the given site
+spo page text add|Adds text to a modern page
+spo propertybag get|Gets the value of the specified property from the property bag
+spo propertybag list|Gets property bag values
+spo propertybag remove|Removes specified property from the property bag
+spo propertybag set|Sets the value of the specified property in the property bag. Adds the property if it does not exist
+spo report activityfilecounts|Gets the number of unique, licensed users who interacted with files stored on SharePoint sites
+spo report activitypages|Gets the number of unique pages visited by users
+spo report activityusercounts|Gets the trend in the number of active users
+spo report activityuserdetail|Gets details about SharePoint activity by user
+spo report siteusagedetail|Gets details about SharePoint site usage
+spo report siteusagefilecounts|Get the total number of files across all sites and the number of active files
+spo report siteusagepages|Gets the number of pages viewed across all sites
+spo report siteusagesitecounts|Gets the total number of files across all sites and the number of active files
+spo report siteusagestorage|Gets the trend of storage allocated and consumed during the reporting period
+spo roledefinition add|Adds a new roledefinition to web
+spo roledefinition get|Gets specified role definition from web by id
+spo roledefinition list|Gets list of role definitions for the specified site
+spo roledefinition remove|Removes the role definition from the specified site
+spo search|Executes a search query
+spo serviceprincipal grant add|Grants the service principal permission to the specified API
+spo serviceprincipal grant list|Lists permissions granted to the service principal
+spo serviceprincipal grant revoke|Revokes the specified set of permissions granted to the service principal
+spo serviceprincipal permissionrequest approve|Approves the specified permission request
+spo serviceprincipal permissionrequest deny|Denies the specified permission request
+spo serviceprincipal permissionrequest list|Lists pending permission requests
+spo serviceprincipal set|Enable or disable the service principal
+spo set|Sets the URL of the root SharePoint site collection for use in SPO commands
+spo site accessrequest setting set|Update access requests for a specific site
+spo site add|Creates new SharePoint Online site
+spo site admin add|Adds a user or group as a site collection administrator
+spo site admin list|Lists all administrators of a specific SharePoint site
+spo site admin remove|Removes a user or group as site collection administrator
+spo site appcatalog add|Creates a site collection app catalog in the specified site
+spo site appcatalog list|List all site collection app catalogs within the tenant
+spo site appcatalog remove|Removes site collection app catalog from the specified site
+spo site apppermission add|Adds an application permissions to the site
+spo site apppermission get|Get a specific application permissions for the site
+spo site apppermission list|Lists application permissions for a site
+spo site apppermission remove|Removes a specific application permission from a site
+spo site apppermission set|Updates a specific application permission for a site
+spo site archive|Archives a site collection
+spo site chrome set|Set the chrome header and footer for the specified site
+spo site commsite enable|Enables communication site features on the specified site
+spo site ensure|Ensures that the particular site collection exists and updates its properties if necessary
+spo site get|Gets information about the specific site collection
+spo site groupify|Connects site collection to an Microsoft 365 Group
+spo site hubsite connect|Connects the specified site collection to the given hub site
+spo site hubsite disconnect|Disconnects the specified site collection from its hub site
+spo site hubsite theme sync|Applies any theme updates from the hub site the site is connected to.
+spo site inplacerecordsmanagement set|Activates or deactivates in-place records management for a site collection
+spo site list|Lists sites of the given type
+spo site membership list|Retrieves information about default site groups' membership
+spo site recyclebinitem clear|Permanently removes all items in a site recycle bin
+spo site recyclebinitem list|Lists items from recycle bin
+spo site recyclebinitem move|Moves items from the first-stage recycle bin to the second-stage recycle bin
+spo site recyclebinitem remove|Permanently deletes specific items from the site recycle bin
+spo site recyclebinitem restore|Restores given items from the site recycle bin
+spo site remove|Removes the specified site
+spo site rename|Renames the URL and title of a site collection
+spo site set|Updates properties of the specified site
+spo site sharingpermission set|Controls how a site and its components can be shared
+spo site unarchive|Unarchives a site collection
+spo site versionpolicy get|Retrieves the version policy settings of a specific site
+spo sitedesign add|Adds site design for creating modern sites
+spo sitedesign apply|Applies a site design to an existing site collection
+spo sitedesign get|Gets information about the specified site design
+spo sitedesign list|Lists available site designs for creating modern sites
+spo sitedesign remove|Removes the specified site design
+spo sitedesign rights grant|Grants access to a site design for one or more principals
+spo sitedesign rights list|Gets a list of principals that have access to a site design
+spo sitedesign rights revoke|Revokes access from a site design for one or more principals
+spo sitedesign run list|Lists information about site designs applied to the specified site
+spo sitedesign run status get|Gets information about the site scripts executed for the specified site design
+spo sitedesign set|Updates a site design with new values
+spo sitedesign task get|Gets information about the specified site design scheduled for execution
+spo sitedesign task list|Lists site designs scheduled for execution on the specified site
+spo sitedesign task remove|Removes the specified site design scheduled for execution
+spo sitescript add|Adds site script for use with site designs
+spo sitescript get|Gets information about the specified site script
+spo sitescript list|Lists site script available for use with site designs
+spo sitescript remove|Removes the specified site script
+spo sitescript set|Updates existing site script
+spo storageentity get|Get details for the specified tenant property
+spo storageentity list|Lists tenant properties stored on the specified SharePoint Online app catalog
+spo storageentity remove|Removes tenant property stored on the specified SharePoint Online app catalog
+spo storageentity set|Sets tenant property on the specified SharePoint Online app catalog
+spo tenant appcatalog add|Creates new tenant app catalog site
+spo tenant appcatalogurl get|Gets the URL of the tenant app catalog
+spo tenant applicationcustomizer add|Add an application customizer as a tenant wide extension.
+spo tenant applicationcustomizer get|Get an application customizer that is installed tenant wide
+spo tenant applicationcustomizer list|Retrieves a list of application customizers that are installed tenant-wide.
+spo tenant applicationcustomizer remove|Removes an application customizer that is installed tenant wide.
+spo tenant applicationcustomizer set|Updates an Application Customizer that is deployed as a tenant-wide extension
+spo tenant commandset add|Add a ListView Command Set as a tenant-wide extension.
+spo tenant commandset get|Get a ListView Command Set that is installed tenant wide
+spo tenant commandset list|Retrieves a list of ListView Command Sets that are installed tenant-wide
+spo tenant commandset remove|Removes a ListView Command Set that is installed tenant wide.
+spo tenant commandset set|Updates a ListView Command Set that is installed tenant wide.
+spo tenant recyclebinitem list|Returns all modern and classic site collections in the tenant scoped recycle bin
+spo tenant recyclebinitem remove|Removes the specified deleted site collection from tenant recycle bin
+spo tenant recyclebinitem restore|Restores the specified deleted site collection from tenant recycle bin
+spo tenant settings list|Lists the global tenant settings
+spo tenant settings set|Sets tenant global settings
+spo tenant site get|Retrieves the tenant site information
+spo term add|Adds taxonomy term
+spo term get|Gets information about the specified taxonomy term
+spo term group add|Adds taxonomy term group
+spo term group get|Gets information about the specified taxonomy term group
+spo term group list|Lists taxonomy term groups
+spo term list|Lists taxonomy terms from the given term set
+spo term set add|Adds taxonomy term set
+spo term set get|Gets information about the specified taxonomy term set
+spo term set list|Lists taxonomy term sets from the given term group
+spo theme apply|Applies theme to the specified site
+spo theme get|Gets custom theme information
+spo theme list|Retrieves the list of custom themes
+spo theme remove|Removes existing theme
+spo theme set|Add or update a theme
+spo user ensure|Ensures that a user is available on a specific site
+spo user get|Gets a site user within specific web
+spo user list|Lists all the users within specific web
+spo user remove|Removes user from specific web
+spo userprofile get|Gets user profile property for a SharePoint user
+spo userprofile set|Sets user profile property for a SharePoint user
+spo web add|Create new subsite
+spo web alert list|Lists all SharePoint list alerts
+spo web alert remove|Removes an alert from a SharePoint list
+spo web clientsidewebpart list|Lists available client-side web parts
+spo web get|Retrieve information about the specified site
+spo web installedlanguage list|Lists all installed languages on site
+spo web list|Lists subsites of the specified site
+spo web reindex|Requests reindexing the specified subsite
+spo web remove|Delete specified subsite
+spo web retentionlabel list|Get a list of retention labels that are available on a site.
+spo web roleassignment add|Adds a role assignment to web
+spo web roleassignment remove|Removes a role assignment from web permissions
+spo web roleinheritance break|Break role inheritance of subsite
+spo web roleinheritance reset|Restores role inheritance of subsite
+spo web set|Updates subsite properties
+spp autofillcolumn set|Applies the autofill option to the selected column
+spp contentcenter list|Gets information about the SharePoint Premium content centers
+spp model apply|Applies (or syncs) a trained document understanding model to a document library
+spp model get|Retrieves information about a document understanding model
+spp model list|Retrieves the list of unstructured document processing models
+spp model remove|Deletes a document understanding model
+status|Shows Microsoft 365 login status
+teams app install|Installs a Microsoft Teams team app from the catalog in the specified team or for the specified user
+teams app list|Lists apps from the Microsoft Teams app catalog
+teams app publish|Publishes Teams app to the organization's app catalog
+teams app remove|Removes a Teams app from the organization's app catalog
+teams app uninstall|Uninstalls an app from a Microsoft Team team
+teams app update|Updates Teams app in the organization's app catalog
+teams cache remove|Removes the Microsoft Teams client cache
+teams callrecord get|Gets a specific Teams call
+teams callrecord list|Lists all Teams calls within the tenant
+teams channel add|Adds a channel to the specified Microsoft Teams team
+teams channel get|Gets information about the specific Microsoft Teams team channel
+teams channel list|Lists channels in the specified Microsoft Teams team
+teams channel member add|Adds a specified member in the specified Microsoft Teams private or shared team channel
+teams channel member list|Lists members of the specified Microsoft Teams team channel
+teams channel member remove|Remove the specified member from the specified Microsoft Teams private or shared team channel
+teams channel member set|Updates the role of the specified member in the specified Microsoft Teams private or shared team channel
+teams channel remove|Removes the specified channel in the Microsoft Teams team
+teams channel set|Updates properties of the specified channel in the given Microsoft Teams team
+teams chat get|Get a Microsoft Teams chat conversation by id, participants or chat name.
+teams chat list|Lists all chat conversations
+teams chat member add|Adds a member to a Microsoft Teams chat conversation.
+teams chat member list|Lists all members from a chat
+teams chat member remove|Removes a member from a Microsoft Teams chat conversation
+teams chat message list|Lists all messages from a chat
+teams chat message send|Sends a chat message to a Microsoft Teams chat conversation.
+teams funsettings list|Lists fun settings for the specified Microsoft Teams team
+teams funsettings set|Updates fun settings of a Microsoft Teams team
+teams guestsettings list|Lists guest settings for a Microsoft Teams team
+teams guestsettings set|Updates guest settings of a Microsoft Teams team
+teams meeting add|Creates a new online meeting
+teams meeting attendancereport get|Gets attendance report for a given meeting
+teams meeting attendancereport list|Lists all attendance reports for a given meeting
+teams meeting get|Get specified meeting details
+teams meeting list|Retrieve all online meetings for a given user or shared mailbox
+teams meeting transcript get|Downloads a transcript for a given meeting
+teams meeting transcript list|Lists all transcripts for a given meeting
+teams membersettings list|Lists member settings for a Microsoft Teams team
+teams membersettings set|Updates member settings of a Microsoft Teams team
+teams message get|Retrieves a message from a channel in a Microsoft Teams team
+teams message list|Lists all messages from a channel in a Microsoft Teams team
+teams message remove|Removes a message from a channel in a Microsoft Teams team
+teams message reply list|Retrieves replies to a message from a channel in a Microsoft Teams team
+teams message restore|Restores a deleted message from a channel in a Microsoft Teams team
+teams message send|Sends a message to a channel in a Microsoft Teams team
+teams messagingsettings list|Lists messaging settings for a Microsoft Teams team
+teams messagingsettings set|Updates messaging settings of a Microsoft Teams team
+teams report deviceusagedistributionusercounts|Get the number of Microsoft Teams unique users by device type
+teams report deviceusageusercounts|Get the number of Microsoft Teams daily unique users by device type
+teams report deviceusageuserdetail|Gets information about Microsoft Teams device usage by user
+teams report directroutingcalls|Get details about direct routing calls made within a given time period
+teams report pstncalls|Get details about PSTN calls made within a given time period
+teams report useractivitycounts|Get the number of Microsoft Teams activities by activity type. The activity types are team chat messages, private chat messages, calls, and meetings.
+teams report useractivityusercounts|Get the number of Microsoft Teams users by activity type. The activity types are number of teams chat messages, private chat messages, calls, or meetings.
+teams report useractivityuserdetail|Get details about Microsoft Teams user activity by user.
+teams tab add|Add a tab to the specified channel
+teams tab get|Gets information about the specified Microsoft Teams tab
+teams tab list|Lists tabs in the specified Microsoft Teams channel
+teams tab remove|Removes a tab from the specified channel
+teams team add|Adds a new Microsoft Teams team
+teams team app list|List apps installed in the specified team
+teams team archive|Archives specified Microsoft Teams team
+teams team clone|Creates a clone of a Microsoft Teams team
+teams team get|Retrieve information about the specified Microsoft Team
+teams team list|Lists Microsoft Teams in the current tenant
+teams team remove|Removes the specified Microsoft Teams team
+teams team set|Updates settings of a Microsoft Teams team
+teams team unarchive|Restores an archived Microsoft Teams team
+teams user app add|Install an app in the personal scope of the specified user
+teams user app list|List the apps installed in the personal scope of the specified user
+teams user app remove|Uninstall an app from the personal scope of the specified user.
+teams user app upgrade|Upgrade an app in the personal scope of the specified user
+teams user list|Lists users for the specified Microsoft Teams team
+tenant id get|Gets Microsoft 365 tenant ID for the specified domain
+tenant info get|Gets information about any tenant
+tenant people profilecardproperty add|Adds an additional attribute to the profile card properties
+tenant people profilecardproperty get|Retrieves information about a specific profile card property
+tenant people profilecardproperty list|Lists all profile card properties
+tenant people profilecardproperty remove|Removes an additional attribute from the profile card properties
+tenant people profilecardproperty set|Updates a custom attribute to the profile card property
+tenant people pronouns get|Retrieves information about pronouns settings for an organization
+tenant people pronouns set|Manage pronouns settings for an organization
+tenant report activeusercounts|Gets the count of daily active users in the reporting period by product.
+tenant report activeuserdetail|Gets details about Microsoft 365 active users
+tenant report office365activationcounts|Get the count of Microsoft 365 activations on desktops and devices.
+tenant report office365activationsusercounts|Get the count of enabled users with activated Office subscriptions.
+tenant report office365activationsuserdetail|Get details about users who have activated Microsoft 365.
+tenant report servicesusercounts|Gets the count of users by activity type and service.
+tenant report settings get|Get the tenant-level settings for Microsoft 365 reports
+tenant report settings set|Update tenant-level settings for Microsoft 365 reports
+tenant security alerts list|Gets the security alerts for a tenant
+tenant serviceannouncement health get|This operation provides the health information of a specified service for a tenant
+tenant serviceannouncement health list|This operation provides the health report of all subscribed services for a tenant
+tenant serviceannouncement healthissue get|Gets a specified service health issue for tenant
+tenant serviceannouncement healthissue list|Gets all service health issues for the tenant
+tenant serviceannouncement message get|Retrieves a specified service update message for the tenant
+tenant serviceannouncement message list|Gets all service update messages for the tenant
+todo list add|Adds a new Microsoft To Do task list
+todo list get|Gets a specific list of Microsoft To Do task lists
+todo list list|Returns a list of Microsoft To Do task lists
+todo list remove|Removes a Microsoft To Do task list
+todo list set|Updates a Microsoft To Do task list
+todo task add|Add a task to a Microsoft To Do task list
+todo task get|Get a specific task from a Microsoft To Do task list
+todo task list|List tasks from a Microsoft To Do task list
+todo task remove|Removes the specified Microsoft To Do task
+todo task set|Update a task in a Microsoft To Do task list
+util accesstoken get|Gets access token for the specified resource
+version|Shows CLI for Microsoft 365 version
+viva connections app create|Creates Viva Connections app
+viva engage community add|Creates a new community in Viva Engage
+viva engage community get|Gets information of a Viva Engage community
+viva engage community list|Lists all Viva Engage communities
+viva engage community remove|Removes a Viva Engage community
+viva engage community set|Updates an existing Viva Engage community
+viva engage community user add|Adds a user to a specific Microsoft 365 Viva Engage community
+viva engage community user list|Lists all users within a specified Microsoft 365 Viva Engage community
+viva engage community user remove|Removes a specified user from a Microsoft 365 Viva Engage community
+viva engage message add|Posts a Viva Engage network message on behalf of the current user
+viva engage message get|Returns a Viva Engage message
+viva engage message like set|Likes or unlikes a Viva Engage message
+viva engage message list|Returns all accessible messages from the user's Viva Engage network
+viva engage message remove|Removes a Viva Engage message
+viva engage network list|Returns a list of networks to which the current user has access
+viva engage report activitycounts|Gets the trends on the amount of VivaEngage activity in your organization by how many messages were posted, read, and liked
+viva engage report activityusercounts|Gets the trends on the number of unique users who posted, read, and liked Viva Engage messages
+viva engage report activityuserdetail|Gets details about Viva Engage activity by user
+viva engage report deviceusagedistributionusercounts|Gets the number of users by device type
+viva engage report deviceusageusercounts|Gets the number of daily users by device type
+viva engage report deviceusageuserdetail|Gets details about Viva Engage device usage by user
+viva engage report groupsactivitycounts|Gets the number of Viva Engage messages posted, read, and liked in groups
+viva engage report groupsactivitydetail|Gets details about Viva Engage groups activity by group
+viva engage report groupsactivitygroupcounts|Gets the total number of groups that existed and how many included group conversation activity
+viva engage role list|Lists all Viva Engage roles
+viva engage role member list|Lists all users assigned to a Viva Engage role
+viva engage role member remove|Removes a user from a Viva Engage role
+viva engage search|Returns a list of messages, users, topics and groups that match the specified query.
+viva engage user get|Retrieves the current user or searches for a user by ID or e-mail
+viva engage user list|Returns users from the current network

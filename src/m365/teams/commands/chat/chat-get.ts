@@ -27,7 +27,7 @@ class TeamsChatGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a Microsoft Teams chat conversation by id, participants or chat name.';
+    return 'Gets a Microsoft Teams chat conversation by id, participants or chat name.';
   }
 
   constructor() {

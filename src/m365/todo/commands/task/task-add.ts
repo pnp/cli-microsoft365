@@ -33,7 +33,7 @@ class TodoTaskAddCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'Add a task to a Microsoft To Do task list';
+    return 'Adds a task to a Microsoft To Do list';
   }
 
   constructor() {

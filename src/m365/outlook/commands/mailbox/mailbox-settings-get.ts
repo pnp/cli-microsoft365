@@ -29,7 +29,7 @@ class OutlookMailboxSettingsGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return `Get the user's mailbox settings`;
+    return `Gets the user's mailbox settings`;
   }
 
   public get schema(): z.ZodType | undefined {

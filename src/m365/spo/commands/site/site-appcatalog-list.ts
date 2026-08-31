@@ -22,7 +22,7 @@ class SpoSiteAppCatalogListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List all site collection app catalogs within the tenant';
+    return 'Lists all site collection app catalogs within the tenant';
   }
 
   public get schema(): z.ZodType | undefined {

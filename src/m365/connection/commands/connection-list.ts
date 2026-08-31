@@ -13,7 +13,7 @@ class ConnectionListCommand extends Command {
   }
 
   public get description(): string {
-    return 'Show the list of available connections';
+    return 'Shows the list of available connections';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -15,7 +15,7 @@ class CliConfigListCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'List all self set CLI for Microsoft 365 configurations';
+    return 'Lists all self set CLI for Microsoft 365 configurations';
   }
 
   public get schema(): z.ZodType {

@@ -24,7 +24,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Install an app in the personal scope of the specified user';
+    return 'Installs an app in the personal scope of the specified user';
   }
 
   constructor() {

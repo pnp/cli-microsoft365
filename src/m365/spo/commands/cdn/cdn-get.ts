@@ -22,7 +22,7 @@ class SpoCdnGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'View current status of the specified Microsoft 365 CDN';
+    return 'Views current status of the specified Microsoft 365 CDN';
   }
 
   constructor() {

@@ -26,7 +26,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Apply a retention label to a folder';
+    return 'Applies a retention label to a folder';
   }
 
   constructor() {

@@ -99,15 +99,14 @@ class SpoUserGetCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('webUrl', 'id', 'email', 'loginName', 'userName', 'entraGroupId', 'entraGroupName');
+    this.types.string.push('webUrl', 'email', 'loginName', 'userName', 'entraGroupId', 'entraGroupName');
   }
 
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id &&
-          typeof args.options.id !== 'number') {
-          return `Specified id ${args.options.id} is not a number`;
+        if (args.options.id && !validation.isValidPositiveInteger(args.options.id)) {
+          return `Specified id ${args.options.id} is not a valid number.`;
         }
 
         if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {

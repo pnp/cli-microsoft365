@@ -33,7 +33,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Add a ListView Command Set as a tenant-wide extension.';
+    return 'Adds a ListView Command Set as a tenant-wide extension.';
   }
 
   constructor() {

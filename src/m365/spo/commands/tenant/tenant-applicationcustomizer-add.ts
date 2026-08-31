@@ -29,7 +29,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Add an application customizer as a tenant wide extension.';
+    return 'Adds an application customizer as a tenant wide extension.';
   }
 
   constructor() {

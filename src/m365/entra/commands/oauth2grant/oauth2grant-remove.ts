@@ -24,7 +24,7 @@ class EntraOAuth2GrantRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Remove specified service principal OAuth2 permissions';
+    return 'Removes specified service principal OAuth2 permissions';
   }
 
   public get schema(): z.ZodTypeAny | undefined {

@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # todo task set
 
-Update a task in a Microsoft To Do task list
+Updates a task in a Microsoft To Do task list
 
 ## Usage
 
@@ -60,6 +60,25 @@ m365 todo task set [options]
 ## Remarks
 
 When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Tasks.ReadWrite |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Tasks.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

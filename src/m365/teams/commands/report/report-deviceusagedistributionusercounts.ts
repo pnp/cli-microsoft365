@@ -11,7 +11,7 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends PeriodBasedRep
   }
 
   public get description(): string {
-    return 'Get the number of Microsoft Teams unique users by device type';
+    return 'Gets the number of Microsoft Teams unique users by device type';
   }
 }
 

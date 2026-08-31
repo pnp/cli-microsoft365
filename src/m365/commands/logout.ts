@@ -18,7 +18,7 @@ class LogoutCommand extends Command {
   }
 
   public get description(): string {
-    return 'Log out from Microsoft 365';
+    return 'Logs out from Microsoft 365';
   }
 
   public get schema(): z.ZodTypeAny | undefined {

@@ -8,9 +8,10 @@ import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './threatassessment-list.js';
+import command, { options } from './threatassessment-list.js';
 
 describe(commands.THREATASSESSMENT_LIST, () => {
   //#region Mocked Responses
@@ -96,12 +97,15 @@ describe(commands.THREATASSESSMENT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
   });
 
@@ -144,14 +148,24 @@ describe(commands.THREATASSESSMENT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'type', 'category']);
   });
 
-  it('fails validation if specified type is invalid ', async () => {
-    const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified type is invalid ', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if type option correctly specified', async () => {
-    const actual = await command.validate({ options: { type: 'file' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if type option correctly specified', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'file' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves threat assessments', async () => {
@@ -203,7 +217,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentMailItem, threatAssessmentFileItem]));
   });
 
@@ -257,7 +271,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'mail' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'mail' }) });
     assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentMailItem]));
   });
 
@@ -311,7 +325,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'emailFile' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'emailFile' }) });
     assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentEmailFileItem]));
   });
 
@@ -345,7 +359,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'file' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'file' }) });
     assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentFileItem]));
   });
 
@@ -378,7 +392,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'url' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'url' }) });
     assert(loggerLogSpy.calledOnceWithExactly([threatAssessmentUrlItem]));
   });
 
@@ -411,7 +425,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'url' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'url' }) });
     assert(loggerLogSpy.calledOnceWithExactly([{ ...threatAssessmentUrlItem, type: 'Unknown' }]));
   });
 
@@ -424,7 +438,7 @@ describe(commands.THREATASSESSMENT_LIST, () => {
     sinon.stub(request, 'get').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
-      options: {}
+      options: commandOptionsSchema.parse({})
     }), new CommandError('The threat assessments could not be retrieved'));
   });
 });

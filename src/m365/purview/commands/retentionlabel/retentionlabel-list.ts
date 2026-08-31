@@ -13,7 +13,7 @@ class PurviewRetentionLabelListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of retention labels';
+    return 'Gets a list of retention labels';
   }
 
   public get schema(): z.ZodTypeAny | undefined {

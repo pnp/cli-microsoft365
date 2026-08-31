@@ -19,7 +19,7 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get the count of Microsoft 365 activations on desktops and devices.';
+    return 'Gets the count of Microsoft 365 activations on desktops and devices.';
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

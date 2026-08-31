@@ -23,7 +23,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'List apps installed in the specified team';
+    return 'Lists apps installed in the specified team';
   }
 
   public defaultProperties(): string[] | undefined {

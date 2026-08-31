@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -11,10 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './dataverse-table-remove.js';
+import command, { options } from './dataverse-table-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.DATAVERSE_TABLE_REMOVE, () => {
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validName = 'aaduser';
@@ -33,6 +36,8 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -78,12 +83,21 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      name: validName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the specified table owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     });
 
     assert(promptIssued);
@@ -93,10 +107,10 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     const postSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -115,11 +129,11 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -136,12 +150,12 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         name: validName,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -166,7 +180,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, name: validName, force: true }) }),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

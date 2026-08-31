@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo group member add
 
-Add members to a SharePoint Group
+Adds members to a SharePoint Group
 
 ## Usage
 
@@ -45,6 +45,27 @@ m365 spo group member add [options]
 ## Remarks
 
 For the `userIds`, `userNames`, `emails`, `entraGroupIds`, or `entraGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | User.Read.All        |
+  | SharePoint      | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions           |
+  |-----------------|-----------------------|
+  | Microsoft Graph | User.Read.All         |
+  | SharePoint      | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
