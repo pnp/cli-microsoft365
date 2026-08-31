@@ -69,7 +69,10 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
     try {
       const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
 
-      if (args.options.upn) {
+      if (args.options.principalId) {
+        await this.addRoleAssignment(args.options.webUrl, args.options.principalId, roleDefinitionId, logger);
+      }
+      else if (args.options.upn) {
         const principalId = await this.getUserPrincipalId(args.options, logger);
         await this.addRoleAssignment(args.options.webUrl, principalId, roleDefinitionId, logger);
       }

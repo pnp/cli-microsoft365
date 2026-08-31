@@ -258,7 +258,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add role assignment on web by role definition id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return;
       }
@@ -274,6 +274,8 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
         roleDefinitionId: 1073741827
       })
     });
+
+    assert(postStub.calledOnce);
   });
 
   it('add role assignment on web get principal id by upn', async () => {

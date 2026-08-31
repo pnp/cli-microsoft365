@@ -16,7 +16,7 @@ export const options = z.strictObject({
   webUrl: z.string().refine(webUrl => validation.isValidSharePointUrl(webUrl) === true, {
     error: e => validation.isValidSharePointUrl(e.input as string).toString()
   }).alias('u'),
-  id: z.number().optional().alias('i'),
+  id: z.number().int().positive().optional().alias('i'),
   loginName: z.string().optional(),
   email: z.string().refine(email => validation.isValidUserPrincipalName(email), { error: e => `${e.input} is not a valid email.` }).optional(),
   userName: z.string().refine(userName => validation.isValidUserPrincipalName(userName), { error: e => `${e.input} is not a valid userName.` }).optional(),

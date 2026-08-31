@@ -206,7 +206,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('remove role assignment from web', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return;
       }
@@ -222,6 +222,8 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         force: true
       })
     });
+
+    assert(postStub.calledOnce);
   });
 
   it('remove role assignment from web get principal id by upn', async () => {

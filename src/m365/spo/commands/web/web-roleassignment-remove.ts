@@ -72,7 +72,10 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
     }
 
     try {
-      if (options.upn) {
+      if (options.principalId) {
+        await this.removeRoleAssignmentWithOptions(options.webUrl, options.principalId, logger);
+      }
+      else if (options.upn) {
         const principalId = await this.getUserPrincipalId(options, logger);
         await this.removeRoleAssignmentWithOptions(options.webUrl, principalId, logger);
       }
