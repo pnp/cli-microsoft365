@@ -88,7 +88,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        hideDefaultThemes: true
+        hideDefaultThemes: 'true'
       })
     });
 
@@ -116,7 +116,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         debug: true,
-        hideDefaultThemes: true
+        hideDefaultThemes: 'true'
       })
     });
     let correctRequestIssued = false;
@@ -155,7 +155,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         debug: true,
-        hideDefaultThemes: true
+        hideDefaultThemes: 'true'
       })
     }), new CommandError('An error has occurred'));
   });
@@ -174,18 +174,18 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   });
 
   it('passes validation when hideDefaultThemes is true', () => {
-    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: true });
+    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: 'true' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when hideDefaultThemes is false', () => {
-    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: false });
+    const actual = commandOptionsSchema.safeParse({ hideDefaultThemes: 'false' });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
-      hideDefaultThemes: true,
+      hideDefaultThemes: 'true',
       unknownOption: 'value'
     });
     assert.strictEqual(actual.success, false);

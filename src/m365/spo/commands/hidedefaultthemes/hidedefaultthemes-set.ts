@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  hideDefaultThemes: z.boolean()
+  hideDefaultThemes: z.enum(['true', 'false']).transform(val => val === 'true')
 });
 
 declare type Options = z.infer<typeof options>;
