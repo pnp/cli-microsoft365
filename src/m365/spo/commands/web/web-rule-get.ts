@@ -35,6 +35,10 @@ class SpoWebRuleGetCommand extends SpoCommand {
     return options;
   }
 
+  public alias(): string[] | undefined {
+    return [commands.WEB_ALERT_GET];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {

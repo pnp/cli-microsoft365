@@ -98,6 +98,16 @@ describe(commands.WEB_RULE_GET, () => {
     assert.strictEqual(command.name, commands.WEB_RULE_GET);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.deepStrictEqual(alias, [commands.WEB_ALERT_GET]);
+  });
+
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
