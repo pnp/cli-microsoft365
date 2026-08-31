@@ -4341,11 +4341,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web rule get',
-              id: 'cmd/spo/web/web-rule-get'
-            },
-            {
-              type: 'doc',
               label: 'web clientsidewebpart list',
               id: 'cmd/spo/web/web-clientsidewebpart-list'
             },
