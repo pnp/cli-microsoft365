@@ -120,16 +120,11 @@ describe(commands.TEAM_UNARCHIVE, () => {
 
   it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq 'Finance'&$select=id`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": []
-            }
-          ]
+          "@odata.count": 0,
+          "value": []
         };
       }
       throw 'Invalid request';
@@ -141,7 +136,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
         name: 'Finance',
         force: true
       }
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    } as any), new CommandError("The specified team 'Finance' does not exist."));
   });
 
   it('restores an archived Microsoft Team by id', async () => {
@@ -162,7 +157,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
 
   it('restores an archived Microsoft Team by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq 'Finance'&$select=id`) {
         return {
           "value": [
             {

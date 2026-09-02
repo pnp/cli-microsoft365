@@ -353,18 +353,10 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get team when resourceprovisioning does not exist', async () => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return {
-          value: [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": [
-              ]
-            }
-          ]
-        };
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -377,12 +369,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
         id: '00000',
         role: 'owner'
       }
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    } as any), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('correctly get teams id by team name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
         return groupsResponse;
       }
 

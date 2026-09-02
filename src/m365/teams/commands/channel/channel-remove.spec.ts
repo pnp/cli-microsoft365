@@ -163,18 +163,13 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('fails when team name does not exist', async () => {
-    const errorMessage = 'The specified team does not exist';
+    const errorMessage = `The specified team '${teamName}' does not exist.`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'&$select=id`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": []
-            }
-          ]
+          "@odata.count": 0,
+          "value": []
         };
       }
 
@@ -225,7 +220,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name and teamName when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'&$select=id`) {
         return {
           value: [
             {
@@ -301,7 +296,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name without prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'&$select=id`) {
         return {
           value: [
             {
