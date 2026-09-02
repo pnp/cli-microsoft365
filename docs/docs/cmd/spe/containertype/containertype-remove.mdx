@@ -29,9 +29,9 @@ m365 spe containertype remove [options]
 
 ## Remarks
 
-:::danger[Important]
+:::info
 
-This command relies on a different API endpoint due to current API limitations. As a result, it requires different permissions than other `spe containertype` commands. We plan to align the permissions in the future once these limitations are resolved.
+Currently, only trial container types can be deleted. A container type can only be deleted if no registrations are associated with it in any tenant.
 
 :::
 
@@ -40,9 +40,9 @@ This command relies on a different API endpoint due to current API limitations. 
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource   | Permissions        |
-  |------------|--------------------|
-  | SharePoint | Container.Selected |
+  | Resource        | Permissions                         |
+  |-----------------|-------------------------------------|
+  | Microsoft Graph | FileStorageContainerType.Manage.All |
 
   :::info
 
@@ -53,9 +53,7 @@ This command relies on a different API endpoint due to current API limitations. 
   </TabItem>
   <TabItem value="Application">
 
-  | Resource   | Permissions        |
-  |------------|--------------------|
-  | SharePoint | Container.Selected |
+  This command does not support application permissions.
 
   </TabItem>
 </Tabs>
