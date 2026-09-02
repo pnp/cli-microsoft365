@@ -121,7 +121,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert.strictEqual(postStub.firstCall.args[0].data.siteUrl, siteUrl);
     assert.strictEqual(postStub.secondCall.args[0].data.siteUrl, siteUrl);
@@ -202,7 +202,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert(deleteStub.calledOnce);
   });
@@ -238,7 +238,7 @@ describe(commands.SITE_REMOVE, () => {
 
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert(deleteStub.notCalled);
   });
@@ -384,8 +384,8 @@ describe(commands.SITE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if only skipRecycleBin is specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, skipRecycleBin: true } }, commandInfo);
+  it('passes validation if only permanent is specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, permanent: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -399,8 +399,8 @@ describe(commands.SITE_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both fromRecycleBin and skipRecycleBin are specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, skipRecycleBin: true } }, commandInfo);
+  it('fails validation if both fromRecycleBin and permanent are specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, permanent: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

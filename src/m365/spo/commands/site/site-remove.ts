@@ -17,7 +17,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   url: string;
-  skipRecycleBin?: boolean;
+  permanent?: boolean;
   fromRecycleBin?: boolean;
   force?: boolean;
 }
@@ -52,7 +52,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        skipRecycleBin: !!args.options.skipRecycleBin,
+        permanent: !!args.options.permanent,
         fromRecycleBin: !!args.options.fromRecycleBin,
         force: !!args.options.force
       });
@@ -65,7 +65,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         option: '-u, --url <url>'
       },
       {
-        option: '--skipRecycleBin'
+        option: '--permanent'
       },
       {
         option: '--fromRecycleBin'
@@ -90,8 +90,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
           return `The root site cannot be deleted.`;
         }
 
-        if (args.options.fromRecycleBin && args.options.skipRecycleBin) {
-          return 'Specify either fromRecycleBin or skipRecycleBin, but not both.';
+        if (args.options.fromRecycleBin && args.options.permanent) {
+          return 'Specify either fromRecycleBin or permanent, but not both.';
         }
 
         return true;
@@ -100,7 +100,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('url');
-    this.types.boolean.push('skipRecycleBin', 'fromRecycleBin', 'force');
+    this.types.boolean.push('permanent', 'fromRecycleBin', 'force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -152,7 +152,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
         if (isGroupSite) {
           await this.deleteGroupifiedSite(logger, siteUrl);
-          if (options.skipRecycleBin) {
+          if (options.permanent) {
             let isGroupInRecycleBin = await this.isGroupInEntraRecycleBin(logger, siteDetails.GroupId);
             let amountOfPolls = 0;
 
@@ -171,7 +171,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
           await this.deleteNonGroupSite(logger, siteUrl);
         }
 
-        if (options.skipRecycleBin) {
+        if (options.permanent) {
           await this.deleteSiteFromSharePointRecycleBin(logger, siteUrl);
         }
       }
