@@ -31,6 +31,25 @@ m365 spo list list [options]
 
 When the `--properties` option includes values with a `/`, for example: `RootFolder/ServerRelativeUrl`, an additional `$expand` query parameter should be included on `RootFolder`.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Return all lists located in in a specific site.
