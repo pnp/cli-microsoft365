@@ -313,7 +313,7 @@ describe(commands.LISTITEM_GET, () => {
       webUrl: webUrl,
       id: expectedId,
       output: "json",
-      properties: "ID,Modified"
+      fields: "ID,Modified"
     };
 
     await command.action(logger, { options: options } as any);
@@ -342,7 +342,7 @@ describe(commands.LISTITEM_GET, () => {
       webUrl: webUrl,
       id: expectedId,
       output: "json",
-      properties: "Title,Modified,Company/Title"
+      fields: "Title,Modified,Company/Title"
     };
 
     await command.action(logger, { options: options } as any);
@@ -396,7 +396,7 @@ describe(commands.LISTITEM_GET, () => {
       id: expectedId,
       listUrl: listUrl,
       output: 'json',
-      properties: 'Title,Modified'
+      fields: 'Title,Modified'
     };
 
     await command.action(logger, { options: options } as any);
