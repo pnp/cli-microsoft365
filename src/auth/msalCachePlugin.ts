@@ -4,9 +4,10 @@ import os from 'os';
 import path from 'path';
 
 const legacyCachePath = path.join(os.homedir(), '.cli-m365-msal.json');
+const fallbackCachePath = path.join(os.homedir(), '.cli-m365-msal-cache.json');
 
 const persistenceConfiguration = {
-  cachePath: legacyCachePath,
+  cachePath: fallbackCachePath,
   serviceName: 'cli-microsoft365',
   accountName: 'msal-cache',
   usePlaintextFileOnLinux: true
