@@ -25,6 +25,7 @@ describe(commands.LISTITEM_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const expectedTitle = `List Item 1`;
@@ -146,6 +147,7 @@ describe(commands.LISTITEM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -401,6 +403,54 @@ describe(commands.LISTITEM_GET, () => {
 
     await command.action(logger, { options: options } as any);
     assert.strictEqual(actualId, expectedId);
+  });
+
+  it('maps deprecated properties option to fields and shows deprecation warning', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return {
+        "ID": actualId,
+        "Modified": "2018-03-15T10:43:10Z",
+        "Title": expectedTitle
+      };
+    });
+
+    const options: any = {
+      listTitle: 'Demo List',
+      webUrl: webUrl,
+      id: expectedId,
+      output: "json",
+      properties: "ID,Modified"
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith(sinon.match(`Option 'properties' is deprecated. Please use 'fields' instead.`)));
+    assert.strictEqual(actualId, expectedId);
+  });
+
+  it('prefers fields over deprecated properties when both are specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return {
+        "ID": actualId,
+        "Modified": "2018-03-15T10:43:10Z",
+        "Title": expectedTitle
+      };
+    });
+
+    const options: any = {
+      listTitle: 'Demo List',
+      webUrl: webUrl,
+      id: expectedId,
+      output: "json",
+      fields: "Title",
+      properties: "ID,Modified"
+    };
+
+    await command.action(logger, { options: options } as any);
+    const requestUrl = (request.get as sinon.SinonStub).lastCall.args[0].url;
+    assert(requestUrl.includes('$select=Title'));
+    assert(!requestUrl.includes('$select=ID'));
   });
 
   it('correctly handles random API error', async () => {

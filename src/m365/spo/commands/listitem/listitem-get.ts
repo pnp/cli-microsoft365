@@ -20,6 +20,8 @@ interface Options extends GlobalOptions {
   id?: string;
   uniqueId?: string;
   fields?: string;
+  /** @deprecated Use `fields` instead. */
+  properties?: string;
   withPermissions?: boolean;
 }
 
@@ -83,6 +85,9 @@ class SpoListItemGetCommand extends SpoCommand {
         option: '--fields [fields]'
       },
       {
+        option: '-p, --properties [properties]'
+      },
+      {
         option: '--withPermissions'
       }
     );
@@ -123,7 +128,8 @@ class SpoListItemGetCommand extends SpoCommand {
       'listTitle',
       'id',
       'uniqueId',
-      'fields'
+      'fields',
+      'properties'
     );
   }
 
@@ -135,6 +141,14 @@ class SpoListItemGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.properties) {
+      await this.warn(logger, `Option 'properties' is deprecated. Please use 'fields' instead.`);
+
+      if (!args.options.fields) {
+        args.options.fields = args.options.properties;
+      }
+    }
+
     let requestUrl = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
