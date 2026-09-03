@@ -78,7 +78,18 @@ When logging in to Microsoft 365 using the user name and password, next to the a
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.mdx) command.  
 
-Federated Identity is currently supported in GitHub Actions. To use this you need to set `authType` to `federatedIdentity` and specify `appId` and `tenant` to the values of the app registration you've configured a federated credential on. 
+Federated Identity is currently supported in GitHub Actions, Azure DevOps and GitLab CI/CD. To use this you need to set `authType` to `federatedIdentity` and specify `appId` and `tenant` to the values of the app registration you've configured a federated credential on.
+
+To use Federated Identity in GitLab CI/CD, the job must request an ID token named `GITLAB_OIDC_TOKEN` with audience `api://AzureADTokenExchange`, for example:
+
+```yaml
+job:
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: api://AzureADTokenExchange
+```
+
+The corresponding federated credential on the Microsoft Entra app registration must have issuer `https://gitlab.com` (or your self-managed GitLab instance URL) and a subject matching the GitLab OIDC claim for the job, for example `project_path:<group>/<project>:ref_type:branch:ref:<branch>`.
 
 To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Microsoft Entra application](../user-guide/using-own-identity.mdx). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_ENTRAAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Microsoft Entra tenant, where you created the Microsoft Entra application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.mdx).
 
@@ -202,7 +213,7 @@ Log in to Microsoft 365 using a user-assigned managed identity with `clientId` s
 m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 ```
 
-Log in to Microsoft 365 using a federated identity. Can currently only be used in GitHub Actions.
+Log in to Microsoft 365 using a federated identity. Can currently only be used in GitHub Actions, Azure DevOps and GitLab CI/CD.
 
 ```sh
 m365 login --authType federatedIdentity --appId eb96cfd0-abfa-4477-8d1d-c6dfde3efb19 --tenant 9a1a1bbd-e158-4cf5-967d-a53b8e85c628
