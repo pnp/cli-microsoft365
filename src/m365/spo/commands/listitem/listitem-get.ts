@@ -19,6 +19,8 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id?: string;
   uniqueId?: string;
+  fields?: string;
+  /** @deprecated Use `fields` instead. */
   properties?: string;
   withPermissions?: boolean;
 }
@@ -80,6 +82,9 @@ class SpoListItemGetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
+        option: '--fields [fields]'
+      },
+      {
         option: '-p, --properties [properties]'
       },
       {
@@ -123,6 +128,7 @@ class SpoListItemGetCommand extends SpoCommand {
       'listTitle',
       'id',
       'uniqueId',
+      'fields',
       'properties'
     );
   }
@@ -135,6 +141,14 @@ class SpoListItemGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.properties) {
+      await this.warn(logger, `Option 'properties' is deprecated. Please use 'fields' instead.`);
+
+      if (!args.options.fields) {
+        args.options.fields = args.options.properties;
+      }
+    }
+
     let requestUrl = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
@@ -148,11 +162,11 @@ class SpoListItemGetCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    const propertiesSelect: string[] = args.options.properties ? args.options.properties.split(',') : [];
-    const propertiesWithSlash: string[] = propertiesSelect.filter(item => item.includes('/'));
-    const propertiesToExpand: string[] = propertiesWithSlash.map(e => e.split('/')[0]);
-    const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
-    const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
+    const fieldsSelect: string[] = args.options.fields ? args.options.fields.split(',') : [];
+    const fieldsWithSlash: string[] = fieldsSelect.filter(item => item.includes('/'));
+    const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
+    const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
+    const fieldExpand: string = expandFieldsArray.length > 0 ? `&$expand=${expandFieldsArray.join(",")}` : ``;
 
     if (args.options.id) {
       requestUrl += `/items(${args.options.id})`;
@@ -162,7 +176,7 @@ class SpoListItemGetCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}?$select=${formatting.encodeQueryParameter(propertiesSelect.join(","))}${fieldExpand}`,
+      url: `${requestUrl}?$select=${formatting.encodeQueryParameter(fieldsSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

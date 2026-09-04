@@ -33,8 +33,8 @@ m365 spo listitem get [options]
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
-`-p, --properties [properties]`
-: Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.
+`--fields [fields]`
+: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested.
 
 `--withPermissions`
 : Set if you want to return associated roles and permissions.
@@ -44,7 +44,13 @@ m365 spo listitem get [options]
 
 ## Remarks
 
-If you want to specify a lookup type in the `properties` option, define which columns from the related list should be returned.
+:::note
+
+The `--properties` option has been renamed to `--fields`. If you use `--properties`, the command still works but shows a deprecation warning.
+
+:::
+
+If you want to specify a lookup type in the `fields` option, define which columns from the related list should be returned.
 
 ## Examples
 
@@ -63,19 +69,19 @@ m365 spo listitem get --listTitle "Demo List" --uniqueId "64dc28c4-3c43-45f6-ba6
 Get an item columns with the ID parameter from a given list in a given site.
 
 ```sh
-m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created"
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
 ```
 
 Get an item columns and lookup column with the ID parameter from a given list in a given site.
 
 ```sh
-m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created,Company/Title"
 ```
 
-Get an item with specific properties from a given list based on the server-relative URL in a specific site.
+Get an item with specific fields from a given list based on the server-relative URL in a specific site.
 
 ```sh
-m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
+m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created,Company/Title"
 ```
 
 Get an item with ID parameter from a given list based on the server-relative URL in a specific site with permissions.
