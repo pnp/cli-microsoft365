@@ -19,8 +19,8 @@ m365 spo page remove [options]
 `-n, --name <name>`
 : Name of the page.
 
-`--recycle`
-: Send the page to the recycle bin instead of permanently deleting it.
+`--permanent`
+: Permanently delete the page instead of moving it to the recycle bin.
 
 `--bypassSharedLock`
 : Remove the page even if it is locked for shared use.
@@ -45,10 +45,10 @@ Remove a modern page without a confirmation prompt
 m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --force
 ```
 
-Send a page to the recycle bin
+Permanently remove a page
 
 ```sh
-m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --recycle
+m365 spo page remove --name HR.aspx --webUrl https://contoso.sharepoint.com/sites/Marketing --permanent
 ```
 
 Remove a page that is locked

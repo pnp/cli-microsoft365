@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
   force?: boolean;
-  skipRecycleBin: boolean;
+  permanent?: boolean;
 }
 
 class EntraM365GroupRemoveCommand extends GraphCommand {
@@ -48,7 +48,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         force: (!(!args.options.force)).toString(),
-        skipRecycleBin: args.options.skipRecycleBin
+        permanent: !!args.options.permanent
       });
     });
   }
@@ -65,7 +65,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
         option: '-f, --force'
       },
       {
-        option: '--skipRecycleBin'
+        option: '--permanent'
       }
     );
   }
@@ -88,6 +88,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'displayName');
+    this.types.boolean.push('permanent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -114,7 +115,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
         // Delete the Microsoft 365 group site. This operation will also delete the group.
         await this.deleteM365GroupSite(logger, siteUrl, spoAdminUrl);
 
-        if (args.options.skipRecycleBin) {
+        if (args.options.permanent) {
           await this.deleteM365GroupFromRecycleBin(logger, groupId!);
           await this.deleteSiteFromRecycleBin(logger, siteUrl, spoAdminUrl);
         }

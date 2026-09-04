@@ -21,8 +21,8 @@ m365 spo folder remove [options]
 `--url <url>`
 : The server- or site-relative decoded URL of the folder to delete.
 
-`--recycle`
-: Recycles the folder instead of actually deleting it.
+`--permanent`
+: Permanently deletes the folder instead of moving it to the recycle bin.
 
 `-f, --force`
 : Don't prompt for confirming deleting the folder.
@@ -61,10 +61,10 @@ Remove a folder with a specific site-relative URL.
 m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/Shared Documents/My Folder'
 ```
 
-Remove a folder with a specific server relative URL to the site recycle bin.
+Permanently remove a folder with a specific server-relative URL.
 
 ```sh
-m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/Shared Documents/My Folder' --recycle
+m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/Shared Documents/My Folder' --permanent
 ```
 
 ## Response

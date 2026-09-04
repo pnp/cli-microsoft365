@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   url: string;
-  recycle?: boolean;
+  permanent?: boolean;
   force?: boolean;
 }
 
@@ -40,7 +40,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        recycle: !!args.options.recycle,
+        permanent: !!args.options.permanent,
         force: !!args.options.force
       });
     });
@@ -55,7 +55,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
         option: '--url <url>'
       },
       {
-        option: '--recycle'
+        option: '--permanent'
       },
       {
         option: '-f, --force'
@@ -71,7 +71,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'url');
-    this.types.boolean.push('recycle', 'force');
+    this.types.boolean.push('permanent', 'force');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -83,7 +83,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
       await this.removeFolder(logger, args.options);
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the folder ${args.options.url} located in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.permanent ? "permanently remove" : "recycle"} the folder ${args.options.url} located in site ${args.options.webUrl}?` });
 
       if (result) {
         await this.removeFolder(logger, args.options);
@@ -98,7 +98,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
 
     const serverRelativePath: string = urlUtil.getServerRelativePath(options.webUrl, options.url);
     let requestUrl: string = `${options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
-    if (options.recycle) {
+    if (!options.permanent) {
       requestUrl += `/recycle()`;
     }
     const requestOptions: CliRequestOptions = {

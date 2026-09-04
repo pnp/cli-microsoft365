@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  recycle?: boolean;
+  permanent?: boolean;
   force?: boolean;
 }
 
@@ -53,7 +53,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        recycle: !!args.options.recycle,
+        permanent: !!args.options.permanent,
         force: !!args.options.force
       });
     });
@@ -80,7 +80,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
         option: '-i, --ids [ids]'
       },
       {
-        option: '-r, --recycle'
+        option: '--permanent'
       },
       {
         option: '-f, --force'
@@ -144,6 +144,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       'ids',
       'filePath'
     );
+    this.types.boolean.push('permanent');
   }
 
   #initOptionSets(): void {
@@ -189,7 +190,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
       await removeListItems();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list items from list ${args.options.listId || args.options.listTitle || args.options.listUrl} located in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.permanent ? "permanently remove" : "recycle"} the list items from list ${args.options.listId || args.options.listTitle || args.options.listUrl} located in site ${args.options.webUrl}?` });
 
       if (result) {
         await removeListItems();
@@ -297,7 +298,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
     requestUrl += `/items(${item})`;
 
-    if (options.recycle) {
+    if (!options.permanent) {
       requestUrl += '/recycle()';
     }
 

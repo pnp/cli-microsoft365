@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   id: string;
-  recycle?: boolean;
+  permanent?: boolean;
   force?: boolean;
 }
 
@@ -38,6 +38,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -46,7 +47,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        recycle: !!args.options.recycle,
+        permanent: !!args.options.permanent,
         force: !!args.options.force
       });
     });
@@ -70,7 +71,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '--recycle'
+        option: '--permanent'
       },
       {
         option: '-f, --force'
@@ -105,6 +106,10 @@ class SpoListItemRemoveCommand extends SpoCommand {
     this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('permanent');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeListItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
@@ -126,7 +131,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
 
       requestUrl += `/items(${args.options.id})`;
 
-      if (args.options.recycle) {
+      if (!args.options.permanent) {
         requestUrl += `/recycle()`;
       }
 
@@ -154,7 +159,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
       await removeListItem();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle || args.options.listUrl} located in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.permanent ? "permanently remove" : "recycle"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle || args.options.listUrl} located in site ${args.options.webUrl}?` });
 
       if (result) {
         await removeListItem();
