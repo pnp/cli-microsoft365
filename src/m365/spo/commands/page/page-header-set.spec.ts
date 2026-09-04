@@ -172,6 +172,74 @@ describe(commands.PAGE_HEADER_SET, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
+  it('preserves existing page header properties when options are not specified', async () => {
+    const existingHeader = {
+      id: 'cbe7b0a9-3504-44dd-a3a3-0e5cacd07788',
+      instanceId: 'cbe7b0a9-3504-44dd-a3a3-0e5cacd07788',
+      title: 'Title Region',
+      description: 'Title Region Description',
+      serverProcessedContent: {
+        htmlStrings: {},
+        searchablePlainTexts: {},
+        imageSources: {
+          imageSource: '/sites/newsletter/siteassets/hero.jpg'
+        },
+        links: {},
+        customMetadata: {
+          imageSource: {
+            siteId: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e',
+            webId: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65',
+            listId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
+            uniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
+          }
+        }
+      },
+      dataVersion: '1.4',
+      properties: {
+        imageSourceType: 2,
+        layoutType: 'ColorBlock',
+        textAlignment: 'Center',
+        showTopicHeader: true,
+        showPublishDate: true,
+        showTimeToRead: true,
+        topicHeader: 'Team Awesome',
+        authors: [],
+        altText: 'Existing alternative text',
+        webId: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65',
+        siteId: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e',
+        listId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
+        uniqueId: '102f496d-23a2-415f-803a-232b8a6c7613',
+        translateX: 42,
+        translateY: 56
+      }
+    };
+    const mockData = {
+      LayoutWebpartsContent: JSON.stringify([existingHeader]),
+      CanvasContent1: mockCanvasContentStringified
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) {
+        return {
+          IsPageCheckedOutToCurrentUser: true,
+          Title: 'Page'
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) {
+        return mockData;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom' } });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
+  });
+
   it('sets page header to default when default type specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"showTimeToRead":false,"topicHeader":""}}]',
@@ -342,9 +410,9 @@ describe(commands.PAGE_HEADER_SET, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
-  it('sets image to empty when header set to custom and no image specified', async () => {
+  it('sets custom header properties including an empty image URL', async () => {
     const mockData = {
-      LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":""},"links":{},"customMetadata":{"imageSource":{"siteId":"","webId":"","listId":"","uniqueId":""}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"showTimeToRead":false,"topicHeader":"","authors":[],"altText":"","webId":"","siteId":"","listId":"","uniqueId":"","translateX":0,"translateY":0}}]',
+      LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":""},"links":{},"customMetadata":{"imageSource":{"siteId":"","webId":"","listId":"","uniqueId":""}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"ColorBlock","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"showTimeToRead":false,"topicHeader":"","authors":[],"altText":"Updated alternative text","webId":"","siteId":"","listId":"","uniqueId":"","translateX":0,"translateY":0}}]',
       CanvasContent1: mockCanvasContentStringified
     };
 
@@ -371,7 +439,16 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom' } });
+    await command.action(logger, {
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        type: 'Custom',
+        imageUrl: '',
+        altText: 'Updated alternative text',
+        layout: 'ColorBlock'
+      }
+    });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
