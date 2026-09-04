@@ -360,31 +360,11 @@ describe(commands.TAB_GET, () => {
 
   it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Team%20Name'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq 'Team%20Name'&$select=id`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null,
-              "resourceProvisioningOptions": []
-            }
-          ]
+          "@odata.count": 0,
+          "value": []
         };
       }
       throw 'Invalid request';
@@ -397,12 +377,12 @@ describe(commands.TAB_GET, () => {
         channelName: 'Channel Name',
         name: 'Tab Name'
       }
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    } as any), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('should get a Microsoft Teams Tab by Team name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Team%20Name'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq 'Team%20Name'&$select=id`) {
         return {
           "value": [
             {

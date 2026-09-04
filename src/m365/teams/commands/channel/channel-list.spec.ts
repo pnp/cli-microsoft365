@@ -207,24 +207,19 @@ describe(commands.CHANNEL_LIST, () => {
     ));
   });
 
-  it('fails when group has no team', async () => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": []
-            }
-          ]
+          "@odata.count": 0,
+          "value": []
         };
       }
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { teamName: 'Team Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, { options: { teamName: 'Team Name' } } as any), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('correctly lists all channels in a Microsoft teams team with specified type parameter', async () => {
@@ -288,7 +283,7 @@ describe(commands.CHANNEL_LIST, () => {
 
   it('correctly lists all channels in a Microsoft teams team by team name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
         return {
           "value": [
             {

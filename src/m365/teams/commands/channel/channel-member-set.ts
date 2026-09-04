@@ -1,9 +1,9 @@
-import { Channel, ConversationMember, Group } from '@microsoft/microsoft-graph-types';
+import { Channel, ConversationMember } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -12,10 +12,6 @@ import { cli } from '../../../../cli/cli.js';
 interface ExtendedConversationMember extends ConversationMember {
   userId?: string;
   email?: string;
-}
-
-interface ExtendedGroup extends Group {
-  resourceProvisioningOptions: string[];
 }
 
 interface CommandArgs {
@@ -161,12 +157,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
       return args.options.teamId;
     }
 
-    const group = await entraGroup.getGroupByDisplayName(args.options.teamName!);
-    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-      throw `The specified team does not exist in the Microsoft Teams`;
-    }
-
-    return group.id!;
+    return teams.getTeamIdByDisplayName(args.options.teamName!);
   }
 
   private async getChannelId(args: CommandArgs): Promise<string> {

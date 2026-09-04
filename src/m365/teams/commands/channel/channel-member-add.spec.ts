@@ -213,7 +213,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
         return channelIdResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'&$select=id`) {
         return singleTeamResponse;
       }
 
@@ -446,7 +446,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   it('fails adding conversation members with invalid channelName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'&$select=id`) {
         return singleTeamResponse;
       }
 
@@ -472,7 +472,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   it('fails to get channel when channel does is not private', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'&$select=id`) {
         return singleTeamResponse;
       }
 
@@ -498,19 +498,14 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     } as any), new CommandError('The specified channel is not a private channel'));
   });
 
-  it('fails when group has no team', async () => {
+  it('fails when team name does not exist', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": []
-            }
-          ]
+          "@odata.count": 0,
+          "value": []
         };
       }
 
@@ -522,7 +517,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
         teamName: 'Team Name',
         channelName: "Other Channel"
       }
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    } as any), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('fails adding conversation members with multiple userDisplayNames', async () => {
