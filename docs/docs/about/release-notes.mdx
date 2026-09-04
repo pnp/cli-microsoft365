@@ -35,6 +35,7 @@ sidebar_position: 4
 
 ### Changes
 
+- removed `spo web rule list` and `spo web rule remove` commands and their `spo web alert` aliases following the retirement of SharePoint Alerts [#6865](https://github.com/pnp/cli-microsoft365/issues/6865)
 - added minimal permissions for `spo folder` commands [#7276](https://github.com/pnp/cli-microsoft365/issues/7276)
 - added minimal permissions for `spo file version` commands [#7272](https://github.com/pnp/cli-microsoft365/issues/7272)
 - added minimal permissions for `todo task` commands [#7534](https://github.com/pnp/cli-microsoft365/issues/7534)
@@ -311,7 +312,7 @@ sidebar_position: 4
 
 - migrated [docs](../cmd/docs.mdx) to Zod [#6915](https://github.com/pnp/cli-microsoft365/issues/6915)
 - migrated [entra multitenant add](../cmd/entra/multitenant/multitenant-add.mdx) to Zod [#6906](https://github.com/pnp/cli-microsoft365/issues/6906)
-- added [sample script](../sample-scripts/spo/list-tenant-alert-usage/index.mdx) to list all deprecated SharePoint list alerts across the tenant [#6864](https://github.com/pnp/cli-microsoft365/issues/6864)
+- added sample script to list all deprecated SharePoint list alerts across the tenant [#6864](https://github.com/pnp/cli-microsoft365/issues/6864)
 - enhanced SPFx commands to set a description for application customizers and ListView Command Sets [#6706](https://github.com/pnp/cli-microsoft365/issues/6706)
 - added minimal permissions for 'entra groupsettingtemplate' commands [#6938](https://github.com/pnp/cli-microsoft365/issues/6938)
 - added support for SPFx v1.22.0-rc.0 [#6974](https://github.com/pnp/cli-microsoft365/issues/6974)
@@ -323,8 +324,8 @@ sidebar_position: 4
 
 **SharePoint:**
 
-- [spo web alert list](../cmd/spo/web/web-rule-list.mdx) - lists all SharePoint list alerts [#6861](https://github.com/pnp/cli-microsoft365/issues/6861)
-- [spo web alert remove](../cmd/spo/web/web-rule-remove.mdx) - removes an alert from a SharePoint list [#6863](https://github.com/pnp/cli-microsoft365/issues/6863)
+- `spo web alert list` - lists all SharePoint list alerts [#6861](https://github.com/pnp/cli-microsoft365/issues/6861)
+- `spo web alert remove` - removes an alert from a SharePoint list [#6863](https://github.com/pnp/cli-microsoft365/issues/6863)
 
 ### Changes
 
