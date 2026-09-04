@@ -28,6 +28,25 @@ m365 tenant info get [options]
 
 If no domain name or tenantId is specified, the command will return the tenant information of the currently signed in user.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                          |
+  |-----------------|--------------------------------------|
+  | Microsoft Graph | CrossTenantInformation.ReadBasic.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                          |
+  |-----------------|--------------------------------------|
+  | Microsoft Graph | CrossTenantInformation.ReadBasic.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Get tenant information for the currently signed in user.
