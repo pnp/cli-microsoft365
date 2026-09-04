@@ -411,7 +411,6 @@ describe(commands.FILE_ADD, () => {
         folder: folderServerRelativePath,
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        overwrite: false,
         verbose: true
       }
     }));
@@ -428,6 +427,7 @@ describe(commands.FILE_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared\'Documents/t1',
         path: localFolderPath + 'TEST\'FILE.txt',
+        overwrite: true,
         verbose: true
       }
     });
@@ -446,6 +446,7 @@ describe(commands.FILE_ADD, () => {
         folder: 'Shared\'Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         fileName: 'TEST\'FILE.txt',
+        overwrite: true,
         verbose: true
       }
     });
@@ -641,7 +642,7 @@ describe(commands.FILE_ADD, () => {
     assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
 
-  it('throws error when not overwriting and file exists', async () => {
+  it('throws error by default when file exists', async () => {
     stubFs();
     stubPostResponses();
 
@@ -661,7 +662,6 @@ describe(commands.FILE_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
-        overwrite: false,
         verbose: true
       }
     }), new CommandError("File 'MS365.jpg' already exists in folder '/sites/project-x/Shared%20Documents/t1'. To overwrite the file, use the --overwrite option."));
@@ -857,8 +857,7 @@ describe(commands.FILE_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
-        checkOut: true,
-        overwrite: false
+        checkOut: true
       }
     });
 

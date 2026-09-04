@@ -134,8 +134,7 @@ class SpoFileAddCommand extends SpoCommand {
         option: '--publishComment [publishComment]'
       },
       {
-        option: '--overwrite [overwrite]',
-        autocomplete: ['true', 'false']
+        option: '--overwrite'
       },
       {
         option: '--fileName [fileName]'
@@ -186,12 +185,8 @@ class SpoFileAddCommand extends SpoCommand {
       await logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
-    if (args.options.overwrite === undefined) {
-      await this.warn(logger, 'In the next major version, the --overwrite option will default to false. To avoid this warning, please set the --overwrite option explicitly to true or false.');
-    }
-
     try {
-      if (args.options.overwrite === false) {
+      if (!args.options.overwrite) {
         try {
           const requestOptions: CliRequestOptions = {
             url: `${args.options.webUrl}/_api/Web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath + '/' + fileName)}')?$select=Exists`,
