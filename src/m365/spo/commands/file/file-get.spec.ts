@@ -15,8 +15,81 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_GET, () => {
+  const fileRoleAssignmentsResponse = {
+    value: [{
+      "Member": {
+        "Id": 3,
+        "IsHiddenInUI": false,
+        "LoginName": "Communication site Owners",
+        "Title": "Communication site Owners",
+        "PrincipalType": 8,
+        "AllowMembersEditMembership": false,
+        "AllowRequestToJoinLeave": false,
+        "AutoAcceptRequestToJoinLeave": false,
+        "Description": null,
+        "OnlyAllowMembersViewMembership": false,
+        "OwnerTitle": "Communication site Owners",
+        "RequestToJoinLeaveEmailSetting": ""
+      },
+      "RoleDefinitionBindings": [
+        {
+          "BasePermissions": {
+            "High": "2147483647",
+            "Low": "4294967295"
+          },
+          "Description": "Has full control.",
+          "Hidden": false,
+          "Id": 1073741829,
+          "Name": "Full Control",
+          "Order": 1,
+          "RoleTypeKind": 5,
+          "BasePermissionsValue": [
+            "ViewListItems",
+            "AddListItems",
+            "EditListItems",
+            "DeleteListItems",
+            "ApproveItems",
+            "OpenItems",
+            "ViewVersions",
+            "DeleteVersions",
+            "CancelCheckout",
+            "ManagePersonalViews",
+            "ManageLists",
+            "ViewFormPages",
+            "AnonymousSearchAccessList",
+            "Open",
+            "ViewPages",
+            "AddAndCustomizePages",
+            "ApplyThemeAndBorder",
+            "ApplyStyleSheets",
+            "ViewUsageData",
+            "CreateSSCSite",
+            "ManageSubwebs",
+            "CreateGroups",
+            "ManagePermissions",
+            "BrowseDirectories",
+            "BrowseUserInfo",
+            "AddDelPrivateWebParts",
+            "UpdatePersonalWebParts",
+            "ManageWeb",
+            "AnonymousSearchAccessWebLists",
+            "UseClientIntegration",
+            "UseRemoteAPIs",
+            "ManageAlerts",
+            "CreateAlerts",
+            "EditMyUserInfo",
+            "EnumeratePermissions"
+          ],
+          "RoleTypeKindValue": "Administrator"
+        }
+      ],
+      "PrincipalId": 3
+    }]
+  };
+
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,6 +124,7 @@ describe(commands.FILE_GET, () => {
     sinonUtil.restore([
       request.get,
       fs.createWriteStream,
+      spo.getFileRoleAssignments,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -275,8 +349,10 @@ describe(commands.FILE_GET, () => {
   });
 
   it('retrieves and prints all details of file as ListItem object with permissions', async () => {
+    sinon.stub(spo, 'getFileRoleAssignments').resolves(fileRoleAssignmentsResponse.value);
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')?$expand=ListItemAllFields") {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -317,43 +393,6 @@ describe(commands.FILE_GET, () => {
           "UIVersion": 1536,
           "UIVersionLabel": "3.0",
           "UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"
-        };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/project-x/Documents/Test1.docx')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`) {
-        return {
-          value: [
-            {
-              "Member": {
-                "Id": 3,
-                "IsHiddenInUI": false,
-                "LoginName": "Communication site Owners",
-                "Title": "Communication site Owners",
-                "PrincipalType": 8,
-                "AllowMembersEditMembership": false,
-                "AllowRequestToJoinLeave": false,
-                "AutoAcceptRequestToJoinLeave": false,
-                "Description": null,
-                "OnlyAllowMembersViewMembership": false,
-                "OwnerTitle": "Communication site Owners",
-                "RequestToJoinLeaveEmailSetting": ""
-              },
-              "RoleDefinitionBindings": [
-                {
-                  "BasePermissions": {
-                    "High": "2147483647",
-                    "Low": "4294967295"
-                  },
-                  "Description": "Has full control.",
-                  "Hidden": false,
-                  "Id": 1073741829,
-                  "Name": "Full Control",
-                  "Order": 1,
-                  "RoleTypeKind": 5
-                }
-              ],
-              "PrincipalId": 3
-            }]
         };
       }
 
