@@ -2,6 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
+import yaml from 'yaml';
 import { CommandError } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -13,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './project-azuredevops-pipeline-add.js';
+import { AzureDevOpsPipeline } from './project-azuredevops-pipeline-model.js';
 
 describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
   let log: any[];
@@ -177,6 +179,50 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
 
     await command.action(logger, { options: { debug: true } } as any);
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
+  });
+
+  it('creates a pipeline with npm run build for SPFx version that requires heft', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString() === path.join(projectPath, 'package.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops')) {
+        return true;
+      }
+      else if (fakePath.toString() === path.join(projectPath, '.azuredevops', 'pipelines')) {
+        return true;
+      }
+
+      throw `Invalid path: ${fakePath}`;
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+        return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
+      }
+
+      throw `Invalid path: ${filePath}`;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.22.0');
+
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
+
+    await command.action(logger, { options: {} } as any);
+
+    assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.azuredevops', 'pipelines', 'deploy-spfx-solution.yml'))), 'workflow file not created');
+    const writtenPipeline: AzureDevOpsPipeline = yaml.parse(writeFileSyncStub.args[0][1] as string);
+    const steps = writtenPipeline.stages[0].jobs[0].steps;
+    const buildStep = steps.find(step => step.displayName === 'Build and package');
+    assert.strictEqual(buildStep?.inputs?.customCommand, 'npm run build', 'Build and package step does not run npm run build');
+    assert.strictEqual(steps.some(step => step.task === 'Gulp@0'), false, 'Gulp steps should not be added');
   });
 
   it('handles error with unknown minor version of SPFx when missing minor version', async () => {

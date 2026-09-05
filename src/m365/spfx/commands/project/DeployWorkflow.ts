@@ -33,8 +33,8 @@ export const workflow: GitHubWorkflow = {
           run: "npm ci"
         },
         {
-          name: "Bundle & Package",
-          run: "gulp bundle --ship\ngulp package-solution --ship\n"
+          name: "Build & Package",
+          run: "npm run build"
         },
         {
           name: "CLI for Microsoft 365 Login",
@@ -144,20 +144,12 @@ export const pipeline: AzureDevOpsPipeline = {
               }
             },
             {
-              task: "Gulp@0",
-              displayName: "Gulp bundle",
+              task: "Npm@1",
+              displayName: "Build and package",
               inputs: {
-                gulpFile: "./gulpfile.js",
-                targets: "bundle",
-                arguments: "--ship"
-              }
-            },
-            {
-              task: "Gulp@0",
-              displayName: "Gulp package",
-              inputs: {
-                targets: "package-solution",
-                arguments: "--ship"
+                command: "custom",
+                verbose: false,
+                customCommand: "run build"
               }
             },
             {
