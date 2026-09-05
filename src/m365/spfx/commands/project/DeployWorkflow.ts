@@ -149,7 +149,7 @@ export const pipeline: AzureDevOpsPipeline = {
               inputs: {
                 command: "custom",
                 verbose: false,
-                customCommand: "npm run build"
+                customCommand: "run build"
               }
             },
             {

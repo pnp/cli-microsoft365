@@ -220,32 +220,32 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
       if (versionRequirements.heft === undefined) {
         let steps = this.getPipelineSteps(pipeline);
 
-        const npmBuildScript = steps.find(step => step.task && step.displayName === "Build and package");
+        const npmBuildScript = steps.find(step => step.task && step.displayName === 'Build and package');
         if (npmBuildScript) {
           pipeline.stages[0].jobs[0].steps = steps.filter(step => step !== npmBuildScript);
         }
 
         const gulpBundleStep: AzureDevOpsPipelineStep = {
-          task: "Gulp@0",
-          displayName: "Gulp bundle",
+          task: 'Gulp@0',
+          displayName: 'Gulp bundle',
           inputs: {
-            gulpFile: "./gulpfile.js",
-            targets: "bundle",
-            arguments: "--ship"
+            gulpFile: './gulpfile.js',
+            targets: 'bundle',
+            arguments: '--ship'
           }
         };
 
         const gulpPackageStep: AzureDevOpsPipelineStep = {
-          task: "Gulp@0",
-          displayName: "Gulp package",
+          task: 'Gulp@0',
+          displayName: 'Gulp package',
           inputs: {
-            targets: "package-solution",
-            arguments: "--ship"
+            targets: 'package-solution',
+            arguments: '--ship'
           }
         };
 
         steps = this.getPipelineSteps(pipeline);
-        const installCLIStepIndex = steps.findIndex(step => step.task === "Npm@1" && step.displayName === "Install CLI for Microsoft 365");
+        const installCLIStepIndex = steps.findIndex(step => step.task === 'Npm@1' && step.displayName === 'Install CLI for Microsoft 365');
         pipeline.stages[0].jobs[0].steps.splice(installCLIStepIndex, 0, gulpBundleStep, gulpPackageStep);
       }
     }
