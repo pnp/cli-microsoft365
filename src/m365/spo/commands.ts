@@ -221,6 +221,7 @@ export default {
   PAGE_PUBLISH: `${prefix} page publish`,
   PAGE_REMOVE: `${prefix} page remove`,
   PAGE_SET: `${prefix} page set`,
+  PAGE_UNPUBLISH: `${prefix} page unpublish`,
   PAGE_CLIENTSIDEWEBPART_ADD: `${prefix} page clientsidewebpart add`,
   PAGE_COLUMN_GET: `${prefix} page column get`,
   PAGE_COLUMN_LIST: `${prefix} page column list`,
