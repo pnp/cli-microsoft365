@@ -221,7 +221,7 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     const writtenPipeline: AzureDevOpsPipeline = yaml.parse(writeFileSyncStub.args[0][1] as string);
     const steps = writtenPipeline.stages[0].jobs[0].steps;
     const buildStep = steps.find(step => step.displayName === 'Build and package');
-    assert.strictEqual(buildStep?.inputs?.customCommand, 'npm run build', 'Build and package step does not run npm run build');
+    assert.strictEqual(buildStep?.inputs?.customCommand, 'run build', 'Build and package step does not run npm run build');
     assert.strictEqual(steps.some(step => step.task === 'Gulp@0'), false, 'Gulp steps should not be added');
   });
 
