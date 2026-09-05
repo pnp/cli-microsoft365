@@ -211,7 +211,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('fails to get channel when channel does is not private', async () => {
+  it('fails to get channel when channel is not a private or shared channel', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('00000000-0000-0000-0000-000000000000')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Other Channel')}'`) {
@@ -236,7 +236,43 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         force: true,
         verbose: true
       }
-    } as any), new CommandError('The specified channel is not a private channel'));
+    } as any), new CommandError('The specified channel is not a private or shared channel'));
+  });
+
+  it('correctly get channel id by channel name of a shared channel', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
+        return {
+          value: [
+            {
+              "id": "19:00000000000000000000000000000000@thread.skype",
+              "membershipType": "shared"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Shared Channel',
+        id: '00000',
+        force: true,
+        verbose: true
+      }
+    });
+    assert.strictEqual(log.length, 1);
   });
 
   it('correctly get channel id by channel name', async () => {
