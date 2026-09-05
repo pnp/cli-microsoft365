@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -8,13 +10,16 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './storageentity-get.js';
+import command, { options } from './storageentity-get.js';
 
 describe(commands.STORAGEENTITY_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,46 +28,28 @@ describe(commands.STORAGEENTITY_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('existingproperty')`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { Comment: 'Lorem', Description: 'ipsum', Value: 'dolor' };
-        }
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetStorageEntity('existingproperty')`) {
+        return { Comment: 'Lorem', Description: 'ipsum', Value: 'dolor' };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutdescription')`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { Comment: 'Lorem', Value: 'dolor' };
-        }
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetStorageEntity('propertywithoutdescription')`) {
+        return { Comment: 'Lorem', Value: 'dolor' };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutcomments')`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { Description: 'ipsum', Value: 'dolor' };
-        }
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetStorageEntity('propertywithoutcomments')`) {
+        return { Description: 'ipsum', Value: 'dolor' };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('nonexistingproperty')`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { "odata.null": true };
-        }
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetStorageEntity('nonexistingproperty')`) {
+        return { "odata.null": true };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('%23myprop')`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { Description: 'ipsum', Value: 'dolor' };
-        }
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetStorageEntity('%23myprop')`) {
+        return { Description: 'ipsum', Value: 'dolor' };
       }
 
       throw 'Invalid request';
@@ -85,6 +72,12 @@ describe(commands.STORAGEENTITY_GET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
   });
 
+  afterEach(() => {
+    sinonUtil.restore([
+      spo.getTenantAppCatalogUrl
+    ]);
+  });
+
   after(() => {
     sinon.restore();
     auth.connection.active = false;
@@ -100,7 +93,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property', async () => {
-    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(loggerLogSpy.calledWith({
       Key: 'existingproperty',
       Value: 'dolor',
@@ -110,7 +103,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property without a description', async () => {
-    await command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(loggerLogSpy.calledWith({
       Key: 'propertywithoutdescription',
       Value: 'dolor',
@@ -120,7 +113,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property without a comment', async () => {
-    await command.action(logger, { options: { key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(loggerLogSpy.calledWith({
       Key: 'propertywithoutcomments',
       Value: 'dolor',
@@ -129,17 +122,36 @@ describe(commands.STORAGEENTITY_GET, () => {
     }));
   });
 
+  it('retrieves tenant property using tenant app catalog URL when appCatalogUrl is not specified', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves('https://contoso.sharepoint.com/sites/appcatalog');
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ key: 'existingproperty' }) });
+    assert(loggerLogSpy.calledWith({
+      Key: 'existingproperty',
+      Value: 'dolor',
+      Description: 'ipsum',
+      Comment: 'Lorem'
+    }));
+  });
+
+  it('throws error when tenant app catalog is not found and appCatalogUrl is not specified', async () => {
+    sinon.stub(spo, 'getTenantAppCatalogUrl').resolves(null);
+
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ key: 'existingproperty' }) }),
+      new CommandError('Tenant app catalog URL not found. Specify the URL of the app catalog site using the appCatalogUrl option.'));
+  });
+
   it('handles a non-existent tenant property', async () => {
-    await command.action(logger, { options: { key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
   });
 
   it('handles a non-existent tenant property (debug)', async () => {
-    await command.action(logger, { options: { debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     let correctValue: boolean = false;
     log.forEach(l => {
       if (l &&
         typeof l === 'string' &&
-        l.indexOf('Property with key nonexistingproperty not found') > -1) {
+        l.includes('Property with key nonexistingproperty not found')) {
         correctValue = true;
       }
     });
@@ -147,7 +159,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('escapes special characters in property name', async () => {
-    await command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(loggerLogSpy.calledWith({
       Key: '#myprop',
       Value: 'dolor',
@@ -156,21 +168,25 @@ describe(commands.STORAGEENTITY_GET, () => {
     }));
   });
 
-  it('requires tenant property name', () => {
-    const options = command.options;
-    let requiresTenantPropertyName = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<key>') > -1) {
-        requiresTenantPropertyName = true;
-      }
-    });
-    assert(requiresTenantPropertyName);
+  it('fails validation if appCatalogUrl is not a valid URL', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'prop', appCatalogUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when appCatalogUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'prop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when appCatalogUrl is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'prop' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('handles promise rejection', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, key: '#myprop' } } as any), new CommandError('error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) }), new CommandError('error'));
   });
 });
