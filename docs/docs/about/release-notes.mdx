@@ -24,6 +24,7 @@ sidebar_position: 4
 - migrated `spo cdn` commands to Zod [#7321](https://github.com/pnp/cli-microsoft365/issues/7321)
 - enhanced `spo storageentity` commands to reference tenant app catalog [#7128](https://github.com/pnp/cli-microsoft365/issues/7128)
 - enhanced [spo site list](../cmd/spo/site/site-list.mdx) command [#6547](https://github.com/pnp/cli-microsoft365/issues/6547)
+- migrated `spo`, `spo homesite`, and `spo hidedefaultthemes` commands to Zod [#7330](https://github.com/pnp/cli-microsoft365/issues/7330)
 
 ### ⚠️ Breaking changes
 
@@ -32,6 +33,8 @@ sidebar_position: 4
 - removed defaults from the [spo page header set](../cmd/spo/page/page-header-set.mdx) command [#7094](https://github.com/pnp/cli-microsoft365/issues/7094)
 - moved to SharePoint APIs in the [spo contenttype sync](../cmd/spo/contenttype/contenttype-sync.mdx) command [#7251](https://github.com/pnp/cli-microsoft365/issues/7251)
 - enhanced `teams` commands to use teams util [#7048](https://github.com/pnp/cli-microsoft365/issues/7048)
+- removed `spo web rule list` and `spo web rule remove` commands and their `spo web alert` aliases, along with the tenant alert inventory sample script, following the retirement of SharePoint Alerts [#6865](https://github.com/pnp/cli-microsoft365/issues/6865)
+- replaced `recycle` option by `permanent` option and renamed `skipRecycleBin` option to `permanent` for `spo` and `spe` commands [#7110](https://github.com/pnp/cli-microsoft365/issues/7110)
 
 ## [v11.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v11.11.0)
 
@@ -43,7 +46,6 @@ sidebar_position: 4
 
 ### Changes
 
-- removed `spo web rule list` and `spo web rule remove` commands and their `spo web alert` aliases, along with the tenant alert inventory sample script, following the retirement of SharePoint Alerts [#6865](https://github.com/pnp/cli-microsoft365/issues/6865)
 - added minimal permissions for `spo folder` commands [#7276](https://github.com/pnp/cli-microsoft365/issues/7276)
 - added minimal permissions for `spo file version` commands [#7272](https://github.com/pnp/cli-microsoft365/issues/7272)
 - added minimal permissions for `todo task` commands [#7534](https://github.com/pnp/cli-microsoft365/issues/7534)
