@@ -1,8 +1,12 @@
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = globalOptionsZod.strict();
 
 class SpoHideDefaultThemesGetCommand extends SpoCommand {
   public get name(): string {
@@ -11,6 +15,10 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Gets the current value of the HideDefaultThemes setting';
+  }
+
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

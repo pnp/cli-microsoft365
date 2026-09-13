@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './hidedefaultthemes-get.js';
+import command, { options } from './hidedefaultthemes-get.js';
 
 describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,6 +27,8 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,8 +78,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-      }
+      options: commandOptionsSchema.parse({})
     });
   });
 
@@ -86,9 +91,9 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
   });
 
@@ -104,7 +109,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(true), 'Invalid request');
   });
 
@@ -127,7 +132,17 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true }) }),
       new CommandError(error.error['odata.error'].message.value));
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
