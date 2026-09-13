@@ -367,8 +367,6 @@ export default {
   USERPROFILE_GET: `${prefix} userprofile get`,
   USERPROFILE_SET: `${prefix} userprofile set`,
   WEB_ADD: `${prefix} web add`,
-  WEB_ALERT_LIST: `${prefix} web alert list`,
-  WEB_ALERT_REMOVE: `${prefix} web alert remove`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
   WEB_INSTALLEDLANGUAGE_LIST: `${prefix} web installedlanguage list`,
@@ -380,7 +378,5 @@ export default {
   WEB_ROLEASSIGNMENT_ADD: `${prefix} web roleassignment add`,
   WEB_ROLEINHERITANCE_BREAK: `${prefix} web roleinheritance break`,
   WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
-  WEB_RULE_LIST: `${prefix} web rule list`,
-  WEB_RULE_REMOVE: `${prefix} web rule remove`,
   WEB_SET: `${prefix} web set`
 };
