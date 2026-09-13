@@ -114,7 +114,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1, permanent: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
@@ -141,7 +141,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { verbose: true, listUrl: listUrl, webUrl: webUrl, id: 1 } });
+    await command.action(logger, { options: { verbose: true, listUrl: listUrl, webUrl: webUrl, id: 1, permanent: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(1)` &&
@@ -171,7 +171,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1, recycle: true } });
+    await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/recycle()`) > -1 &&
@@ -201,6 +201,7 @@ describe(commands.LISTITEM_REMOVE, () => {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
+        permanent: true,
         force: true
       }
     }), new CommandError(err));
@@ -227,7 +228,7 @@ describe(commands.LISTITEM_REMOVE, () => {
     });
   });
 
-  it('uses correct API url when recycle option is passed', async () => {
+  it('uses correct recycle API URL by default', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
         return Promise.resolve('Correct Url');
@@ -242,7 +243,6 @@ describe(commands.LISTITEM_REMOVE, () => {
       options: {
         id: actionId,
         listTitle: 'Documents',
-        recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
       }

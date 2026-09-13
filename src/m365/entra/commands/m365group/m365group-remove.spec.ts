@@ -212,9 +212,20 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
+    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
     assert(deleteStub.called);
     assert(loggerLogToStderrSpy.calledWith("Group has been deleted and is now available in the deleted groups list. Removing permanently..."));
+  });
+
+  it('supports the deprecated skipRecycleBin option', async () => {
+    defaultGetStub();
+    defaultPostStub();
+    const deleteStub: sinon.SinonStub = defaultDeleteStub();
+
+    await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
+
+    assert(deleteStub.called);
+    assert(loggerLogToStderrSpy.calledWith(`Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`));
   });
 
   it('verifies if the group is deleted and available in the deleted groups list, retry and delete the group', async () => {
@@ -230,7 +241,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
+    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
     assert(deleteStub.called);
   });
 
@@ -274,7 +285,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     });
     defaultDeleteStub();
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, skipRecycleBin: true, force: true, debug: true } }),
+    await assert.rejects(command.action(logger, { options: { id: groupId, permanent: true, force: true, debug: true } }),
       new CommandError('An error has occurred.'));
   });
 
@@ -290,7 +301,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     defaultDeleteStub();
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } }),
       new CommandError('Error'));
   });
 
@@ -306,7 +317,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
+    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
     assert(deleteStub.notCalled);
   });
 
