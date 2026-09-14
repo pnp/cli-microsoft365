@@ -164,6 +164,23 @@ describe(commands.FOLDER_UNARCHIVE, () => {
     assert(postStub.notCalled);
   });
 
+  it('unarchives folder when prompt confirmed', async () => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: { Id: 1, ParentList: { Id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } });
+    const postStub = sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        id: '00000000-0000-0000-0000-000000000000'
+      }
+    });
+
+    assert(postStub.calledOnce);
+  });
+
   it('unarchives folder by url', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/test/Shared documents/folder')}')?$select=Exists,ListItemAllFields/Id,ListItemAllFields/ParentList/Id&$expand=ListItemAllFields,ListItemAllFields/ParentList`) {
@@ -298,18 +315,6 @@ describe(commands.FOLDER_UNARCHIVE, () => {
         force: true
       }
     }), new CommandError(`The folder '/Shared Documents' is the root folder of a document library and cannot be unarchived. Unarchive a subfolder instead.`));
-  });
-
-  it('throws an error when trying to unarchive the root folder of a document library by id', async () => {
-    sinon.stub(request, 'get').resolves({ Exists: true, ListItemAllFields: {} });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/test',
-        id: '00000000-0000-0000-0000-000000000000',
-        force: true
-      }
-    }), new CommandError(`The folder '00000000-0000-0000-0000-000000000000' is the root folder of a document library and cannot be unarchived. Unarchive a subfolder instead.`));
   });
 
   it('throws an error when the folder does not exist by url', async () => {

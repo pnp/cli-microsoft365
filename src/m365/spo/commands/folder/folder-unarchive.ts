@@ -53,6 +53,7 @@ class SpoFolderUnarchiveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { webUrl, url, id, force } = args.options;
+    const identifier = url || id;
 
     if (!force) {
       const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Folders that are reactivated cannot be archived again for 120 days. Are you sure you would like to unarchive this item?` });
@@ -63,7 +64,7 @@ class SpoFolderUnarchiveCommand extends SpoCommand {
 
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Unarchiving folder ${url || id} at site ${webUrl}...`);
+        await logger.logToStderr(`Unarchiving folder ${identifier} at site ${webUrl}...`);
       }
 
       let requestUrl: string = `${webUrl}/_api/web`;
@@ -86,11 +87,11 @@ class SpoFolderUnarchiveCommand extends SpoCommand {
       });
 
       if (!folderInfo.Exists) {
-        throw `The folder '${url || id}' does not exist.`;
+        throw `The folder '${identifier}' does not exist.`;
       }
 
       if (!folderInfo.ListItemAllFields?.ParentList) {
-        throw `The folder '${url || id}' is the root folder of a document library and cannot be unarchived. Unarchive a subfolder instead.`;
+        throw `The folder '${identifier}' is the root folder of a document library and cannot be unarchived. Unarchive a subfolder instead.`;
       }
 
       const requestOptions: CliRequestOptions = {
