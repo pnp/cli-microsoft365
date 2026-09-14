@@ -327,6 +327,7 @@ describe(commands.USER_ENSURE, () => {
   it('fails validation if webUrl is not a valid url', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', entraId: validEntraId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
   });
 
   it('fails validation if entraId is not a valid id', () => {

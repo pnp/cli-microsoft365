@@ -426,6 +426,7 @@ describe(commands.USER_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: 1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('fails validation if entraGroupId is not a valid id', () => {

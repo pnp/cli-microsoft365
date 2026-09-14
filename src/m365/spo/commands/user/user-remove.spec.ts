@@ -177,6 +177,7 @@ describe(commands.USER_REMOVE, () => {
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: 10 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('fails validation if entraGroupId is not a valid id', () => {

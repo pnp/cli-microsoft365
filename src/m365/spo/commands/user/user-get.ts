@@ -12,7 +12,7 @@ import { z } from 'zod';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string().refine(webUrl => validation.isValidSharePointUrl(webUrl) === true, {
-    error: e => validation.isValidSharePointUrl(e.input as string).toString()
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
   }).alias('u'),
   id: z.number().int().positive().optional().alias('i'),
   email: z.string().refine(email => validation.isValidUserPrincipalName(email), { error: e => `${e.input} is not a valid email.` }).optional(),
