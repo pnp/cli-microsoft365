@@ -56,7 +56,7 @@ class SpoFolderUnarchiveCommand extends SpoCommand {
     const identifier = url || id;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Folders that are reactivated cannot be archived again for 120 days. Are you sure you would like to unarchive this item?` });
+      const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Folders that are reactivated cannot be archived again for a period of time. Are you sure you would like to unarchive this folder?` });
       if (!result) {
         return;
       }
