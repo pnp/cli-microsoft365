@@ -19,7 +19,8 @@ interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
   force?: boolean;
-  skipRecycleBin: boolean;
+  permanent?: boolean;
+  skipRecycleBin?: boolean;
 }
 
 class EntraM365GroupRemoveCommand extends GraphCommand {
@@ -48,7 +49,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         force: (!(!args.options.force)).toString(),
-        skipRecycleBin: args.options.skipRecycleBin
+        permanent: !!(args.options.permanent || args.options.skipRecycleBin)
       });
     });
   }
@@ -63,6 +64,9 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
       },
       {
         option: '-f, --force'
+      },
+      {
+        option: '--permanent'
       },
       {
         option: '--skipRecycleBin'
@@ -88,9 +92,15 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'displayName');
+    this.types.boolean.push('permanent', 'skipRecycleBin');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.skipRecycleBin) {
+      await this.warn(logger, `Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`);
+      args.options.permanent = true;
+    }
+
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id || args.options.displayName}...`);
@@ -114,7 +124,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
         // Delete the Microsoft 365 group site. This operation will also delete the group.
         await this.deleteM365GroupSite(logger, siteUrl, spoAdminUrl);
 
-        if (args.options.skipRecycleBin) {
+        if (args.options.permanent) {
           await this.deleteM365GroupFromRecycleBin(logger, groupId!);
           await this.deleteSiteFromRecycleBin(logger, siteUrl, spoAdminUrl);
         }

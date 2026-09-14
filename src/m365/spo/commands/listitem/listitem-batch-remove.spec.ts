@@ -91,7 +91,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
   });
 
   it('prompts before removing list items when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, ids: ids } });
+    await command.action(logger, { options: { webUrl: webUrl, listId: listId, ids: ids, permanent: true } });
 
     assert(promptIssued);
   });
@@ -118,7 +118,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, recycle: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
     assert(postStub.calledOnce);
   });
 
@@ -134,7 +134,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, recycle: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
     assert(postStub.calledOnce);
   });
 
@@ -146,7 +146,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, ids: ids, listId: listId, force: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, ids: ids, listId: listId, permanent: true, force: true, verbose: true } });
     assert(postStub.calledOnce);
   });
 
@@ -192,7 +192,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, recycle: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } });
     assert.strictEqual(amountOfRequestsInBody, 150);
   });
 

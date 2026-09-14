@@ -121,10 +121,20 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert.strictEqual(postStub.firstCall.args[0].data.siteUrl, siteUrl);
     assert.strictEqual(postStub.secondCall.args[0].data.siteUrl, siteUrl);
+  });
+
+  it('supports the deprecated skipRecycleBin option', async () => {
+    sinon.stub(odata, 'getAllItems').resolves([siteDetailsNonGroup]);
+    const postStub = sinon.stub(request, 'post').resolves();
+
+    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true } });
+
+    assert(postStub.calledTwice);
+    assert(log.includes(`Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`));
   });
 
   it('deletes a group site, deletes the m365 group from entra id', async () => {
@@ -202,7 +212,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert(deleteStub.calledOnce);
   });
@@ -238,7 +248,7 @@ describe(commands.SITE_REMOVE, () => {
 
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
     assert(postStub.calledTwice);
     assert(deleteStub.notCalled);
   });
@@ -384,8 +394,8 @@ describe(commands.SITE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if only skipRecycleBin is specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, skipRecycleBin: true } }, commandInfo);
+  it('passes validation if only permanent is specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, permanent: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -396,6 +406,11 @@ describe(commands.SITE_REMOVE, () => {
 
   it('fails validation when trying to remove the root site collection', async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both fromRecycleBin and permanent are specified', async () => {
+    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, permanent: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

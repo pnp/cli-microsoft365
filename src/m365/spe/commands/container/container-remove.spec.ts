@@ -117,8 +117,8 @@ describe(commands.CONTAINER_REMOVE, () => {
     assert(confirmationPromptStub.calledOnce);
   });
 
-  it('prompts before recycling the container', async () => {
-    await command.action(logger, { options: { id: containerTypeId, recycle: true } });
+  it('prompts before permanently removing the container', async () => {
+    await command.action(logger, { options: { id: containerTypeId, permanent: true } });
     assert(confirmationPromptStub.calledOnce);
   });
 
@@ -140,11 +140,11 @@ describe(commands.CONTAINER_REMOVE, () => {
       throw 'Invalid DELETE request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { id: containerId, recycle: true, force: true } });
+    await command.action(logger, { options: { id: containerId, force: true } });
     assert(deleteStub.calledOnce);
   });
 
-  it('correctly removes a container by id', async () => {
+  it('correctly permanently removes a container by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}/permanentDelete`) {
         return;
@@ -153,7 +153,7 @@ describe(commands.CONTAINER_REMOVE, () => {
       throw 'Invalid POST request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { id: containerId, force: true } });
+    await command.action(logger, { options: { id: containerId, permanent: true, force: true } });
     assert(postStub.calledOnce);
   });
 
@@ -166,11 +166,11 @@ describe(commands.CONTAINER_REMOVE, () => {
       throw 'Invalid DELETE request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId, recycle: true, force: true } });
+    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId, force: true } });
     assert(deleteStub.calledOnce);
   });
 
-  it('correctly removes a container by name', async () => {
+  it('correctly permanently removes a container by name', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${containerId}/permanentDelete`) {
         return;
@@ -179,7 +179,7 @@ describe(commands.CONTAINER_REMOVE, () => {
       throw 'Invalid POST request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { name: containerName, containerTypeName: containerTypeName, verbose: true, force: true } });
+    await command.action(logger, { options: { name: containerName, containerTypeName: containerTypeName, permanent: true, verbose: true, force: true } });
     assert(postStub.calledOnce);
   });
 
@@ -192,7 +192,7 @@ describe(commands.CONTAINER_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: containerId, force: true } }),
+    await assert.rejects(command.action(logger, { options: { id: containerId, permanent: true, force: true } }),
       new CommandError(errorMessage));
   });
 });

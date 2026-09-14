@@ -16,7 +16,7 @@ export interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   url?: string;
-  recycle?: boolean;
+  permanent?: boolean;
   bypassSharedLock?: boolean;
   force?: boolean;
 }
@@ -49,7 +49,7 @@ class SpoFileRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         url: typeof args.options.url !== 'undefined',
-        recycle: !!args.options.recycle,
+        permanent: !!args.options.permanent,
         bypassSharedLock: !!args.options.bypassSharedLock,
         force: !!args.options.force
       });
@@ -68,7 +68,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         option: '--url [url]'
       },
       {
-        option: '--recycle'
+        option: '--permanent'
       },
       {
         option: '--bypassSharedLock'
@@ -103,7 +103,7 @@ class SpoFileRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('webUrl', 'id', 'url');
-    this.types.boolean.push('recycle', 'bypassSharedLock', 'force');
+    this.types.boolean.push('permanent', 'bypassSharedLock', 'force');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -126,7 +126,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
 
-      if (args.options.recycle) {
+      if (!args.options.permanent) {
         requestUrl += `/recycle()`;
       }
 
@@ -157,7 +157,7 @@ class SpoFileRemoveCommand extends SpoCommand {
       await removeFile();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.recycle ? 'recycle' : 'remove'} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.permanent ? 'permanently remove' : 'recycle'} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?` });
 
       if (result) {
         await removeFile();

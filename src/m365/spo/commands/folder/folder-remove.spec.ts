@@ -101,7 +101,8 @@ describe(commands.FOLDER_REMOVE, () => {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1'
+        url: '/Shared Documents/Folder1',
+        permanent: true
       }
     });
     assert(stubPost.called);
@@ -114,6 +115,7 @@ describe(commands.FOLDER_REMOVE, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents/Folder1',
+        permanent: true,
         force: true
       }
     });
@@ -132,7 +134,8 @@ describe(commands.FOLDER_REMOVE, () => {
       {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
-        url: '/Shared Documents/Folder1'
+        url: '/Shared Documents/Folder1',
+        permanent: true
       }
     });
     const lastCall: any = stubPost.lastCall.args[0];
@@ -141,7 +144,7 @@ describe(commands.FOLDER_REMOVE, () => {
     assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
-  it('should send params for recycle request when recycle is set to true', async () => {
+  it('should send params for recycle request by default', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
@@ -150,8 +153,7 @@ describe(commands.FOLDER_REMOVE, () => {
       {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1',
-        recycle: true
+        url: '/Shared Documents/Folder1'
       }
     });
     const lastCall: any = stubPost.lastCall.args[0];
@@ -183,8 +185,7 @@ describe(commands.FOLDER_REMOVE, () => {
       {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1',
-        recycle: true
+        url: '/Shared Documents/Folder1'
       }
     } as any), new CommandError(error.error['odata.error'].message.value));
   });
