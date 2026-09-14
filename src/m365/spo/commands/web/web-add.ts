@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -9,19 +10,26 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import { BasePermissions, PermissionKind } from '../../base-permissions.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  description: z.string().optional().alias('d'),
+  url: z.string().alias('u'),
+  webTemplate: z.string().alias('w'),
+  parentWebUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('p'),
+  locale: z.union([z.string(), z.number()]).refine(locale => !isNaN(parseInt(locale.toString())), {
+    error: e => `${e.input} is not a valid locale number`
+  }).optional().alias('l'),
+  breakInheritance: z.boolean().optional(),
+  inheritNavigation: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title: string;
-  url: string;
-  webTemplate: string;
-  parentWebUrl: string;
-  description?: string;
-  locale?: string;
-  breakInheritance: boolean;
-  inheritNavigation: boolean;
 }
 
 class SpoWebAddCommand extends SpoCommand {
@@ -33,72 +41,8 @@ class SpoWebAddCommand extends SpoCommand {
     return 'Creates new subsite';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: (!(!args.options.description)).toString(),
-        locale: args.options.locale || '1033',
-        breakInheritance: args.options.breakInheritance || false,
-        inheritNavigation: args.options.inheritNavigation || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-w, --webTemplate <webTemplate>'
-      },
-      {
-        option: '-p, --parentWebUrl <parentWebUrl>'
-      },
-      {
-        option: '-l, --locale [locale]'
-      },
-      {
-        option: '--breakInheritance'
-      },
-      {
-        option: '--inheritNavigation'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.parentWebUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.locale) {
-          const locale: number = parseInt(args.options.locale);
-          if (isNaN(locale)) {
-            return `${args.options.locale} is not a valid locale number`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -129,7 +73,7 @@ class SpoWebAddCommand extends SpoCommand {
       };
 
       if (this.verbose) {
-        await logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
+        await logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.url}...`);
       }
 
       const siteInfo = await request.post(requestOptionsPost);

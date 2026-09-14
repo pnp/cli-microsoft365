@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-remove.js';
+import command, { options } from './web-remove.js';
 
 describe(commands.WEB_REMOVE, () => {
   let log: any[];
@@ -19,6 +19,7 @@ describe(commands.WEB_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.WEB_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,23 +73,19 @@ describe(commands.WEB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        url: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should fail validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all required options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        url: "https://contoso.sharepoint.com/subsite"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: "https://contoso.sharepoint.com/subsite" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: "https://contoso.sharepoint.com/subsite", unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should prompt before deleting subsite when confirmation argument not passed', async () => {
@@ -99,7 +97,7 @@ describe(commands.WEB_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/subsite' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/subsite' }) });
     assert(promptIssued);
   });
 
@@ -114,10 +112,10 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: "https://contoso.sharepoint.com/subsite",
         force: true
-      }
+      })
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -145,9 +143,9 @@ describe(commands.WEB_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: "https://contoso.sharepoint.com/subsite"
-      }
+      })
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -171,11 +169,11 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         url: "https://contoso.sharepoint.com/subsite",
         force: true
-      }
+      })
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -199,11 +197,11 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         url: "https://contoso.sharepoint.com/subsite",
         force: true
-      }
+      })
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -227,10 +225,10 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: "https://contoso.sharepoint.com/subsite",
         force: true
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 });

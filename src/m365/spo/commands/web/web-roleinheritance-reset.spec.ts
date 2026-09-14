@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-roleinheritance-reset.js';
+import command, { options } from './web-roleinheritance-reset.js';
 
 describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -26,6 +27,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,25 +71,19 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('reset role inheritance of subsite', async () => {
@@ -100,11 +96,11 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
   });
 
@@ -119,22 +115,22 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     } as any), new CommandError(err));
   });
 
   it('aborts resetting role inheritance when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com' }) });
     assert(postSpy.notCalled);
   });
 
   it('prompts before resetting role inheritance when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com' }) });
     assert(promptIssued);
   });
 
@@ -151,7 +147,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com' }) });
     assert(resetInheritanceCallIssued);
   });
 });

@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-clientsidewebpart-list.js';
+import command, { options } from './web-clientsidewebpart-list.js';
 
 describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -63,23 +65,19 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should fail validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all required options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/subsite" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/subsite", unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles error when calling client side webparts', async () => {
@@ -91,10 +89,10 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     } as any), new CommandError('Error'));
   });
 
@@ -128,10 +126,10 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
   });
 
@@ -166,11 +164,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
@@ -205,11 +203,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     const expectedClientSideWebparts: any[] = [];
 
@@ -260,11 +258,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     const expectedClientSideWebparts: any[] = [];
 
