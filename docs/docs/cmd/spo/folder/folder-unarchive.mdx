@@ -2,14 +2,14 @@ import Global from '../../_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# spo folder archive
+# spo folder unarchive
 
-Archives a folder
+Unarchives a folder
 
 ## Usage
 
 ```sh
-m365 spo folder archive [options]
+m365 spo folder unarchive [options]
 ```
 
 ## Options
@@ -19,20 +19,16 @@ m365 spo folder archive [options]
 : The URL of the site where the folder is located.
 
 `--url [url]`
-: The server- or site-relative decoded URL of the folder to archive. Specify either `url` or `id`, but not both.
+: The server- or site-relative decoded URL of the folder to unarchive. Specify either `url` or `id`, but not both.
 
 `-i, --id [id]`
-: The unique ID (GUID) of the folder to archive. Specify either `url` or `id`, but not both.
+: The unique ID (GUID) of the folder to unarchive. Specify either `url` or `id`, but not both.
 
 `-f, --force`
 : Don't prompt for confirmation.
 ```
 
 <Global />
-
-## Remarks
-
-Folder archival can take some time to complete, as the status might not be reflected immediately.
 
 ## Permissions
 
@@ -55,16 +51,16 @@ Folder archival can take some time to complete, as the status might not be refle
 
 ## Examples
 
-Archive a folder by id without prompting for confirmation.
+Unarchive a folder without prompting for confirmation
 
 ```sh
-m365 spo folder archive --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7a8c9207-7745-4cda-b0e2-be2618ee3030 --force
+m365 spo folder unarchive --webUrl https://contoso.sharepoint.com/sites/Marketing --id 7a8c9207-7745-4cda-b0e2-be2618ee3030 --force
 ```
 
-Archive a folder by URL with prompting for confirmation.
+Unarchive a folder by URL with prompting for confirmation
 
 ```sh
-m365 spo folder archive --webUrl https://contoso.sharepoint.com/sites/Marketing --url '/sites/Marketing/shared documents/folder'
+m365 spo folder unarchive --webUrl https://contoso.sharepoint.com/sites/Marketing --url '/sites/Marketing/documents/general'
 ```
 
 ## Response
