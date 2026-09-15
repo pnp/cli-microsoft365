@@ -11,7 +11,6 @@
       "dependencies": {
         "@azure/msal-common": "^16.13.0",
         "@azure/msal-node": "^5.6.0",
-        "@azure/msal-node-extensions": "^5.2.3",
         "@inquirer/confirm": "^6.2.0",
         "@inquirer/input": "^5.1.3",
         "@inquirer/select": "^5.2.2",
@@ -77,6 +76,9 @@
         "sinon": "^22.1.0",
         "source-map-support": "^0.5.21",
         "tsc-watch": "^7.2.1"
+      },
+      "optionalDependencies": {
+        "@azure/msal-node-extensions": "^5.5.0"
       }
     },
     "node_modules/@actions/core": {
@@ -456,6 +458,7 @@
       "integrity": "sha1-Wpznsdx9A0+1v+i3zNYxq2+ex3Q=",
       "hasInstallScript": true,
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "@azure/msal-common": "16.14.0",
         "@azure/msal-node-runtime": "^0.20.0",
@@ -470,6 +473,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-16.14.0.tgz",
       "integrity": "sha1-zd2zjYMr4OG+YifqZNTrEZmXInw=",
       "license": "MIT",
+      "optional": true,
       "engines": {
         "node": ">=0.8.0"
       }
@@ -478,7 +482,8 @@
       "version": "0.20.6",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-runtime/-/msal-node-runtime-0.20.6.tgz",
       "integrity": "sha1-EQ3GT4uReISiL6VxQ3tuogN/WGo=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/@azure/opentelemetry-instrumentation-azure-sdk": {
       "version": "1.0.0",
@@ -4014,7 +4019,8 @@
           "url": "https://feross.org/support"
         }
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/big-integer": {
       "version": "1.6.52",
@@ -4028,6 +4034,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/bl/-/bl-4.1.0.tgz",
       "integrity": "sha1-RRU1JkGCvsL7vIOmKrmM8R2fezo=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "buffer": "^5.5.0",
         "inherits": "^2.0.4",
@@ -4131,6 +4138,7 @@
         }
       ],
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "base64-js": "^1.3.1",
         "ieee754": "^1.1.13"
@@ -4339,7 +4347,8 @@
       "version": "1.1.4",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/chownr/-/chownr-1.1.4.tgz",
       "integrity": "sha1-b8nXtC0ypYNZYzdmbn0ICE2izGs=",
-      "license": "ISC"
+      "license": "ISC",
+      "optional": true
     },
     "node_modules/cjs-module-lexer": {
       "version": "2.2.0",
@@ -4622,6 +4631,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/decompress-response/-/decompress-response-6.0.0.tgz",
       "integrity": "sha1-yjh2Et234QS9FthaqwDV7PCcZvw=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "mimic-response": "^3.1.0"
       },
@@ -4703,6 +4713,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/detect-libc/-/detect-libc-2.1.2.tgz",
       "integrity": "sha1-aJxdzcGQDvVYOky59te0c3QgdK0=",
       "license": "Apache-2.0",
+      "optional": true,
       "engines": {
         "node": ">=8"
       }
@@ -4792,6 +4803,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/end-of-stream/-/end-of-stream-1.4.5.tgz",
       "integrity": "sha1-c0TXEd6kDgt0q8LtSXeHQ8ztsIw=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "once": "^1.4.0"
       }
@@ -5158,6 +5170,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/expand-template/-/expand-template-2.0.3.tgz",
       "integrity": "sha1-bhSz/O4POmNA7LV9LokYaSBSpHw=",
       "license": "(MIT OR WTFPL)",
+      "optional": true,
       "engines": {
         "node": ">=6"
       }
@@ -5383,7 +5396,8 @@
       "version": "1.0.0",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fs-constants/-/fs-constants-1.0.0.tgz",
       "integrity": "sha1-a+Dem+mYzhavivwkSXue6bfM2a0=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/function-bind": {
       "version": "1.1.2",
@@ -5468,7 +5482,8 @@
       "version": "0.0.0",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/github-from-package/-/github-from-package-0.0.0.tgz",
       "integrity": "sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/glob": {
       "version": "10.5.0",
@@ -5653,7 +5668,8 @@
           "url": "https://feross.org/support"
         }
       ],
-      "license": "BSD-3-Clause"
+      "license": "BSD-3-Clause",
+      "optional": true
     },
     "node_modules/ignore": {
       "version": "7.0.5",
@@ -6038,6 +6054,7 @@
       "integrity": "sha1-TGIlcI9RtQy/d8Wq6BchlkwpGMs=",
       "hasInstallScript": true,
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "node-addon-api": "^4.3.0",
         "prebuild-install": "^7.0.1"
@@ -6288,6 +6305,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mimic-response/-/mimic-response-3.1.0.tgz",
       "integrity": "sha1-LR1Zr5wbEpgVrMwsRqAipc4fo8k=",
       "license": "MIT",
+      "optional": true,
       "engines": {
         "node": ">=10"
       },
@@ -6328,7 +6346,8 @@
       "version": "0.5.3",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz",
       "integrity": "sha1-+hDJEVzG2IZb4iG6R+6b7XhgERM=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/mocha": {
       "version": "11.8.0",
@@ -6421,7 +6440,8 @@
       "version": "2.0.0",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/napi-build-utils/-/napi-build-utils-2.0.0.tgz",
       "integrity": "sha1-E8IsAYf8/MzhRhhEE2NypH3cAn4=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/natural-compare": {
       "version": "1.4.0",
@@ -6433,6 +6453,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-abi/-/node-abi-3.96.0.tgz",
       "integrity": "sha1-iwOLxsypfWzsLpqv24G5ANof+A0=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "semver": "^7.3.5"
       },
@@ -6444,7 +6465,8 @@
       "version": "4.3.0",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-addon-api/-/node-addon-api-4.3.0.tgz",
       "integrity": "sha1-UqGgtHUZPgko6Y4EJqDRJUeCt38=",
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/node-cleanup": {
       "version": "2.1.2",
@@ -6493,6 +6515,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/once/-/once-1.4.0.tgz",
       "integrity": "sha1-WDsap3WWHUsROsF9nFC6753Xa9E=",
       "license": "ISC",
+      "optional": true,
       "dependencies": {
         "wrappy": "1"
       }
@@ -6768,6 +6791,7 @@
       "integrity": "sha1-1jCrrSsUdEPyCiEpF76uaLgJLuw=",
       "deprecated": "No longer maintained. Please contact the author of the relevant native addon; alternatives are available.",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "detect-libc": "^2.0.0",
         "expand-template": "^2.0.3",
@@ -6864,6 +6888,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/pump/-/pump-3.0.4.tgz",
       "integrity": "sha1-HzE0MFJ/qLkFYi69Iv4UROdXqzw=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "end-of-stream": "^1.1.0",
         "once": "^1.3.1"
@@ -7260,7 +7285,8 @@
           "url": "https://feross.org/support"
         }
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/simple-get": {
       "version": "4.0.1",
@@ -7281,6 +7307,7 @@
         }
       ],
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "decompress-response": "^6.0.0",
         "once": "^1.3.1",
@@ -7569,6 +7596,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-fs/-/tar-fs-2.1.5.tgz",
       "integrity": "sha1-M+nClBPc4MWK2n/3fbTlowr//nA=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "chownr": "^1.1.1",
         "mkdirp-classic": "^0.5.2",
@@ -7581,6 +7609,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-stream/-/tar-stream-2.2.0.tgz",
       "integrity": "sha1-rK2EwoQTawYNw/qmRHSqmuvXcoc=",
       "license": "MIT",
+      "optional": true,
       "dependencies": {
         "bl": "^4.0.3",
         "end-of-stream": "^1.4.1",
@@ -7758,6 +7787,7 @@
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tunnel-agent/-/tunnel-agent-0.6.0.tgz",
       "integrity": "sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=",
       "license": "Apache-2.0",
+      "optional": true,
       "dependencies": {
         "safe-buffer": "^5.0.1"
       },
@@ -8179,7 +8209,8 @@
       "version": "1.0.2",
       "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/wrappy/-/wrappy-1.0.2.tgz",
       "integrity": "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
-      "license": "ISC"
+      "license": "ISC",
+      "optional": true
     },
     "node_modules/wsl-utils": {
       "version": "1.0.0",
