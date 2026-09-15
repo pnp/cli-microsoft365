@@ -5,7 +5,7 @@
     "title": "Lists information on decluttering teams",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/m365-teams-decluttering",
     "creationDateTime": "2023-10-17",
-    "updateDateTime": "2023-10-17",
+    "updateDateTime": "2026-09-30",
     "shortDescription": "Lists all the teams to provide insights",
     "longDescription": [
       "Get insights about the teams in your tenant. Please keep in mind that you see only the teams that you have access to. For a full overview and a complete decluttering experience, the calling user has to be admin rights in SPO and Teams."
@@ -25,7 +25,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "7.0.0"
+        "value": "12.0.0"
       }
     ],
     "thumbnails": [
