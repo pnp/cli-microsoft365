@@ -156,5 +156,5 @@ export const zod = {
       }
 
       return null;
-    }, z.enum(e))
+    }, z.enum(e)) as unknown as z.ZodPreprocess<z.ZodEnum<T>>
 };
