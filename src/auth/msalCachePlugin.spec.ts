@@ -20,6 +20,9 @@ describe('msalCachePlugin', () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
+      fs.chmodSync,
+      fs.closeSync,
+      fs.openSync,
       fs.readFileSync,
       fs.unlinkSync,
       fs.writeFileSync
@@ -262,12 +265,16 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns('{"token":"data"}');
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
     const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
 
     await plugin.beforeCacheAccess(context);
+    await plugin.afterCacheAccess(context);
     assert(mockCache.deserialize.calledWith('{"token":"data"}'));
   });
 
@@ -278,11 +285,15 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
     sinon.stub(fs, 'existsSync').returns(false);
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
     const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
 
     await plugin.beforeCacheAccess(context);
+    await plugin.afterCacheAccess(context);
     assert(mockCache.deserialize.notCalled);
   });
 
@@ -293,12 +304,108 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
+    const openStub = sinon.stub(fs, 'openSync').returns(1);
+    const closeStub = sinon.stub(fs, 'closeSync');
+    const unlinkStub = sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').returns(false);
     const writeStub = sinon.stub(fs, 'writeFileSync');
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('{"serialized":"data"}') };
     const context = { tokenCache: mockCache, cacheHasChanged: true, hasChanged: true } as any;
 
+    await plugin.beforeCacheAccess(context);
     await plugin.afterCacheAccess(context);
     assert(writeStub.calledOnce);
+    assert(openStub.calledOnceWith(sinon.match(/\.lockfile$/), 'wx', 0o600));
+    assert(unlinkStub.calledOnceWith(sinon.match(/\.lockfile$/)));
+    assert(closeStub.calledOnceWith(1));
+  });
+
+  it(`file cache plugin tightens permissions before overwriting an existing file`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(process, 'platform').value('linux');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{}');
+    const chmodStub = sinon.stub(fs, 'chmodSync');
+    const writeStub = sinon.stub(fs, 'writeFileSync');
+    const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('{"serialized":"data"}') };
+    const context = { tokenCache: mockCache, cacheHasChanged: true, hasChanged: true } as any;
+
+    await plugin.beforeCacheAccess(context);
+    await plugin.afterCacheAccess(context);
+
+    assert(chmodStub.calledOnceWith(sinon.match(/\.cli-m365-msal-cache\.json$/), 0o600));
+    assert(chmodStub.calledBefore(writeStub));
+  });
+
+  it(`file cache plugin retries while another process holds the lock`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(process, 'platform').value('linux');
+    const clock = sinon.useFakeTimers();
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    const lockError = (code: string): NodeJS.ErrnoException => Object.assign(new Error(code), { code });
+    sinon.stub(fs, 'openSync')
+      .onFirstCall().throws(lockError('EEXIST'))
+      .onSecondCall().throws(lockError('EPERM'))
+      .returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').returns(false);
+    const context = { tokenCache: { deserialize: sinon.stub() }, cacheHasChanged: false } as any;
+
+    const accessPromise = plugin.beforeCacheAccess(context);
+    await clock.tickAsync(200);
+    await accessPromise;
+    await plugin.afterCacheAccess(context);
+  });
+
+  it(`file cache plugin rethrows unexpected lock errors`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(process, 'platform').value('linux');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'openSync').throws(Object.assign(new Error('access denied'), { code: 'EACCES' }));
+    const context = { tokenCache: { deserialize: sinon.stub() }, cacheHasChanged: false } as any;
+
+    await assert.rejects(plugin.beforeCacheAccess(context), { message: 'access denied' });
+  });
+
+  it(`file cache plugin fails after exhausting lock retries`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(process, 'platform').value('linux');
+    const clock = sinon.useFakeTimers();
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+
+    sinon.stub(fs, 'openSync').throws(Object.assign(new Error('locked'), { code: 'EEXIST' }));
+    const context = { tokenCache: { deserialize: sinon.stub() }, cacheHasChanged: false } as any;
+
+    const accessPromise = plugin.beforeCacheAccess(context);
+    await clock.tickAsync(50000);
+    await assert.rejects(accessPromise, /Could not acquire MSAL cache lock/);
+  });
+
+  it(`file cache plugin can finish cache access when no lock was acquired`, async () => {
+    sinon.stub(msalCachePlugin, 'createNativePersistence').rejects(new Error('not available'));
+    sinon.stub(msalCachePlugin, 'removeLegacyCache');
+    sinon.stub(process, 'platform').value('linux');
+
+    const plugin = await msalCachePlugin.getCachePlugin();
+    const context = { tokenCache: { serialize: sinon.stub() }, cacheHasChanged: false } as any;
+
+    await plugin.afterCacheAccess(context);
   });
 
   it(`file cache plugin does not write when cache not changed`, async () => {
@@ -308,10 +415,15 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').returns(false);
     const writeStub = sinon.stub(fs, 'writeFileSync');
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
     const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
 
+    await plugin.beforeCacheAccess(context);
     await plugin.afterCacheAccess(context);
     assert(writeStub.notCalled);
   });
@@ -323,10 +435,15 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFileSync').throws(new Error('write failed'));
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('data') };
     const context = { tokenCache: mockCache, cacheHasChanged: true, hasChanged: true } as any;
 
+    await plugin.beforeCacheAccess(context);
     await plugin.afterCacheAccess(context);
   });
 
@@ -337,11 +454,15 @@ describe('msalCachePlugin', () => {
 
     const plugin = await msalCachePlugin.getCachePlugin();
 
-    sinon.stub(fs, 'existsSync').throws(new Error('read failed'));
+    sinon.stub(fs, 'openSync').returns(1);
+    sinon.stub(fs, 'closeSync');
+    sinon.stub(fs, 'unlinkSync');
+    sinon.stub(fs, 'existsSync').onFirstCall().throws(new Error('read failed')).returns(false);
     const mockCache = { deserialize: sinon.stub(), serialize: sinon.stub().returns('') };
     const context = { tokenCache: mockCache, cacheHasChanged: false, hasChanged: false } as any;
 
     await plugin.beforeCacheAccess(context);
+    await plugin.afterCacheAccess(context);
     assert(mockCache.deserialize.notCalled);
   });
 });

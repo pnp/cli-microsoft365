@@ -13,13 +13,14 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base.js';
-import command from './web-reindex.js';
+import command, { options } from './web-reindex.js';
 
 describe(commands.WEB_REINDEX, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -35,6 +36,7 @@ describe(commands.WEB_REINDEX, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -113,7 +115,7 @@ describe(commands.WEB_REINDEX, () => {
       return JSON.stringify({});
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a' }) });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
     assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
@@ -157,7 +159,7 @@ describe(commands.WEB_REINDEX, () => {
       return JSON.stringify({});
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' }) });
     assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
     assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
   });
@@ -243,7 +245,7 @@ describe(commands.WEB_REINDEX, () => {
       return JSON.stringify({});
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a' }) });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName[0], 'vti_searchversion');
     assert.strictEqual(propertyName[1], 'vti_searchversion');
@@ -332,7 +334,7 @@ describe(commands.WEB_REINDEX, () => {
       return JSON.stringify({});
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' }) });
     assert(loggerLogToStderrSpy.called, 'Nothing has been logged');
     assert.strictEqual(propertyName[0], 'vti_searchversion');
     assert.strictEqual(propertyName[1], 'vti_searchversion');
@@ -410,16 +412,21 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(true);
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').rejects(new Error('ClientSvc unknown error'));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a' }) }), new CommandError('ClientSvc unknown error'));
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if url is valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

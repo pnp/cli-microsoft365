@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-roleinheritance-break.js';
+import command, { options } from './web-roleinheritance-break.js';
 
 describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,18 +71,19 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/subsite" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/subsite", unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should prompt before breaking when confirmation argument not passed', async () => {
@@ -92,7 +95,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: "https://contoso.sharepoint.com/subsite" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: "https://contoso.sharepoint.com/subsite" }) });
     assert(promptIssued);
   });
 
@@ -109,9 +112,9 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: "https://contoso.sharepoint.com/subsite"
-      }
+      })
     });
   });
 
@@ -125,9 +128,9 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: "https://contoso.sharepoint.com/subsite"
-      }
+      })
     });
 
     assert(sinonStub.notCalled);
@@ -143,12 +146,12 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/subsite',
         clearExistingPermissions: true,
         force: true
-      }
+      })
     });
   });
 
@@ -157,10 +160,10 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw { error: { message: errorMessage } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/subsite',
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

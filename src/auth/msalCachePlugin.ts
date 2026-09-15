@@ -26,12 +26,15 @@ let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void
 // See: https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7170
 class FileCachePlugin implements ICachePlugin {
   private cachePath: string;
+  private lockFileHandle: number | undefined;
 
   constructor(cachePath: string) {
     this.cachePath = cachePath;
   }
 
   public async beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
+    await this.acquireLock();
+
     try {
       if (fs.existsSync(this.cachePath)) {
         const data = fs.readFileSync(this.cachePath, 'utf8');
@@ -44,15 +47,54 @@ class FileCachePlugin implements ICachePlugin {
   }
 
   public async afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
-    if (!tokenCacheContext.cacheHasChanged) {
-      return;
-    }
-
     try {
-      fs.writeFileSync(this.cachePath, tokenCacheContext.tokenCache.serialize(), { encoding: 'utf8', mode: 0o600 });
+      if (tokenCacheContext.cacheHasChanged) {
+        if (fs.existsSync(this.cachePath)) {
+          fs.chmodSync(this.cachePath, 0o600);
+        }
+        fs.writeFileSync(this.cachePath, tokenCacheContext.tokenCache.serialize(), { encoding: 'utf8', mode: 0o600 });
+      }
     }
     catch {
       // Do nothing
+    }
+    finally {
+      this.releaseLock();
+    }
+  }
+
+  private async acquireLock(): Promise<void> {
+    const lockPath = `${this.cachePath}.lockfile`;
+
+    for (let retry = 0; retry < 500; retry++) {
+      try {
+        this.lockFileHandle = fs.openSync(lockPath, 'wx', 0o600);
+        return;
+      }
+      catch (err) {
+        const errorCode = (err as NodeJS.ErrnoException).code;
+        if (errorCode !== 'EEXIST' && errorCode !== 'EPERM') {
+          throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    throw new Error(`Could not acquire MSAL cache lock at ${lockPath}`);
+  }
+
+  private releaseLock(): void {
+    if (this.lockFileHandle === undefined) {
+      return;
+    }
+
+    const lockFileHandle = this.lockFileHandle;
+    this.lockFileHandle = undefined;
+    try {
+      fs.unlinkSync(`${this.cachePath}.lockfile`);
+    }
+    finally {
+      fs.closeSync(lockFileHandle);
     }
   }
 }
