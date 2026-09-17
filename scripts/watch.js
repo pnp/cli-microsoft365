@@ -3,11 +3,11 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const tsgoPath = resolve(__dirname, '..', 'node_modules', '.bin', 'tsgo');
+const tscPath = resolve(__dirname, '..', 'node_modules', 'typescript-native', 'bin', 'tsc');
 
-const tsgo = spawn(tsgoPath, ['--watch'], { stdio: 'pipe' });
+const tsc = spawn(process.execPath, [tscPath, '--watch'], { stdio: 'pipe' });
 
-tsgo.stdout.on('data', (data) => {
+tsc.stdout.on('data', (data) => {
   const output = data.toString();
   process.stdout.write(output);
 
@@ -17,10 +17,10 @@ tsgo.stdout.on('data', (data) => {
   }
 });
 
-tsgo.stderr.on('data', (data) => {
+tsc.stderr.on('data', (data) => {
   process.stderr.write(data);
 });
 
-tsgo.on('close', (code) => {
+tsc.on('close', (code) => {
   process.exit(code);
 });
