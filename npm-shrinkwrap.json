@@ -75,7 +75,7 @@
         "rimraf": "^6.1.3",
         "sinon": "^22.1.0",
         "source-map-support": "^0.5.21",
-        "tsc-watch": "^7.2.1"
+        "typescript-native": "npm:typescript@^7.0.2"
       }
     },
     "node_modules/@actions/core": {
@@ -3675,6 +3675,346 @@
         "url": "https://opencollective.com/eslint"
       }
     },
+    "node_modules/@typescript/typescript-aix-ppc64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-aix-ppc64/-/typescript-aix-ppc64-7.0.2.tgz",
+      "integrity": "sha1-zcfOgdYPHgkDSWDd+x+4gNendrY=",
+      "cpu": [
+        "ppc64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "aix"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-darwin-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz",
+      "integrity": "sha1-pV/fz6WN9Y0n2yI3zealweNacjU=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-darwin-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-darwin-x64/-/typescript-darwin-x64-7.0.2.tgz",
+      "integrity": "sha1-ONHJFygAqR1we+xk0qNwoBZjTbQ=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-freebsd-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-freebsd-arm64/-/typescript-freebsd-arm64-7.0.2.tgz",
+      "integrity": "sha1-8f+IEAMLNdK1vg22otxlBGDqlPo=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-freebsd-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-freebsd-x64/-/typescript-freebsd-x64-7.0.2.tgz",
+      "integrity": "sha1-PYawPzU8WxupUWLrbONVM7/ClL0=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-arm": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz",
+      "integrity": "sha1-rZS0HhruKk3MaimMe2fEM0X94y4=",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz",
+      "integrity": "sha1-2TNNltbaxv+F2pyGVYiUjek56R8=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-loong64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz",
+      "integrity": "sha1-KWWu5PyHM2ATnYk9qv5jl6KROK0=",
+      "cpu": [
+        "loong64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-mips64el": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-mips64el/-/typescript-linux-mips64el-7.0.2.tgz",
+      "integrity": "sha1-Goh6MRvtOoM/gL/Uqe03wnGTbPA=",
+      "cpu": [
+        "mips64el"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-ppc64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-ppc64/-/typescript-linux-ppc64-7.0.2.tgz",
+      "integrity": "sha1-i2PJsvRFs5PrTkPsIdoiXa3jV30=",
+      "cpu": [
+        "ppc64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-riscv64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz",
+      "integrity": "sha1-tuijXCibPql6kqQdRhqu7Q07NuE=",
+      "cpu": [
+        "riscv64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-s390x": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-s390x/-/typescript-linux-s390x-7.0.2.tgz",
+      "integrity": "sha1-Lvlmk75IYfbReWVCflsAnLvtGj4=",
+      "cpu": [
+        "s390x"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-linux-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz",
+      "integrity": "sha1-cyacsLq6UK6gygYERaa4jlg/HOI=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-netbsd-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-netbsd-arm64/-/typescript-netbsd-arm64-7.0.2.tgz",
+      "integrity": "sha1-OjZJ+X+vohC05uN5jBXgZgXIqQE=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "netbsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-netbsd-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-netbsd-x64/-/typescript-netbsd-x64-7.0.2.tgz",
+      "integrity": "sha1-R+xZSRpAxHDSgH3E0rglUo/Zeas=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "netbsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-openbsd-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-openbsd-arm64/-/typescript-openbsd-arm64-7.0.2.tgz",
+      "integrity": "sha1-eWvo2gvZidij+5bygB44qDZbS68=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-openbsd-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-openbsd-x64/-/typescript-openbsd-x64-7.0.2.tgz",
+      "integrity": "sha1-03/ipynrlCwHbEVO5/GBX699Vg8=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-sunos-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-sunos-x64/-/typescript-sunos-x64-7.0.2.tgz",
+      "integrity": "sha1-q6jTRkw1ZacER4m6upaRa9SrLIg=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "sunos"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-win32-arm64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-win32-arm64/-/typescript-win32-arm64-7.0.2.tgz",
+      "integrity": "sha1-ud5QoXGWOD9iYgtfnQovNK07YNc=",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
+    "node_modules/@typescript/typescript-win32-x64": {
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz",
+      "integrity": "sha1-zzt7DWzlY12spMjgHBic3N5H7Dw=",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "Apache-2.0",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "engines": {
+        "node": ">=16.20.0"
+      }
+    },
     "node_modules/@typespec/ts-http-runtime": {
       "version": "0.3.7",
       "resolved": "https://registry.npmjs.org/@typespec/ts-http-runtime/-/ts-http-runtime-0.3.7.tgz",
@@ -4639,11 +4979,6 @@
         "node": ">= 0.4"
       }
     },
-    "node_modules/duplexer": {
-      "version": "0.1.2",
-      "dev": true,
-      "license": "MIT"
-    },
     "node_modules/eastasianwidth": {
       "version": "0.2.0",
       "dev": true,
@@ -4990,20 +5325,6 @@
         "node": ">=0.10.0"
       }
     },
-    "node_modules/event-stream": {
-      "version": "3.3.4",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "duplexer": "~0.1.1",
-        "from": "~0",
-        "map-stream": "~0.1.0",
-        "pause-stream": "0.0.11",
-        "split": "0.3",
-        "stream-combiner": "~0.0.4",
-        "through": "~2.3.1"
-      }
-    },
     "node_modules/execa": {
       "version": "9.6.1",
       "license": "MIT",
@@ -5238,11 +5559,6 @@
       "version": "2.1.2",
       "resolved": "https://registry.npmjs.org/forwarded-parse/-/forwarded-parse-2.1.2.tgz",
       "integrity": "sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==",
-      "license": "MIT"
-    },
-    "node_modules/from": {
-      "version": "0.1.7",
-      "dev": true,
       "license": "MIT"
     },
     "node_modules/function-bind": {
@@ -6061,10 +6377,6 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     },
-    "node_modules/map-stream": {
-      "version": "0.1.0",
-      "dev": true
-    },
     "node_modules/math-intrinsics": {
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
@@ -6224,11 +6536,6 @@
     },
     "node_modules/natural-compare": {
       "version": "1.4.0",
-      "dev": true,
-      "license": "MIT"
-    },
-    "node_modules/node-cleanup": {
-      "version": "2.1.2",
       "dev": true,
       "license": "MIT"
     },
@@ -6425,17 +6732,6 @@
       "dev": true,
       "license": "ISC"
     },
-    "node_modules/pause-stream": {
-      "version": "0.0.11",
-      "dev": true,
-      "license": [
-        "MIT",
-        "Apache2"
-      ],
-      "dependencies": {
-        "through": "~2.3"
-      }
-    },
     "node_modules/pg-int8": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/pg-int8/-/pg-int8-1.0.1.tgz",
@@ -6588,20 +6884,6 @@
       "license": "MIT",
       "engines": {
         "node": ">=10"
-      }
-    },
-    "node_modules/ps-tree": {
-      "version": "1.2.0",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "event-stream": "=3.3.4"
-      },
-      "bin": {
-        "ps-tree": "bin/ps-tree.js"
-      },
-      "engines": {
-        "node": ">= 0.10"
       }
     },
     "node_modules/punycode": {
@@ -7021,25 +7303,6 @@
         "source-map": "^0.6.0"
       }
     },
-    "node_modules/split": {
-      "version": "0.3.3",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "through": "2"
-      },
-      "engines": {
-        "node": "*"
-      }
-    },
-    "node_modules/stream-combiner": {
-      "version": "0.0.4",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "duplexer": "~0.1.1"
-      }
-    },
     "node_modules/string_decoder": {
       "version": "1.3.0",
       "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz",
@@ -7047,14 +7310,6 @@
       "license": "MIT",
       "dependencies": {
         "safe-buffer": "~5.2.0"
-      }
-    },
-    "node_modules/string-argv": {
-      "version": "0.3.2",
-      "dev": true,
-      "license": "MIT",
-      "engines": {
-        "node": ">=0.6.19"
       }
     },
     "node_modules/string-width": {
@@ -7339,11 +7594,6 @@
         "url": "https://github.com/sponsors/isaacs"
       }
     },
-    "node_modules/through": {
-      "version": "2.3.8",
-      "dev": true,
-      "license": "MIT"
-    },
     "node_modules/tinyglobby": {
       "version": "0.2.17",
       "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz",
@@ -7379,28 +7629,6 @@
       },
       "peerDependencies": {
         "typescript": ">=4.8.4"
-      }
-    },
-    "node_modules/tsc-watch": {
-      "version": "7.2.1",
-      "resolved": "https://registry.npmjs.org/tsc-watch/-/tsc-watch-7.2.1.tgz",
-      "integrity": "sha512-FcntBnz5bXGQ/q265acfDzU7xi6R/sgwMokI+Iu293n14Wu8ovAtcwqNfU9vv/DM1THlnmmxatSSyGOvWsSblg==",
-      "dev": true,
-      "license": "MIT",
-      "dependencies": {
-        "cross-spawn": "^7.0.6",
-        "node-cleanup": "^2.1.2",
-        "ps-tree": "^1.2.0",
-        "string-argv": "^0.3.2"
-      },
-      "bin": {
-        "tsc-watch": "dist/lib/tsc-watch.js"
-      },
-      "engines": {
-        "node": ">=12.12.0"
-      },
-      "peerDependencies": {
-        "typescript": "*"
       }
     },
     "node_modules/tslib": {
@@ -7455,6 +7683,42 @@
       },
       "engines": {
         "node": ">=14.17"
+      }
+    },
+    "node_modules/typescript-native": {
+      "name": "typescript",
+      "version": "7.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha1-nsdz15VKjBgsF8xbvVdaoovFFYI=",
+      "dev": true,
+      "license": "Apache-2.0",
+      "bin": {
+        "tsc": "bin/tsc"
+      },
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "optionalDependencies": {
+        "@typescript/typescript-aix-ppc64": "7.0.2",
+        "@typescript/typescript-darwin-arm64": "7.0.2",
+        "@typescript/typescript-darwin-x64": "7.0.2",
+        "@typescript/typescript-freebsd-arm64": "7.0.2",
+        "@typescript/typescript-freebsd-x64": "7.0.2",
+        "@typescript/typescript-linux-arm": "7.0.2",
+        "@typescript/typescript-linux-arm64": "7.0.2",
+        "@typescript/typescript-linux-loong64": "7.0.2",
+        "@typescript/typescript-linux-mips64el": "7.0.2",
+        "@typescript/typescript-linux-ppc64": "7.0.2",
+        "@typescript/typescript-linux-riscv64": "7.0.2",
+        "@typescript/typescript-linux-s390x": "7.0.2",
+        "@typescript/typescript-linux-x64": "7.0.2",
+        "@typescript/typescript-netbsd-arm64": "7.0.2",
+        "@typescript/typescript-netbsd-x64": "7.0.2",
+        "@typescript/typescript-openbsd-arm64": "7.0.2",
+        "@typescript/typescript-openbsd-x64": "7.0.2",
+        "@typescript/typescript-sunos-x64": "7.0.2",
+        "@typescript/typescript-win32-arm64": "7.0.2",
+        "@typescript/typescript-win32-x64": "7.0.2"
       }
     },
     "node_modules/undici": {

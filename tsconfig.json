@@ -4,6 +4,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "lib": ["es2020", "dom"],
+    "types": ["mocha", "node"],
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "./dist",
