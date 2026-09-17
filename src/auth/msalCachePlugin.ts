@@ -5,6 +5,9 @@ import path from 'path';
 
 const legacyCachePath = path.join(os.homedir(), '.cli-m365-msal.json');
 const fallbackCachePath = path.join(os.homedir(), '.cli-m365-msal-cache.json');
+const lockRetryCount = 500;
+const lockRetryDelay = 100;
+const staleLockThreshold = 10000;
 
 const persistenceConfiguration = {
   cachePath: fallbackCachePath,
@@ -13,7 +16,7 @@ const persistenceConfiguration = {
   usePlaintextFileOnLinux: true
 };
 
-let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> | undefined;
+let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void>; isFileFallback: boolean }> | undefined;
 
 // Fallback ICachePlugin that stores tokens as plain JSON on disk.
 // @azure/msal-node-extensions ships a usePlaintextFileOnLinux option
@@ -63,12 +66,36 @@ class FileCachePlugin implements ICachePlugin {
     }
   }
 
+  public async clearCache(): Promise<void> {
+    await this.acquireLock();
+
+    try {
+      removeFile(this.cachePath);
+    }
+    finally {
+      this.releaseLock();
+    }
+  }
+
   private async acquireLock(): Promise<void> {
     const lockPath = `${this.cachePath}.lockfile`;
 
-    for (let retry = 0; retry < 500; retry++) {
+    for (let retry = 0; retry < lockRetryCount; retry++) {
       try {
-        this.lockFileHandle = fs.openSync(lockPath, 'wx', 0o600);
+        const lockFileHandle = fs.openSync(lockPath, 'wx', 0o600);
+        try {
+          fs.writeFileSync(lockFileHandle, process.pid.toString(), { encoding: 'utf8' });
+        }
+        catch (err) {
+          try {
+            removeFile(lockPath);
+          }
+          finally {
+            fs.closeSync(lockFileHandle);
+          }
+          throw err;
+        }
+        this.lockFileHandle = lockFileHandle;
         return;
       }
       catch (err) {
@@ -76,11 +103,41 @@ class FileCachePlugin implements ICachePlugin {
         if (errorCode !== 'EEXIST' && errorCode !== 'EPERM') {
           throw err;
         }
-        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (this.isLockStale(lockPath)) {
+          removeFile(lockPath);
+          continue;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, lockRetryDelay));
       }
     }
 
     throw new Error(`Could not acquire MSAL cache lock at ${lockPath}`);
+  }
+
+  private isLockStale(lockPath: string): boolean {
+    try {
+      const ownerPid = Number(fs.readFileSync(lockPath, 'utf8'));
+      if (Number.isInteger(ownerPid) && ownerPid > 0) {
+        try {
+          process.kill(ownerPid, 0);
+          return false;
+        }
+        catch (err) {
+          return (err as NodeJS.ErrnoException).code === 'ESRCH';
+        }
+      }
+
+      return Date.now() - fs.statSync(lockPath).mtimeMs >= staleLockThreshold;
+    }
+    catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        return false;
+      }
+
+      throw err;
+    }
   }
 
   private releaseLock(): void {
@@ -99,12 +156,23 @@ class FileCachePlugin implements ICachePlugin {
   }
 }
 
+function removeFile(filePath: string): void {
+  try {
+    fs.unlinkSync(filePath);
+  }
+  catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw err;
+    }
+  }
+}
+
 export const msalCachePlugin = {
   async importMsalExtensions(): Promise<typeof import('@azure/msal-node-extensions')> {
     return await import('@azure/msal-node-extensions');
   },
 
-  async createNativePersistence(): Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void> }> {
+  async createNativePersistence(): Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void>; isFileFallback: boolean }> {
     const { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } = await msalCachePlugin.importMsalExtensions();
     const persistence = await PersistenceCreator.createPersistence({
       ...persistenceConfiguration,
@@ -112,30 +180,22 @@ export const msalCachePlugin = {
     });
     return {
       plugin: new PersistenceCachePlugin(persistence),
-      clearCache: async () => { await persistence.delete(); }
+      clearCache: async () => { await persistence.delete(); },
+      isFileFallback: false
     };
   },
 
-  createFileFallback(): { plugin: ICachePlugin; clearCache: () => Promise<void> } {
+  createFileFallback(): { plugin: ICachePlugin; clearCache: () => Promise<void>; isFileFallback: boolean } {
+    const plugin = new FileCachePlugin(persistenceConfiguration.cachePath);
     return {
-      plugin: new FileCachePlugin(persistenceConfiguration.cachePath),
-      clearCache: async () => {
-        try { fs.unlinkSync(persistenceConfiguration.cachePath); }
-        catch { /* file may not exist */ }
-      }
+      plugin,
+      clearCache: async () => { await plugin.clearCache(); },
+      isFileFallback: true
     };
   },
 
   removeLegacyCache(): void {
-    try {
-      if (fs.existsSync(legacyCachePath)) {
-        fs.unlinkSync(legacyCachePath);
-      }
-    }
-    catch {
-      // Ignore errors: file may already be managed by the new
-      // persistence layer (e.g. DPAPI-encrypted on Windows)
-    }
+    removeFile(legacyCachePath);
   },
 
   async getCachePlugin(): Promise<ICachePlugin> {
@@ -171,12 +231,13 @@ export const msalCachePlugin = {
         throw err;
       }
     })();
-    const { clearCache } = await _initPromise;
+    const { clearCache, isFileFallback } = await _initPromise;
     await clearCache();
     // Also remove the file-based fallback cache to ensure no tokens
     // remain if the machine previously used file-based persistence
-    try { fs.unlinkSync(persistenceConfiguration.cachePath); }
-    catch { /* file may not exist */ }
+    if (!isFileFallback) {
+      await msalCachePlugin.createFileFallback().clearCache();
+    }
   },
 
   resetForTesting(): void {
