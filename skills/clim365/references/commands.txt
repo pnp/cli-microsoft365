@@ -708,8 +708,6 @@ spo user remove|Removes user from specific web
 spo userprofile get|Gets user profile property for a SharePoint user
 spo userprofile set|Sets user profile property for a SharePoint user
 spo web add|Create new subsite
-spo web alert list|Lists all SharePoint list alerts
-spo web alert remove|Removes an alert from a SharePoint list
 spo web clientsidewebpart list|Lists available client-side web parts
 spo web get|Retrieve information about the specified site
 spo web installedlanguage list|Lists all installed languages on site

@@ -9,13 +9,14 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-import command from './spo-get.js';
+import command, { options } from './spo-get.js';
 
 describe(commands.GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,10 +66,10 @@ describe(commands.GET, () => {
     auth.connection.spoUrl = undefined;
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       SpoUrl: ''
@@ -78,10 +80,10 @@ describe(commands.GET, () => {
     auth.connection.spoUrl = 'https://northwind.sharepoint.com';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       SpoUrl: 'https://northwind.sharepoint.com'
@@ -91,41 +93,17 @@ describe(commands.GET, () => {
   it('throws error when trying to get SPO URL when not logged in to M365', async () => {
     auth.connection.active = false;
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.connection.spoUrl, undefined);
   });
 
-  it('Contains the correct options', () => {
-    const options = command.options;
-    let containsOutputOption = false;
-    let containsVerboseOption = false;
-    let containsDebugOption = false;
-    let containsQueryOption = false;
-
-    options.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        containsOutputOption = true;
-      }
-      else if (o.option.indexOf('--verbose') > -1) {
-        containsVerboseOption = true;
-      }
-      else if (o.option.indexOf('--debug') > -1) {
-        containsDebugOption = true;
-      }
-      else if (o.option.indexOf('--query') > -1) {
-        containsQueryOption = true;
-      }
-    });
-
-    assert(options.length === 4, "Wrong amount of options returned");
-    assert(containsOutputOption, "Output option not available");
-    assert(containsVerboseOption, "Verbose option not available");
-    assert(containsDebugOption, "Debug option not available");
-    assert(containsQueryOption, "Query option not available");
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation without any extra options', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

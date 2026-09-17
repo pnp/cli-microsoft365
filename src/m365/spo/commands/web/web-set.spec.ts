@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './web-set.js';
+import command, { options } from './web-set.js';
 
 describe(commands.WEB_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.WEB_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,7 +74,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title' }) });
   });
 
   it('updates site logo URL', async () => {
@@ -86,7 +88,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: 'image.png' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: 'image.png' }) });
   });
 
   it('unsets the site logo', async () => {
@@ -100,7 +102,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: '' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: '' }) });
   });
 
   it('disables quick launch', async () => {
@@ -114,7 +116,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: false }) });
   });
 
   it('enables quick launch', async () => {
@@ -128,7 +130,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true }) });
   });
 
   it('sets site header to compact', async () => {
@@ -142,7 +144,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' }) });
   });
 
   it('sets site header to standard', async () => {
@@ -156,7 +158,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' }) });
   });
 
   it('sets site header emphasis to 0', async () => {
@@ -170,7 +172,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '0' }) });
   });
 
   it('sets site header emphasis to 1', async () => {
@@ -184,7 +186,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '1' }) });
   });
 
   it('sets site header emphasis to 2', async () => {
@@ -198,7 +200,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '2' }) });
   });
 
   it('sets site header emphasis to 3', async () => {
@@ -212,7 +214,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '3' }) });
   });
 
   it('sets site menu mode to megamenu', async () => {
@@ -226,7 +228,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true }) });
   });
 
   it('sets site menu mode to cascading', async () => {
@@ -240,7 +242,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false }) });
   });
 
   it('updates all properties', async () => {
@@ -252,7 +254,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true, navAudienceTargetingEnabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: '1', megaMenuEnabled: true, footerEnabled: true, navAudienceTargetingEnabled: true }) });
   });
 
   it('Update Welcome page', async () => {
@@ -267,7 +269,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' }) });
   });
 
   it('Update Welcome page (debug)', async () => {
@@ -282,7 +284,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' }) });
   });
 
   it('correctly handles error when hub site not found', async () => {
@@ -300,7 +302,7 @@ describe(commands.WEB_SET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a' }) }), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
   it('correctly handles error while updating Welcome page', async () => {
@@ -326,10 +328,10 @@ describe(commands.WEB_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx',
         url: 'https://contoso.sharepoint.com/sites/team-a'
-      }
+      })
     }), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
   });
 
@@ -338,105 +340,94 @@ describe(commands.WEB_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('supports specifying url', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the url is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url is a valid SharePoint URL and quickLaunch set to "true"', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the url is a valid SharePoint URL and quickLaunch set to "true"', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if headerLayout is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if headerLayout is invalid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if headerLayout is set to standard', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerLayout is set to standard', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if headerLayout is set to compact', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerLayout is set to compact', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if headerEmphasis is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if headerEmphasis is not a number', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if headerEmphasis is out of bounds', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '4' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if headerEmphasis is out of bounds', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 4 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if headerEmphasis is 0', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '0' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerEmphasis is 0', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if headerEmphasis is 1', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerEmphasis is 1', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if headerEmphasis is 2', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '2' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerEmphasis is 2', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if headerEmphasis is 3', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '3' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if headerEmphasis is 3', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if megaMenuEnabled is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if megaMenuEnabled is set to true', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if megaMenuEnabled is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if megaMenuEnabled is set to false', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if footerEnabled is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if footerEnabled is set to true', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if footerEnabled is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if footerEnabled is set to false', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if navAudienceTargetingEnabled is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if navAudienceTargetingEnabled is set to true', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if navAudienceTargetingEnabled is set to false', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if navAudienceTargetingEnabled is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: false });
+    assert.strictEqual(actual.success, true);
   });
 
   it('enables footer', async () => {
@@ -450,7 +441,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true }) });
   });
 
   it('disables footer', async () => {
@@ -464,7 +455,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false }) });
   });
 
   it('enables navAudienceTargetingEnabled', async () => {
@@ -480,43 +471,48 @@ describe(commands.WEB_SET, () => {
       NavAudienceTargetingEnabled: true
     };
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true }) });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-  it('fails validation if search scope is not valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if search scope is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if search scope is set to defaultscope', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if search scope is set to defaultscope', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if search scope is set to tenant', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if search scope is set to tenant', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if search scope is set to hub', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if search scope is set to hub', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if search scope is set to site', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if search scope is set to site', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation even if search scope is not all lower case', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation even if search scope is not all lower case', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if search scope passed is a number', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 2 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if search scope passed is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 2 });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with an unknown option', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', unknownOption: 'value' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('sets search scope to default scope', async () => {
@@ -530,7 +526,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' }) });
   });
 
   it('sets search scope to tenant', async () => {
@@ -544,7 +540,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' }) });
   });
 
   it('sets search scope to hub', async () => {
@@ -558,7 +554,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' }) });
   });
 
   it('sets search scope to site', async () => {
@@ -572,7 +568,7 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' }) });
   });
 
   it('sets search scope even if parameter is not all lower case', async () => {
@@ -586,6 +582,6 @@ describe(commands.WEB_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' }) });
   });
 });
