@@ -22,13 +22,21 @@ m365 spo file unarchive [options]
 : The server- or site-relative decoded URL of the file to unarchive. Specify either `url` or `id`, but not both.
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the file to unarchive. Specify either `url` or `id`, but not both.
+: The unique ID (GUID) of the file to unarchive. Specify either `url` or `id`, but not both.
 
 `-f, --force`
 : Don't prompt for confirmation.
 ```
 
 <Global />
+
+## Remarks
+
+:::warning
+
+Reactivation could take up to 24 hours. Files that are reactivated cannot be archived again for **120 days**.
+
+:::
 
 ## Permissions
 
