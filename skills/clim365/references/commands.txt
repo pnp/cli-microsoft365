@@ -719,6 +719,8 @@ spo web roleassignment add|Adds a role assignment to web
 spo web roleassignment remove|Removes a role assignment from web permissions
 spo web roleinheritance break|Break role inheritance of subsite
 spo web roleinheritance reset|Restores role inheritance of subsite
+spo web rule list|Lists all SharePoint list alerts
+spo web rule remove|Removes an alert from a SharePoint list
 spo web set|Updates subsite properties
 spp autofillcolumn set|Applies the autofill option to the selected column
 spp contentcenter list|Gets information about the SharePoint Premium content centers
