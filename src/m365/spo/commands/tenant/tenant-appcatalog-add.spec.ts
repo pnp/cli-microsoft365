@@ -67,7 +67,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it('creates app catalog when app catalog and site with different URL already exist and force used', async () => {
-    sinon.stub(cli, 'executeCommand').callsFake(async (command, args) => {
+    const executeCommandStub = sinon.stub(cli, 'executeCommand').callsFake(async (command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog' ||
           args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -105,10 +105,16 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
+
+    const siteRemoveCalls = executeCommandStub.getCalls().filter(call => call.args[0] === spoSiteRemoveCommand);
+    assert.strictEqual(siteRemoveCalls.length, 1);
+    assert.strictEqual(siteRemoveCalls[0].args[1].options.permanent, true);
+    assert.strictEqual(siteRemoveCalls[0].args[1].options.wait, true);
+    assert.strictEqual(siteRemoveCalls[0].args[1].options.force, true);
   });
 
   it('creates app catalog when app catalog and site with different URL already exist and force used (debug)', async () => {
-    sinon.stub(cli, 'executeCommand').callsFake(async (command, args) => {
+    const executeCommandStub = sinon.stub(cli, 'executeCommand').callsFake(async (command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog' ||
           args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -148,6 +154,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any);
+
+    const siteRemoveCalls = executeCommandStub.getCalls().filter(call => call.args[0] === spoSiteRemoveCommand);
+    assert.strictEqual(siteRemoveCalls.length, 2);
+    siteRemoveCalls.forEach(call => {
+      assert.strictEqual(call.args[1].options.permanent, true);
+      assert.strictEqual(call.args[1].options.wait, true);
+      assert.strictEqual(call.args[1].options.force, true);
+    });
   });
 
   it('handles error when creating app catalog when app catalog and site with different URL already exist and force used failed', async () => {
