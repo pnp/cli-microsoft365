@@ -1,23 +1,23 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import auth from "../../../../Auth.js";
-import { cli } from "../../../../cli/cli.js";
-import { CommandInfo } from "../../../../cli/CommandInfo.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { CommandError } from "../../../../Command.js";
-import request from "../../../../request.js";
-import { pid } from "../../../../utils/pid.js";
-import { session } from "../../../../utils/session.js";
-import { sinonUtil } from "../../../../utils/sinonUtil.js";
-import { telemetry } from "../../../../telemetry.js";
-import commands from "../../commands.js";
-import command from './apppage-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { telemetry } from '../../../../telemetry.js';
+import commands from '../../commands.js';
+import command, { options } from './apppage-set.js';
 
 describe(commands.APPPAGE_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +26,7 @@ describe(commands.APPPAGE_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -45,8 +46,7 @@ describe(commands.APPPAGE_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -55,159 +55,98 @@ describe(commands.APPPAGE_SET, () => {
     auth.connection.active = false;
   });
 
-  it("has correct name", () => {
+  it('has correct name', () => {
     assert.strictEqual(command.name, commands.APPPAGE_SET);
   });
 
-  it("has a description", () => {
+  it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it("fails to update the single-part app page if request is rejected", async () => {
-    sinon.stub(request, "post").callsFake(async opts => {
-      if (
-        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
-        opts.data.serverRelativeUrl.indexOf("failme")
-      ) {
-        throw "Failed to update the single-part app page";
+  it('fails to update the single-part app page if request is rejected', async () => {
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url as string).indexOf('_api/sitepages/Pages/UpdateFullPageApp') > -1 &&
+        opts.data.serverRelativeUrl.indexOf('failme')) {
+        throw 'Failed to update the single-part app page';
       }
       throw 'Invalid request';
     });
     await assert.rejects(command.action(logger,
       {
-        options: {
-          name: "failme",
-          webUrl: "https://contoso.sharepoint.com/",
+        options: commandOptionsSchema.parse({
+          name: 'failme',
+          webUrl: 'https://contoso.sharepoint.com/',
           webPartData: JSON.stringify({})
-        }
-      }), new CommandError(`Failed to update the single-part app page`));
+        })
+      }), new CommandError('Failed to update the single-part app page'));
   });
 
-  it("Update the single-part app pag", async () => {
-    sinon.stub(request, "post").callsFake(async opts => {
-      if (
-        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1
-      ) {
+  it('updates the single-part app page', async () => {
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url as string).indexOf('_api/sitepages/Pages/UpdateFullPageApp') > -1) {
         return;
       }
       throw 'Invalid request';
     });
     await command.action(logger,
       {
-        options: {
-          pageName: "demo",
-          webUrl: "https://contoso.sharepoint.com/teams/sales",
+        options: commandOptionsSchema.parse({
+          name: 'demo',
+          webUrl: 'https://contoso.sharepoint.com/teams/sales',
           webPartData: JSON.stringify({})
-        }
+        })
       });
   });
 
-  it("supports specifying name", () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf("--name") > -1) {
-        containsOption = true;
-      }
+  it('fails validation if name not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartData: JSON.stringify({ abc: 'def' }),
+      webUrl: 'https://contoso.sharepoint.com'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it("supports specifying webUrl", () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf("--webUrl") > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webPartData not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Contoso.aspx',
+      webUrl: 'https://contoso.sharepoint.com'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it("supports specifying webPartData", () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf("--webPartData") > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webUrl not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartData: JSON.stringify({ abc: 'def' }),
+      name: 'page.aspx'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it("fails validation if name not specified", async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if webPartData is not a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Contoso.aspx',
+      webUrl: 'https://contoso',
+      webPartData: 'abc'
     });
-
-    const actual = await command.validate({
-      options: {
-        webPartData: JSON.stringify({ abc: "def" }),
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it("fails validation if webPartData not specified", async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Contoso.aspx',
+      webPartData: '{}',
+      webUrl: 'https://contoso.sharepoint.com',
+      unknownOption: 'value'
     });
-
-    const actual = await command.validate({
-      options: {
-        name: "Contoso.aspx",
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it("fails validation if webUrl not specified", async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('validation passes on all required options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Contoso.aspx',
+      webPartData: '{}',
+      webUrl: 'https://contoso.sharepoint.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        webPartData: JSON.stringify({ abc: "def" }),
-        name: "page.aspx"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it("fails validation if webPartData is not a valid JSON string", async () => {
-    const actual = await command.validate({
-      options: {
-        name: "Contoso.aspx",
-        webUrl: "https://contoso",
-        webPartData: "abc"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it("validation passes on all required options", async () => {
-    const actual = await command.validate({
-      options: {
-        name: "Contoso.aspx",
-        webPartData: "{}",
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 });
