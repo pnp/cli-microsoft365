@@ -93,7 +93,12 @@ class SpoWebRuleListCommand extends SpoCommand {
       listId = args.options.listId;
     }
     else if (args.options.listUrl || args.options.listTitle) {
-      listId = await spo.getListId(args.options.webUrl, args.options.listTitle, args.options.listUrl, logger, this.verbose);
+      try {
+        listId = await spo.getListId(args.options.webUrl, args.options.listTitle, args.options.listUrl, logger, this.verbose);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     }
 
     if (listId) {
