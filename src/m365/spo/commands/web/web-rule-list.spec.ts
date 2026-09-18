@@ -13,6 +13,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
 import { z } from 'zod';
 import commands from '../../commands.js';
 import command from './web-rule-list.js';
@@ -145,7 +146,8 @@ describe(commands.WEB_RULE_LIST, () => {
     sinonUtil.restore([
       odata.getAllItems,
       request.get,
-      entraUser.getUpnByUserId
+      entraUser.getUpnByUserId,
+      spo.getListId
     ]);
   });
 
@@ -341,6 +343,23 @@ describe(commands.WEB_RULE_LIST, () => {
     await command.action(logger, { options: { webUrl: webUrl, listId: listId, userId: userId, verbose: true } });
     assert(odataStub.calledOnce);
     assert(loggerLogSpy.calledWith(alertResponse));
+  });
+
+  it('correctly handles error when retrieving the list', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.ResourceNotFoundException',
+          message: {
+            value: "List 'Tasks' does not exist at site with URL 'https://contoso.sharepoint.com/sites/marketing'."
+          }
+        }
+      }
+    };
+    sinon.stub(spo, 'getListId').rejects(error);
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } }),
+      new CommandError("List 'Tasks' does not exist at site with URL 'https://contoso.sharepoint.com/sites/marketing'."));
   });
 
   it('correctly handles error when retrieving alerts', async () => {
