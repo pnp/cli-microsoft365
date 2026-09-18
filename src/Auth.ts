@@ -757,8 +757,21 @@ export class Auth {
 
       return this.getAccessTokenWithFederatedToken(resource, federationToken, logger, debug);
     }
+    else if (process.env.GITLAB_CI && process.env.GITLAB_OIDC_TOKEN) {
+      if (debug) {
+        await logger.logToStderr('GITLAB_CI and GITLAB_OIDC_TOKEN env variables found. The context is GitLab CI/CD...');
+      }
+
+      if (!this.connection.appId || this.connection.tenant === 'common') {
+        throw new CommandError('The appId and tenant parameters are required when using Federated Identity in GitLab CI/CD.');
+      }
+
+      // GitLab's id_tokens feature mints the OIDC JWT directly into the configured job variable, so no
+      // separate request to GitLab is needed to obtain the federation token before exchanging it with Entra ID.
+      return this.getAccessTokenWithFederatedToken(resource, process.env.GITLAB_OIDC_TOKEN, logger, debug);
+    }
     else {
-      throw new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.');
+      throw new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab CI/CD.');
     }
   }
 

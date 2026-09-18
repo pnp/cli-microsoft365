@@ -1591,19 +1591,21 @@ describe('Auth', () => {
     assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
   });
 
-  it('fails when not using federated identity from GitHub Action or Azure DevOps Pipeline', async () => {
+  it('fails when not using federated identity from GitHub Action, Azure DevOps Pipeline or GitLab CI/CD', async () => {
     process.env = {
       ACTIONS_ID_TOKEN_REQUEST_URL: '',
       ACTIONS_ID_TOKEN_REQUEST_TOKEN: '',
       SYSTEM_OIDCREQUESTURI: '',
-      SYSTEM_ACCESSTOKEN: ''
+      SYSTEM_ACCESSTOKEN: '',
+      GITLAB_CI: '',
+      GITLAB_OIDC_TOKEN: ''
     };
 
     auth.connection.authType = AuthType.FederatedIdentity;
     auth.connection.appId = appId;
     auth.connection.tenant = tenant;
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab CI/CD.'));
   });
 
   it('fails when using federated identity from Azure DevOps Pipeline, but SYSTEM_ACCESSTOKEN not available', async () => {
@@ -1655,6 +1657,64 @@ describe('Auth', () => {
     auth.connection.tenant = 'common';
 
     await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The appId and tenant parameters are required when not using a service connection.`));
+  });
+
+  it('calls api with correct params using federated identity flow from GitLab CI/CD', async () => {
+    const gitlabOidcToken = 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...';
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: gitlabOidcToken
+    };
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert(requestPostStub.calledOnce);
+    assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_id=${appId}`) > -1, true);
+    assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_assertion=${gitlabOidcToken}`) > -1, true);
+  });
+
+  it('fails when using federated identity from GitLab CI/CD with empty appId and tenant option', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = undefined;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using Federated Identity in GitLab CI/CD.'));
+  });
+
+  it('fails when using federated identity from GitLab CI/CD with empty tenant option', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using Federated Identity in GitLab CI/CD.'));
   });
 
   it('returns access token if persisting connection fails', async () => {
