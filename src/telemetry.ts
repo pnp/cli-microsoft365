@@ -1,5 +1,5 @@
-import appInsights from './appInsights.js';
 import { cli } from './cli/cli.js';
+import { googleAnalytics } from './googleAnalytics.js';
 import { settingsNames } from './settingsNames.js';
 import { pid } from './utils/pid.js';
 import { session } from './utils/session.js';
@@ -7,22 +7,17 @@ import { session } from './utils/session.js';
 async function trackTelemetry(object: any): Promise<void> {
   try {
     const { commandName, properties, exception } = object;
-
-    appInsights.commonProperties.shell = pid.getProcessName(process.ppid) || '';
-    appInsights.context.tags[appInsights.context.keys.sessionId] = session.getId(process.ppid);
+    const context = {
+      shell: pid.getProcessName(process.ppid) || '',
+      sessionId: session.getId(process.ppid)
+    };
 
     if (exception) {
-      appInsights.trackException({
-        exception
-      });
+      await googleAnalytics.trackException(exception, context);
     }
     else {
-      appInsights.trackEvent({
-        name: commandName,
-        properties
-      });
+      await googleAnalytics.trackEvent(commandName, properties, context);
     }
-    await appInsights.flush();
   }
   catch {
     // Do nothing
