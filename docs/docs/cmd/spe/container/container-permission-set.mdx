@@ -1,0 +1,72 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spe container permission set
+
+Updates SharePoint Embedded Container permission
+
+## Usage
+
+```sh
+m365 spe container permission set [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id <id>`
+: ID of the permission which will be modified.
+
+`--containerId [containerId]`
+: ID of a SharePoint Embedded container. Specify either `containerId` or `containerName` but not both.
+
+`-n, --containerName [containerName]`
+: Display name of the Container. Specify either `containerId` or `containerName` but not both.
+
+`--containerTypeId [containerTypeId]`
+: The ID of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`--containerTypeName [containerTypeName]`
+: The name of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`-r, --roles <roles>`:
+: Comma separated list of permissions. Possible values are `reader`, `writer`, `manager`, `owner`.
+```
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Updates role for the specified container
+
+```sh
+m365 spe container permission set --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ" --roles "reader"
+```
+
+Updates multiple roles for the specified container
+
+```sh
+m365 spe container permission set --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ" --roles "reader,writer"
+```
+
+## Response
+
+The command won't return a response on success.
