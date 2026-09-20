@@ -55,7 +55,7 @@ class SpoFolderArchiveCommand extends SpoCommand {
     const { webUrl, url, id, force } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you would like to archive this item? You will be able to reactivate it instantly for the first 7 days. After that, it will take up to 24 hours to reactivate.` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you would like to archive this folder? You will be able to reactivate it instantly for the first 7 days. After that, it will take up to 24 hours to reactivate.` });
       if (!result) {
         return;
       }
