@@ -618,6 +618,34 @@ describe('Auth', () => {
     assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
   });
 
+  it('falls back to the appId as the identity id when the access token has no oid claim', async () => {
+    auth.connection.certificate = base64EncodedPemCert;
+    auth.connection.authType = AuthType.Certificate;
+
+    const jwt = JSON.stringify({
+      app_displayname: 'Contoso app'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const appOnlyTokenWithoutOid = `abc.${jwt64}.def`;
+
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake(async (logger, debug, thumbprint, cert) => {
+      const confidentialApplication = await originalGetConfidentialClient(logger, debug, thumbprint, cert);
+      sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').resolves({
+        expiresOn: new Date(),
+        accessToken: appOnlyTokenWithoutOid
+      } as any);
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').resolves([]);
+
+    await auth.ensureAccessToken(resource, logger, false);
+    assert.strictEqual(auth.connection.identityName, 'Contoso app');
+    assert.strictEqual(auth.connection.identityId, appId);
+    assert.strictEqual(auth.connection.name, appId);
+  });
+
   it('retrieves token using certificate flow when authType certificate specified (debug)', async () => {
     auth.connection.certificate = base64EncodedPemCert;
     auth.connection.authType = AuthType.Certificate;
