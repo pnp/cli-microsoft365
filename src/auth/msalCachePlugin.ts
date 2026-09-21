@@ -2,6 +2,7 @@ import type { ICachePlugin, TokenCacheContext } from '@azure/msal-node';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { lock } from 'proper-lockfile';
 
 const legacyCachePath = path.join(os.homedir(), '.cli-m365-msal.json');
 const fallbackCachePath = path.join(os.homedir(), '.cli-m365-msal-cache.json');
@@ -16,6 +17,8 @@ const persistenceConfiguration = {
   usePlaintextFileOnLinux: true
 };
 
+export const fileLock = { lock };
+
 let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void>; isFileFallback: boolean }> | undefined;
 
 // Fallback ICachePlugin that stores tokens as plain JSON on disk.
@@ -29,7 +32,7 @@ let _initPromise: Promise<{ plugin: ICachePlugin; clearCache: () => Promise<void
 // See: https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7170
 class FileCachePlugin implements ICachePlugin {
   private cachePath: string;
-  private lockFileHandle: number | undefined;
+  private releaseCacheLock: (() => Promise<void>) | undefined;
 
   constructor(cachePath: string) {
     this.cachePath = cachePath;
@@ -62,7 +65,7 @@ class FileCachePlugin implements ICachePlugin {
       // Do nothing
     }
     finally {
-      this.releaseLock();
+      await this.releaseLock();
     }
   }
 
@@ -73,86 +76,22 @@ class FileCachePlugin implements ICachePlugin {
       removeFile(this.cachePath);
     }
     finally {
-      this.releaseLock();
+      await this.releaseLock();
     }
   }
 
   private async acquireLock(): Promise<void> {
-    const lockPath = `${this.cachePath}.lockfile`;
-
-    for (let retry = 0; retry < lockRetryCount; retry++) {
-      try {
-        const lockFileHandle = fs.openSync(lockPath, 'wx', 0o600);
-        try {
-          fs.writeFileSync(lockFileHandle, process.pid.toString(), { encoding: 'utf8' });
-        }
-        catch (err) {
-          try {
-            removeFile(lockPath);
-          }
-          finally {
-            fs.closeSync(lockFileHandle);
-          }
-          throw err;
-        }
-        this.lockFileHandle = lockFileHandle;
-        return;
-      }
-      catch (err) {
-        const errorCode = (err as NodeJS.ErrnoException).code;
-        if (errorCode !== 'EEXIST' && errorCode !== 'EPERM') {
-          throw err;
-        }
-
-        if (this.isLockStale(lockPath)) {
-          removeFile(lockPath);
-          continue;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, lockRetryDelay));
-      }
-    }
-
-    throw new Error(`Could not acquire MSAL cache lock at ${lockPath}`);
+    this.releaseCacheLock = await msalCachePlugin.acquireFileLock(this.cachePath);
   }
 
-  private isLockStale(lockPath: string): boolean {
-    try {
-      const ownerPid = Number(fs.readFileSync(lockPath, 'utf8'));
-      if (Number.isInteger(ownerPid) && ownerPid > 0) {
-        try {
-          process.kill(ownerPid, 0);
-          return false;
-        }
-        catch (err) {
-          return (err as NodeJS.ErrnoException).code === 'ESRCH';
-        }
-      }
-
-      return Date.now() - fs.statSync(lockPath).mtimeMs >= staleLockThreshold;
-    }
-    catch (err) {
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-        return false;
-      }
-
-      throw err;
-    }
-  }
-
-  private releaseLock(): void {
-    if (this.lockFileHandle === undefined) {
+  private async releaseLock(): Promise<void> {
+    if (this.releaseCacheLock === undefined) {
       return;
     }
 
-    const lockFileHandle = this.lockFileHandle;
-    this.lockFileHandle = undefined;
-    try {
-      fs.unlinkSync(`${this.cachePath}.lockfile`);
-    }
-    finally {
-      fs.closeSync(lockFileHandle);
-    }
+    const releaseCacheLock = this.releaseCacheLock;
+    this.releaseCacheLock = undefined;
+    await releaseCacheLock();
   }
 }
 
@@ -168,6 +107,22 @@ function removeFile(filePath: string): void {
 }
 
 export const msalCachePlugin = {
+  async acquireFileLock(cachePath: string): Promise<() => Promise<void>> {
+    return await fileLock.lock(cachePath, {
+      lockfilePath: `${cachePath}.lockfile`,
+      realpath: false,
+      stale: staleLockThreshold,
+      update: staleLockThreshold / 2,
+      retries: {
+        retries: lockRetryCount,
+        factor: 1,
+        minTimeout: lockRetryDelay,
+        maxTimeout: lockRetryDelay,
+        randomize: false
+      }
+    });
+  },
+
   async importMsalExtensions(): Promise<typeof import('@azure/msal-node-extensions')> {
     return await import('@azure/msal-node-extensions');
   },
