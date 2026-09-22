@@ -69,7 +69,7 @@ jobs:
         nodeRun: [*node_version]
         nodeBuild: [*node_version]
         # nodeBuild values in include entries must match the node_version anchor above
-        include: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[{"os":"ubuntu-latest","nodeRun":20,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":22,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":25,"nodeBuild":24}]') || fromJSON('[]') }}
+        include: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[{"os":"ubuntu-latest","nodeRun":20,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":22,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":26,"nodeBuild":24}]') || fromJSON('[]') }}
 
     steps:
       # Windows runners run out of memory during tests without extra pagefile
@@ -94,7 +94,7 @@ jobs:
           node-version: ${{ matrix.nodeRun }}
           registry-url: 'https://registry.npmjs.org'
       # Cache key uses nodeBuild (not nodeRun) so compat-test runs
-      # (Node 20/22/25) reuse the same node_modules as the primary build
+      # (Node version used to build) reuse the same node_modules as the primary build
       - name: Cache node modules
         id: cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
