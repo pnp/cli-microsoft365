@@ -170,7 +170,8 @@ describe('msalCachePlugin', () => {
 
   it(`creates native persistence using imported msal-extensions`, async () => {
     const mockPersistence = {
-      delete: sinon.stub().resolves(true)
+      delete: sinon.stub().resolves(true),
+      getFilePath: sinon.stub().returns('/native-cache')
     };
     sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
       DataProtectionScope: { CurrentUser: 0 },
@@ -191,7 +192,10 @@ describe('msalCachePlugin', () => {
 
   it(`native persistence clearCache delegates to persistence.delete`, async () => {
     const deleteStub = sinon.stub().resolves(true);
-    const mockPersistence = { delete: deleteStub };
+    const mockPersistence = {
+      delete: deleteStub,
+      getFilePath: sinon.stub().returns('/native-cache')
+    };
     sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
       DataProtectionScope: { CurrentUser: 0 },
       PersistenceCreator: {
@@ -207,6 +211,81 @@ describe('msalCachePlugin', () => {
     const result = await msalCachePlugin.createNativePersistence();
     await result.clearCache();
     assert(deleteStub.calledOnce);
+    assert((fileLock.lock as sinon.SinonStub).calledOnceWith('/native-cache.cli-m365', sinon.match.object));
+    assert((fileLock.lock as sinon.SinonStub).calledBefore(deleteStub));
+    assert(releaseLockStub.calledOnce);
+    assert(deleteStub.calledBefore(releaseLockStub));
+  });
+
+  it(`native persistence serializes cache access with cache deletion`, async () => {
+    const beforeCacheAccessStub = sinon.stub().resolves();
+    const afterCacheAccessStub = sinon.stub().resolves();
+    const mockPersistence = {
+      delete: sinon.stub().resolves(true),
+      getFilePath: sinon.stub().returns('/native-cache')
+    };
+    sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
+      DataProtectionScope: { CurrentUser: 0 },
+      PersistenceCreator: {
+        createPersistence: sinon.stub().resolves(mockPersistence)
+      },
+      PersistenceCachePlugin: class {
+        beforeCacheAccess = beforeCacheAccessStub;
+        afterCacheAccess = afterCacheAccessStub;
+      }
+    } as any);
+
+    const result = await msalCachePlugin.createNativePersistence();
+    const context = { tokenCache: {}, cacheHasChanged: true } as any;
+    await result.plugin.beforeCacheAccess(context);
+    await result.plugin.afterCacheAccess(context);
+
+    assert((fileLock.lock as sinon.SinonStub).calledOnce);
+    assert((fileLock.lock as sinon.SinonStub).calledBefore(beforeCacheAccessStub));
+    assert(beforeCacheAccessStub.calledBefore(afterCacheAccessStub));
+    assert(afterCacheAccessStub.calledBefore(releaseLockStub));
+  });
+
+  it(`native persistence releases the cache lock when cache access fails`, async () => {
+    const mockPersistence = {
+      delete: sinon.stub().resolves(true),
+      getFilePath: sinon.stub().returns('/native-cache')
+    };
+    sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
+      DataProtectionScope: { CurrentUser: 0 },
+      PersistenceCreator: {
+        createPersistence: sinon.stub().resolves(mockPersistence)
+      },
+      PersistenceCachePlugin: class {
+        beforeCacheAccess(): Promise<void> { return Promise.reject(new Error('read failed')); }
+        afterCacheAccess(): Promise<void> { return Promise.resolve(); }
+      }
+    } as any);
+
+    const result = await msalCachePlugin.createNativePersistence();
+    await assert.rejects(result.plugin.beforeCacheAccess({} as any), { message: 'read failed' });
+    assert(releaseLockStub.calledOnce);
+  });
+
+  it(`native persistence can finish cache access when no lock was acquired`, async () => {
+    const mockPersistence = {
+      delete: sinon.stub().resolves(true),
+      getFilePath: sinon.stub().returns('/native-cache')
+    };
+    sinon.stub(msalCachePlugin, 'importMsalExtensions').resolves({
+      DataProtectionScope: { CurrentUser: 0 },
+      PersistenceCreator: {
+        createPersistence: sinon.stub().resolves(mockPersistence)
+      },
+      PersistenceCachePlugin: class {
+        beforeCacheAccess(): Promise<void> { return Promise.resolve(); }
+        afterCacheAccess(): Promise<void> { return Promise.resolve(); }
+      }
+    } as any);
+
+    const result = await msalCachePlugin.createNativePersistence();
+    await result.plugin.afterCacheAccess({} as any);
+    assert(releaseLockStub.notCalled);
   });
 
   it(`createFileFallback returns a plugin and clearCache function`, () => {

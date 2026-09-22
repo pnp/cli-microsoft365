@@ -95,6 +95,55 @@ class FileCachePlugin implements ICachePlugin {
   }
 }
 
+class LockingCachePlugin implements ICachePlugin {
+  private releaseCacheLock: (() => Promise<void>) | undefined;
+
+  constructor(private readonly plugin: ICachePlugin, private readonly lockPath: string) {
+  }
+
+  public async beforeCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
+    this.releaseCacheLock = await msalCachePlugin.acquireFileLock(this.lockPath);
+
+    try {
+      await this.plugin.beforeCacheAccess(tokenCacheContext);
+    }
+    catch (err) {
+      await this.releaseLock();
+      throw err;
+    }
+  }
+
+  public async afterCacheAccess(tokenCacheContext: TokenCacheContext): Promise<void> {
+    try {
+      await this.plugin.afterCacheAccess(tokenCacheContext);
+    }
+    finally {
+      await this.releaseLock();
+    }
+  }
+
+  public async clearCache(clearCache: () => Promise<void>): Promise<void> {
+    this.releaseCacheLock = await msalCachePlugin.acquireFileLock(this.lockPath);
+
+    try {
+      await clearCache();
+    }
+    finally {
+      await this.releaseLock();
+    }
+  }
+
+  private async releaseLock(): Promise<void> {
+    if (this.releaseCacheLock === undefined) {
+      return;
+    }
+
+    const releaseCacheLock = this.releaseCacheLock;
+    this.releaseCacheLock = undefined;
+    await releaseCacheLock();
+  }
+}
+
 function removeFile(filePath: string): void {
   try {
     fs.unlinkSync(filePath);
@@ -133,9 +182,13 @@ export const msalCachePlugin = {
       ...persistenceConfiguration,
       dataProtectionScope: DataProtectionScope.CurrentUser
     });
+    const plugin = new LockingCachePlugin(
+      new PersistenceCachePlugin(persistence),
+      `${persistence.getFilePath()}.cli-m365`
+    );
     return {
-      plugin: new PersistenceCachePlugin(persistence),
-      clearCache: async () => { await persistence.delete(); },
+      plugin,
+      clearCache: async () => { await plugin.clearCache(async () => { await persistence.delete(); }); },
       isFileFallback: false
     };
   },
