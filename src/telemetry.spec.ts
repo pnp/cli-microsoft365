@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { cli } from "./cli/cli.js";
+import { cli } from './cli/cli.js';
 import { googleAnalytics } from './googleAnalytics.js';
 import { settingsNames } from './settingsNames.js';
 import { telemetry } from './telemetry.js';

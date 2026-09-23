@@ -55,7 +55,7 @@ class SpoFileUnarchiveCommand extends SpoCommand {
     const { webUrl, url, id, force, verbose } = args.options;
 
     if (!force) {
-      const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Files that are reactivated cannot be archived again for 30 days. Are you sure you would like to unarchive this item?` });
+      const result = await cli.promptForConfirmation({ message: `Reactivation could take up to 24 hours. Files that are reactivated cannot be archived again for a period of time. Are you sure you would like to unarchive this file?` });
       if (!result) {
         return;
       }

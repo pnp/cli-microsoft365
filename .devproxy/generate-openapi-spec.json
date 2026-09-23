@@ -10,7 +10,7 @@
   ],
   "urlsToWatch": [
     "!https://login.microsoftonline.com/*",
-    "!https://www.google-analytics.com/mp/collect*",
+    "!https://www.google-analytics.com/g/collect*",
     "*"
   ],
   "openApiSpecGeneratorPlugin": {

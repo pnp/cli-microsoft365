@@ -31,6 +31,7 @@
         "node-forge": "^1.4.0",
         "omelette": "^0.4.17",
         "open": "^11.0.1",
+        "proper-lockfile": "^4.1.2",
         "semver": "^7.8.5",
         "strip-json-comments": "^5.0.3",
         "typescript": "^5.9.3",
@@ -59,6 +60,7 @@
         "@types/node": "^24.13.3",
         "@types/node-forge": "^1.3.14",
         "@types/omelette": "^0.4.5",
+        "@types/proper-lockfile": "^4.1.4",
         "@types/semver": "^7.8.0",
         "@types/sinon": "^22.0.0",
         "@types/update-notifier": "^6.0.8",
@@ -75,6 +77,9 @@
         "sinon": "^22.1.0",
         "source-map-support": "^0.5.21",
         "tsc-watch": "^7.2.1"
+      },
+      "optionalDependencies": {
+        "@azure/msal-node-extensions": "^5.5.0"
       }
     },
     "node_modules/@actions/core": {
@@ -129,6 +134,39 @@
       "engines": {
         "node": ">=20"
       }
+    },
+    "node_modules/@azure/msal-node-extensions": {
+      "version": "5.5.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-extensions/-/msal-node-extensions-5.5.0.tgz",
+      "integrity": "sha1-Wpznsdx9A0+1v+i3zNYxq2+ex3Q=",
+      "hasInstallScript": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "@azure/msal-common": "16.14.0",
+        "@azure/msal-node-runtime": "^0.20.0",
+        "keytar": "^7.8.0"
+      },
+      "engines": {
+        "node": ">=20"
+      }
+    },
+    "node_modules/@azure/msal-node-extensions/node_modules/@azure/msal-common": {
+      "version": "16.14.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-16.14.0.tgz",
+      "integrity": "sha1-zd2zjYMr4OG+YifqZNTrEZmXInw=",
+      "license": "MIT",
+      "optional": true,
+      "engines": {
+        "node": ">=0.8.0"
+      }
+    },
+    "node_modules/@azure/msal-node-runtime": {
+      "version": "0.20.6",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-runtime/-/msal-node-runtime-0.20.6.tgz",
+      "integrity": "sha1-EQ3GT4uReISiL6VxQ3tuogN/WGo=",
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/@bcoe/v8-coverage": {
       "version": "1.0.2",
@@ -741,6 +779,23 @@
       "dev": true,
       "license": "MIT"
     },
+    "node_modules/@types/proper-lockfile": {
+      "version": "4.1.4",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/proper-lockfile/-/proper-lockfile-4.1.4.tgz",
+      "integrity": "sha1-zZ+rkr2wRzDBraVCw1bwNiD4QAg=",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@types/retry": "*"
+      }
+    },
+    "node_modules/@types/retry": {
+      "version": "0.12.5",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/retry/-/retry-0.12.5.tgz",
+      "integrity": "sha1-8JD/S9jS5blA/ycKs5/Vyhg0oH4=",
+      "dev": true,
+      "license": "MIT"
+    },
     "node_modules/@types/semver": {
       "version": "7.8.0",
       "resolved": "https://registry.npmjs.org/@types/semver/-/semver-7.8.0.tgz",
@@ -1289,11 +1344,44 @@
       "dev": true,
       "license": "MIT"
     },
+    "node_modules/base64-js": {
+      "version": "1.5.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/base64-js/-/base64-js-1.5.1.tgz",
+      "integrity": "sha1-GxtEAWClv3rUC2UPCVljSBkDkwo=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/feross"
+        },
+        {
+          "type": "patreon",
+          "url": "https://www.patreon.com/feross"
+        },
+        {
+          "type": "consulting",
+          "url": "https://feross.org/support"
+        }
+      ],
+      "license": "MIT",
+      "optional": true
+    },
     "node_modules/big-integer": {
       "version": "1.6.52",
       "license": "Unlicense",
       "engines": {
         "node": ">=0.6"
+      }
+    },
+    "node_modules/bl": {
+      "version": "4.1.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/bl/-/bl-4.1.0.tgz",
+      "integrity": "sha1-RRU1JkGCvsL7vIOmKrmM8R2fezo=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "buffer": "^5.5.0",
+        "inherits": "^2.0.4",
+        "readable-stream": "^3.4.0"
       }
     },
     "node_modules/boxen": {
@@ -1373,6 +1461,31 @@
     "node_modules/btoa-lite": {
       "version": "1.0.0",
       "license": "MIT"
+    },
+    "node_modules/buffer": {
+      "version": "5.7.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/buffer/-/buffer-5.7.1.tgz",
+      "integrity": "sha1-umLnwTEzBTWCGXFghRqPZI6Z7tA=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/feross"
+        },
+        {
+          "type": "patreon",
+          "url": "https://www.patreon.com/feross"
+        },
+        {
+          "type": "consulting",
+          "url": "https://feross.org/support"
+        }
+      ],
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "base64-js": "^1.3.1",
+        "ieee754": "^1.1.13"
+      }
     },
     "node_modules/buffer-equal-constant-time": {
       "version": "1.0.1",
@@ -1572,6 +1685,13 @@
       "funding": {
         "url": "https://paulmillr.com/funding/"
       }
+    },
+    "node_modules/chownr": {
+      "version": "1.1.4",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/chownr/-/chownr-1.1.4.tgz",
+      "integrity": "sha1-b8nXtC0ypYNZYzdmbn0ICE2izGs=",
+      "license": "ISC",
+      "optional": true
     },
     "node_modules/cli-boxes": {
       "version": "3.0.0",
@@ -1843,6 +1963,22 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     },
+    "node_modules/decompress-response": {
+      "version": "6.0.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/decompress-response/-/decompress-response-6.0.0.tgz",
+      "integrity": "sha1-yjh2Et234QS9FthaqwDV7PCcZvw=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "mimic-response": "^3.1.0"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/sindresorhus"
+      }
+    },
     "node_modules/deep-extend": {
       "version": "0.6.0",
       "license": "MIT",
@@ -1907,6 +2043,16 @@
       "license": "MIT",
       "engines": {
         "node": ">=0.4.0"
+      }
+    },
+    "node_modules/detect-libc": {
+      "version": "2.1.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/detect-libc/-/detect-libc-2.1.2.tgz",
+      "integrity": "sha1-aJxdzcGQDvVYOky59te0c3QgdK0=",
+      "license": "Apache-2.0",
+      "optional": true,
+      "engines": {
+        "node": ">=8"
       }
     },
     "node_modules/diff": {
@@ -1988,6 +2134,16 @@
       "version": "9.2.2",
       "dev": true,
       "license": "MIT"
+    },
+    "node_modules/end-of-stream": {
+      "version": "1.4.5",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/end-of-stream/-/end-of-stream-1.4.5.tgz",
+      "integrity": "sha1-c0TXEd6kDgt0q8LtSXeHQ8ztsIw=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "once": "^1.4.0"
+      }
     },
     "node_modules/es-define-property": {
       "version": "1.0.1",
@@ -2341,6 +2497,16 @@
         "url": "https://github.com/sindresorhus/execa?sponsor=1"
       }
     },
+    "node_modules/expand-template": {
+      "version": "2.0.3",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/expand-template/-/expand-template-2.0.3.tgz",
+      "integrity": "sha1-bhSz/O4POmNA7LV9LokYaSBSpHw=",
+      "license": "(MIT OR WTFPL)",
+      "optional": true,
+      "engines": {
+        "node": ">=6"
+      }
+    },
     "node_modules/fast-deep-equal": {
       "version": "3.1.3",
       "dev": true,
@@ -2546,6 +2712,13 @@
       "dev": true,
       "license": "MIT"
     },
+    "node_modules/fs-constants": {
+      "version": "1.0.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fs-constants/-/fs-constants-1.0.0.tgz",
+      "integrity": "sha1-a+Dem+mYzhavivwkSXue6bfM2a0=",
+      "license": "MIT",
+      "optional": true
+    },
     "node_modules/function-bind": {
       "version": "1.1.2",
       "resolved": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
@@ -2625,6 +2798,13 @@
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/github-from-package": {
+      "version": "0.0.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/github-from-package/-/github-from-package-0.0.0.tgz",
+      "integrity": "sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=",
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/glob": {
       "version": "10.5.0",
@@ -2769,6 +2949,27 @@
         "node": ">=18.18.0"
       }
     },
+    "node_modules/ieee754": {
+      "version": "1.2.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/ieee754/-/ieee754-1.2.1.tgz",
+      "integrity": "sha1-jrehCmP/8l0VpXsAFYbRd9Gw01I=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/feross"
+        },
+        {
+          "type": "patreon",
+          "url": "https://www.patreon.com/feross"
+        },
+        {
+          "type": "consulting",
+          "url": "https://feross.org/support"
+        }
+      ],
+      "license": "BSD-3-Clause",
+      "optional": true
+    },
     "node_modules/ignore": {
       "version": "7.0.5",
       "dev": true,
@@ -2784,6 +2985,13 @@
       "engines": {
         "node": ">=0.8.19"
       }
+    },
+    "node_modules/inherits": {
+      "version": "2.0.4",
+      "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+      "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
+      "license": "ISC",
+      "optional": true
     },
     "node_modules/ini": {
       "version": "4.1.1",
@@ -3126,6 +3334,18 @@
         "safe-buffer": "^5.0.1"
       }
     },
+    "node_modules/keytar": {
+      "version": "7.9.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/keytar/-/keytar-7.9.0.tgz",
+      "integrity": "sha1-TGIlcI9RtQy/d8Wq6BchlkwpGMs=",
+      "hasInstallScript": true,
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "node-addon-api": "^4.3.0",
+        "prebuild-install": "^7.0.1"
+      }
+    },
     "node_modules/keyv": {
       "version": "4.5.4",
       "dev": true,
@@ -3337,6 +3557,19 @@
         "node": ">=6"
       }
     },
+    "node_modules/mimic-response": {
+      "version": "3.1.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mimic-response/-/mimic-response-3.1.0.tgz",
+      "integrity": "sha1-LR1Zr5wbEpgVrMwsRqAipc4fo8k=",
+      "license": "MIT",
+      "optional": true,
+      "engines": {
+        "node": ">=10"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/sindresorhus"
+      }
+    },
     "node_modules/minimatch": {
       "version": "9.0.9",
       "dev": true,
@@ -3365,6 +3598,13 @@
       "engines": {
         "node": ">=16 || 14 >=14.17"
       }
+    },
+    "node_modules/mkdirp-classic": {
+      "version": "0.5.3",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz",
+      "integrity": "sha1-+hDJEVzG2IZb4iG6R+6b7XhgERM=",
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/mocha": {
       "version": "11.8.0",
@@ -3447,10 +3687,37 @@
         "node": "^20.17.0 || >=22.9.0"
       }
     },
+    "node_modules/napi-build-utils": {
+      "version": "2.0.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/napi-build-utils/-/napi-build-utils-2.0.0.tgz",
+      "integrity": "sha1-E8IsAYf8/MzhRhhEE2NypH3cAn4=",
+      "license": "MIT",
+      "optional": true
+    },
     "node_modules/natural-compare": {
       "version": "1.4.0",
       "dev": true,
       "license": "MIT"
+    },
+    "node_modules/node-abi": {
+      "version": "3.96.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-abi/-/node-abi-3.96.0.tgz",
+      "integrity": "sha1-iwOLxsypfWzsLpqv24G5ANof+A0=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "semver": "^7.3.5"
+      },
+      "engines": {
+        "node": ">=10"
+      }
+    },
+    "node_modules/node-addon-api": {
+      "version": "4.3.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-addon-api/-/node-addon-api-4.3.0.tgz",
+      "integrity": "sha1-UqGgtHUZPgko6Y4EJqDRJUeCt38=",
+      "license": "MIT",
+      "optional": true
     },
     "node_modules/node-cleanup": {
       "version": "2.1.2",
@@ -3492,6 +3759,16 @@
       "version": "0.4.17",
       "engines": {
         "node": ">=0.8.0"
+      }
+    },
+    "node_modules/once": {
+      "version": "1.4.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/once/-/once-1.4.0.tgz",
+      "integrity": "sha1-WDsap3WWHUsROsF9nFC6753Xa9E=",
+      "license": "ISC",
+      "optional": true,
+      "dependencies": {
+        "wrappy": "1"
       }
     },
     "node_modules/onetime": {
@@ -3689,6 +3966,34 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     },
+    "node_modules/prebuild-install": {
+      "version": "7.1.3",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/prebuild-install/-/prebuild-install-7.1.3.tgz",
+      "integrity": "sha1-1jCrrSsUdEPyCiEpF76uaLgJLuw=",
+      "deprecated": "No longer maintained. Please contact the author of the relevant native addon; alternatives are available.",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "detect-libc": "^2.0.0",
+        "expand-template": "^2.0.3",
+        "github-from-package": "0.0.0",
+        "minimist": "^1.2.3",
+        "mkdirp-classic": "^0.5.3",
+        "napi-build-utils": "^2.0.0",
+        "node-abi": "^3.3.0",
+        "pump": "^3.0.0",
+        "rc": "^1.2.7",
+        "simple-get": "^4.0.0",
+        "tar-fs": "^2.0.0",
+        "tunnel-agent": "^0.6.0"
+      },
+      "bin": {
+        "prebuild-install": "bin.js"
+      },
+      "engines": {
+        "node": ">=10"
+      }
+    },
     "node_modules/prelude-ls": {
       "version": "1.2.1",
       "dev": true,
@@ -3709,6 +4014,23 @@
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/proper-lockfile": {
+      "version": "4.1.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/proper-lockfile/-/proper-lockfile-4.1.2.tgz",
+      "integrity": "sha1-yLneKvay8WAQZ/mOAaxmuqIjFB8=",
+      "license": "MIT",
+      "dependencies": {
+        "graceful-fs": "^4.2.4",
+        "retry": "^0.12.0",
+        "signal-exit": "^3.0.2"
+      }
+    },
+    "node_modules/proper-lockfile/node_modules/signal-exit": {
+      "version": "3.0.7",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/signal-exit/-/signal-exit-3.0.7.tgz",
+      "integrity": "sha1-qaF2f4r4QVURTqq9c/mSc8j1mtk=",
+      "license": "ISC"
     },
     "node_modules/proto-list": {
       "version": "1.2.4",
@@ -3733,6 +4055,17 @@
       },
       "engines": {
         "node": ">= 0.10"
+      }
+    },
+    "node_modules/pump": {
+      "version": "3.0.4",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/pump/-/pump-3.0.4.tgz",
+      "integrity": "sha1-HzE0MFJ/qLkFYi69Iv4UROdXqzw=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "end-of-stream": "^1.1.0",
+        "once": "^1.3.1"
       }
     },
     "node_modules/punycode": {
@@ -3780,6 +4113,21 @@
         "node": ">=0.10.0"
       }
     },
+    "node_modules/readable-stream": {
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz",
+      "integrity": "sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "inherits": "^2.0.3",
+        "string_decoder": "^1.1.1",
+        "util-deprecate": "^1.0.1"
+      },
+      "engines": {
+        "node": ">= 6"
+      }
+    },
     "node_modules/readdirp": {
       "version": "4.1.2",
       "dev": true,
@@ -3821,6 +4169,15 @@
       "license": "MIT",
       "engines": {
         "node": ">=0.10.0"
+      }
+    },
+    "node_modules/retry": {
+      "version": "0.12.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/retry/-/retry-0.12.0.tgz",
+      "integrity": "sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=",
+      "license": "MIT",
+      "engines": {
+        "node": ">= 4"
       }
     },
     "node_modules/rimraf": {
@@ -4073,6 +4430,53 @@
         "url": "https://github.com/sponsors/isaacs"
       }
     },
+    "node_modules/simple-concat": {
+      "version": "1.0.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/simple-concat/-/simple-concat-1.0.1.tgz",
+      "integrity": "sha1-9Gl2CCujXCJj8cirXt/ibEHJVS8=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/feross"
+        },
+        {
+          "type": "patreon",
+          "url": "https://www.patreon.com/feross"
+        },
+        {
+          "type": "consulting",
+          "url": "https://feross.org/support"
+        }
+      ],
+      "license": "MIT",
+      "optional": true
+    },
+    "node_modules/simple-get": {
+      "version": "4.0.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/simple-get/-/simple-get-4.0.1.tgz",
+      "integrity": "sha1-SjnbVJKHyXnTUhEvoD/Zn9a8NUM=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/feross"
+        },
+        {
+          "type": "patreon",
+          "url": "https://www.patreon.com/feross"
+        },
+        {
+          "type": "consulting",
+          "url": "https://feross.org/support"
+        }
+      ],
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "decompress-response": "^6.0.0",
+        "once": "^1.3.1",
+        "simple-concat": "^1.0.0"
+      }
+    },
     "node_modules/sinon": {
       "version": "22.1.0",
       "resolved": "https://registry.npmjs.org/sinon/-/sinon-22.1.0.tgz",
@@ -4134,6 +4538,16 @@
       "license": "MIT",
       "dependencies": {
         "duplexer": "~0.1.1"
+      }
+    },
+    "node_modules/string_decoder": {
+      "version": "1.3.0",
+      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz",
+      "integrity": "sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "safe-buffer": "~5.2.0"
       }
     },
     "node_modules/string-argv": {
@@ -4341,6 +4755,36 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     },
+    "node_modules/tar-fs": {
+      "version": "2.1.5",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-fs/-/tar-fs-2.1.5.tgz",
+      "integrity": "sha1-M+nClBPc4MWK2n/3fbTlowr//nA=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "chownr": "^1.1.1",
+        "mkdirp-classic": "^0.5.2",
+        "pump": "^3.0.0",
+        "tar-stream": "^2.1.4"
+      }
+    },
+    "node_modules/tar-stream": {
+      "version": "2.2.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-stream/-/tar-stream-2.2.0.tgz",
+      "integrity": "sha1-rK2EwoQTawYNw/qmRHSqmuvXcoc=",
+      "license": "MIT",
+      "optional": true,
+      "dependencies": {
+        "bl": "^4.0.3",
+        "end-of-stream": "^1.4.1",
+        "fs-constants": "^1.0.0",
+        "inherits": "^2.0.3",
+        "readable-stream": "^3.1.1"
+      },
+      "engines": {
+        "node": ">=6"
+      }
+    },
     "node_modules/test-exclude": {
       "version": "8.0.0",
       "dev": true,
@@ -4487,6 +4931,19 @@
       "license": "MIT",
       "engines": {
         "node": ">=0.6.11 <=0.7.0 || >=0.7.3"
+      }
+    },
+    "node_modules/tunnel-agent": {
+      "version": "0.6.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tunnel-agent/-/tunnel-agent-0.6.0.tgz",
+      "integrity": "sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=",
+      "license": "Apache-2.0",
+      "optional": true,
+      "dependencies": {
+        "safe-buffer": "^5.0.1"
+      },
+      "engines": {
+        "node": "*"
       }
     },
     "node_modules/type-check": {
@@ -4712,6 +5169,13 @@
         "punycode": "^2.1.0"
       }
     },
+    "node_modules/util-deprecate": {
+      "version": "1.0.2",
+      "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+      "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
+      "license": "MIT",
+      "optional": true
+    },
     "node_modules/uuid": {
       "version": "14.0.2",
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-14.0.2.tgz",
@@ -4879,6 +5343,13 @@
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/wrappy": {
+      "version": "1.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/wrappy/-/wrappy-1.0.2.tgz",
+      "integrity": "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
+      "license": "ISC",
+      "optional": true
     },
     "node_modules/wsl-utils": {
       "version": "1.0.0",
