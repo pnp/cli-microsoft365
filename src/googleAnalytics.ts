@@ -12,7 +12,6 @@ const measurementId = 'G-4BNT8MQCYT';
 const apiSecret = 'mm_3WD_TRuO-9MKsuZnhDQ';
 const endpoint = 'https://www.google-analytics.com/mp/collect';
 const clientIdSetting = 'telemetryClientId';
-const maxParameterValueLength = 100;
 const requestTimeout = 1000;
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -58,66 +57,45 @@ function toEventValue(value: unknown): string | number {
   return String(value);
 }
 
-function toOptionName(name: string): string {
-  if (name.length <= maxParameterValueLength) {
-    return name;
-  }
-
-  const hash = crypto.createHash('sha256').update(name).digest('hex').substring(0, 8);
-  return `${name.substring(0, maxParameterValueLength - hash.length - 1)}_${hash}`;
-}
-
 function getEvents(commandName: string, properties: Record<string, unknown>, context: TelemetryContext): GoogleAnalyticsEvent[] {
   const sessionId = getSessionId(context.sessionId);
-  const events: GoogleAnalyticsEvent[] = [{
+  const eventProperties = Object.entries(properties).reduce<Record<string, string | number>>((result, [name, value]) => {
+    if (typeof value !== 'undefined') {
+      result[name] = toEventValue(value);
+    }
+
+    return result;
+  }, {});
+
+  return [{
     name: 'command_used',
     params: {
       ['command_name']: commandName,
       ...commonProperties,
       shell: context.shell,
+      ...eventProperties,
       ['session_id']: sessionId,
       ['engagement_time_msec']: 1
     }
   }];
-
-  Object.entries(properties).forEach(([name, value]) => {
-    if (typeof value === 'undefined') {
-      return;
-    }
-
-    events.push({
-      name: 'command_option_used',
-      params: {
-        ['command_name']: commandName,
-        ['option_name']: toOptionName(name),
-        ['option_value']: toEventValue(value),
-        ['session_id']: sessionId,
-        ['engagement_time_msec']: 1
-      }
-    });
-  });
-
-  return events;
 }
 
 async function sendEvents(events: GoogleAnalyticsEvent[]): Promise<void> {
   const clientId = getClientId();
-  await Promise.all(events.map(async event => {
-    const response = await Axios.post(`${endpoint}?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
-      ['client_id']: clientId,
-      events: [event]
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      timeout: requestTimeout,
-      validateStatus: () => true
-    });
+  const response = await Axios.post(`${endpoint}?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+    ['client_id']: clientId,
+    events
+  }, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    timeout: requestTimeout,
+    validateStatus: () => true
+  });
 
-    if (response.status < 200 || response.status >= 300) {
-      throw new Error(`Google Analytics returned ${response.status}`);
-    }
-  }));
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`Google Analytics returned ${response.status}`);
+  }
 }
 
 export const googleAnalytics = {

@@ -26,24 +26,18 @@ describe('googleAnalytics', () => {
       shell: 'zsh'
     });
 
-    assert.strictEqual(axiosPostStub.callCount, 3);
+    assert.strictEqual(axiosPostStub.callCount, 1);
     assert.match(axiosPostStub.firstCall.args[0], /measurement_id=.+&api_secret=.+/);
 
-    const commandBody = axiosPostStub.firstCall.args[1];
-    assert.strictEqual(commandBody.client_id, 'client-id');
-    assert.strictEqual(commandBody.events[0].name, 'command_used');
-    assert.strictEqual(commandBody.events[0].params.command_name, 'spo file add');
-    assert.strictEqual(commandBody.events[0].params.shell, 'zsh');
-    assert.strictEqual(commandBody.events[0].params.os, process.platform);
-
-    const outputBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(outputBody.events[0].name, 'command_option_used');
-    assert.strictEqual(outputBody.events[0].params.option_name, 'output');
-    assert.strictEqual(outputBody.events[0].params.option_value, 'json');
-
-    const debugBody = axiosPostStub.thirdCall.args[1];
-    assert.strictEqual(debugBody.events[0].params.option_name, 'debug');
-    assert.strictEqual(debugBody.events[0].params.option_value, 'false');
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.client_id, 'client-id');
+    assert.strictEqual(body.events.length, 1);
+    assert.strictEqual(body.events[0].name, 'command_used');
+    assert.strictEqual(body.events[0].params.command_name, 'spo file add');
+    assert.strictEqual(body.events[0].params.shell, 'zsh');
+    assert.strictEqual(body.events[0].params.os, process.platform);
+    assert.strictEqual(body.events[0].params.output, 'json');
+    assert.strictEqual(body.events[0].params.debug, 'false');
 
     const requestOptions = axiosPostStub.firstCall.args[2];
     assert.strictEqual(requestOptions.timeout, 1000);
@@ -73,55 +67,24 @@ describe('googleAnalytics', () => {
   it('omits undefined option properties', async () => {
     await googleAnalytics.trackEvent('test command', { output: 'json', query: undefined }, { sessionId: 'session-id', shell: 'zsh' });
 
-    assert.strictEqual(axiosPostStub.callCount, 2);
-    const outputBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(outputBody.events[0].params.option_name, 'output');
-    assert.strictEqual(outputBody.events[0].params.option_value, 'json');
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.events.length, 1);
+    assert.strictEqual(body.events[0].params.output, 'json');
+    assert.strictEqual(body.events[0].params.query, undefined);
   });
 
   it('converts non-primitive option properties to strings', async () => {
     await googleAnalytics.trackEvent('test command', { value: null }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(optionBody.events[0].params.option_value, 'null');
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.events[0].params.value, 'null');
   });
 
   it('sends numeric option properties as numbers', async () => {
     await googleAnalytics.trackEvent('test command', { value: 1 }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(optionBody.events[0].params.option_value, 1);
-  });
-
-  it('sends option names longer than 40 characters as parameter values', async () => {
-    const optionName = 'disableTrialEnvironmentCreationByNonAdminUsers';
-
-    await googleAnalytics.trackEvent('test command', { [optionName]: true }, { sessionId: 'session-id', shell: 'zsh' });
-
-    const optionBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(optionBody.events[0].params.option_name, optionName);
-    assert.strictEqual(optionBody.events[0].params.option_value, 'true');
-  });
-
-  it('shortens option names longer than the GA parameter value limit without collisions', async () => {
-    const optionName = 'a'.repeat(101);
-
-    await googleAnalytics.trackEvent('test command', { [optionName]: true }, { sessionId: 'session-id', shell: 'zsh' });
-
-    const optionBody = axiosPostStub.secondCall.args[1];
-    assert.strictEqual(optionBody.events[0].params.option_name.length, 100);
-    assert.match(optionBody.events[0].params.option_name, /^a{91}_[0-9a-f]{8}$/);
-  });
-
-  it('sends more than 25 options as separate bounded events', async () => {
-    const properties = Object.fromEntries(Array.from({ length: 27 }, (_, i) => [`option${i}`, true]));
-
-    await googleAnalytics.trackEvent('test command', properties, { sessionId: 'session-id', shell: 'zsh' });
-
-    assert.strictEqual(axiosPostStub.callCount, 28);
-    axiosPostStub.getCalls().forEach(call => {
-      assert(Object.keys(call.args[1].events[0].params).length <= 25);
-    });
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.events[0].params.value, 1);
   });
 
   it('sets the Docker environment in telemetry', async () => {
