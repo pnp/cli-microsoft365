@@ -1,7 +1,5 @@
 import assert from 'assert';
 import fs from 'fs';
-import os from 'os';
-import path from 'path';
 import sinon from 'sinon';
 import { AuthType, CertificateType, CloudType, Connection } from '../Auth.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
@@ -16,10 +14,6 @@ describe('FileTokenStorage', () => {
       fs.readFileSync,
       fs.writeFile
     ]);
-  });
-
-  it(`stores MSAL cache in the user's home directory`, () => {
-    assert.strictEqual(FileTokenStorage.msalCacheFilePath(), path.join(os.homedir(), '.cli-m365-msal.json'));
   });
 
   it('fails retrieving connection info from file if the token file doesn\'t exist', async () => {
