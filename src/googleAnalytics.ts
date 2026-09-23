@@ -12,7 +12,7 @@ const measurementId = 'G-4BNT8MQCYT';
 const apiSecret = 'mm_3WD_TRuO-9MKsuZnhDQ';
 const endpoint = 'https://www.google-analytics.com/mp/collect';
 const clientIdSetting = 'telemetryClientId';
-const requestTimeout = 1000;
+const requestTimeout = 3000;
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export interface TelemetryContext {

@@ -40,7 +40,7 @@ describe('googleAnalytics', () => {
     assert.strictEqual(body.events[0].params.debug, 'false');
 
     const requestOptions = axiosPostStub.firstCall.args[2];
-    assert.strictEqual(requestOptions.timeout, 1000);
+    assert.strictEqual(requestOptions.timeout, 3000);
     assert.strictEqual(requestOptions.validateStatus(500), true);
   });
 
