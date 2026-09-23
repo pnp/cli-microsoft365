@@ -40,7 +40,7 @@
 ## Integration & External Dependencies
 - **Microsoft Graph, SharePoint REST, etc.**: Use `request.ts` for all HTTP calls.
 - **Authentication**: Uses `@azure/msal-node` and related packages.
-- **Telemetry**: Application Insights via `applicationinsights` package.
+- **Telemetry**: Google Analytics via the Measurement Protocol in `src/googleAnalytics.ts`.
 - **Docs**: Docusaurus, see `docs/` and `docs/docusaurus.config.ts`.
 
 ## Examples

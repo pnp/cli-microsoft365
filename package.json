@@ -285,20 +285,6 @@
     },
     "axios": {
       "follow-redirects": "1.16.0"
-    },
-    "@grpc/proto-loader": {
-      "protobufjs": "7.6.0"
-    },
-    "@opentelemetry/otlp-transformer": {
-      "protobufjs": "7.6.0"
-    },
-    "@azure/monitor-opentelemetry": {
-      "@opentelemetry/sdk-node": "0.218.0",
-      "@opentelemetry/exporter-prometheus": "0.218.0"
-    },
-    "protobufjs": "7.6.0",
-    "applicationinsights": {
-      "uuid": "11.1.1"
     }
   },
   "dependencies": {
@@ -312,7 +298,6 @@
     "adaptivecards": "^3.0.6",
     "adaptivecards-templating": "^2.3.1",
     "adm-zip": "^0.6.0",
-    "applicationinsights": "^3.16.0",
     "axios": "^1.20.0",
     "chalk": "^6.0.0",
     "clipboardy": "^5.3.2",
