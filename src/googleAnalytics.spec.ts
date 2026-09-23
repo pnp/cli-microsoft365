@@ -20,31 +20,30 @@ describe('googleAnalytics', () => {
     process.env = env;
   });
 
-  it('sends command and option usage using Google Analytics collection', async () => {
+  it('sends command and option usage using Measurement Protocol', async () => {
     await googleAnalytics.trackEvent('spo file add', { output: 'json', debug: false }, {
       sessionId: 'session-id',
       shell: 'zsh'
     });
 
     assert.strictEqual(axiosPostStub.callCount, 3);
-    assert.strictEqual(axiosPostStub.firstCall.args[0], 'https://www.google-analytics.com/g/collect');
+    assert.match(axiosPostStub.firstCall.args[0], /measurement_id=.+&api_secret=.+/);
 
-    const commandEvent = new URLSearchParams(axiosPostStub.firstCall.args[1]);
-    assert.strictEqual(commandEvent.get('tid'), 'G-4BNT8MQCYT');
-    assert.strictEqual(commandEvent.get('cid'), 'client-id');
-    assert.strictEqual(commandEvent.get('en'), 'command_used');
-    assert.strictEqual(commandEvent.get('ep.command_name'), 'spo file add');
-    assert.strictEqual(commandEvent.get('ep.shell'), 'zsh');
-    assert.strictEqual(commandEvent.get('ep.os'), process.platform);
+    const commandBody = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(commandBody.client_id, 'client-id');
+    assert.strictEqual(commandBody.events[0].name, 'command_used');
+    assert.strictEqual(commandBody.events[0].params.command_name, 'spo file add');
+    assert.strictEqual(commandBody.events[0].params.shell, 'zsh');
+    assert.strictEqual(commandBody.events[0].params.os, process.platform);
 
-    const outputEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(outputEvent.get('en'), 'command_option_used');
-    assert.strictEqual(outputEvent.get('ep.option_name'), 'output');
-    assert.strictEqual(outputEvent.get('ep.option_value'), 'json');
+    const outputBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(outputBody.events[0].name, 'command_option_used');
+    assert.strictEqual(outputBody.events[0].params.option_name, 'output');
+    assert.strictEqual(outputBody.events[0].params.option_value, 'json');
 
-    const debugEvent = new URLSearchParams(axiosPostStub.thirdCall.args[1]);
-    assert.strictEqual(debugEvent.get('ep.option_name'), 'debug');
-    assert.strictEqual(debugEvent.get('ep.option_value'), 'false');
+    const debugBody = axiosPostStub.thirdCall.args[1];
+    assert.strictEqual(debugBody.events[0].params.option_name, 'debug');
+    assert.strictEqual(debugBody.events[0].params.option_value, 'false');
 
     const requestOptions = axiosPostStub.firstCall.args[2];
     assert.strictEqual(requestOptions.timeout, 1000);
@@ -75,23 +74,23 @@ describe('googleAnalytics', () => {
     await googleAnalytics.trackEvent('test command', { output: 'json', query: undefined }, { sessionId: 'session-id', shell: 'zsh' });
 
     assert.strictEqual(axiosPostStub.callCount, 2);
-    const outputEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(outputEvent.get('ep.option_name'), 'output');
-    assert.strictEqual(outputEvent.get('ep.option_value'), 'json');
+    const outputBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(outputBody.events[0].params.option_name, 'output');
+    assert.strictEqual(outputBody.events[0].params.option_value, 'json');
   });
 
   it('converts non-primitive option properties to strings', async () => {
     await googleAnalytics.trackEvent('test command', { value: null }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(optionEvent.get('ep.option_value'), 'null');
+    const optionBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(optionBody.events[0].params.option_value, 'null');
   });
 
   it('sends numeric option properties as numbers', async () => {
     await googleAnalytics.trackEvent('test command', { value: 1 }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(optionEvent.get('epn.option_value'), '1');
+    const optionBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(optionBody.events[0].params.option_value, 1);
   });
 
   it('sends option names longer than 40 characters as parameter values', async () => {
@@ -99,9 +98,9 @@ describe('googleAnalytics', () => {
 
     await googleAnalytics.trackEvent('test command', { [optionName]: true }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(optionEvent.get('ep.option_name'), optionName);
-    assert.strictEqual(optionEvent.get('ep.option_value'), 'true');
+    const optionBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(optionBody.events[0].params.option_name, optionName);
+    assert.strictEqual(optionBody.events[0].params.option_value, 'true');
   });
 
   it('shortens option names longer than the GA parameter value limit without collisions', async () => {
@@ -109,9 +108,9 @@ describe('googleAnalytics', () => {
 
     await googleAnalytics.trackEvent('test command', { [optionName]: true }, { sessionId: 'session-id', shell: 'zsh' });
 
-    const optionEvent = new URLSearchParams(axiosPostStub.secondCall.args[1]);
-    assert.strictEqual(optionEvent.get('ep.option_name')!.length, 100);
-    assert.match(optionEvent.get('ep.option_name')!, /^a{91}_[0-9a-f]{8}$/);
+    const optionBody = axiosPostStub.secondCall.args[1];
+    assert.strictEqual(optionBody.events[0].params.option_name.length, 100);
+    assert.match(optionBody.events[0].params.option_name, /^a{91}_[0-9a-f]{8}$/);
   });
 
   it('sends more than 25 options as separate bounded events', async () => {
@@ -121,9 +120,7 @@ describe('googleAnalytics', () => {
 
     assert.strictEqual(axiosPostStub.callCount, 28);
     axiosPostStub.getCalls().forEach(call => {
-      const event = new URLSearchParams(call.args[1]);
-      const eventParameterCount = Array.from(event.keys()).filter(key => key.startsWith('ep.') || key.startsWith('epn.')).length;
-      assert(eventParameterCount <= 25);
+      assert(Object.keys(call.args[1].events[0].params).length <= 25);
     });
   });
 
@@ -135,22 +132,22 @@ describe('googleAnalytics', () => {
     assert.strictEqual(dockerGoogleAnalytics.commonProperties.env, 'docker');
   });
 
-  it('sends errors as exceptions using Google Analytics collection', async () => {
+  it('sends errors as exceptions using Measurement Protocol', async () => {
     const message = 'a'.repeat(101);
 
     await googleAnalytics.trackException(new Error(message), { sessionId: 'session-id', shell: 'zsh' });
 
-    const exceptionEvent = new URLSearchParams(axiosPostStub.firstCall.args[1]);
-    assert.strictEqual(exceptionEvent.get('en'), 'exception');
-    assert.strictEqual(exceptionEvent.get('ep.description'), message.substring(0, 100));
-    assert.strictEqual(exceptionEvent.get('ep.shell'), 'zsh');
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.events[0].name, 'exception');
+    assert.strictEqual(body.events[0].params.description, message.substring(0, 100));
+    assert.strictEqual(body.events[0].params.shell, 'zsh');
   });
 
   it('converts non-error exceptions to strings', async () => {
     await googleAnalytics.trackException('error', { sessionId: 'session-id', shell: 'zsh' });
 
-    const exceptionEvent = new URLSearchParams(axiosPostStub.firstCall.args[1]);
-    assert.strictEqual(exceptionEvent.get('ep.description'), 'error');
+    const body = axiosPostStub.firstCall.args[1];
+    assert.strictEqual(body.events[0].params.description, 'error');
   });
 
   it('throws when Google Analytics rejects the request', async () => {

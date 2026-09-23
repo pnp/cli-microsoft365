@@ -9,7 +9,8 @@ import config from './config.js';
 import { app } from './utils/app.js';
 
 const measurementId = 'G-4BNT8MQCYT';
-const endpoint = 'https://www.google-analytics.com/g/collect';
+const apiSecret = 'mm_3WD_TRuO-9MKsuZnhDQ';
+const endpoint = 'https://www.google-analytics.com/mp/collect';
 const clientIdSetting = 'telemetryClientId';
 const maxParameterValueLength = 100;
 const requestTimeout = 1000;
@@ -102,28 +103,12 @@ function getEvents(commandName: string, properties: Record<string, unknown>, con
 async function sendEvents(events: GoogleAnalyticsEvent[]): Promise<void> {
   const clientId = getClientId();
   await Promise.all(events.map(async event => {
-    const payload = new URLSearchParams({
-      v: '2',
-      tid: measurementId,
-      cid: clientId,
-      en: event.name
-    });
-
-    Object.entries(event.params).forEach(([name, value]) => {
-      if (name === 'session_id') {
-        payload.set('sid', value.toString());
-      }
-      else if (name === 'engagement_time_msec') {
-        payload.set('_et', value.toString());
-      }
-      else {
-        payload.set(`${typeof value === 'number' ? 'epn' : 'ep'}.${name}`, value.toString());
-      }
-    });
-
-    const response = await Axios.post(endpoint, payload.toString(), {
+    const response = await Axios.post(`${endpoint}?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
+      ['client_id']: clientId,
+      events: [event]
+    }, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/json'
       },
       timeout: requestTimeout,
       validateStatus: () => true
