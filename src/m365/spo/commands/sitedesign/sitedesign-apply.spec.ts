@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './sitedesign-apply.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITEDESIGN_APPLY, () => {
   let log: string[];
@@ -47,7 +48,8 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -150,11 +152,130 @@ describe(commands.SITEDESIGN_APPLY, () => {
     } as any), new CommandError('An error has occurred'));
   });
 
+  it('applies a built-in site design by id, passing store 1', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          siteDesignId: '3d5ef50b-88a0-42a7-9fb2-8036009f6f42',
+          webUrl: 'https://contoso.sharepoint.com',
+          store: 1
+        })) {
+        return {
+          value: [{ "Outcome": "0", "OutcomeText": null, "Title": "Apply theme" }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: '3d5ef50b-88a0-42a7-9fb2-8036009f6f42',
+        webUrl: 'https://contoso.sharepoint.com',
+        builtIn: true
+      }
+    });
+    assert(loggerLogSpy.calledWith([{ "Outcome": "0", "OutcomeText": null, "Title": "Apply theme" }]));
+  });
+
+  it('applies a built-in site design by template name, resolving the id and passing store 1', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          siteDesignId: '3d5ef50b-88a0-42a7-9fb2-8036009f6f42',
+          webUrl: 'https://contoso.sharepoint.com',
+          store: 1
+        })) {
+        return {
+          value: [{ "Outcome": "0", "OutcomeText": null, "Title": "Apply theme" }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        template: 'Event',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+    assert(loggerLogSpy.calledWith([{ "Outcome": "0", "OutcomeText": null, "Title": "Apply theme" }]));
+  });
+
+  it('fails validation if id and template are both specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', template: 'Event', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if neither id nor template are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if template is not a valid built-in site design', async () => {
+    const actual = await command.validate({ options: { template: 'Invalid', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if template is a valid built-in site design', async () => {
+    const actual = await command.validate({ options: { template: 'Event', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if asTask is combined with builtIn', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webUrl: 'https://contoso.sharepoint.com', builtIn: true, asTask: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if asTask is combined with template', async () => {
+    const actual = await command.validate({ options: { template: 'Event', webUrl: 'https://contoso.sharepoint.com', asTask: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying template', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--template') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying builtIn', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--builtIn') > -1) {
         containsOption = true;
       }
     });

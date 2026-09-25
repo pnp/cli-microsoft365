@@ -5,6 +5,7 @@ import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { getBuiltInSiteDesignId, getBuiltInSiteDesignTemplateNames } from './BuiltInSiteDesigns.js';
 
 interface CommandArgs {
   options: Options;
@@ -12,7 +13,9 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   asTask: boolean;
-  id: string;
+  id?: string;
+  template?: string;
+  builtIn?: boolean;
   webUrl: string;
 }
 
@@ -31,12 +34,15 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        asTask: args.options.asTask || false
+        asTask: args.options.asTask || false,
+        builtIn: args.options.builtIn || false,
+        template: typeof args.options.template !== 'undefined'
       });
     });
   }
@@ -44,13 +50,20 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
       },
       {
         option: '-u, --webUrl <webUrl>'
       },
       {
         option: '--asTask'
+      },
+      {
+        option: '-b, --builtIn'
+      },
+      {
+        option: '--template [template]',
+        autocomplete: getBuiltInSiteDesignTemplateNames()
       }
     );
   }
@@ -58,8 +71,16 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.template && !getBuiltInSiteDesignTemplateNames().includes(args.options.template)) {
+          return `${args.options.template} is not a valid built-in site design template. Allowed values are: ${getBuiltInSiteDesignTemplateNames().join(', ')}`;
+        }
+
+        if (args.options.asTask && (args.options.builtIn || args.options.template)) {
+          return `The asTask option is not supported when applying a built-in site design`;
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -67,13 +88,28 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['id', 'template'] }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const isBuiltIn: boolean = !!args.options.builtIn || !!args.options.template;
+      const siteDesignId: string = args.options.template
+        ? getBuiltInSiteDesignId(args.options.template) as string
+        : args.options.id as string;
+
       const requestBody: any = {
-        siteDesignId: args.options.id,
+        siteDesignId: siteDesignId,
         webUrl: args.options.webUrl
       };
+
+      if (isBuiltIn) {
+        requestBody.store = 1;
+      }
 
       const requestOptions: any = {
         url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.${args.options.asTask ? 'AddSiteDesignTask' : 'ApplySiteDesign'}`,
