@@ -1,0 +1,26 @@
+---
+title: Setup the CLI
+sidebar_position: 3
+---
+
+# Setup the CLI for Microsoft 365
+
+After you install the CLI, you need to set it up before you can start using it. The easiest way is to let the setup wizard create and configure the Microsoft Entra app registration for you.
+
+## Use the setup wizard
+
+Run the setup command to start the guided configuration flow:
+
+```sh
+m365 setup
+```
+
+The wizard helps you choose an app registration, set the right defaults for your use case, and prepare the CLI for your first login.
+
+## When you can't use the wizard
+
+If you can't use `m365 setup`, you still need a Microsoft Entra app registration before you can log in to Microsoft 365. Follow [Use your own Microsoft Entra identity](../using-own-identity.mdx) to create and configure it manually.
+
+## Next step
+
+Once setup is complete, continue with [Log in to Microsoft 365](connecting-microsoft-365.mdx).
