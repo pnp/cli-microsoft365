@@ -20,7 +20,6 @@ interface Options extends GlobalOptions {
   displayName?: string;
   force?: boolean;
   permanent?: boolean;
-  skipRecycleBin?: boolean;
 }
 
 class EntraM365GroupRemoveCommand extends GraphCommand {
@@ -49,7 +48,7 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         force: (!(!args.options.force)).toString(),
-        permanent: !!(args.options.permanent || args.options.skipRecycleBin)
+        permanent: !!args.options.permanent
       });
     });
   }
@@ -67,9 +66,6 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
       },
       {
         option: '--permanent'
-      },
-      {
-        option: '--skipRecycleBin'
       }
     );
   }
@@ -92,15 +88,10 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'displayName');
-    this.types.boolean.push('permanent', 'skipRecycleBin');
+    this.types.boolean.push('permanent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.skipRecycleBin) {
-      await this.warn(logger, `Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`);
-      args.options.permanent = true;
-    }
-
     const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id || args.options.displayName}...`);

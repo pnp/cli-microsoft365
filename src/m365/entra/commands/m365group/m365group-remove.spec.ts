@@ -217,17 +217,6 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert(loggerLogToStderrSpy.calledWith("Group has been deleted and is now available in the deleted groups list. Removing permanently..."));
   });
 
-  it('supports the deprecated skipRecycleBin option', async () => {
-    defaultGetStub();
-    defaultPostStub();
-    const deleteStub: sinon.SinonStub = defaultDeleteStub();
-
-    await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
-
-    assert(deleteStub.called);
-    assert(loggerLogToStderrSpy.calledWith(`Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`));
-  });
-
   it('verifies if the group is deleted and available in the deleted groups list, retry and delete the group', async () => {
     const getCallStub: sinon.SinonStub = sinon.stub(request, 'get');
 
