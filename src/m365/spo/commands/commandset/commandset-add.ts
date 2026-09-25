@@ -1,31 +1,33 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { CustomAction } from '../customaction/customaction.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listType: z.enum(['List', 'Library', 'SitePages']).alias('l'),
+  clientSideComponentId: z.string().refine(validation.isValidGuid, { message: 'The value must be a valid GUID.' }).alias('i'),
+  description: z.string().optional(),
+  clientSideComponentProperties: z.string().optional(),
+  scope: z.enum(['Site', 'Web']).optional().alias('s'),
+  location: z.enum(['ContextMenu', 'CommandBar', 'Both']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  title: string;
-  webUrl: string;
-  listType: string;
-  clientSideComponentId: string;
-  description?: string;
-  clientSideComponentProperties?: string;
-  scope?: string;
-  location?: string;
-}
-
 class SpoCommandSetAddCommand extends SpoCommand {
-  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
-  private static readonly scopes: string[] = ['Site', 'Web'];
-  private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
-
   public get name(): string {
     return commands.COMMANDSET_ADD;
   }
@@ -34,76 +36,8 @@ class SpoCommandSetAddCommand extends SpoCommand {
     return 'Adds a ListView Command Set to a site.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        location: typeof args.options.location !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listType <listType>', autocomplete: SpoCommandSetAddCommand.listTypes
-      },
-      {
-        option: '-i, --clientSideComponentId  <clientSideComponentId>'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--clientSideComponentProperties  [clientSideComponentProperties]'
-      },
-      {
-        option: '-s, --scope [scope]', autocomplete: SpoCommandSetAddCommand.scopes
-      },
-      {
-        option: '--location [location]', autocomplete: SpoCommandSetAddCommand.locations
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId as string)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (SpoCommandSetAddCommand.listTypes.indexOf(args.options.listType) < 0) {
-          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoCommandSetAddCommand.listTypes.join(', ')}`;
-        }
-
-        if (args.options.scope && SpoCommandSetAddCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandSetAddCommand.scopes.join(', ')}`;
-        }
-
-        if (args.options.location && SpoCommandSetAddCommand.locations.indexOf(args.options.location) < 0) {
-          return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetAddCommand.locations.join(', ')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
