@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './applicationcustomizer-set.js';
+import command, { options } from './applicationcustomizer-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
@@ -27,6 +27,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   const hostProperties = '{"preAllocatedApplicationCustomizerTopHeight":"50","preAllocatedApplicationCustomizerBottomHeight":"50"}';
   let log: any[];
   let logger: Logger;
+  let commandOptionsSchema: typeof options;
 
   const singleResponse = {
     value: [
@@ -120,6 +121,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -166,62 +168,59 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, newTitle: newTitle } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, newTitle: newTitle });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if at least one of the parameters has a value', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, clientSideComponentProperties: clientSideComponentProperties } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if at least one of the parameters has a value', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, clientSideComponentProperties: clientSideComponentProperties });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when an empty description is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, description: '' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when an empty description is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, description: '' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when all parameters are empty', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, id: null, clientSideComponentId: null, title: '', newTitle: newTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when all parameters are empty', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: null, clientSideComponentId: null, title: '', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, clientSideComponentId: 'invalid', newTitle: newTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, clientSideComponentId: 'invalid', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: 'invalid', newTitle: newTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: 'invalid', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the scope option is not a valid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, scope: 'invalid', newTitle: newTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope option is not a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, scope: 'invalid', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, clientSideComponentProperties: 'invalid json string' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the hostProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, hostProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the hostProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, hostProperties: 'invalid json string' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles error when no application customizer with the specified id found', async () => {
@@ -234,7 +233,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { id: id, webUrl: webUrl, newTitle: newTitle }
+        options: commandOptionsSchema.parse({ id: id, webUrl: webUrl, newTitle: newTitle })
       }
       ), new CommandError(`No application customizer with id '${id}' found`));
   });
@@ -249,7 +248,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, newTitle: newTitle }
+        options: commandOptionsSchema.parse({ title: title, webUrl: webUrl, newTitle: newTitle })
       }
       ), new CommandError(`No application customizer with title '${title}' found`));
   });
@@ -264,7 +263,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, newTitle: newTitle }
+        options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, webUrl: webUrl, newTitle: newTitle })
       }
       ), new CommandError(`No application customizer with ClientSideComponentId '${clientSideComponentId}' found`));
   });
@@ -287,7 +286,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle }
+        options: commandOptionsSchema.parse({ title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle })
       }
       ), new CommandError("Multiple application customizer with title 'SiteGuidedTour' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
@@ -310,7 +309,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', newTitle: newTitle }
+        options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', newTitle: newTitle })
       }
       ), new CommandError("Multiple application customizer with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
@@ -326,7 +325,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle }) });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -339,7 +338,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, webUrl: webUrl, scope: 'Web', newTitle: newTitle, description: description }) });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -354,7 +353,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, webUrl: webUrl, scope: 'Site', newTitle: newTitle }) });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -370,7 +369,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', clientSideComponentProperties: clientSideComponentProperties }) });
     assert(updateCallsSpy.calledOnce);
   });
 
@@ -383,7 +382,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { id: id, webUrl: webUrl, scope: 'Web', description: '' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id, webUrl: webUrl, scope: 'Web', description: '' }) });
 
     assert(updateCallsSpy.calledOnce);
     assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
@@ -401,7 +400,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
-    await command.action(logger, { options: { id: id, webUrl: webUrl, scope: 'Web', hostProperties: hostProperties } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id, webUrl: webUrl, scope: 'Web', hostProperties: hostProperties }) });
 
     assert(updateCallsSpy.calledOnce);
     assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {

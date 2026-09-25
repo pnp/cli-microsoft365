@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './applicationcustomizer-get.js';
+import command, { options } from './applicationcustomizer-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
@@ -73,6 +73,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -82,6 +83,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = webUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -122,138 +124,89 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc', webUrl: webUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc', webUrl: webUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc', webUrl: webUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: 'abc', webUrl: webUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: id,
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when all options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      webUrl: 'foo'
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        clientSideComponentId: clientSideComponentId,
-        webUrl: webUrl
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when no options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when all options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: id,
+      clientSideComponentId: clientSideComponentId,
+      webUrl: webUrl
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and id options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation when no options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation when title and id options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: id,
+      webUrl: webUrl
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        webUrl: webUrl
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when title and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      clientSideComponentId: clientSideComponentId,
+      webUrl: webUrl
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        clientSideComponentId: clientSideComponentId,
-        webUrl: webUrl
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when id and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when id and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      clientSideComponentId: clientSideComponentId,
+      webUrl: webUrl
     });
-
-    const actual = await command.validate({
-      options: {
-        id: id,
-        clientSideComponentId: clientSideComponentId,
-        webUrl: webUrl
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the scope is not a valid application customizer scope', async () => {
-    const actual = await command.validate({ options: { id: id, webUrl: webUrl, scope: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope is not a valid application customizer scope', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, webUrl: webUrl, scope: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: id, webUrl: webUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, webUrl: webUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passed validation when title specified', async () => {
-    const actual = await command.validate({ options: { title: title, webUrl: webUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation when title specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, webUrl: webUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if clientSideComponentId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if clientSideComponentId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: clientSideComponentId, webUrl: webUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('humanize scope shows correct value when scope odata is 2', () => {
@@ -281,11 +234,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
@@ -307,11 +260,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         webUrl: webUrl,
         debug: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
@@ -333,11 +286,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId,
         webUrl: webUrl,
         debug: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
@@ -353,11 +306,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         webUrl: webUrl,
         clientSideComponentProperties: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(applicationCustomizerGetOutput.ClientSideComponentProperties)));
@@ -375,11 +328,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError(`No application customizer with id '${id}' found`));
   });
 
@@ -396,11 +349,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError(`No application customizer with title '${title}' found`));
   });
 
@@ -414,11 +367,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError(`No application customizer with Client Side Component Id '${clientSideComponentId}' found`));
   });
 
@@ -487,11 +440,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
@@ -560,11 +513,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError("Multiple application customizers with Client Side Component Id '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
@@ -653,11 +606,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         webUrl: webUrl,
         debug: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerGetOutput));
@@ -693,11 +646,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         webUrl: webUrl,
         scope: 'Web'
-      }
+      })
     }), new CommandError(`No application customizer with id '${id}' found`));
   });
 });
