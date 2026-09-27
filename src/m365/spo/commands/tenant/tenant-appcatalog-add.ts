@@ -140,7 +140,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
       const siteRemoveOptions = {
         url: url,
-        skipRecycleBin: true,
+        permanent: true,
         wait: true,
         force: true,
         verbose: this.verbose,

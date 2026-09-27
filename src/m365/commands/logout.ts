@@ -30,8 +30,6 @@ class LogoutCommand extends Command {
       await logger.logToStderr('Logging out from Microsoft 365...');
     }
 
-    const deactivate: () => void = (): void => auth.connection.deactivate();
-
     try {
       await auth.clearConnectionInfo();
     }
@@ -39,10 +37,10 @@ class LogoutCommand extends Command {
       if (this.debug) {
         await logger.logToStderr(new CommandError(error));
       }
+      throw new CommandError(error);
     }
-    finally {
-      deactivate();
-    }
+
+    auth.connection.deactivate();
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

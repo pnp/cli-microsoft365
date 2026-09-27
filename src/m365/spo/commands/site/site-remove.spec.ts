@@ -127,16 +127,6 @@ describe(commands.SITE_REMOVE, () => {
     assert.strictEqual(postStub.secondCall.args[0].data.siteUrl, siteUrl);
   });
 
-  it('supports the deprecated skipRecycleBin option', async () => {
-    sinon.stub(odata, 'getAllItems').resolves([siteDetailsNonGroup]);
-    const postStub = sinon.stub(request, 'post').resolves();
-
-    await command.action(logger, { options: { url: siteUrl, skipRecycleBin: true, force: true } });
-
-    assert(postStub.calledTwice);
-    assert(log.includes(`Option 'skipRecycleBin' is deprecated. Please use 'permanent' instead.`));
-  });
-
   it('deletes a group site, deletes the m365 group from entra id', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === odataUrl) {
@@ -411,11 +401,6 @@ describe(commands.SITE_REMOVE, () => {
 
   it('fails validation if both fromRecycleBin and permanent are specified', async () => {
     const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, permanent: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both fromRecycleBin and skipRecycleBin are specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, skipRecycleBin: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

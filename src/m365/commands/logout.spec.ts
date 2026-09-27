@@ -102,8 +102,12 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: commandOptionsSchema.parse({}) });
-      assert(logoutSpy.called);
+      await assert.rejects(
+        command.action(logger, { options: commandOptionsSchema.parse({}) }),
+        new CommandError('An error has occurred')
+      );
+      assert(logoutSpy.notCalled);
+      assert(auth.connection.active);
     }
     finally {
       sinonUtil.restore([
@@ -119,8 +123,13 @@ describe(commands.LOGOUT, () => {
     auth.connection.active = true;
 
     try {
-      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
-      assert(logoutSpy.called);
+      await assert.rejects(
+        command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }),
+        new CommandError('An error has occurred')
+      );
+      assert(logoutSpy.notCalled);
+      assert(auth.connection.active);
+      assert(log.some(msg => (msg as unknown as CommandError).message === 'An error has occurred'));
     }
     finally {
       sinonUtil.restore([

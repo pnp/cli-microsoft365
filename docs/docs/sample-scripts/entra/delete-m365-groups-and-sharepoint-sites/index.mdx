@@ -20,8 +20,8 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
   ```powershell
   ### Warning. Use with caution. This script deletes all M365 Groups and SPO Sites in your tenant
   $devAccount = "<putyourupnhereforsecuritycheck>"
-  ### Deletes the resources from the recyclebin. The CLI does not support this feature yet
-  $skipRecycleBin = $true
+  ### Permanently deletes the SharePoint sites, so they aren't moved to the recycle bin
+  $permanent = $true
 
   $m365Status = m365 status --output text
   Write-Host $m365Status
@@ -62,7 +62,7 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
   foreach ($site in $allSites) {
     $siteCounter++
     Write-Host "Deleting $($site.Url)... ($siteCounter/$siteCount)"
-    m365 spo site remove --url $site.Url --skipRecycleBin $skipRecycleBin --force
+    m365 spo site remove --url $site.Url --permanent $permanent --force
   }
   ```
 
