@@ -253,6 +253,11 @@ const sidebars: SidebarsConfig = {
           agent: [
             {
               type: 'doc',
+              label: 'agent identity list',
+              id: 'cmd/entra/agent/agent-identity-list'
+            },
+            {
+              type: 'doc',
               label: 'agent list',
               id: 'cmd/entra/agent/agent-list'
             }
