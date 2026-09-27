@@ -1,0 +1,138 @@
+---
+tags:
+  - reports
+  - rules
+  - retirement
+  - tenant
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# List SharePoint rules usage across the tenant
+
+Author: [Saurabh Tripathi](https://github.com/saurabh7019)
+
+SharePoint Online list rules are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing rules. This information helps administrators identify and plan the migration of critical rules to modern alternatives.
+
+**Prerequisites:**
+This script assumes you have permissions to all sites in the tenant. We recommend running this script with application-only permissions using Sites.FullControl.All permissions.
+
+<Tabs>
+  <TabItem value="PowerShell">
+
+  ```powershell
+  $fileExportPath = "Rules.csv"
+
+  function Convert-RulesToResults {
+    param(
+      [array]$Rules,
+      [string]$SiteTitle,
+      [string]$SiteUrl
+    )
+
+    $ruleResults = @()
+
+    foreach ($rule in $Rules) {
+      $targetPath = $rule.List.RootFolder.ServerRelativeUrl
+
+      $filterPath = ($rule.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+      if ($filterPath) {
+        $targetPath = $filterPath
+      }
+      elseif ($rule.Item) {
+        $targetPath = $rule.Item.FileRef
+      }
+
+      $frequency = switch ($rule.AlertFrequency) {
+        0 { "Immediate" }
+        1 { "Daily" }
+        2 { "Weekly" }
+        default { "Unknown" }
+      }
+
+      $ruleResults += [PSCustomObject][ordered]@{
+        SiteTitle  = $SiteTitle
+        SiteUrl    = $SiteUrl
+        RuleTitle  = $rule.Title
+        RuleId     = $rule.ID
+        TargetPath = $targetPath
+        Frequency  = $frequency
+        RuleType   = $rule.AlertTemplateName
+        UserName   = $rule.User.Title
+        UserEmail  = $rule.User.Email
+      }
+    }
+
+    return $ruleResults
+  }
+
+  function Get-DeprecatedRulesRecursively {
+    param(
+      [string]$SiteUrl,
+      [string]$SiteTitle
+    )
+
+    $results = @()
+
+    try {
+      # Get deprecated rules from specific site
+      $rules = m365 spo web rule list --webUrl $SiteUrl --output json --query "[?!(Properties[].Key && contains(Properties[].Key, 'ruletitle'))]" | ConvertFrom-Json
+
+      if ($rules.Count -gt 0) {
+        Write-Host "`tFound $($rules.Count) rule(s)" -ForegroundColor Yellow
+        $results += Convert-RulesToResults -Rules $rules -SiteTitle $SiteTitle -SiteUrl $SiteUrl
+      }
+      else {
+        Write-Host "`tNo rules found" -ForegroundColor Green
+      }
+
+      $webs = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
+      foreach ($web in $webs) {
+        Write-Host "`tScanning subsite '$($web.Url)'..." -ForegroundColor Gray
+        $results += Get-DeprecatedRulesRecursively -SiteUrl $web.Url -SiteTitle $web.Title
+      }
+    }
+    catch {
+      Write-Host "`tError: $($_.Exception.Message)" -ForegroundColor Red
+    }
+
+    return $results
+  }
+
+  try {
+    m365 login --ensure
+
+    $results = @()
+    Write-Host "Retrieving all sites..."
+    $sites = m365 spo site list --output json --query "[?ArchiveStatus == 'NotArchived']" | ConvertFrom-Json
+    $count = $sites.Count
+    $iCnt = 0
+
+    Write-Host "Processing $count sites..."
+
+    foreach ($site in $sites) {
+      $iCnt++
+      Write-Host "($iCnt/$count) Scanning '$($site.Url)'..."
+      $results += Get-DeprecatedRulesRecursively -SiteUrl $site.Url -SiteTitle $site.Title
+    }
+
+    if ($results.Count -gt 0) {
+      $location = Get-Location
+      Write-Host ("`nExporting {0} rules to '{1}\{2}'..." -f $results.Count, $location.Path, $fileExportPath)
+      $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
+      Write-Host "Report saved successfully!"
+    }
+    else {
+      Write-Host "`nNo legacy rules found across the tenant."
+    }
+  }
+  catch {
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+  }
+
+  Write-Host "`nCompleted." -ForegroundColor Green
+  ```
+
+  </TabItem>
+</Tabs>
