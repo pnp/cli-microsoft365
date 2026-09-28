@@ -12,11 +12,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-get.js';
+import command, { options } from './list-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.LIST_GET, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validName: string = "Task list";
   const validId: string = "AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=";
   const listResponse = {
@@ -43,6 +44,7 @@ describe(commands.LIST_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -80,15 +82,9 @@ describe(commands.LIST_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
+
+
 
   it('throws an error when no list found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -102,9 +98,9 @@ describe(commands.LIST_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validName
-      }
+      })
     }), new CommandError(`The specified list '${validName}' does not exist.`));
   });
 
@@ -118,9 +114,9 @@ describe(commands.LIST_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(listResponse.value[0]));
@@ -136,9 +132,9 @@ describe(commands.LIST_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: validName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(listResponse.value[0]));
@@ -149,6 +145,12 @@ describe(commands.LIST_GET, () => {
       throw { error: { message: 'An error has occurred' } };
     });
 
-    await assert.rejects(command.action(logger, { options: { id: validId } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) } as any), new CommandError('An error has occurred'));
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
 });

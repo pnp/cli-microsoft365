@@ -1,18 +1,22 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 import { ToDoList } from '../../ToDoList.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional().alias('i'),
+  name: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
 }
 
 class TodoListGetCommand extends GraphDelegatedCommand {
@@ -24,36 +28,15 @@ class TodoListGetCommand extends GraphDelegatedCommand {
     return 'Gets a specific list of Microsoft To Do task lists';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema.refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+      message: `Specify either 'id' or 'name', but not both.`,
+      params: { customCode: 'optionSet', options: ['id', 'name'] }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
