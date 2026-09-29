@@ -412,7 +412,8 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelName: "Other Private Channel"
+        channelName: "Other Private Channel",
+        userDisplayNames: "Admin"
       })
     }), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
   });
@@ -441,7 +442,8 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelName: "Other Channel"
+        channelName: "Other Channel",
+        userDisplayNames: "Admin"
       })
     }), new CommandError('The specified channel is not a private channel'));
   });
@@ -463,7 +465,8 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         teamName: 'Team Name',
-        channelName: "Other Channel"
+        channelName: "Other Channel",
+        userDisplayNames: "Admin"
       })
     }), new CommandError("The specified team 'Team Name' does not exist."));
   });

@@ -235,8 +235,7 @@ describe(commands.CHANNEL_SET, () => {
         id: id,
         teamName: teamName,
         newName: newName,
-        description: description,
-        force: true
+        description: description
       })
     }), new CommandError(errorMessage));
   });

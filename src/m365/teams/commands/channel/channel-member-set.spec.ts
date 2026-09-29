@@ -676,7 +676,10 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
-        teamId: '00000000-0000-0000-0000-000000000000'
+        teamName: 'Team Name',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        role: 'owner'
       })
     }), new CommandError('An error has occurred'));
   });

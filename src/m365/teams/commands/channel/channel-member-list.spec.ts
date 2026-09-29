@@ -181,7 +181,8 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         debug: true,
-        teamName: 'Team Name'
+        teamName: 'Team Name',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       })
     }), new CommandError("The specified team 'Team Name' does not exist."));
   });
@@ -296,7 +297,8 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
-        teamId: '00000000-0000-0000-0000-000000000000'
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       })
     }), new CommandError('An error has occurred'));
   });
