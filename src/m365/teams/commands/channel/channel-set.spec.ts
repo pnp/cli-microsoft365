@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-set.js';
+import command, { options } from './channel-set.js';
 
 describe(commands.CHANNEL_SET, () => {
   const id = '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype';
@@ -25,6 +25,7 @@ describe(commands.CHANNEL_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +34,7 @@ describe(commands.CHANNEL_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,52 +73,53 @@ describe(commands.CHANNEL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly validates the arguments', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        name: name,
-        newName: newName,
-        description: description
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('correctly validates the arguments', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      name: name,
+      newName: newName,
+      description: description
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        name: name,
-        newName: newName,
-        description: description
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      name: name,
+      newName: newName,
+      description: description
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        id: 'invalid',
-        newName: newName,
-        description: description
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      id: 'invalid',
+      newName: newName,
+      description: description
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when name is General', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        name: 'General',
-        newName: newName,
-        description: description
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when name is General', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      name: 'General',
+      newName: newName,
+      description: description
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails to patch channel when channel does not exists', async () => {
@@ -130,13 +133,13 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: teamId,
         name: name,
         newName: newName,
         description: description
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -168,12 +171,12 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         name: name,
         newName: newName,
         description: description
-      }
+      })
     });
   });
 
@@ -204,12 +207,12 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: teamName,
         id: id,
         newName: newName,
         description: description
-      }
+      })
     });
   });
 
@@ -228,13 +231,13 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         teamName: teamName,
         newName: newName,
         description: description,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

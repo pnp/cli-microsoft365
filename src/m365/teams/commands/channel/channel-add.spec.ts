@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './channel-add.js';
 import { teams } from '../../../../utils/teams.js';
 
 describe(commands.CHANNEL_ADD, () => {
@@ -20,6 +19,7 @@ describe(commands.CHANNEL_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +28,7 @@ describe(commands.CHANNEL_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,145 +71,116 @@ describe(commands.CHANNEL_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both teamId and teamName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both teamId and teamName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      teamName: 'Team Name',
+      name: 'Architecture Discussion',
+      description: 'Architecture'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        teamName: 'Team Name',
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both channelId and channelName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both channelId and channelName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Architecture Discussion',
+      description: 'Architecture'
     });
-
-    const actual = await command.validate({
-      options: {
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid GUID',
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid GUID',
+      name: 'Architecture Discussion',
+      description: 'Architecture'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if unkown type is specified.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion',
-        type: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if unkown type is specified.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion',
+      type: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if owner is not specified when creating private channel.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion',
-        type: 'private'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if owner is not specified when creating private channel.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion',
+      type: 'private'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if owner is specified when not creating private channel.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion',
-        owner: 'John.Doe@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if owner is specified when not creating private channel.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion',
+      owner: 'John.Doe@contoso.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if owner is not specified when creating shared channel.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion',
-        type: 'shared'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if owner is not specified when creating shared channel.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion',
+      type: 'shared'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if owner is specified when not creating a private or shared channel.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion',
-        owner: 'John.Doe@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if owner is specified when not creating a private or shared channel.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion',
+      owner: 'John.Doe@contoso.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct general channel input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture',
-        description: 'Architecture meeting'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct general channel input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture',
+      description: 'Architecture meeting'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct private channel input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture',
-        description: 'Architecture meeting',
-        type: 'private',
-        owner: 'john.doe@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct private channel input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture',
+      description: 'Architecture meeting',
+      type: 'private',
+      owner: 'john.doe@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct shared channel input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture',
-        description: 'Architecture meeting',
-        type: 'shared',
-        owner: 'john.doe@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct shared channel input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture',
+      description: 'Architecture meeting',
+      type: 'shared',
+      owner: 'john.doe@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'test',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails to get team when team does not exists', async () => {
@@ -221,12 +193,12 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamName: 'Team Name',
         name: 'Architecture Discussion',
         description: 'Architecture'
-      }
+      })
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
@@ -243,12 +215,12 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         description: 'Architecture'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -272,10 +244,10 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -299,12 +271,12 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'private',
         owner: 'john.doe@contoso.com'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -328,12 +300,12 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'shared',
         owner: 'john.doe@contoso.com'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({
@@ -365,11 +337,11 @@ describe(commands.CHANNEL_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         teamName: 'Team Name',
         name: 'Architecture Discussion'
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -394,10 +366,10 @@ describe(commands.CHANNEL_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

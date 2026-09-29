@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-member-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './channel-member-set.js';
 
 describe(commands.CHANNEL_MEMBER_SET, () => {
   const memberResponse = {
@@ -36,6 +35,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -44,6 +44,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,270 +85,177 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if required options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if required options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both teamId and teamName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both teamId and teamName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      teamName: 'Team Name',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        teamName: 'Team Name',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both channelId and channelName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both channelId and channelName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both channelId and channelName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        channelName: 'Channel Name',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if channelId is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: 'Invalid',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if userName, userId or id options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both channelId and channelName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      channelName: 'Channel Name',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userName and userId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if channelId is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: 'Invalid',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'Demo.User@contoso.onmicrosoft.com',
-        userId: '00000000-0000-0000-0000-000000000000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userName and id options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if userName, userId or id options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'Demo.User@contoso.onmicrosoft.com',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userId and id options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both userName and userId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'Demo.User@contoso.onmicrosoft.com',
+      userId: '00000000-0000-0000-0000-000000000000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userId: '00000000-0000-0000-0000-000000000000',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName, userId and id options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both userName and id options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'Demo.User@contoso.onmicrosoft.com',
+      id: '00000',
+      role: 'owner'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'Demo.User@contoso.onmicrosoft.com',
-        userId: '00000000-0000-0000-0000-000000000000',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userId: '00000000-0000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both userId and id options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userId: '00000000-0000-0000-0000-000000000000',
+      id: '00000',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName, userId and id options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'Demo.User@contoso.onmicrosoft.com',
+      userId: '00000000-0000-0000-0000-000000000000',
+      id: '00000',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid groupId, channelId, Id and Owner role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the userId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userId: '00000000-0000',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid groupId, channelId, Id and Member role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'member'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when invalid role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid groupId, channelId, Id and Owner role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid groupId, channelId, Id and Member role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'member'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails when team name does not exist', async () => {
@@ -360,13 +268,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
-      }
-    } as any), new CommandError("The specified team 'Team Name' does not exist."));
+      })
+    }), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('correctly get teams id by team name', async () => {
@@ -387,12 +295,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(memberResponse));
   });
@@ -409,13 +317,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+      })
+    }), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
   it('fails to get channel when channel does is not private', async () => {
@@ -436,13 +344,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Other Channel',
         id: '00000',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified channel is not a private channel'));
+      })
+    }), new CommandError('The specified channel is not a private channel'));
   });
 
   it('correctly get channel id by channel name', async () => {
@@ -470,12 +378,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
         role: 'owner'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(memberResponse));
   });
@@ -499,13 +407,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return userId', async () => {
@@ -526,13 +434,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not exist by userName', async () => {
@@ -554,13 +462,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return email', async () => {
@@ -581,18 +489,18 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
+      if (settingName === 'prompt') {
         return false;
       }
 
@@ -622,13 +530,13 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
-      }
-    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
+      })
+    }), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
   });
 
   it('handles selecting single result when multiple members with the specified username found and cli is set to prompt', async () => {
@@ -670,12 +578,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(memberResponse));
   });
@@ -706,12 +614,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(memberResponse));
   });
@@ -742,12 +650,12 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(memberResponse));
   });
@@ -767,9 +675,9 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

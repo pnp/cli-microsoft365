@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-member-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './channel-member-add.js';
 
 describe(commands.CHANNEL_MEMBER_ADD, () => {
   //#region Mocked Responses 
@@ -139,6 +138,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -147,6 +147,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -220,161 +221,152 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "fce9e580-8bba-",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "fce9e580-8bba-",
+      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect channelId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '586a8b9e36c4479bbbd378e439a96df2@thread.skype',
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '586a8b9e36c4479bbbd378e439a96df2@thread.skype',
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect channelId missing trailing @thread.skype.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:586a8b9e36c4479bbbd378e439a96df2',
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing trailing @thread.skype.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:586a8b9e36c4479bbbd378e439a96df2',
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct teamId, channelId, and userIds input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamId, channelId, and userIds input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct teamId, channelName, and userIds input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelName: "Private Channel",
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamId, channelName, and userIds input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+      channelName: "Private Channel",
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct teamName, channelName, and userIds input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamName, channelName, and userIds input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamName: "Human Resources",
+      channelName: "Private Channel",
+      userIds: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct teamId, channelId, and userDisplayNames input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userDisplayNames: "admin.contoso.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamId, channelId, and userDisplayNames input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+      userDisplayNames: "admin.contoso.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct teamId, channelName, and userDisplayNames input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelName: "Private Channel",
-        userDisplayNames: "admin.contoso.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamId, channelName, and userDisplayNames input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+      channelName: "Private Channel",
+      userDisplayNames: "admin.contoso.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct teamName, channelName, and userDisplayNames input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        userDisplayNames: "admin.contoso.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct teamName, channelName, and userDisplayNames input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamName: "Human Resources",
+      channelName: "Private Channel",
+      userDisplayNames: "admin.contoso.com"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:586a8b9e36c4479bbbd378e439a96df2@thread.skype',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds conversation members using teamName, channelId, and userIds', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: "Human Resources",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userIds: "admin@contoso.com",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('adds conversation members using teamId, channelName, and userIds', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Private Channel",
         userIds: "admin@contoso.com",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('adds conversation members using teamName, channelName, and userIds', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: "Human Resources",
         channelName: "Private Channel",
         userIds: "admin@contoso.com",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('adds conversation members using teamName, channelId, and userDisplayNames', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: "Human Resources",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayNames: "Admin",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('adds conversation members using teamId, channelName, and userDisplayNames', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Private Channel",
         userDisplayNames: "Admin",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -390,11 +382,11 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: "Human Resources",
         channelName: "Private Channel",
         userDisplayNames: "Admin"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -418,11 +410,11 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Other Private Channel"
-      }
-    } as any), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
+      })
+    }), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
   });
 
   it('fails to get channel when channel does is not private', async () => {
@@ -447,11 +439,11 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Other Channel"
-      }
-    } as any), new CommandError('The specified channel is not a private channel'));
+      })
+    }), new CommandError('The specified channel is not a private channel'));
   });
 
   it('fails when team name does not exist', async () => {
@@ -469,16 +461,16 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name',
         channelName: "Other Channel"
-      }
-    } as any), new CommandError("The specified team 'Team Name' does not exist."));
+      })
+    }), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('fails adding conversation members with multiple userDisplayNames', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
+      if (settingName === 'prompt') {
         return false;
       }
 
@@ -499,12 +491,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayNames: "Admin"
-      }
-    } as any), new CommandError("Multiple users with display name 'Admin' found. Found: 4cb2b035-ad76-406c-bdc4-6c72ad403a22, 662c9a98-1e96-44d2-b5ef-4933004200f8."));
+      })
+    }), new CommandError("Multiple users with display name 'Admin' found. Found: 4cb2b035-ad76-406c-bdc4-6c72ad403a22, 662c9a98-1e96-44d2-b5ef-4933004200f8."));
   });
 
   it('handles selecting single result when multiple userDisplayNames with the specified name found and cli is set to prompt', async () => {
@@ -524,12 +516,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleUserResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayNames: "Admin",
         owner: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -549,12 +541,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayNames: "Admin"
-      }
-    } as any), new CommandError("The specified user 'Admin' does not exist"));
+      })
+    }), new CommandError("The specified user 'Admin' does not exist"));
   });
 
   it('correctly handles error when adding conversation members', async () => {
@@ -573,11 +565,11 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         userDisplayNames: "Admin"
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });
