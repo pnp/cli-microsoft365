@@ -1,16 +1,22 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  chatId: z.string().refine(val => validation.isValidTeamsChatId(val), {
+    message: 'The value of the option chatId must be a valid Teams ChatId.'
+  }).alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  chatId: string;
 }
 
 class TeamsChatMemberListCommand extends GraphCommand {
@@ -26,31 +32,8 @@ class TeamsChatMemberListCommand extends GraphCommand {
     return ['userId', 'displayName', 'email'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --chatId <chatId>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid Teams ChatId`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
