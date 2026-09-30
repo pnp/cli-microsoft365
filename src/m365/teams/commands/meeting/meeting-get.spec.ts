@@ -14,7 +14,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './meeting-get.js';
+import command, { options } from './meeting-get.js';
 
 describe(commands.MEETING_GET, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
@@ -106,10 +106,13 @@ describe(commands.MEETING_GET, () => {
     ]
   };
 
+  const validOptions = { joinUrl: joinUrl };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -122,6 +125,7 @@ describe(commands.MEETING_GET, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -163,24 +167,84 @@ describe(commands.MEETING_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when the userId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: 'foo',
-        joinUrl: joinUrl
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('preserves option aliases, types and requirements in command metadata', () => {
+    const actual = commandInfo.options
+      .filter(option => !['debug', 'verbose', 'output', 'query'].includes(option.name))
+      .map(option => ({ name: option.name, short: option.short, type: option.type, required: option.required }));
+    assert.deepStrictEqual(actual, [
+      { name: 'userId', short: 'u', type: 'string', required: false },
+      { name: 'userName', short: 'n', type: 'string', required: false },
+      { name: 'email', short: undefined, type: 'string', required: false },
+      { name: 'joinUrl', short: 'j', type: 'string', required: true }
+    ]);
   });
 
-  it('passes validation if required options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: userId,
-        joinUrl: joinUrl
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ ...validOptions, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation without a user selector', () => {
+    const actual = commandOptionsSchema.safeParse(validOptions);
+    assert.strictEqual(actual.success, true);
+  });
+
+  for (const [selector, value, token] of [
+    ['userId', userId, '@meid'],
+    ['userName', userName, '@meusername'],
+    ['email', userName, '@meusername']
+  ]) {
+    it(`passes validation with a valid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: value });
+      assert.strictEqual(actual.success, true);
+    });
+
+    it(`passes validation with the runtime token for ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: token });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const selector of ['userName', 'email']) {
+    it(`preserves acceptance of unvalidated ${selector} values`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: 'invalid' });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const selectors of [
+    { userId: userId, userName: userName },
+    { userId: userId, email: userName },
+    { userName: userName, email: userName },
+    { userId: userId, userName: userName, email: userName }
+  ]) {
+    it(`preserves acceptance of multiple selectors: ${Object.keys(selectors).join(', ')}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, ...selectors });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const requiredOption of Object.keys(validOptions)) {
+    it(`fails validation without required option ${requiredOption}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [requiredOption]: undefined });
+      assert.strictEqual(actual.success, false);
+    });
+  }
+
+  it('fails validation when the userId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: 'foo',
+      joinUrl: joinUrl
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId,
+      joinUrl: joinUrl
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves specific meeting details using userId (debug)', async () => {
@@ -194,12 +258,12 @@ describe(commands.MEETING_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         userId: userId,
         joinUrl: joinUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingResponse.value[0]));
@@ -218,11 +282,11 @@ describe(commands.MEETING_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: userName,
         joinUrl: joinUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingResponse.value[0]));
@@ -240,11 +304,11 @@ describe(commands.MEETING_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         email: email,
         joinUrl: joinUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingResponse.value[0]));
@@ -261,10 +325,10 @@ describe(commands.MEETING_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         joinUrl: joinUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingResponse.value[0]));
@@ -281,11 +345,11 @@ describe(commands.MEETING_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userId: userId,
         joinUrl: joinUrl
-      }
+      })
     }), new CommandError(`The specified meeting was not found`));
   });
 
@@ -295,10 +359,10 @@ describe(commands.MEETING_GET, () => {
     sinon.stub(request, 'get').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         joinUrl: joinUrl
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -307,10 +371,10 @@ describe(commands.MEETING_GET, () => {
     const errorMessage = `The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`;
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         joinUrl: joinUrl
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -319,11 +383,11 @@ describe(commands.MEETING_GET, () => {
     const errorMessage = `The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`;
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userId: userId,
         joinUrl: joinUrl
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });
