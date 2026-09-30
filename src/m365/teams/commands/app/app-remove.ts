@@ -1,20 +1,25 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  force?: boolean;
-  id?: string;
-  name?: string;
 }
 
 class TeamsAppRemoveCommand extends GraphCommand {
@@ -26,53 +31,19 @@ class TeamsAppRemoveCommand extends GraphCommand {
     return 'Removes a Teams app from the organization\'s app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString(),
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either id or name, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
