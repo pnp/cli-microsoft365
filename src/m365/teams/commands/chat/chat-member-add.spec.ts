@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chat-member-add.js';
+import command, { options } from './chat-member-add.js';
 
 describe(commands.CHAT_MEMBER_ADD, () => {
   const chatId = '19:09fd7575940146d383a4a83fc9598546@thread.v2';
   const userPrincipalName = 'john@contoso.com';
   const userId = 'a857e888-b602-4790-86d9-3dca2109449e';
 
+  let commandOptionsSchema: typeof options;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -30,6 +31,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -82,7 +84,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       visibleHistoryStartDateTime: undefined
     };
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId, role: 'guest', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId, role: 'guest', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -102,7 +104,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       visibleHistoryStartDateTime: undefined
     };
 
-    await command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userName: userPrincipalName, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -122,7 +124,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       visibleHistoryStartDateTime: '0001-01-01T00:00:00Z'
     };
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId, withAllHistory: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId, withAllHistory: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -142,53 +144,81 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z'
     };
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
-  it('fails validation if chatId is not valid chatId', async () => {
-    const actual = await command.validate({ options: { chatId: 'invalid', userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if chatId is not valid chatId', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: 'invalid', userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userId is not valid guid', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName is not valid UPN', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userName: userPrincipalName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if role is not a valid role', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId, role: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if role is not a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId, role: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if role is a valid role', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId, role: 'guest' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if role is a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId, role: 'guest' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the visibleHistoryStartDateTime is not a valid date', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the visibleHistoryStartDateTime is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId, visibleHistoryStartDateTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the visibleHistoryStartDateTime is a valid date', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the visibleHistoryStartDateTime is a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: chatId,
+      userId: userId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: chatId,
+      userId: userId,
+      userName: userPrincipalName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both visibleHistoryStartDateTime and withAllHistory are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: chatId,
+      userId: userId,
+      visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z',
+      withAllHistory: true
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles OData API error', async () => {
@@ -201,6 +231,6 @@ describe(commands.CHAT_MEMBER_ADD, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId }) }), new CommandError(error.error.message));
   });
 });
