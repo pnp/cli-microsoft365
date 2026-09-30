@@ -20,41 +20,67 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
 
-  const navigationNodeResponse = {
-    value: [
+  const menuStateResponse = {
+    AudienceIds: [],
+    FriendlyUrlPrefix: '',
+    IsAudienceTargetEnabledForGlobalNav: false,
+    Nodes: [
       {
-        "Id": 2003,
-        "IsDocLib": true,
-        "IsExternal": false,
-        "IsVisible": true,
-        "ListTemplateType": 0,
-        "Title": "Node 1",
-        "Url": "/sites/team-a/SitePages/page1.aspx",
-        "Children": [
+        AudienceIds: [],
+        CurrentLCID: 1033,
+        CustomProperties: [],
+        FriendlyUrlSegment: '',
+        IsDeleted: false,
+        IsHidden: false,
+        IsTitleForExistingLanguage: false,
+        Key: '2003',
+        Nodes: [
           {
-            "AudienceIds": null,
-            "CurrentLCID": 1033,
-            "Id": 2005,
-            "IsDocLib": true,
-            "IsExternal": true,
-            "IsVisible": true,
-            "ListTemplateType": 0,
-            "Title": "External site",
-            "Url": "https://externalsite.com",
-            "Children": []
+            AudienceIds: [],
+            CurrentLCID: 1033,
+            CustomProperties: [],
+            FriendlyUrlSegment: '',
+            IsDeleted: false,
+            IsHidden: false,
+            IsTitleForExistingLanguage: false,
+            Key: '2005',
+            Nodes: [],
+            NodeType: 0,
+            OpenInNewWindow: true,
+            SimpleUrl: 'https://externalsite.com',
+            Title: 'External site',
+            Translations: []
           }
-        ]
+        ],
+        NodeType: 0,
+        OpenInNewWindow: null,
+        SimpleUrl: '/sites/team-a/SitePages/page1.aspx',
+        Title: 'Node 1',
+        Translations: []
       },
       {
-        "Id": 2004,
-        "IsDocLib": true,
-        "IsExternal": false,
-        "IsVisible": true,
-        "ListTemplateType": 0,
-        "Title": "Node 2",
-        "Url": "/sites/team-a/SitePages/page2.aspx"
+        AudienceIds: [],
+        CurrentLCID: 1033,
+        CustomProperties: [],
+        FriendlyUrlSegment: '',
+        IsDeleted: false,
+        IsHidden: false,
+        IsTitleForExistingLanguage: false,
+        Key: '2004',
+        Nodes: [],
+        NodeType: 0,
+        OpenInNewWindow: false,
+        SimpleUrl: '/sites/team-a/SitePages/page2.aspx',
+        Title: 'Node 2',
+        Translations: []
       }
-    ]
+    ],
+    SimpleUrl: '',
+    SPSitePrefix: '/sites/team-a',
+    SPWebPrefix: '/sites/team-a',
+    StartingNodeKey: '1025',
+    StartingNodeTitle: 'Quick launch',
+    Version: '2026-02-21T00:12:03.6643426Z'
   };
 
   before(() => {
@@ -86,7 +112,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.post
     ]);
   });
 
@@ -103,34 +129,40 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('has correct default properties', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Key', 'Title', 'SimpleUrl']);
+  });
+
   it('gets nodes from the top navigation', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar?$expand=Children,Children/Children,Children/Children/Children') {
-        return navigationNodeResponse;
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/navigation/MenuState' &&
+        opts.data.menuNodeKey === '1002') {
+        return menuStateResponse;
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } });
-    assert(loggerLogSpy.calledOnceWith(navigationNodeResponse.value));
+    assert(loggerLogSpy.calledOnceWith(menuStateResponse.Nodes));
   });
 
   it('gets nodes from the quick launch', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/quicklaunch?$expand=Children,Children/Children,Children/Children/Children') {
-        return navigationNodeResponse;
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/navigation/MenuState' &&
+        opts.data.menuNodeKey === null) {
+        return menuStateResponse;
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' } });
-    assert(loggerLogSpy.calledOnceWith(navigationNodeResponse.value));
+    assert(loggerLogSpy.calledOnceWith(menuStateResponse.Nodes));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').rejects({
+    sinon.stub(request, 'post').rejects({
       error: {
         code: "-2147024891, System.UnauthorizedAccessException",
         message: "Attempted to perform an unauthorized operation."
