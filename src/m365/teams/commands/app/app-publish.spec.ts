@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-publish.js';
+import command, { options } from './app-publish.js';
 
 describe(commands.APP_PUBLISH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const appResponse = {
     id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
     externalId: "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
@@ -61,6 +62,7 @@ describe(commands.APP_PUBLISH, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,7 +86,8 @@ describe(commands.APP_PUBLISH, () => {
     sinonUtil.restore([
       request.post,
       fs.readFileSync,
-      fs.existsSync
+      fs.existsSync,
+      fs.lstatSync
     ]);
   });
 
@@ -101,41 +104,29 @@ describe(commands.APP_PUBLISH, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the filePath does not exist', async () => {
+  it('fails validation if the filePath does not exist', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({
-      options: { filePath: 'invalid.zip' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: 'invalid.zip' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the filePath points to a directory', async () => {
+  it('fails validation if the filePath points to a directory', () => {
     const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
 
-    const actual = await command.validate({
-      options: { filePath: './' }
-    }, commandInfo);
-    sinonUtil.restore([
-      fs.lstatSync
-    ]);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ filePath: './' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('validates for a correct input.', async () => {
+  it('validates for a correct input.', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    const actual = await command.validate({
-      options: {
-        filePath: 'teamsapp.zip'
-      }
-    }, commandInfo);
-    sinonUtil.restore([
-      fs.lstatSync
-    ]);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      filePath: 'teamsapp.zip'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds new Teams app to the tenant app catalog', async () => {
@@ -148,8 +139,10 @@ describe(commands.APP_PUBLISH, () => {
     });
 
     sinon.stub(fs, 'readFileSync').returns('123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await command.action(logger, { options: { filePath: 'teamsapp.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ filePath: 'teamsapp.zip' }) });
     assert(loggerLogSpy.calledWith(appResponse));
   });
 
@@ -163,8 +156,10 @@ describe(commands.APP_PUBLISH, () => {
     });
 
     sinon.stub(fs, 'readFileSync').returns('123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, filePath: 'teamsapp.zip' }) });
     assert(loggerLogSpy.calledWith(appResponse));
   });
 
@@ -183,7 +178,17 @@ describe(commands.APP_PUBLISH, () => {
 
 
     sinon.stub(fs, 'readFileSync').returns('123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await assert.rejects(command.action(logger, { options: { filePath: 'teamsapp.zip' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ filePath: 'teamsapp.zip' }) } as any), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      filePath: 'teamsapp.zip',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

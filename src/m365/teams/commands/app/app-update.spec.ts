@@ -12,13 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-update.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-update.js';
 
 describe(commands.APP_UPDATE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const fsStats: fs.Stats = {
     isDirectory: () => false,
@@ -55,6 +55,7 @@ describe(commands.APP_UPDATE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -79,6 +80,7 @@ describe(commands.APP_UPDATE, () => {
       request.put,
       fs.readFileSync,
       fs.existsSync,
+      fs.lstatSync,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
@@ -97,91 +99,60 @@ describe(commands.APP_UPDATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and name options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both id and name options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+      name: 'Test app',
+      filePath: 'teamsapp.zip'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
-        name: 'Test app',
-        filePath: 'teamsapp.zip'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and name options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both id and name options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      filePath: 'teamsapp.zip'
     });
-
-    const actual = await command.validate({
-      options: {
-        filePath: 'teamsapp.zip'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not a valid GUID.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid',
-        filePath: 'teamsapp.zip'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid',
+      filePath: 'teamsapp.zip'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the filePath does not exist', async () => {
+  it('fails validation if the filePath does not exist', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({
-      options: { id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: 'invalid.zip' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: 'invalid.zip' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the filePath points to a directory', async () => {
+  it('fails validation if the filePath points to a directory', () => {
     const stats = { ...fsStats, isDirectory: () => true };
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(stats);
 
-    const actual = await command.validate({
-      options: { id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: './' }
-    }, commandInfo);
-    sinonUtil.restore([
-      fs.lstatSync
-    ]);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: './' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('validates for a correct input.', async () => {
+  it('validates for a correct input.', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    const actual = await command.validate({
-      options: {
-        id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
-        filePath: 'teamsapp.zip'
-      }
-    }, commandInfo);
-    sinonUtil.restore([
-      fs.lstatSync
-    ]);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+      filePath: 'teamsapp.zip'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails to get Teams app when app does not exists', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
         return { value: [] };
@@ -190,22 +161,24 @@ describe(commands.APP_UPDATE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Test app',
         filePath: 'teamsapp.zip'
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
+      })
+    }), new CommandError('The specified Teams app does not exist'));
   });
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
+      if (settingName === 'prompt') {
         return false;
       }
 
       return defaultValue;
     });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
@@ -226,12 +199,12 @@ describe(commands.APP_UPDATE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Test app',
         filePath: 'teamsapp.zip'
-      }
-    } as any), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
+      })
+    }), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
   });
 
   it('handles selecting single result when multiple Teams apps found with the specified name', async () => {
@@ -266,8 +239,10 @@ describe(commands.APP_UPDATE, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await command.action(logger, { options: { filePath: 'teamsapp.zip', name: 'Test app' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ filePath: 'teamsapp.zip', name: 'Test app' }) });
     assert(updateTeamsAppCalled);
   });
 
@@ -283,8 +258,10 @@ describe(commands.APP_UPDATE, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await command.action(logger, { options: { filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` }) });
     assert(updateTeamsAppCalled);
   });
 
@@ -301,8 +278,10 @@ describe(commands.APP_UPDATE, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` }) });
     assert(updateTeamsAppCalled);
   });
 
@@ -333,13 +312,15 @@ describe(commands.APP_UPDATE, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         filePath: 'teamsapp.zip',
         name: 'Test app'
-      }
+      })
     });
     assert(updateTeamsAppCalled);
   });
@@ -359,7 +340,18 @@ describe(commands.APP_UPDATE, () => {
     sinon.stub(request, 'put').rejects(error);
 
     sinon.stub(fs, 'readFileSync').returns('123');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
 
-    await assert.rejects(command.action(logger, { options: { filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` }) }), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+      filePath: 'teamsapp.zip',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

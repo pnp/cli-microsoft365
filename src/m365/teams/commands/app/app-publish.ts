@@ -1,17 +1,33 @@
 import fs from 'fs';
 import path from 'path';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  filePath: z.string()
+    .refine(val => {
+      const fullPath = path.resolve(val);
+      if (!fs.existsSync(fullPath)) {
+        return false;
+      }
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        return false;
+      }
+      return true;
+    }, {
+      message: 'Specified file does not exist or points to a directory.'
+    })
+    .alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  filePath: string;
 }
 
 class TeamsAppPublishCommand extends GraphCommand {
@@ -23,37 +39,8 @@ class TeamsAppPublishCommand extends GraphCommand {
     return 'Publishes Teams app to the organization\'s app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-p, --filePath <filePath>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const fullPath: string = path.resolve(args.options.filePath);
-
-        if (!fs.existsSync(fullPath)) {
-          return `File '${fullPath}' not found`;
-        }
-
-        if (fs.lstatSync(fullPath).isDirectory()) {
-          return `Path '${fullPath}' points to a directory`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
