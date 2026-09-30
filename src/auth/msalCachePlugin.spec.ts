@@ -39,6 +39,7 @@ describe('msalCachePlugin', () => {
       assert.strictEqual(typeof result.PersistenceCachePlugin, 'function');
     }
     catch (err) {
+      assert.strictEqual(process.platform, 'linux');
       assert.match((err as Error).message, /keytar|libsecret-1\.so\.0/i);
     }
   });
