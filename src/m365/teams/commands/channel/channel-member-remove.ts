@@ -1,32 +1,54 @@
 import { Channel, ConversationMember } from '@microsoft/microsoft-graph-types';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional(),
+  teamName: z.string()
+    .optional(),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams channel id.'
+    })
+    .optional(),
+  channelName: z.string()
+    .optional(),
+  userName: z.string()
+    .optional(),
+  userId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional(),
+  id: z.string()
+    .optional(),
+  force: z.boolean()
+    .optional()
+    .alias('f')
+});
 
 interface ExtendedConversationMember extends ConversationMember {
   userId?: string;
   email?: string;
 }
 
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  channelId?: string;
-  channelName?: string;
-  userName?: string;
-  userId?: string;
-  id?: string;
-  force?: boolean;
 }
 
 class TeamsChannelMemberRemoveCommand extends GraphCommand {
@@ -41,85 +63,33 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     return 'Removes the specified member from the specified Microsoft Teams private or shared team channel';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
+      })
+      .refine(opts => [opts.channelId, opts.channelName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either channelId or channelName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['channelId', 'channelName']
+        }
+      })
+      .refine(opts => [opts.userId, opts.userName, opts.id].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either userId, userName, or id, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'id']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-          return `${args.options.channelId} is not a valid Teams Channel ID`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['teamId', 'teamName'] },
-      { options: ['channelId', 'channelName'] },
-      { options: ['userId', 'userName', 'id'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
