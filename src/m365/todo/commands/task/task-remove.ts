@@ -1,20 +1,24 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  listName: z.string().optional(),
+  listId: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  listName?: string;
-  listId?: string;
-  force?: boolean;
 }
 
 class TodoTaskRemoveCommand extends GraphDelegatedCommand {
@@ -26,43 +30,15 @@ class TodoTaskRemoveCommand extends GraphDelegatedCommand {
     return 'Removes the specified Microsoft To Do task';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listName: typeof args.options.listName !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        force: typeof args.options.force !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema.refine(opts => [opts.listId, opts.listName].filter(x => x !== undefined).length === 1, {
+      message: `Specify either 'listId' or 'listName', but not both.`,
+      params: { customCode: 'optionSet', options: ['listId', 'listName'] }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listName', 'listId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -78,7 +54,7 @@ class TodoTaskRemoveCommand extends GraphDelegatedCommand {
     }
   }
 
-  private async getToDoListId(options: GlobalOptions): Promise<string | undefined> {
+  private async getToDoListId(options: Options): Promise<string | undefined> {
     if (options.listName) {
       // Search list by its name
       const requestOptions: CliRequestOptions = {
@@ -96,7 +72,7 @@ class TodoTaskRemoveCommand extends GraphDelegatedCommand {
     return options.listId as string;
   }
 
-  private async removeToDoTask(options: GlobalOptions): Promise<void> {
+  private async removeToDoTask(options: Options): Promise<void> {
     try {
       const toDoListId: string | undefined = await this.getToDoListId(options);
 

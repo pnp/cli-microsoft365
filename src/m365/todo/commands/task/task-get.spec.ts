@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './task-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.TASK_GET, () => {
@@ -20,6 +19,7 @@ describe(commands.TASK_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const taskResponse = {
     "importance": "normal",
     "isReminderOn": false,
@@ -49,6 +49,7 @@ describe(commands.TASK_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -88,41 +89,9 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both listId and listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
 
-      return defaultValue;
-    });
 
-    const actual = await command.validate({
-      options: {
-        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
-        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
-        listName: 'Tasks List'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
-  it('fails validation if neither listId nor listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA='
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('fails to get To Do Task list when the specified task list does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -132,28 +101,12 @@ describe(commands.TASK_GET, () => {
       throw 'The specified task list does not exist';
     });
 
-    await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'task-id', listName: 'Tasks List' }) } as any), new CommandError('The specified task list does not exist'));
   });
 
-  it('passes validation if only listId is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
-        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA='
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 
-  it('passes validation if only listName is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
-        listName: 'Tasks List'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
+
+
 
   it('list a To Do task using listId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -165,11 +118,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
         output: 'text'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(taskResponseText));
   });
@@ -184,11 +137,11 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
         output: 'json'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(taskResponse));
   });
@@ -217,13 +170,19 @@ describe(commands.TASK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listName: 'Tasks List',
         output: 'json'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(taskResponse));
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
 });
