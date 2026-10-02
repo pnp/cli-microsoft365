@@ -1,21 +1,36 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import { teams } from '../../../../utils/teams.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => !val || validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .optional(),
+  teamName: z.string()
+    .optional(),
+  channelId: z.string()
+    .refine(val => !val || validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams ChannelId.'
+    })
+    .optional(),
+  channelName: z.string()
+    .optional(),
+  id: z.string()
+    .alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  channelId?: string;
-  channelName?: string;
-  id: string;
 }
 
 class TeamsMessageRestoreCommand extends GraphDelegatedCommand {
@@ -27,69 +42,26 @@ class TeamsMessageRestoreCommand extends GraphDelegatedCommand {
     return 'Restores a deleted message from a channel in a Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
+      })
+      .refine(opts => [opts.channelId, opts.channelName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either channelId or channelName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['channelId', 'channelName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '-i, --id <id>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `'${args.options.teamId}' is not a valid GUID for 'teamId'.`;
-        }
-
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-          return `'${args.options.channelId}' is not a valid ID for 'channelId'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['teamId', 'teamName'] }, { options: ['channelId', 'channelName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('teamId', 'teamName', 'channelId', 'channelName', 'id');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
