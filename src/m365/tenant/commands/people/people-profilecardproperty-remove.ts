@@ -1,18 +1,22 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { profileCardPropertyNames } from './profileCardProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  force?: boolean;
 }
 
 class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
@@ -24,44 +28,20 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
     return 'Removes an additional attribute from the profile card properties';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>',
-        autocomplete: profileCardPropertyNames
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (profileCardPropertyNames.every(n => n.toLowerCase() !== args.options.name.toLowerCase())) {
-          return `${args.options.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        if (!profileCardPropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `${opts.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`
+          });
         }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

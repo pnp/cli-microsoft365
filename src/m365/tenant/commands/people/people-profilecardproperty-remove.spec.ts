@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './people-profilecardproperty-remove.js';
+import command, { options } from './people-profilecardproperty-remove.js';
 
 describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -63,14 +65,22 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the name is not a valid value.', async () => {
-    const actual = await command.validate({ options: { name: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is not a valid value.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the name is set to userPrincipalName.', async () => {
-    const actual = await command.validate({ options: { name: 'userPrincipalName' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the name is set to userPrincipalName.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'userPrincipalName' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'userPrincipalName',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly removes profile card property for userPrincipalName', async () => {
@@ -82,7 +92,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'userPrincipalName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'userPrincipalName' }) });
     assert(removeStub.called);
   });
 
@@ -95,7 +105,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'userPrincipalName', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'userPrincipalName', debug: true }) });
     assert(removeStub.called);
   });
 
@@ -108,7 +118,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'fax' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'fax' }) });
     assert(removeStub.called);
   });
 
@@ -121,7 +131,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'StateOrProvince', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'StateOrProvince', force: true }) });
     assert(removeStub.called);
   });
 
@@ -134,7 +144,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { name: 'STATEORPROVINCE', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'STATEORPROVINCE', force: true }) });
     assert(deleteStub.called);
   });
 
@@ -161,9 +171,9 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'userPrincipalName'
-      }
+      })
     }), new CommandError(`Not Found`));
   });
 });

@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -8,13 +9,16 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  domainName: z.string().optional().alias('d'),
+  tenantId: z.string().optional().alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  domainName?: string;
-  tenantId?: string;
 }
 
 class TenantInfoGetCommand extends GraphCommand {
@@ -26,48 +30,30 @@ class TenantInfoGetCommand extends GraphCommand {
     return 'Gets information about any tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        domainName: typeof args.options.domainName !== 'undefined',
-        tenantId: typeof args.options.tenantId !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-d, --domainName [domainName]'
-      },
-      {
-        option: '-i, --tenantId [tenantId]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.tenantId && !validation.isValidGuid(args.options.tenantId)) {
-          return `${args.options.tenantId} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        if (opts.tenantId && !validation.isValidGuid(opts.tenantId)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `${opts.tenantId} is not a valid GUID`
+          });
         }
-
-        if (args.options.tenantId && args.options.domainName) {
-          return `Specify either domainName or tenantId but not both`;
+      })
+      .refine(
+        opts => !(opts.tenantId && opts.domainName),
+        {
+          message: 'Specify either domainName or tenantId but not both',
+          params: {
+            customCode: 'optionSet',
+            options: ['domainName', 'tenantId']
+          }
         }
-
-        return true;
-      }
-    );
+      );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
