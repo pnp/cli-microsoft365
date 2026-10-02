@@ -1,16 +1,20 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { profileCardPropertyNames, ProfileCardProperty } from './profileCardProperties.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
 }
 
 class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
@@ -22,32 +26,20 @@ class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
     return 'Retrieves information about a specific profile card property';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>',
-        autocomplete: profileCardPropertyNames
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!profileCardPropertyNames.some(p => p.toLowerCase() === args.options.name.toLowerCase())) {
-          return `'${args.options.name}' is not a valid value for option name. Allowed values are: ${profileCardPropertyNames.join(', ')}.`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        if (!profileCardPropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `'${opts.name}' is not a valid value for option name. Allowed values are: ${profileCardPropertyNames.join(', ')}.`
+          });
         }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

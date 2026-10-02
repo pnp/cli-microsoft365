@@ -1,23 +1,28 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { Localization, ProfileCardProperty, profileCardPropertyNames as allProfileCardPropertyNames } from './profileCardProperties.js';
+import { Localization, ProfileCardProperty, profileCardPropertyNames } from './profileCardProperties.js';
 import commands from '../../commands.js';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
+import { zod } from '../../../../utils/zod.js';
+
+const customAttributePropertyNames = profileCardPropertyNames.filter(p => p.toLowerCase().startsWith('customattribute'));
+
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  displayName: z.string().optional().alias('d')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  name: string;
-  displayName?: string;
-}
-
 class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
-  private readonly profileCardPropertyNames = allProfileCardPropertyNames.filter(p => p.toLowerCase().startsWith('customattribute'));
-
   public get name(): string {
     return commands.PEOPLE_PROFILECARDPROPERTY_SET;
   }
@@ -26,65 +31,35 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
     return 'Updates a custom attribute to the profile card property';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      // Add unknown options to telemetry
-      const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
-      const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
-
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        ...unknownOptionsObj
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>',
-        autocomplete: this.profileCardPropertyNames
-      },
-      {
-        option: '-d, --displayName <displayName>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!this.profileCardPropertyNames.some(p => p.toLowerCase() === args.options.name.toLowerCase())) {
-          return `'${args.options.name}' is not a valid value for option name. Allowed values are: ${this.profileCardPropertyNames.join(', ')}.`;
-        }
-
-        // Unknown options are allowed only if they start with 'displayName-'
-        const unknownOptionKeys = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
-        const invalidOptionKey = unknownOptionKeys.find(o => !o.startsWith('displayName-'));
-        if (invalidOptionKey) {
-          return `Invalid option: '${invalidOptionKey}'`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('name', 'displayName');
-  }
-
   public allowUnknownOptions(): boolean | undefined {
     return true;
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        if (!customAttributePropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `${opts.name} is not a valid value for name. Allowed values are ${customAttributePropertyNames.join(', ')}`
+          });
+        }
+      })
+      .superRefine((opts, ctx) => {
+        const knownKeys = new Set([...Object.keys(globalOptionsZod.shape), 'name', 'displayName']);
+        const unknownKeys = Object.keys(opts).filter(k => !knownKeys.has(k));
+        const wronglyFormattedOptions = unknownKeys.filter(key => !key.toLowerCase().startsWith('displayname-'));
+        if (wronglyFormattedOptions.length > 0) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Wrong option format detected for the following option(s): ${wronglyFormattedOptions.join(', ')}'. When adding localizations for customAttributes, use the format displayName-<languageTag>.`
+          });
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -94,7 +69,7 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
       }
 
       // Get the right casing for the profile card property name
-      const profileCardProperty = this.profileCardPropertyNames.find(p => p.toLowerCase() === args.options.name.toLowerCase());
+      const profileCardProperty = customAttributePropertyNames.find(p => p.toLowerCase() === args.options.name.toLowerCase());
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/admin/people/profileCardProperties/${profileCardProperty}`,
@@ -140,7 +115,7 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
    * @example Transform "--displayName-en-US 'Cost center'" to { languageTag: 'en-US', displayName: 'Cost center' }
    */
   private getLocalizations(options: Options): Localization[] {
-    const unknownOptions = optionsUtils.getUnknownOptions(options, this.options);
+    const unknownOptions = optionsUtils.getUnknownOptions(options, zod.schemaToOptions(this.schema!));
 
     const result = Object.keys(unknownOptions).map(o => ({
       languageTag: o.substring(o.indexOf('-') + 1),

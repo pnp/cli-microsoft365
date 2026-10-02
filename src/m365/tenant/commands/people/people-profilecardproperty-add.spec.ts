@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './people-profilecardproperty-add.js';
+import command, { options } from './people-profilecardproperty-add.js';
 
 describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
 
@@ -47,6 +47,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -55,6 +56,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,44 +94,48 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the name is not a valid value.', async () => {
-    const actual = await command.validate({ options: { name: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('allows unknown options', () => {
+    assert.strictEqual(command.allowUnknownOptions(), true);
   });
 
-  it('fails validation if the name is customAttribute1 and the displayName option is not used.', async () => {
-    const actual = await command.validate({ options: { name: 'customAttribute1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is not a valid value.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if a localization property has an invalid name.', async () => {
-    const actual = await command.validate({ options: { name: 'customAttribute1', displayName: 'Cost center', 'invalid-nl-NL': 'Kostenplaats' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is customAttribute1 and the displayName option is not used.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'customAttribute1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if a the localization option is used for a non-extension attribute.', async () => {
-    const actual = await command.validate({ options: { name: 'userPrincipalName', 'displayName-nl-NL': 'Kostenplaats' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if a localization property has an invalid name.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'customAttribute1', displayName: 'Cost center', 'invalid-nl-NL': 'Kostenplaats' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the displayName option is used for a non-extension attribute.', async () => {
-    const actual = await command.validate({ options: { name: 'userPrincipalName', displayName: 'Cost center' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if a the localization option is used for a non-extension attribute.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'userPrincipalName', 'displayName-nl-NL': 'Kostenplaats' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the name is set to userPrincipalName.', async () => {
-    const actual = await command.validate({ options: { name: 'userPrincipalName' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the displayName option is used for a non-extension attribute.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'userPrincipalName', displayName: 'Cost center' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the name is customAttribute1 and the displayName option is used.', async () => {
-    const actual = await command.validate({ options: { name: 'customAttribute1', displayName: 'Cost center' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the name is set to userPrincipalName.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'userPrincipalName' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if a correct localization option is used.', async () => {
-    const actual = await command.validate({ options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the name is customAttribute1 and the displayName option is used.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'customAttribute1', displayName: 'Cost center' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if a correct localization option is used.', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly adds profile card property for userPrincipalName', async () => {
@@ -141,7 +147,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'userPrincipalName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'userPrincipalName' }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -154,7 +160,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'userPrincipalName', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'userPrincipalName', debug: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -167,7 +173,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'fax' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'fax' }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -180,7 +186,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'stateOrProvince' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'stateOrProvince' }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -193,7 +199,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'alias', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'alias', output: 'json' }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -206,7 +212,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'alias', output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'alias', output: 'text' }) });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -219,7 +225,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'customAttribute1', displayName: 'Cost center' }) });
     assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyResponse));
   });
 
@@ -232,7 +238,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats' }) });
     assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyResponse));
   });
 
@@ -245,7 +251,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats', output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats', output: 'text' }) });
     assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyTextResponse));
   });
 
@@ -258,7 +264,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { name: 'ALIAS', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'ALIAS', output: 'json' }) });
     assert.strictEqual(postStub.lastCall.args[0].data.directoryPropertyName, 'Alias');
   });
 
@@ -285,9 +291,9 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'userPrincipalName'
-      }
+      })
     }), new CommandError(`Conflicts with existing entry`));
   });
 });

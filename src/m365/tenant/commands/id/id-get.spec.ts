@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,12 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './id-get.js';
+import command, { options } from './id-get.js';
 
 describe(commands.ID_GET, () => {
   let log: any[];
   let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,6 +27,8 @@ describe(commands.ID_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
@@ -64,6 +70,19 @@ describe(commands.ID_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      domainName: 'contoso.com',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('gets logged in Microsoft 365 tenant ID if no domain name is passed', async () => {
@@ -140,7 +159,7 @@ describe(commands.ID_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
     sinonUtil.restore(accessToken.getUserNameFromAccessToken);
   });
@@ -215,7 +234,7 @@ describe(commands.ID_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { domainName: 'contoso.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ domainName: 'contoso.com' }) });
     assert(loggerLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
   });
 
@@ -237,12 +256,12 @@ describe(commands.ID_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { domainName: 'xyz.com' } } as any), new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z"));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ domainName: 'xyz.com' }) }), new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z"));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { domainName: 'xyz.com' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ domainName: 'xyz.com' }) }), new CommandError('An error has occurred'));
   });
 });
