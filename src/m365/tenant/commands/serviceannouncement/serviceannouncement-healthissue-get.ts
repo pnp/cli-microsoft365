@@ -1,16 +1,20 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
 }
 
 class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
@@ -22,18 +26,8 @@ class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
     return 'Gets a specified service health issue for tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -55,4 +49,4 @@ class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
   }
 }
 
-export default new TenantServiceAnnouncementHealthIssueGetCommand(); 
+export default new TenantServiceAnnouncementHealthIssueGetCommand();

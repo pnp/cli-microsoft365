@@ -1,5 +1,7 @@
-import PeriodBasedReport from '../../../base/PeriodBasedReport.js';
+import PeriodBasedReport, { periodBasedReportOptions as options } from '../../../base/PeriodBasedReport.js';
 import commands from '../../commands.js';
+
+export { options };
 
 class TenantReportActiveUserCountsCommand extends PeriodBasedReport {
   public get name(): string {

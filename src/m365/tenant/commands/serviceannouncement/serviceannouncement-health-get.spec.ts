@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './serviceannouncement-health-get.js';
+import command, { options } from './serviceannouncement-health-get.js';
 
 describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
   const serviceHealthResponse = {
@@ -63,6 +63,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -71,6 +72,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -111,23 +113,27 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when command called', async () => {
-    const actual = await command.validate({
-      options: {
-        serviceName: "Exchange Online"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when command called', () => {
+    const actual = commandOptionsSchema.safeParse({
+      serviceName: "Exchange Online"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when command called with issues', async () => {
-    const actual = await command.validate({
-      options: {
-        serviceName: "Exchange Online",
-        issues: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when command called with issues', () => {
+    const actual = commandOptionsSchema.safeParse({
+      serviceName: "Exchange Online",
+      issues: true
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      serviceName: "Exchange Online",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly returns service health', async () => {
@@ -139,11 +145,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       throw 'Invalid request';
     });
 
-    const options: any = {
-      serviceName: "Exchange Online"
-    };
-
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ serviceName: "Exchange Online" }) });
     assert(loggerLogSpy.calledWith(serviceHealthResponse));
   });
 
@@ -157,13 +159,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       throw 'Invalid request';
     });
 
-    const options: any = {
-      serviceName: "Exchange Online",
-      issues: true,
-      output: "csv"
-    };
-
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ serviceName: "Exchange Online", issues: true, output: "csv" }) });
     assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
   });
 
@@ -176,12 +172,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       throw 'Invalid request';
     });
 
-    const options: any = {
-      serviceName: "Exchange Online",
-      issues: true
-    };
-
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ serviceName: "Exchange Online", issues: true }) });
     assert(loggerLogSpy.calledWith(serviceHealthIssueResponse));
   });
 
@@ -189,6 +180,6 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ serviceName: "Exchange Online" }) }), new CommandError('An error has occurred'));
   });
 });

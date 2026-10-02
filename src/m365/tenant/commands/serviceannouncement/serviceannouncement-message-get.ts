@@ -1,15 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(val => (/MC\d{6}/).test(val), {
+      message: 'The value is not a valid message ID'
+    })
+    .alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
 }
 
 class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
@@ -21,31 +29,8 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     return 'Retrieves a specified service update message for the tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!this.isValidId(args.options.id)) {
-          return `${args.options.id} is not a valid message ID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -68,10 +53,6 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private isValidId(id: string): boolean {
-    return (/MC\d{6}/).test(id);
   }
 }
 
