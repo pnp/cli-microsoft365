@@ -1,12 +1,17 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = globalOptionsZod.strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
 }
 
 class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
@@ -20,6 +25,10 @@ class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets details about users who have activated Microsoft 365.';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
