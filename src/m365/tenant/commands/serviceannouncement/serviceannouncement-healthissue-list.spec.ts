@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './serviceannouncement-healthissue-list.js';
+import command, { options } from './serviceannouncement-healthissue-list.js';
 
 describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = {
     "value": [
@@ -209,6 +213,8 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -251,6 +257,13 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('handles promise error while getting service health issues available in Microsoft 365', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/issues') > -1) {
@@ -271,8 +284,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
-      }
+      options: commandOptionsSchema.parse({})
     });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
@@ -286,9 +298,9 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
@@ -302,10 +314,10 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         service: 'Microsoft Forms'
-      }
-    } as any);
+      })
+    });
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftForms.value));
   });
 
@@ -318,10 +330,10 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         service: 'Microsoft Forms',
         output: 'text'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftForms.value));
   });

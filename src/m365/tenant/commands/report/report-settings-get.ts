@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+
+export const options = globalOptionsZod.strict();
 
 class TenantReportSettingsGetCommand extends GraphCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class TenantReportSettingsGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Gets the tenant-level settings for Microsoft 365 reports';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
