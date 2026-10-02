@@ -1717,9 +1717,7 @@ export const spo = {
       throw 'Either properties or contentTypeName must be provided for systemUpdateListItem.';
     }
 
-    const parsedUrl = new URL(absoluteListUrl);
-    const serverRelativeSiteMatch = absoluteListUrl.match(new RegExp('/sites/[^/]+'));
-    const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteMatch ?? ''}`;
+    const webUrl = absoluteListUrl.substring(0, absoluteListUrl.indexOf('/_api/'));
 
     if (verbose && logger) {
       await logger.logToStderr(`Getting list id...`);
