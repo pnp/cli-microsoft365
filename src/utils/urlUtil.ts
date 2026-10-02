@@ -193,8 +193,8 @@ export const urlUtil = {
   getTargetSiteAbsoluteUrl(webUrl: string, url: string): string {
     const fullUrl: string = url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
 
-    // Pattern to match SharePoint URLs
-    const urlPattern = /https:\/\/[\w-]+\.sharepoint\.com\/(teams|sites|personal)\/([\w-]+)/;
+    // Pattern to match SharePoint site collection URLs on any of the supported managed paths
+    const urlPattern = /^https:\/\/[\w-]+\.sharepoint\.com\/(teams|sites|personal)\/[^/?#]+/i;
 
     const match = fullUrl.match(urlPattern);
 
