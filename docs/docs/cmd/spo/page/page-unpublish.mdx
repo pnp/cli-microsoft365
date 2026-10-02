@@ -1,0 +1,63 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo page unpublish
+
+Unpublishes a modern page
+
+## Usage
+
+```sh
+m365 spo page unpublish [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the page is located.
+
+`-n, --name <name>`
+: Name of the page.
+```
+
+<Global />
+
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Unpublish a modern page
+
+```sh
+m365 spo page unpublish --webUrl https://contoso.sharepoint.com/sites/Marketing --name "Style guide.aspx"
+```
+
+Unpublish a modern page in a subfolder
+
+```sh
+m365 spo page unpublish --webUrl https://contoso.sharepoint.com/sites/Marketing --name "/Styles/Guide.aspx"
+```
+
+## Response
+
+The command won't return a response on success.
