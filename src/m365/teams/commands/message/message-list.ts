@@ -1,19 +1,39 @@
+import { z } from 'zod';
 import { ChatMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .alias('i'),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams ChannelId.'
+    })
+    .alias('c'),
+  since: z.string()
+    .refine(val => validation.isValidISODateDashOnly(val), {
+      message: 'The value is not a valid ISO Date (with dash separator).'
+    })
+    .refine(val => validation.isDateInRange(val, 8), {
+      message: 'The value is not in the last 8 months (for delta messages).'
+    })
+    .optional()
+    .alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId: string;
-  channelId: string;
-  since?: string;
 }
 
 class TeamsMessageListCommand extends GraphCommand {
@@ -29,58 +49,8 @@ class TeamsMessageListCommand extends GraphCommand {
     return ['id', 'summary', 'body'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        since: typeof args.options.since !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '-c, --channelId <channelId>'
-      },
-      {
-        option: '-s, --since [since]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
-        }
-
-        if (args.options.since && !validation.isValidISODateDashOnly(args.options.since as string)) {
-          return `${args.options.since} is not a valid ISO Date (with dash separator)`;
-        }
-
-        if (args.options.since && !validation.isDateInRange(args.options.since as string, 8)) {
-          return `${args.options.since} is not in the last 8 months (for delta messages)`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
