@@ -1717,7 +1717,7 @@ export const spo = {
       throw 'Either properties or contentTypeName must be provided for systemUpdateListItem.';
     }
 
-    const webUrl = urlUtil.getTargetSiteAbsoluteUrl(absoluteListUrl, absoluteListUrl);
+    const webUrl = absoluteListUrl.substring(0, absoluteListUrl.indexOf('/_api/'));
 
     if (verbose && logger) {
       await logger.logToStderr(`Getting list id...`);
