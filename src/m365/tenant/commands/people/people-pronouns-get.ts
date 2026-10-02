@@ -1,7 +1,11 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+export const options = globalOptionsZod.strict();
 
 class TenantPeoplePronounsGetCommand extends GraphCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class TenantPeoplePronounsGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves information about pronouns settings for an organization';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
