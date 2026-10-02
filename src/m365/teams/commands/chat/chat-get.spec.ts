@@ -13,10 +13,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chat-get.js';
+import command, { options } from './chat-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHAT_GET, () => {
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses  
   const findGroupChatsByMembersResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats(id,topic,createdDateTime,members,members())", "@odata.nextLink": "https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'group'&$expand=members&$select=id,topic,createdDateTime,members&$skiptoken=eyJDb250aW51YXRpb25Ub2tlbiI6Ilczc2ljM1JoY25RaU9pSXlNREl5TFRBeExUSXdWREE1T2pRME9qVXhMakl5Tnlzd01Eb3dNQ0lzSW1WdVpDSTZJakl3TWpJdE1ERXRNakJVTURrNk5EUTZOVEV1TWpJM0t6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmU3g3SW5OMFlYSjBJam9pTVRrM01DMHdNUzB3TVZRd01Eb3dNRG93TUNzd01Eb3dNQ0lzSW1WdVpDSTZJakU1TnpBdE1ERXRNREZVTURBNk1EQTZNREF1TURBeEt6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmVjA9IiwiQ2hhdFR5cGUiOiJjaGF0fG1lZXRpbmd8c2ZiaW50ZXJvcGNoYXR8cGhvbmVjaGF0In0%3d", "value": [{ "id": "19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2", "topic": "Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat", "createdDateTime": "2021-12-22T13:13:11.023Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A35bd5bc75e604da8a64e6cba7cfcf175%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjI2ExZDY1Nzk0LWMyYmUtNGEzMy04MTExLWVlY2Y2OGZlOWYzNQ==", "roles": ["Owner"], "displayName": "Alex Wilber", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "a1d65794-c2be-4a33-8111-eecf68fe9f35", "email": "AlexW@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjIzcwZTM3MDExLWY2ZjItNDAwMi04MDU2LWQ2MDg1YjQ5N2E2ZA==", "roles": ["Owner"], "displayName": "Nate Grecian", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "70e37011-f6f2-4002-8056-d6085b497a6d", "email": "NateG@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }, { "id": "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces", "topic": null, "createdDateTime": "2021-12-09T08:22:07.845Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3Ac03b5a8f9a2e42788561a89d055e6de5%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjI2FkN2MxYTU5LWM0N2ItNDdmYi1hNDgxLTM1NWI0ZmM5YzEzNA==", "roles": ["Owner"], "displayName": "Andrew Konnelli", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "ad7c1a59-c47b-47fb-a481-355b4fc9c134", "email": "AndrewK@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjIzI4YzRlMTdkLWI1NzktNGUxZS1iMDNjLWEyOTZkMTJjYmZiOQ==", "roles": ["Owner"], "displayName": "Dave Kapowski", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "28c4e17d-b579-4e1e-b03c-a296d12cbfb9", "email": "DaveK@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }, { "id": "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces", "topic": null, "createdDateTime": "2021-12-09T07:17:25.322Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A8a2a5e0f94f74346908e6a7b0023da50%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTo4YTJhNWUwZjk0Zjc0MzQ2OTA4ZTZhN2IwMDIzZGE1MEB0aHJlYWQudjIjI2FkN2MxYTU5LWM0N2ItNDdmYi1hNDgxLTM1NWI0ZmM5YzEzNA==", "roles": ["Owner"], "displayName": "Alex Wilber", "visibleHistoryStartDateTime": "2021-12-09T07:17:25.322Z", "userId": "ad7c1a59-c47b-47fb-a481-355b4fc9c134", "email": "AlexW@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTo4YTJhNWUwZjk0Zjc0MzQ2OTA4ZTZhN2IwMDIzZGE1MEB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-09T07:17:25.322Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }] };
 
@@ -52,6 +53,7 @@ describe(commands.CHAT_GET, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -119,226 +121,173 @@ describe(commands.CHAT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id and name and participants are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if id and name and participants are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        id: "8b081ef6"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for an incorrect id missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for an incorrect id missing trailing @thread.v2 or @unq.gbl.spaces', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for an invalid email address (single)', async () => {
-    const actual = await command.validate({
-      options: {
-        participants: 'alexwcontoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for invalid email addresses (multiple)', async () => {
-    const actual = await command.validate({
-      options: {
-        participants: 'alexw@contoso.com,natecontoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if id and name properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the id is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "8b081ef6"
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        name: 'test'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id and participants properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation for an incorrect id missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        participants: 'alexw@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if name and participants properties are both defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation for an incorrect id missing trailing @thread.v2 or @unq.gbl.spaces', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d'
     });
-
-    const actual = await command.validate({
-      options: {
-        name: 'test',
-        participants: 'alexw@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if all three mutually exclusive properties are defined', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation for an invalid email address (single)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      participants: 'alexwcontoso.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        name: 'test',
-        participants: 'alexw@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct id input', async () => {
-    const actual = await command.validate({
-      options: {
-        id: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation for invalid email addresses (multiple)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      participants: 'alexw@contoso.com,natecontoso.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct name input', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'test'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation for empty participants', () => {
+    const actual = commandOptionsSchema.safeParse({
+      participants: ''
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct participants input', async () => {
-    const actual = await command.validate({
-      options: {
-        participants: 'alexw@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id and name properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      name: 'test'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct participants (array) input', async () => {
-    const actual = await command.validate({
-      options: {
-        participants: 'alexw@contoso.com,nateg@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id and participants properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      participants: 'alexw@contoso.com'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if name and participants properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'test',
+      participants: 'alexw@contoso.com'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if all three mutually exclusive properties are defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      name: 'test',
+      participants: 'alexw@contoso.com'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('validates for a correct id input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct name input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'test'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct participants input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      participants: 'alexw@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct participants (array) input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      participants: 'alexw@contoso.com,nateg@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('gets chat conversation using id', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleChatResponse));
   });
 
   it('gets chat conversation using name', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Just a conversation"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });
 
   it('gets chat conversation using participants (single)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         participants: "AlexW@M365x214355.onmicrosoft.com"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleChatResponse));
   });
 
   it('gets chat conversation to existing conversation using participants (multiple)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         participants: "AndrewK@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleChatResponse));
   });
 
   it('fails retrieving chat conversation with nonexistent name', async () => {
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Nonexistent conversation name"
-      }
-    } as any), new CommandError(`No chat conversation was found with this name.`));
+      })
+    }), new CommandError(`No chat conversation was found with this name.`));
   });
 
   it('fails retrieving non-existent chat conversation by participants', async () => {
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         participants: "NestorB@M365x214355.onmicrosoft.com"
-      }
-    } as any), new CommandError(`No chat conversation was found with these participants.`));
+      })
+    }), new CommandError(`No chat conversation was found with these participants.`));
   });
 
   it('fails retrieving chat conversation with multiple found chat conversations by name', async () => {
@@ -351,19 +300,19 @@ describe(commands.CHAT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Just a conversation with same name"
-      }
-    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:28aca38f8f684a71babac6ab063b4041@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
+      })
+    }), new CommandError("Multiple chat conversations with this name found. Found: 19:28aca38f8f684a71babac6ab063b4041@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
   });
 
   it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Just a conversation with same name"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });
@@ -378,19 +327,19 @@ describe(commands.CHAT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"
-      }
-    } as any), new CommandError("Multiple chat conversations with these participants found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
+      })
+    }), new CommandError("Multiple chat conversations with these participants found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
   });
 
   it('handles selecting single result when multiple chats conversations by participants found and cli is set to prompt', async () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });

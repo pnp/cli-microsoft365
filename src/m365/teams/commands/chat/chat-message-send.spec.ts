@@ -13,10 +13,11 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chat-message-send.js';
+import command, { options } from './chat-message-send.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHAT_MESSAGE_SEND, () => {
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses  
   const findGroupChatsByMembersResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats(id,topic,createdDateTime,members,members())", "@odata.nextLink": "https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'group'&$expand=members&$select=id,topic,createdDateTime,members&$skiptoken=eyJDb250aW51YXRpb25Ub2tlbiI6Ilczc2ljM1JoY25RaU9pSXlNREl5TFRBeExUSXdWREE1T2pRME9qVXhMakl5Tnlzd01Eb3dNQ0lzSW1WdVpDSTZJakl3TWpJdE1ERXRNakJVTURrNk5EUTZOVEV1TWpJM0t6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmU3g3SW5OMFlYSjBJam9pTVRrM01DMHdNUzB3TVZRd01Eb3dNRG93TUNzd01Eb3dNQ0lzSW1WdVpDSTZJakU1TnpBdE1ERXRNREZVTURBNk1EQTZNREF1TURBeEt6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmVjA9IiwiQ2hhdFR5cGUiOiJjaGF0fG1lZXRpbmd8c2ZiaW50ZXJvcGNoYXR8cGhvbmVjaGF0In0%3d", "value": [{ "id": "19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2", "topic": "Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat", "createdDateTime": "2021-12-22T13:13:11.023Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A35bd5bc75e604da8a64e6cba7cfcf175%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjI2ExZDY1Nzk0LWMyYmUtNGEzMy04MTExLWVlY2Y2OGZlOWYzNQ==", "roles": ["Owner"], "displayName": "Alex Wilber", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "a1d65794-c2be-4a33-8111-eecf68fe9f35", "email": "AlexW@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTozNWJkNWJjNzVlNjA0ZGE4YTY0ZTZjYmE3Y2ZjZjE3NUB0aHJlYWQudjIjIzcwZTM3MDExLWY2ZjItNDAwMi04MDU2LWQ2MDg1YjQ5N2E2ZA==", "roles": ["Owner"], "displayName": "Nate Grecian", "visibleHistoryStartDateTime": "2021-12-22T13:13:11.023Z", "userId": "70e37011-f6f2-4002-8056-d6085b497a6d", "email": "NateG@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }, { "id": "19:c03b5a8f9a2e42788561a89d055e6de5@thread.v2", "topic": null, "createdDateTime": "2021-12-09T08:22:07.845Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3Ac03b5a8f9a2e42788561a89d055e6de5%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjI2FkN2MxYTU5LWM0N2ItNDdmYi1hNDgxLTM1NWI0ZmM5YzEzNA==", "roles": ["Owner"], "displayName": "Andrew Konnelli", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "ad7c1a59-c47b-47fb-a481-355b4fc9c134", "email": "AndrewK@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjIzI4YzRlMTdkLWI1NzktNGUxZS1iMDNjLWEyOTZkMTJjYmZiOQ==", "roles": ["Owner"], "displayName": "Dave Kapowski", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "28c4e17d-b579-4e1e-b03c-a296d12cbfb9", "email": "DaveK@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTpjMDNiNWE4ZjlhMmU0Mjc4ODU2MWE4OWQwNTVlNmRlNUB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-09T08:22:07.845Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }, { "id": "19:8a2a5e0f94f74346908e6a7b0023da50@thread.v2", "topic": null, "createdDateTime": "2021-12-09T07:17:25.322Z", "members@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A8a2a5e0f94f74346908e6a7b0023da50%40thread.v2')/members", "members": [{ "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTo4YTJhNWUwZjk0Zjc0MzQ2OTA4ZTZhN2IwMDIzZGE1MEB0aHJlYWQudjIjI2FkN2MxYTU5LWM0N2ItNDdmYi1hNDgxLTM1NWI0ZmM5YzEzNA==", "roles": ["Owner"], "displayName": "Andrew Konnelli", "visibleHistoryStartDateTime": "2021-12-09T07:17:25.322Z", "userId": "ad7c1a59-c47b-47fb-a481-355b4fc9c134", "email": "AndrewK@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }, { "@odata.type": "#microsoft.graph.aadUserConversationMember", "id": "MCMjMCMjZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IyMxOTo4YTJhNWUwZjk0Zjc0MzQ2OTA4ZTZhN2IwMDIzZGE1MEB0aHJlYWQudjIjIzQ4ZDMxODg3LTVmYWQtNGQ3My1hOWY1LTNjMzU2ZTY4YTAzOA==", "roles": ["Owner"], "displayName": "Megan Bowen", "visibleHistoryStartDateTime": "2021-12-09T07:17:25.322Z", "userId": "48d31887-5fad-4d73-a9f5-3c356e68a038", "email": "MeganB@M365x214355.onmicrosoft.com", "tenantId": "dcd219dd-bc68-4b9b-bf0b-4a33a796be35" }] }] };
 
@@ -48,7 +49,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     auth.connection.active = true;
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     commandInfo = cli.getCommandInfo(command);
-
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
@@ -120,198 +121,183 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if chatId and chatName and userEmails are not specified', async () => {
-    const actual = await command.validate({
-      options: {
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if chatId and chatName and userEmails are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the chatId is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: "8b081ef6",
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the chatId is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: "8b081ef6",
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for an incorrect chatId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an incorrect chatId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for an incorrect chatId missing trailing @thread.v2 or @unq.gbl.spaces', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an incorrect chatId missing trailing @thread.v2 or @unq.gbl.spaces', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for an invalid email address (single)', async () => {
-    const actual = await command.validate({
-      options: {
-        userEmails: 'alexwcontoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an invalid email address (single)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userEmails: 'alexwcontoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for invalid email addresses (multiple)', async () => {
-    const actual = await command.validate({
-      options: {
-        userEmails: 'alexw@contoso.com,natecontoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for invalid email addresses (multiple)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userEmails: 'alexw@contoso.com,natecontoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if chatId and chatName properties are both defined', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        chatName: 'test',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for empty userEmails', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userEmails: '',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if chatId and userEmails properties are both defined', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        userEmails: 'alexw@contoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if chatId and chatName properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      chatName: 'test',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if chatName and userEmails properties are both defined', async () => {
-    const actual = await command.validate({
-      options: {
-        chatName: 'test',
-        userEmails: 'alexw@contoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if chatId and userEmails properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      userEmails: 'alexw@contoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if all three mutually exclusive properties are defined', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
-        chatName: 'test',
-        userEmails: 'alexw@contoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if chatName and userEmails properties are both defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatName: 'test',
+      userEmails: 'alexw@contoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if message is not specified', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if all three mutually exclusive properties are defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
+      chatName: 'test',
+      userEmails: 'alexw@contoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if contentType is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces',
-        contentType: 'Invalid',
-        message: 'Hello World'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if message is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct chatId input', async () => {
-    const actual = await command.validate({
-      options: {
-        chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces",
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if contentType is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces',
+      contentType: 'Invalid',
+      message: 'Hello World'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct chatName input', async () => {
-    const actual = await command.validate({
-      options: {
-        chatName: 'test',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct chatId input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces",
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct userEmails input', async () => {
-    const actual = await command.validate({
-      options: {
-        userEmails: 'alexw@contoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct chatName input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatName: 'test',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct userEmails (array) input', async () => {
-    const actual = await command.validate({
-      options: {
-        userEmails: 'alexw@contoso.com,nateg@contoso.com',
-        message: "Hello World"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct userEmails input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userEmails: 'alexw@contoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('validates for a correct userEmails (array) input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userEmails: 'alexw@contoso.com,nateg@contoso.com',
+      message: "Hello World"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces",
+      message: "Hello World",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('sends chat message using chatId', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatId: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
         message: "Hello World",
         contentType: "text"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('sends chat message using chatId and contentType', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatId: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
         message: "<p>Hello World</p>",
         contentType: "html"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('sends chat message using chatName', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatName: "Just a conversation",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -330,20 +316,20 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('sends chat message to existing conversation using userEmails (multiple)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AndrewK@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -362,51 +348,51 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('fails sending message with nonexistent chatName', async () => {
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatName: "Nonexistent conversation name",
         message: "Hello World"
-      }
-    } as any), new CommandError('No chat conversation was found with this name.'));
+      })
+    }), new CommandError('No chat conversation was found with this name.'));
   });
 
   it('fails sending message with multiple found chat conversations by chatName', async () => {
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatName: "Just a conversation with same name",
         message: "Hello World"
-      }
-    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:309128478c1743b19bebd08efc390efb@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
+      })
+    }), new CommandError("Multiple chat conversations with this name found. Found: 19:309128478c1743b19bebd08efc390efb@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
   });
 
   it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleChatByNameResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatName: "Just a conversation with same name",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('fails sending message with multiple found chat conversations by userEmails', async () => {
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
-    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
+      })
+    }), new CommandError("Multiple chat conversations with this name found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
   });
 
   it('handles selecting single result when multiple chats by user email found and cli is set to prompt', async () => {
@@ -425,10 +411,10 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -455,10 +441,10 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -474,11 +460,11 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatId: '19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces',
         message: '<b>Hello World</b>',
         contentType: 'html'
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -500,10 +486,10 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         chatId: '19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces',
         message: 'Hello World'
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -526,10 +512,10 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userEmails: "AlexW@M365x214355.onmicrosoft.com",
         message: "Hello World"
-      }
-    } as any), new CommandError(`Request failed with status code 404`));
+      })
+    }), new CommandError(`Request failed with status code 404`));
   });
 });
