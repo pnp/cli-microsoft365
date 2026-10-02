@@ -32,13 +32,19 @@ async function loadAllCommands() {
     delete c.defaultProperties;
   });
   // this file is used by command completion
-  fs.writeFileSync('allCommandsFull.json', JSON.stringify(cli.commands));
+  writeFileIfChanged('allCommandsFull.json', JSON.stringify(cli.commands));
 
   cli.commands.forEach(c => {
     delete c.options;
   });
   // this file is use for regular command execution
-  fs.writeFileSync('allCommands.json', JSON.stringify(cli.commands));
+  writeFileIfChanged('allCommands.json', JSON.stringify(cli.commands));
+}
+
+function writeFileIfChanged(filePath, contents) {
+  if (!fs.existsSync(filePath) || fs.readFileSync(filePath, 'utf8') !== contents) {
+    fs.writeFileSync(filePath, contents);
+  }
 }
 
 function getCommandHelpFilePath(commandName) {
