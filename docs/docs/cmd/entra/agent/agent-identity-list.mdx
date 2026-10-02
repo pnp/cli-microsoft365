@@ -1,0 +1,207 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra agent identity list
+
+Retrieves a list of agent identities
+
+## Usage
+
+```sh
+m365 entra agent identity list [options]
+```
+
+## Options
+
+```md definition-list
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve.
+```
+
+<Global />
+
+## Remarks
+
+Using the `--properties` option, you can specify a comma-separated list of agent identity properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+
+The command returns only agent identity objects. Other types of service principals aren't returned.
+
+A principal who creates an agent identity blueprint or blueprint principal is automatically assigned as the owner. Owners can create and modify agent identities associated with a blueprint they own without being assigned an Agent ID role. For nonowners to call this API in delegated scenarios using work or school accounts, the admin must be assigned a supported Microsoft Entra role. This operation supports the least-privileged built-in role **Agent ID Administrator**. For more information, see the [Microsoft Graph API documentation](https://learn.microsoft.com/en-us/graph/api/agentidentity-list).
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions            |
+  |-----------------|------------------------|
+  | Microsoft Graph | AgentIdentity.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions            |
+  |-----------------|------------------------|
+  | Microsoft Graph | AgentIdentity.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieve all agent identities.
+
+```sh
+m365 entra agent identity list
+```
+
+Retrieve id and name of agent identities.
+
+```sh
+m365 entra agent identity list --properties 'id,displayName'
+```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "1b7313c4-05d0-4a08-88e3-7b76c003a0a2",
+      "displayName": "My Agent Identity",
+      "createdDateTime": "2019-09-17T19:10:35Z",
+      "createdByAppId": "9c1a3a7c-1234-4c1a-9d9c-2b3b3c1a4d5e",
+      "agentIdentityBlueprintId": "9c1a3a7c-1234-4c1a-9d9c-2b3b3c1a4d5e",
+      "accountEnabled": true,
+      "disabledByMicrosoftStatus": null,
+      "servicePrincipalType": "ServiceIdentity",
+      "tags": []
+    },
+    {
+      "id": "4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74",
+      "displayName": "Support Agent",
+      "createdDateTime": "2020-01-22T08:12:05Z",
+      "createdByAppId": "9c1a3a7c-1234-4c1a-9d9c-2b3b3c1a4d5e",
+      "agentIdentityBlueprintId": "9c1a3a7c-1234-4c1a-9d9c-2b3b3c1a4d5e",
+      "accountEnabled": false,
+      "disabledByMicrosoftStatus": null,
+      "servicePrincipalType": "ServiceIdentity",
+      "tags": []
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName
+  ------------------------------------  -----------------
+  1b7313c4-05d0-4a08-88e3-7b76c003a0a2  My Agent Identity
+  4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74  Support Agent
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName
+  1b7313c4-05d0-4a08-88e3-7b76c003a0a2,My Agent Identity
+  4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74,Support Agent
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra agent identity list --debug "false" --verbose "false"
+
+  Date: 3/21/2026
+
+  ## My Agent Identity (1b7313c4-05d0-4a08-88e3-7b76c003a0a2)
+
+  Property | Value
+  ---------|-------
+  id | 1b7313c4-05d0-4a08-88e3-7b76c003a0a2
+  displayName | My Agent Identity
+
+  ## Support Agent (4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74)
+
+  Property | Value
+  ---------|-------
+  id | 4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74
+  displayName | Support Agent
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `--properties "id,displayName"` response
+
+When you use the `--properties` option, the response contains only the properties you requested.
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "1b7313c4-05d0-4a08-88e3-7b76c003a0a2",
+      "displayName": "My Agent Identity"
+    },
+    {
+      "id": "4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74",
+      "displayName": "Support Agent"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName
+  ------------------------------------  -----------------
+  1b7313c4-05d0-4a08-88e3-7b76c003a0a2  My Agent Identity
+  4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74  Support Agent
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName
+  1b7313c4-05d0-4a08-88e3-7b76c003a0a2,My Agent Identity
+  4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74,Support Agent
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra agent identity list --properties "id,displayName" --debug "false" --verbose "false"
+
+  Date: 3/21/2026
+
+  ## My Agent Identity (1b7313c4-05d0-4a08-88e3-7b76c003a0a2)
+
+  Property | Value
+  ---------|-------
+  id | 1b7313c4-05d0-4a08-88e3-7b76c003a0a2
+  displayName | My Agent Identity
+
+  ## Support Agent (4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74)
+
+  Property | Value
+  ---------|-------
+  id | 4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74
+  displayName | Support Agent
+  ```
+
+  </TabItem>
+</Tabs>
