@@ -1,0 +1,423 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# v12 Upgrade Guidance
+
+This page lists every breaking change in CLI for Microsoft 365 v12 and the actions required to upgrade from v11 to v12.
+
+## How to use this page
+
+1. Check the [summary of breaking changes](#summary-of-breaking-changes) for commands that you use in your scripts.
+2. Use the [upgrade checklist](#upgrade-checklist) to determine which changes require action.
+3. For each change that applies to you, follow the steps under **Action required** in that change's section.
+
+Each change has a unique ID (for example, `SPO-1`) and uses the same structure:
+
+- **Affected commands**: commands whose behavior changed in v12.
+- **Change type**: the kind of breaking change.
+- **Action required when**: the condition under which you need to update your scripts or configuration.
+- **What changed**: v11 behavior compared to v12 behavior.
+- **Action required**: the steps to take.
+- **Example**: v11 and v12 usage, where applicable.
+
+## Summary of breaking changes
+
+ID | Area | Change | Change type | Affected commands
+-- | ---- | ------ | ----------- | -----------------
+[SPO-1](#SPO-1) | SharePoint Online | Existing files are no longer overwritten by default | Default behavior | `spo file add`
+[SPO-2](#SPO-2) | SharePoint Online | Options that you don't specify are no longer reset to default values | Default behavior | `spo page header set`
+[SPO-3](#SPO-3) | SharePoint Online | SharePoint write permissions required, Microsoft Graph permissions no longer required | Permissions | `spo contenttype sync`
+[SPO-4](#SPO-4) | SharePoint Online | Output properties renamed, removed, and added | Output | `spo navigation node list`
+[TEAMS-1](#TEAMS-1) | Teams | Teams specified by name are retrieved using the Microsoft Teams endpoint | Permissions | 15 `teams` commands
+[GEN-1](#GEN-1) | General | Removed items are moved to the recycle bin by default | Default behavior, options | 9 `remove` commands
+[GEN-2](#GEN-2) | General | `spo web alert` aliases removed | Removed alias | `spo web alert list`, `spo web alert remove`
+[GEN-3](#GEN-3) | General | `properties` option renamed to `fields` | Options | `spo listitem get`
+
+## Upgrade checklist
+
+Change | Action required when | Action
+------ | -------------------- | ------
+[SPO-1](#SPO-1) | You use `spo file add` to replace files that already exist | Add `--overwrite`
+[SPO-2](#SPO-2) | You use `spo page header set` and rely on unspecified options being set to default values | Specify these options explicitly
+[SPO-3](#SPO-3) | You use `spo contenttype sync` | Consent SharePoint `AllSites.Manage` (delegated) or `Sites.Manage.All` (application)
+[SPO-4](#SPO-4) | You process the output of `spo navigation node list` | Use the new property names
+[TEAMS-1](#TEAMS-1) | You specify a team by name in an affected `teams` command | Consent Microsoft Graph `Team.ReadBasic.All` and update error message checks
+[GEN-1](#GEN-1) | You use an affected `remove` command | Remove `--recycle`, replace `--skipRecycleBin` with `--permanent`, add `--permanent` where items must be deleted permanently
+[GEN-2](#GEN-2) | You use `spo web alert list` or `spo web alert remove` | Use `spo web rule list` or `spo web rule remove`
+[GEN-3](#GEN-3) | You use `spo listitem get` with `--properties` | Use `--fields`
+
+## SharePoint Online
+
+### SPO-1: `spo file add` no longer overwrites existing files by default {/* #SPO-1 */}
+
+- **Affected commands**: [spo file add](./cmd/spo/file/file-add.mdx)
+- **Change type**: Default behavior
+- **Action required when**: your scripts upload files that may already exist in the target folder and must replace them.
+
+#### What changed
+
+In v11, `overwrite` was an option, and existing files were overwritten by default. In v12, it is a flag that defaults to `false`. If a file with the same name already exists in the target folder, the command returns an error unless you specify `--overwrite`.
+
+#### Action required
+
+1. Add the `--overwrite` flag to every `spo file add` command that must replace an existing file.
+
+#### Example
+
+```sh title="v12: replace the file if it already exists"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --overwrite
+```
+
+### SPO-2: `spo page header set` no longer applies default values {/* #SPO-2 */}
+
+- **Affected commands**: [spo page header set](./cmd/spo/page/page-header-set.mdx)
+- **Change type**: Default behavior
+- **Action required when**: your scripts rely on the command setting unspecified options to their default values.
+
+#### What changed
+
+In v11, options you didn't specify were set to their default values, which could unintentionally reset existing header properties. In v12, unspecified options are left untouched, so the header properties keep their current values. The `type`, `altText`, `layout`, `textAlignment`, `showTopicHeader`, and `showPublishDate` options no longer have default values.
+
+#### Action required
+
+1. Find all `spo page header set` commands that rely on the default values of the options listed above.
+2. Explicitly specify these options with the values you want.
+
+#### Example
+
+```sh title="v12: explicitly specify the header properties to set"
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Default --textAlignment Center --showPublishDate true
+```
+
+### SPO-3: `spo contenttype sync` requires SharePoint write permissions {/* #SPO-3 */}
+
+- **Affected commands**: [spo contenttype sync](./cmd/spo/contenttype/contenttype-sync.mdx)
+- **Change type**: Permissions
+- **Action required when**: you use this command and your app registration doesn't have the SharePoint permissions listed below.
+
+#### What changed
+
+In v11, the command used both SharePoint and Microsoft Graph APIs, requiring Microsoft Graph permissions and read-level SharePoint permissions. In v12, the command uses SharePoint only, no longer requires Microsoft Graph permissions, and requires write-level SharePoint permissions.
+
+Required permissions in v12:
+
+Permission type | Resource | Permission
+--------------- | -------- | ----------
+Delegated | SharePoint | `AllSites.Manage`
+Application | SharePoint | `Sites.Manage.All`
+
+#### Action required
+
+1. Add the required SharePoint permission to your app registration and grant consent.
+2. Optionally, remove the Microsoft Graph permissions that you added for this command. Only do this if no other commands that you use need them.
+
+### SPO-4: `spo navigation node list` output changed {/* #SPO-4 */}
+
+- **Affected commands**: [spo navigation node list](./cmd/spo/navigation/navigation-node-list.mdx)
+- **Change type**: Output
+- **Action required when**: your scripts read properties from the output of this command, for example in JSON output, `--query` expressions, or text output.
+
+#### What changed
+
+The command now uses a different API that allows you to retrieve more detailed information about navigation nodes. It exposes additional information, such as whether a link opens in a new tab (`OpenInNewWindow`).
+
+| v11 property | v12 property | Change |
+| ------------ | ------------ | ------ |
+| `Id` (number) | `Key` (string) | Renamed, type changed from number to string |
+| `Url` | `SimpleUrl` | Renamed |
+| `Children` | `Nodes` | Renamed |
+| `IsDocLib` | - | Removed |
+| `IsExternal` | - | Removed |
+| `IsVisible` | - | Removed |
+| `ListTemplateType` | - | Removed |
+| - | `CustomProperties` | Added |
+| - | `FriendlyUrlSegment` | Added |
+| - | `IsDeleted` | Added |
+| - | `IsHidden` | Added |
+| - | `IsTitleForExistingLanguage` | Added |
+| - | `NodeType` | Added |
+| - | `OpenInNewWindow` | Added |
+| - | `Translations` | Added |
+
+#### Action required
+
+1. Replace `Id` with `Key`, `Url` with `SimpleUrl`, and `Children` with `Nodes`.
+2. Remove references to `IsDocLib`, `IsExternal`, `IsVisible`, and `ListTemplateType`.
+3. Treat `Key` as a string, for example in comparisons.
+4. Use `Key` when passing the ID of a navigation node to other commands, such as [spo navigation node remove](./cmd/spo/navigation/navigation-node-remove.mdx).
+
+#### Example
+
+<Tabs>
+  <TabItem value="v11">
+
+  ```sh
+  m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --query "[?Title == 'Navigation Link'].Id"
+  ```
+
+  </TabItem>
+  <TabItem value="v12">
+
+  ```sh
+  m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --query "[?Title == 'Navigation Link'].Key"
+  ```
+
+  </TabItem>
+</Tabs>
+
+<details>
+  <summary>Compare the full JSON output of v11 and v12</summary>
+
+<Tabs>
+  <TabItem value="v11 output">
+
+  ```json
+  [
+    {
+      "AudienceIds": [
+        "5786b8e8-c495-4734-b345-756733960730"
+      ],
+      "CurrentLCID": 1033,
+      "Id": 2032,
+      "IsDocLib": true,
+      "IsExternal": true,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "Navigation Link",
+      "Url": "https://contoso.sharepoint.com",
+      "Children": [
+        {
+          "AudienceIds": null,
+          "CurrentLCID": 1033,
+          "Id": 2033,
+          "IsDocLib": true,
+          "IsExternal": true,
+          "IsVisible": true,
+          "ListTemplateType": 0,
+          "Title": "Microsoft 365",
+          "Url": "https://microsoft365.com",
+          "Children": []
+        }
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="v12 output">
+
+  ```json
+  [
+    {
+      "AudienceIds": [
+        "5786b8e8-c495-4734-b345-756733960730"
+      ],
+      "CurrentLCID": 1033,
+      "CustomProperties": [],
+      "FriendlyUrlSegment": "",
+      "IsDeleted": false,
+      "IsHidden": false,
+      "IsTitleForExistingLanguage": false,
+      "Key": "2032",
+      "Nodes": [
+        {
+          "AudienceIds": [],
+          "CurrentLCID": 1033,
+          "CustomProperties": [],
+          "FriendlyUrlSegment": "",
+          "IsDeleted": false,
+          "IsHidden": false,
+          "IsTitleForExistingLanguage": false,
+          "Key": "2033",
+          "Nodes": [],
+          "NodeType": 0,
+          "OpenInNewWindow": true,
+          "SimpleUrl": "https://microsoft365.com",
+          "Title": "Microsoft 365",
+          "Translations": []
+        }
+      ],
+      "NodeType": 0,
+      "OpenInNewWindow": false,
+      "SimpleUrl": "https://contoso.sharepoint.com",
+      "Title": "Navigation Link",
+      "Translations": []
+    }
+  ]
+  ```
+
+  </TabItem>
+</Tabs>
+</details>
+
+## Teams
+
+### TEAMS-1: Teams specified by name are retrieved using the Microsoft Teams endpoint {/* #TEAMS-1 */}
+
+- **Affected commands**: see the list below
+- **Change type**: Permissions
+- **Action required when**: you specify a team by name (for example, using `--teamName` or `--name`) in any of the affected commands. No action is required if you only specify teams by ID.
+
+Affected commands:
+
+- [teams channel add](./cmd/teams/channel/channel-add.mdx)
+- [teams channel get](./cmd/teams/channel/channel-get.mdx)
+- [teams channel list](./cmd/teams/channel/channel-list.mdx)
+- [teams channel remove](./cmd/teams/channel/channel-remove.mdx)
+- [teams channel set](./cmd/teams/channel/channel-set.mdx)
+- [teams channel member add](./cmd/teams/channel/channel-member-add.mdx)
+- [teams channel member list](./cmd/teams/channel/channel-member-list.mdx)
+- [teams channel member remove](./cmd/teams/channel/channel-member-remove.mdx)
+- [teams channel member set](./cmd/teams/channel/channel-member-set.mdx)
+- [teams message remove](./cmd/teams/message/message-remove.mdx)
+- [teams message restore](./cmd/teams/message/message-restore.mdx)
+- [teams tab get](./cmd/teams/tab/tab-get.mdx)
+- [teams team archive](./cmd/teams/team/team-archive.mdx)
+- [teams team remove](./cmd/teams/team/team-remove.mdx)
+- [teams team unarchive](./cmd/teams/team/team-unarchive.mdx)
+
+#### What changed
+
+In v11, a team specified by name was retrieved using the Microsoft Entra groups endpoint, followed by a check whether the group is a team. In v12, the team is retrieved directly using the Microsoft Teams endpoint.
+
+Because of this, the permissions required to retrieve a team by name changed from group permissions to the Microsoft Graph `Team.ReadBasic.All` permission.
+
+#### Action required
+
+1. Add the Microsoft Graph `Team.ReadBasic.All` permission to your app registration and grant consent.
+
+## General
+
+### GEN-1: Removed items are moved to the recycle bin by default {/* #GEN-1 */}
+
+- **Affected commands**: see the table below
+- **Change type**: Default behavior, options
+- **Action required when**: you use any of the affected commands.
+
+#### What changed
+
+To prevent unintentional data loss, remove commands that previously deleted items permanently by default now move items to the recycle bin by default. To permanently delete an item, use the new `--permanent` flag. For consistency, the `--skipRecycleBin` flag has been replaced with `--permanent` in the commands that already moved items to the recycle bin by default.
+
+Command | v11 default | v11 option | v12 default | v12 option
+------- | ----------- | ---------- | ----------- | ----------
+[entra m365group remove](./cmd/entra/m365group/m365group-remove.mdx) | Recycle | `--skipRecycleBin` to delete permanently | Recycle | `--permanent` to delete permanently
+[spe container remove](./cmd/spe/container/container-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo file remove](./cmd/spo/file/file-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo folder remove](./cmd/spo/folder/folder-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo list remove](./cmd/spo/list/list-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo listitem batch remove](./cmd/spo/listitem/listitem-batch-remove.mdx) | **Delete permanently** | `-r, --recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo listitem remove](./cmd/spo/listitem/listitem-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo page remove](./cmd/spo/page/page-remove.mdx) | **Delete permanently** | `--recycle` to recycle | Recycle | `--permanent` to delete permanently
+[spo site remove](./cmd/spo/site/site-remove.mdx) | Recycle | `--skipRecycleBin` to delete permanently | Recycle | `--permanent` to delete permanently
+
+#### Action required
+
+1. Remove the `--recycle` (`-r`) flag from your scripts.
+2. Replace `--skipRecycleBin` with `--permanent`.
+3. Add `--permanent` to commands that must delete items permanently.
+
+#### Example
+
+<Tabs>
+  <TabItem value="v11">
+
+  ```sh title="Move a file to the recycle bin"
+  m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx" --recycle
+  ```
+
+  ```sh title="Delete a file permanently"
+  m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx"
+  ```
+
+  ```sh title="Delete a site permanently"
+  m365 spo site remove --url https://contoso.sharepoint.com/sites/project-x --skipRecycleBin
+  ```
+
+  </TabItem>
+  <TabItem value="v12">
+
+  ```sh title="Move a file to the recycle bin"
+  m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx"
+  ```
+
+  ```sh title="Delete a file permanently"
+  m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents/Test.docx" --permanent
+  ```
+
+  ```sh title="Delete a site permanently"
+  m365 spo site remove --url https://contoso.sharepoint.com/sites/project-x --permanent
+  ```
+
+  </TabItem>
+</Tabs>
+
+### GEN-2: `spo web alert` aliases removed {/* #GEN-2 */}
+
+- **Affected commands**: [spo web alert list](./cmd/spo/web/web-rule-list.mdx), [spo web alert remove](./cmd/spo/web/web-rule-remove.mdx)
+- **Change type**: Removed alias
+- **Action required when**: your scripts use `spo web alert list` or `spo web alert remove`.
+
+#### What changed
+
+Following the retirement of SharePoint alerts, the `spo web alert` aliases have been removed. The commands remain available under their `spo web rule` names.
+
+Removed alias (v11) | Command to use (v12)
+------------------- | --------------------
+`spo web alert list` | [spo web rule list](./cmd/spo/web/web-rule-list.mdx)
+`spo web alert remove` | [spo web rule remove](./cmd/spo/web/web-rule-remove.mdx)
+
+#### Action required
+
+1. Replace `spo web alert` with `spo web rule` in your scripts.
+
+#### Example
+
+<Tabs>
+  <TabItem value="v11">
+
+  ```sh
+  m365 spo web alert list --webUrl https://contoso.sharepoint.com/sites/Marketing
+  ```
+
+  </TabItem>
+  <TabItem value="v12">
+
+  ```sh
+  m365 spo web rule list --webUrl https://contoso.sharepoint.com/sites/Marketing
+  ```
+
+  </TabItem>
+</Tabs>
+
+### GEN-3: `properties` option renamed to `fields` in `spo listitem get` {/* #GEN-3 */}
+
+- **Affected commands**: [spo listitem get](./cmd/spo/listitem/listitem-get.mdx)
+- **Change type**: Options
+- **Action required when**: your scripts use `--properties` with `spo listitem get`.
+
+#### What changed
+
+To make it consistent with other commands, the `properties` option of [spo listitem get](./cmd/spo/listitem/listitem-get.mdx) has been renamed to `fields`.
+
+#### Action required
+
+1. Replace `--properties` with `--fields`.
+
+#### Example
+
+<Tabs>
+  <TabItem value="v11">
+
+  ```sh
+  m365 spo listitem get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 147 --properties "Title,Created"
+  ```
+
+  </TabItem>
+  <TabItem value="v12">
+
+  ```sh
+  m365 spo listitem get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 147 --fields "Title,Created"
+  ```
+
+  </TabItem>
+</Tabs>
