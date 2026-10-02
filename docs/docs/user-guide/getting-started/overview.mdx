@@ -1,0 +1,42 @@
+---
+title: Overview
+sidebar_position: 1
+---
+# Getting Started with the CLI for Microsoft 365
+CLI for Microsoft 365 allows you to manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. This overview walks you through the quickest path to get started: install the CLI, set it up, and log in.
+
+## Quick Start
+The fastest way to start using CLI for Microsoft 365 is to install it with `npm`, use the guided setup command, and then log in.
+
+### 1. Install
+Install the CLI globally on your machine using `npm`:
+
+```bash
+npm install -g @pnp/cli-microsoft365
+```
+
+### 2. Setup
+Run the guided setup command to configure required Microsoft Entra app registration automatically:
+
+```bash
+m365 setup
+```
+
+If you can't use the setup wizard, continue with [Use your own Microsoft Entra identity](../using-own-identity.mdx) to create the app registration manually.
+
+### 3. Login
+Authenticate with your Microsoft 365 tenant using the login command:
+
+```bash
+m365 login
+```
+
+Once logged in, you are ready to run commands against your tenant! Try listing your SharePoint sites:
+```bash
+m365 spo site list
+```
+
+### Alternate setup and advanced options
+If you have specific requirements or environment limitations, check out these alternatives:
+- Alternative package managers or environments: See our [Installing the CLI](installing-cli) guide for instructions on installing the CLI using Yarn or pnpm.
+- Manual app registration: Follow [Use your own Microsoft Entra identity](../using-own-identity.mdx) if you need to register an app yourself.

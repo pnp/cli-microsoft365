@@ -4,14 +4,13 @@ sidebar_position: 10
 ---
 
 # Use your own Microsoft Entra identity
+Before you can use CLI for Microsoft 365, you must have a Microsoft Entra application registration that the CLI can use to authenticate to your tenant. The easiest path is to run [m365 setup](../cmd/setup.mdx), but if you cannot use the setup wizard, follow this guide to create and configure the app registration manually.
 
-When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you can either start with the [m365 setup](../cmd/setup.mdx) command or define the `appId` and `tenant` options directly during login.
-
-To simplify the process of creating an Microsoft Entra application registration with all the necessary permission scopes, you can use the [m365 setup](../cmd/setup.mdx) command. This command can set up an application registration with a wide range of permissions, including those that require administrative consent. This makes it easy to get started with the CLI and try out commands across many CLI for Microsoft 365 workloads in your tenant without having to manually manage permissions for different commands in Azure.
+The `m365 setup` command can create an application registration with the required permissions for common CLI scenarios, including permissions that require administrative consent. This makes it easy to get started and try commands across multiple CLI for Microsoft 365 workloads without manually managing permissions in Azure.
 
 While this approach is convenient for development and test environments, using these levels of permissions against production environments may be inconvenient. Administrators might be uncomfortable granting such permissions to an application within their environment. Therefore, it's important to carefully consider the permissions you grant when setting up your application registration for production use.
 
-In this scenario, administrators will want to provide their own Microsoft Entra application registration to use with the CLI to enable greater control over the permissions that are granted.
+In production environments, administrators will often want to provide their own Microsoft Entra application registration to use with the CLI so they can control exactly which permissions are granted.
 
 This tutorial will walk you through how to create your own Microsoft Entra application with permissions restricted to only read information about SharePoint Online Site Collections and how to use this custom application with the CLI for Microsoft 365.
 

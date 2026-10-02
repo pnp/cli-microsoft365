@@ -1,6 +1,6 @@
 ---
 title: Log in to Microsoft 365 
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 import AsciinemaPlayer from '@site/src/components/AsciinemaPlayer';
@@ -8,7 +8,7 @@ import 'asciinema-player/dist/bundle/asciinema-player.css';
 
 # Log in to Microsoft 365
 
-Before you can use CLI for Microsoft 365 commands to manage your tenant, you have to log in to Microsoft 365. Following section explains how you can log in and check the Microsoft 365 login status.
+Before you can use CLI for Microsoft 365 commands to manage your tenant, you have to log in to Microsoft 365. This step assumes you already set up the CLI and have a Microsoft Entra app registration ready.
 
 ## Microsoft 365 services
 
@@ -28,11 +28,11 @@ When logging in, you need to specify the `appId` and `tenant` of your Microsoft 
 
 :::info
 
-If you don't have an application registration yet, you can create one using the [m365 setup](../cmd/setup.mdx) command. This command will guide you through the process of creating a new application registration and granting it the necessary permissions in your tenant. It will also set the `appId` and `tenant` environment variables for you, allowing you to log in to Microsoft 365 without specifying these values when using the `login` command.
+If you don't have an application registration yet, start with the [Setup the CLI](setup-cli.mdx) guide. It shows the quickest path with `m365 setup` and points you to [Use your own Microsoft Entra identity](../using-own-identity.mdx) when you need to register an app manually.
 
 Alternatively, you can manually set the `CLIMICROSOFT365_ENTRAAPPID` and `CLIMICROSOFT365_TENANT` environment variables to avoid specifying the `appId` and `tenant` values during login.
 
-For more details on creating an application registration or setting the environment variables, refer to the article: [Use your own Microsoft Entra identity](./using-own-identity.mdx).
+For more details on creating an application registration or setting the environment variables, refer to [Use your own Microsoft Entra identity](../using-own-identity.mdx).
 
 :::
 
@@ -212,4 +212,4 @@ All communication between the CLI for Microsoft 365 and Microsoft 365 APIs happe
 
 ## Persisted connections
 
-After logging in to Microsoft 365, the CLI for Microsoft 365 will persist that connection information until you explicitly log out from Microsoft 365. This is necessary to support building scripts using the CLI for Microsoft 365, where each command is executed independently of other commands. Persisted connection contains information about the user name used to establish the connection as well as the retrieved refresh- and access tokens. To secure this information from unprivileged access, it's stored securely in the password store specific to the platform on which you're using the CLI. For more information, see the separate article dedicated to [persisting connection information](../concepts/persisting-connection.mdx) in the CLI for Microsoft 365.
+After logging in to Microsoft 365, the CLI for Microsoft 365 will persist that connection information until you explicitly log out from Microsoft 365. This is necessary to support building scripts using the CLI for Microsoft 365, where each command is executed independently of other commands. Persisted connection contains information about the user name used to establish the connection as well as the retrieved refresh- and access tokens. To secure this information from unprivileged access, it's stored securely in the password store specific to the platform on which you're using the CLI. For more information, see the separate article dedicated to [persisting connection information](../../concepts/persisting-connection.mdx) in the CLI for Microsoft 365.
