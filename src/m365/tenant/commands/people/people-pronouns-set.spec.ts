@@ -102,7 +102,7 @@ describe(commands.PEOPLE_PRONOUNS_SET, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({ enabled: true }) }),
       new CommandError('An error has occurred')
     );
   });

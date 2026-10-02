@@ -1,17 +1,21 @@
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  domainName: z.string().optional().alias('d')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  domainName?: string;
 }
 
 class TenantIdGetCommand extends Command {
@@ -23,27 +27,8 @@ class TenantIdGetCommand extends Command {
     return 'Gets Microsoft 365 tenant ID for the specified domain';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        domainName: typeof args.options.domainName !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-d, --domainName [domainName]'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

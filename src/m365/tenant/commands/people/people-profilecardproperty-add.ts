@@ -1,18 +1,23 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { profileCardPropertyNames } from './profileCardProperties.js';
 
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  displayName: z.string().optional().alias('d')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  displayName?: string;
 }
 
 class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
@@ -24,72 +29,78 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     return 'Adds an additional attribute to the profile card properties';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      // Add unknown options to telemetry
-      const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
-      const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
-
-      Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        ...unknownOptionsObj
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>',
-        autocomplete: profileCardPropertyNames
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const propertyName = args.options.name.toLowerCase();
-
-        if (profileCardPropertyNames.every(n => n.toLowerCase() !== propertyName)) {
-          return `${args.options.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        if (!profileCardPropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `${opts.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`
+          });
         }
-
-        if (propertyName.startsWith('customattribute') && args.options.displayName === undefined) {
-          return `The option 'displayName' is required when adding customAttributes as profile card properties`;
-        }
-
-        if (!propertyName.startsWith('customattribute') && args.options.displayName !== undefined) {
-          return `The option 'displayName' can only be used when adding customAttributes as profile card properties`;
-        }
-
-        const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(args.options, this.options));
-
-        if (!propertyName.startsWith('customattribute') && unknownOptions.length > 0) {
-          return `Unknown options like ${unknownOptions.join(', ')} are only supported with customAttributes`;
-        }
-
-        if (propertyName.startsWith('customattribute')) {
-          const wronglyFormattedOptions = unknownOptions.filter(key => !key.toLowerCase().startsWith('displayname-'));
-          if (wronglyFormattedOptions.length > 0) {
-            return `Wrong option format detected for the following option(s): ${wronglyFormattedOptions.join(', ')}'. When adding localizations for customAttributes, use the format displayName-<languageTag>.`;
+      })
+      .refine(
+        opts => {
+          const propertyName = (opts.name).toLowerCase();
+          if (propertyName.startsWith('customattribute') && opts.displayName === undefined) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message: `The option 'displayName' is required when adding customAttributes as profile card properties`,
+          params: {
+            customCode: 'required'
           }
         }
-
-        return true;
-      }
-    );
+      )
+      .refine(
+        opts => {
+          const propertyName = (opts.name).toLowerCase();
+          if (!propertyName.startsWith('customattribute') && opts.displayName !== undefined) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message: `The option 'displayName' can only be used when adding customAttributes as profile card properties`,
+          params: {
+            customCode: 'required'
+          }
+        }
+      )
+      .superRefine((opts, ctx) => {
+        const propertyName = (opts.name).toLowerCase();
+        if (!propertyName.startsWith('customattribute')) {
+          // For non-custom attributes, check that no unknown options are passed
+          const knownKeys = new Set([...Object.keys(globalOptionsZod.shape), 'name', 'displayName']);
+          const unknownKeys = Object.keys(opts).filter(k => !knownKeys.has(k));
+          if (unknownKeys.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Unknown options like ${unknownKeys.join(', ')} are only supported with customAttributes`
+            });
+          }
+        }
+      })
+      .superRefine((opts, ctx) => {
+        const propertyName = (opts.name).toLowerCase();
+        if (propertyName.startsWith('customattribute')) {
+          const knownKeys = new Set([...Object.keys(globalOptionsZod.shape), 'name', 'displayName']);
+          const unknownKeys = Object.keys(opts).filter(k => !knownKeys.has(k));
+          const wronglyFormattedOptions = unknownKeys.filter(key => !key.toLowerCase().startsWith('displayname-'));
+          if (wronglyFormattedOptions.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Wrong option format detected for the following option(s): ${wronglyFormattedOptions.join(', ')}'. When adding localizations for customAttributes, use the format displayName-<languageTag>.`
+            });
+          }
+        }
+      });
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -152,7 +163,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   }
 
   private getLocalizations(options: Options): { languageTag: string, displayName: string }[] {
-    const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(options, this.options));
+    const unknownOptions = Object.keys(optionsUtils.getUnknownOptions(options, zod.schemaToOptions(this.schema!)));
 
     if (unknownOptions.length === 0) {
       return [];
@@ -163,7 +174,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     unknownOptions.forEach(key => {
       localizations.push({
         languageTag: key.replace('displayName-', ''),
-        displayName: options[key]
+        displayName: options[key] as string
       });
     });
 
