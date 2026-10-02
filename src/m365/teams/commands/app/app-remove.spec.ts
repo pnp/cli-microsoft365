@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-remove.js';
 
 describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let requests: any[];
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -69,54 +70,29 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and name options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both id and name options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+      name: 'TeamsApp'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
-        name: 'TeamsApp'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and name options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if both id and name options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
+  });
 
-      return defaultValue;
+  it('fails validation if the id is not a valid GUID.', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22"
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the id is not a valid GUID.', async () => {
-    const actual = await command.validate({
-      options: { id: 'invalid' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
   it('removes Teams app by id in the tenant app catalog with confirmation (debug)', async () => {
@@ -130,7 +106,7 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true }) });
     assert(removeTeamsAppCalled);
   });
 
@@ -147,14 +123,14 @@ describe(commands.APP_REMOVE, () => {
 
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` }) });
     assert(removeTeamsAppCalled);
   });
 
   it('aborts removing Teams app when prompt not confirmed', async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` }) });
     assert(requests.length === 0);
   });
 
@@ -187,7 +163,7 @@ describe(commands.APP_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'TeamsApp' } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'TeamsApp' }) }));
     assert(removeTeamsAppCalled);
   });
 
@@ -219,7 +195,7 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22' });
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'TeamsApp' } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'TeamsApp' }) }));
     assert(removeTeamsAppCalled);
   });
 
@@ -232,17 +208,17 @@ describe(commands.APP_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'TeamsApp',
         force: true
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
+      })
+    }), new CommandError('The specified Teams app does not exist'));
   });
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
+      if (settingName === 'prompt') {
         return false;
       }
 
@@ -268,12 +244,12 @@ describe(commands.APP_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'TeamsApp',
         force: true
-      }
-    } as any), new CommandError(`Multiple Teams apps with name 'TeamsApp' found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.`));
+      })
+    }), new CommandError(`Multiple Teams apps with name 'TeamsApp' found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.`));
   });
 
   it('correctly handles error when removing app', async () => {
@@ -289,10 +265,18 @@ describe(commands.APP_REMOVE, () => {
       }
     });
     await assert.rejects(command.action(logger, {
-      options: {
-        filePath: 'teamsapp.zip',
-        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      options: commandOptionsSchema.parse({
+        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`,
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
