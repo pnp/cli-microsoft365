@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './package-generate.js';
+import command, { options } from './package-generate.js';
 
 const admZipMock = {
   // we need these unused params so that they can be properly mocked with sinon
@@ -25,6 +25,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -32,6 +33,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(session, 'getId').returns('');
     (command as any).archive = admZipMock;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     cli.getConfig();
   });
 
@@ -95,14 +97,14 @@ describe(commands.PACKAGE_GENERATE, () => {
   it('creates a package for the specified HTML snippet', async () => {
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     });
     assert(archiveWriteZipSpy.called);
   });
@@ -110,7 +112,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   it('creates a package for the specified HTML snippet (debug)', async () => {
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
@@ -118,7 +120,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
         debug: true
-      }
+      })
     });
     assert(archiveWriteZipSpy.called);
   });
@@ -128,14 +130,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'tab'
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab']).replace(/"/g, '&quot;')));
   });
@@ -145,14 +147,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'personalApp'
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
   });
@@ -162,14 +164,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
   });
@@ -179,14 +181,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'mkdtempSync').throws(new Error('An error has occurred'));
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     }), (err) => err === 'An error has occurred');
     assert(archiveWriteZipSpy.notCalled);
   });
@@ -194,14 +196,14 @@ describe(commands.PACKAGE_GENERATE, () => {
   it('handles error when creating the package failed', async () => {
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     }), (err) => err === 'An error has occurred');
   });
 
@@ -209,14 +211,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     });
     assert(fsrmdirSyncSpy.called);
   });
@@ -226,14 +228,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     }));
     assert(fsrmdirSyncSpy.called);
   });
@@ -242,14 +244,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinonUtil.restore(fs.rmdirSync);
     sinon.stub(fs, 'rmdirSync').throws(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all'
-      }
+      })
     }), (err) => err === 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
   });
 
@@ -258,14 +260,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$token$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'tab'
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '$token$'));
   });
@@ -275,14 +277,14 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposePageContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         exposePageContextGlobally: true
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
   });
@@ -292,63 +294,71 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposeTeamsContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         exposeTeamsContextGlobally: true
-      }
+      })
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
   });
 
-  it(`fails validation if the enableForTeams option is invalid`, async () => {
-    const actual = await command.validate({
-      options: {
-        webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
-        html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
-        enableForTeams: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`fails validation if the enableForTeams option is invalid`, () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartTitle: 'Amsterdam weather',
+      webPartDescription: 'Shows weather in Amsterdam',
+      name: 'amsterdam-weather',
+      html: '@amsterdam-weather.html',
+      allowTenantWideDeployment: true,
+      enableForTeams: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`passes validation if the enableForTeams option is set to tab`, async () => {
-    const actual = await command.validate({
-      options: {
-        webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
-        html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
-        enableForTeams: 'tab'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if the enableForTeams option is set to tab`, () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartTitle: 'Amsterdam weather',
+      webPartDescription: 'Shows weather in Amsterdam',
+      name: 'amsterdam-weather',
+      html: '@amsterdam-weather.html',
+      allowTenantWideDeployment: true,
+      enableForTeams: 'tab'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to personalApp`, async () => {
-    const actual = await command.validate({
-      options: {
-        webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
-        html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
-        enableForTeams: 'personalApp'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if the enableForTeams option is set to personalApp`, () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartTitle: 'Amsterdam weather',
+      webPartDescription: 'Shows weather in Amsterdam',
+      name: 'amsterdam-weather',
+      html: '@amsterdam-weather.html',
+      allowTenantWideDeployment: true,
+      enableForTeams: 'personalApp'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to all`, async () => {
-    const actual = await command.validate({
-      options: {
-        webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
-        html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
-        enableForTeams: 'all'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if the enableForTeams option is set to all`, () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartTitle: 'Amsterdam weather',
+      webPartDescription: 'Shows weather in Amsterdam',
+      name: 'amsterdam-weather',
+      html: '@amsterdam-weather.html',
+      allowTenantWideDeployment: true,
+      enableForTeams: 'all'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webPartTitle: 'Amsterdam weather',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

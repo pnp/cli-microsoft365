@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'yaml';
-import { CommandError } from '../../../../Command.js';
+import { z } from 'zod';
+import { globalOptionsZod, CommandError } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
@@ -9,27 +10,27 @@ import { validation } from '../../../../utils/validation.js';
 import { pipeline } from './DeployWorkflow.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import { AzureDevOpsPipeline, AzureDevOpsPipelineStep } from './project-azuredevops-pipeline-model.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { versions } from '../SpfxCompatibilityMatrix.js';
 import { spfx } from '../../../../utils/spfx.js';
 import { Project } from './project-model/index.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n').optional(),
+  branchName: z.string().alias('b').optional(),
+  loginMethod: z.enum(['application', 'user']).alias('l').optional(),
+  scope: z.enum(['tenant', 'sitecollection']).alias('s').optional(),
+  siteUrl: z.string().alias('u').optional(),
+  skipFeatureDeployment: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  name?: string;
-  branchName?: string;
-  loginMethod?: string;
-  scope?: string;
-  skipFeatureDeployment?: boolean;
-  siteUrl?: string;
-}
-
 class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
-  private static loginMethod: string[] = ['application', 'user'];
-  private static scope: string[] = ['tenant', 'sitecollection'];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
 
   public get name(): string {
@@ -40,76 +41,24 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
     return 'Adds a Azure DevOps Pipeline for a SharePoint Framework project.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        branchName: typeof args.options.branchName !== 'undefined',
-        loginMethod: typeof args.options.loginMethod !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        skipFeatureDeployment: !!args.options.skipFeatureDeployment
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || opts.siteUrl, {
+        error: `siteUrl option has to be defined when scope set to sitecollection`,
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || validation.isValidSharePointUrl(opts.siteUrl!) === true, {
+        error: `The specified siteUrl is not a valid SharePoint Online site URL.`,
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-b, --branchName [branchName]'
-      },
-      {
-        option: '-l, --loginMethod [loginMethod]',
-        autocomplete: SpfxProjectAzureDevOpsPipelineAddCommand.loginMethod
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: SpfxProjectAzureDevOpsPipelineAddCommand.scope
-      },
-      {
-        option: '-u, --siteUrl [siteUrl]'
-      },
-      {
-        option: '--skipFeatureDeployment'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.scope && args.options.scope === 'sitecollection') {
-          if (!args.options.siteUrl) {
-            return `siteUrl option has to be defined when scope set to ${args.options.scope}`;
-          }
-
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-        }
-
-        if (args.options.loginMethod && SpfxProjectAzureDevOpsPipelineAddCommand.loginMethod.indexOf(args.options.loginMethod) < 0) {
-          return `${args.options.loginMethod} is not a valid login method. Allowed values are ${SpfxProjectAzureDevOpsPipelineAddCommand.loginMethod.join(', ')}`;
-        }
-
-        if (args.options.scope && SpfxProjectAzureDevOpsPipelineAddCommand.scope.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpfxProjectAzureDevOpsPipelineAddCommand.scope.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -149,7 +98,7 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
     fs.writeFileSync(path.resolve(pipelineFile), yaml.stringify(pipeline), 'utf-8');
   }
 
-  private updatePipeline(sppkgPath: string | undefined, pipeline: AzureDevOpsPipeline, options: GlobalOptions): void {
+  private updatePipeline(sppkgPath: string | undefined, pipeline: AzureDevOpsPipeline, options: Options): void {
     if (options.name) {
       pipeline.name = options.name;
     }
@@ -200,7 +149,7 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
       if (options.scope === 'sitecollection') {
         script.script = script.script.replace(`{{deploy}}`, `m365 spo app deploy --name '$(PackageName)' --appCatalogScope sitecollection --appCatalogUrl '$(SiteAppCatalogUrl)'`);
         script.script = script.script.replace(`{{addApp}}`, `m365 spo app add --filePath '$(Build.SourcesDirectory)/sharepoint/$(SppkgPath)' --appCatalogScope sitecollection --appCatalogUrl '$(SiteAppCatalogUrl)' --overwrite`);
-        this.assignPipelineVariables(pipeline, 'SiteAppCatalogUrl', options.siteUrl);
+        this.assignPipelineVariables(pipeline, 'SiteAppCatalogUrl', options.siteUrl!);
       }
       else {
         script.script = script.script.replace(`{{deploy}}`, `m365 spo app deploy --name '$(PackageName)' --appCatalogScope 'tenant'`);

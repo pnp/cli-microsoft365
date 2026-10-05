@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'yaml';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod, CommandError } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import { validation } from '../../../../utils/validation.js';
@@ -14,23 +14,24 @@ import { Project } from './project-model/index.js';
 import { versions } from '../SpfxCompatibilityMatrix.js';
 import { spfx } from '../../../../utils/spfx.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n').optional(),
+  branchName: z.string().alias('b').optional(),
+  manuallyTrigger: z.boolean().alias('m').optional(),
+  loginMethod: z.enum(['application', 'user']).alias('l').optional(),
+  scope: z.enum(['tenant', 'sitecollection']).alias('s').optional(),
+  siteUrl: z.string().alias('u').optional(),
+  skipFeatureDeployment: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  name?: string;
-  branchName?: string;
-  manuallyTrigger?: boolean;
-  loginMethod?: string;
-  scope?: string;
-  skipFeatureDeployment?: boolean;
-  siteUrl?: string;
-}
-
 class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
-  private static loginMethod: string[] = ['application', 'user'];
-  private static scope: string[] = ['tenant', 'sitecollection'];
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
 
   public get name(): string {
@@ -41,80 +42,24 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     return 'Adds a GitHub workflow for a SharePoint Framework project.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        branchName: typeof args.options.branchName !== 'undefined',
-        manuallyTrigger: !!args.options.manuallyTrigger,
-        loginMethod: typeof args.options.loginMethod !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        skipFeatureDeployment: !!args.options.skipFeatureDeployment
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || opts.siteUrl, {
+        error: `siteUrl option has to be defined when scope set to sitecollection`,
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || validation.isValidSharePointUrl(opts.siteUrl!) === true, {
+        error: `The specified siteUrl is not a valid SharePoint Online site URL.`,
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-b, --branchName [branchName]'
-      },
-      {
-        option: '-m, --manuallyTrigger'
-      },
-      {
-        option: '-l, --loginMethod [loginMethod]',
-        autocomplete: SpfxProjectGithubWorkflowAddCommand.loginMethod
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: SpfxProjectGithubWorkflowAddCommand.scope
-      },
-      {
-        option: '-u, --siteUrl [siteUrl]'
-      },
-      {
-        option: '--skipFeatureDeployment'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.scope && args.options.scope === 'sitecollection') {
-          if (!args.options.siteUrl) {
-            return `siteUrl option has to be defined when scope set to ${args.options.scope}`;
-          }
-
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-        }
-
-        if (args.options.loginMethod && SpfxProjectGithubWorkflowAddCommand.loginMethod.indexOf(args.options.loginMethod) < 0) {
-          return `${args.options.loginMethod} is not a valid login method. Allowed values are ${SpfxProjectGithubWorkflowAddCommand.loginMethod.join(', ')}`;
-        }
-
-        if (args.options.scope && SpfxProjectGithubWorkflowAddCommand.scope.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpfxProjectGithubWorkflowAddCommand.scope.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -156,7 +101,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     fs.writeFileSync(path.resolve(workflowFile), yaml.stringify(workflow), 'utf-8');
   }
 
-  private updateWorkflow(solutionName: string, sppkgPath: string | undefined, workflow: GitHubWorkflow, options: GlobalOptions): void {
+  private updateWorkflow(solutionName: string, sppkgPath: string | undefined, workflow: GitHubWorkflow, options: Options): void {
     workflow.name = options.name ? options.name : workflow.name.replace('{{ name }}', solutionName);
 
     if (options.branchName) {

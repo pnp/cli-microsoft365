@@ -1,19 +1,26 @@
 import child_process from 'child_process';
 import { satisfies } from 'semver';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../Command.js';
 import { CheckStatus, formatting } from '../../../utils/formatting.js';
 import commands from '../commands.js';
 import { BaseProjectCommand } from './project/base-project-command.js';
 import { SharePointVersion, SpfxVersionPrerequisites, VersionCheck, versions } from './SpfxCompatibilityMatrix.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  env: z.enum(['sp2016', 'sp2019', 'spo']).optional().alias('e'),
+  spfxVersion: z.string().optional().refine(val => !val || versions[val], {
+    message: `The specified version is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`
+  }).alias('v'),
+  output: z.enum(['text', 'json']).optional().alias('o')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  env?: string;
-  spfxVersion?: string;
 }
 
 /**
@@ -60,55 +67,8 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     return 'Verifies environment configuration for using the specific version of the SharePoint Framework';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        env: args.options.env,
-        spfxVersion: args.options.spfxVersion
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --env [env]',
-        autocomplete: ['sp2016', 'sp2019', 'spo']
-      },
-      {
-        option: '-v, --spfxVersion [spfxVersion]',
-        autocomplete: Object.keys(versions)
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.env) {
-          const sp: SharePointVersion | undefined = this.spVersionStringToEnum(args.options.env);
-          if (!sp) {
-            return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
-          }
-        }
-
-        if (args.options.spfxVersion) {
-          if (!versions[args.options.spfxVersion]) {
-            return `${args.options.spfxVersion} is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,8 +1,8 @@
 import os from 'os';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import rules from './project-externalize/DefaultRules.js';
@@ -10,8 +10,15 @@ import { ExternalizeEntry, FileEdit } from './project-externalize/index.js';
 import { BasicDependencyRule } from './project-externalize/rules/index.js';
 import { External, ExternalConfiguration, Project } from './project-model/index.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  output: z.enum(['json', 'text', 'md']).optional().alias('o')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
 }
 
 class SpfxProjectExternalizeCommand extends BaseProjectCommand {
@@ -58,18 +65,8 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     return 'Externalizes SharePoint Framework project dependencies';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = this.allowedOutputs;
-      }
-    });
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -116,13 +113,13 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getMdOutput(logStatement: any[], command: Command, options: GlobalOptions): string {
+  public getMdOutput(logStatement: any[], command: Command, options: Options): string {
     // overwrite markdown output to return the output as-is
     // because the command already implements its own logic to format the output
     return logStatement as any;
   }
 
-  private async writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): Promise<void> {
+  private async writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: Options): Promise<void> {
     let report;
 
     switch (options.output) {
