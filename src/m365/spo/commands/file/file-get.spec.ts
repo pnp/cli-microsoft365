@@ -122,6 +122,27 @@ describe(commands.FILE_GET, () => {
     assert(loggerLogSpy.calledWith(returnValue));
   });
 
+  it('requests the file as text with --asString so JSON content is not parsed', async () => {
+    const returnValue: string = '{"name":"test"}';
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
+        return opts.responseType === 'text' ? returnValue : JSON.parse(returnValue);
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        asString: true
+      }
+    });
+    assert.strictEqual(getStub.lastCall.args[0].responseType, 'text');
+    assert(loggerLogSpy.calledWith(returnValue));
+  });
+
   it('retrieves and prints all details of file as ListItem object', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
