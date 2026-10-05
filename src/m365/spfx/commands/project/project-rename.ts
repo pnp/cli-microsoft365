@@ -1,19 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  newName: z.string().alias('n'),
+  generateNewId: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  newName: string;
-  generateNewId?: boolean;
 }
 
 class SpfxProjectRenameCommand extends BaseProjectCommand {
@@ -27,30 +31,8 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     return 'Renames SharePoint Framework project';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        generateNewId: args.options.generateNewId
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --newName <newName>'
-      },
-      {
-        option: '--generateNewId'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

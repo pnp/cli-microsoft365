@@ -12,7 +12,7 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
-import command, { SpfxDoctorCheck } from './spfx-doctor.js';
+import command, { options, SpfxDoctorCheck } from './spfx-doctor.js';
 
 describe(commands.DOCTOR, () => {
   let log: string[];
@@ -21,6 +21,7 @@ describe(commands.DOCTOR, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogSpyErr: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const packageVersionResponse = (name: string, version: string): string => {
     return `{
@@ -40,6 +41,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -110,7 +112,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -142,7 +144,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -178,7 +180,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -214,7 +216,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -250,7 +252,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -282,7 +284,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -314,7 +316,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -350,7 +352,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -386,7 +388,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -422,7 +424,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -458,7 +460,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { spfxVersion: '1.11.0' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ spfxVersion: '1.11.0' }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
@@ -482,7 +484,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('SharePoint Framework not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('SharePoint Framework not found'));
     assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
     assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
@@ -503,7 +505,7 @@ describe(commands.DOCTOR, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('SharePoint Framework not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('SharePoint Framework not found'));
     assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
     assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
@@ -524,7 +526,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { spfxVersion: '1.11.0' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ spfxVersion: '1.11.0' }) });
     assert(loggerLogSpy.calledWith(`${getStatus(1, 'SharePoint Framework')} v1.11.0 not found`), 'SharePoint Framework found');
     assert(loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
@@ -542,7 +544,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { env: 'spo' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ env: 'spo' }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
   });
 
@@ -559,7 +561,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { env: 'spo' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ env: 'spo' }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
   });
 
@@ -576,18 +578,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { env: 'sp2019' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ env: 'sp2019' }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
   });
 
-  it('fails validation if output does not equal text or json.', async () => {
-    const actual = await command.validate({
-      options: {
-        output: 'md'
-      }
-    }, commandInfo);
-
-    assert.notStrictEqual(actual, true);
+  it('fails validation if output does not equal text or json.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      output: 'md'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails SP2019 compatibility check for SPFx v1.5.0', async () => {
@@ -603,7 +602,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await assert.rejects(command.action(logger, { options: { env: 'sp2019' } } as any), new CommandError('SharePoint Framework v1.5.0 is not supported in SP2019'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ env: 'sp2019' }) }), new CommandError('SharePoint Framework v1.5.0 is not supported in SP2019'));
     assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
     assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
   });
@@ -621,7 +620,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { env: 'sp2016' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ env: 'sp2016' }) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2016')));
   });
 
@@ -638,7 +637,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await assert.rejects(command.action(logger, { options: { env: 'sp2016' } } as any), new CommandError('SharePoint Framework v1.2.0 is not supported in SP2016'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ env: 'sp2016' }) }), new CommandError('SharePoint Framework v1.2.0 is not supported in SP2016'));
     assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
     assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
   });
@@ -658,7 +657,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')));
   });
 
@@ -677,7 +676,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'Node v8.0.0')));
   });
 
@@ -696,7 +695,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10 required')));
     assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
   });
@@ -716,7 +715,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8 || ^10 required')));
     assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
   });
@@ -729,7 +728,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('npm not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('npm not found'));
     assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
 
@@ -762,7 +761,7 @@ describe(commands.DOCTOR, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { toVersion: '1.4.1', debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
@@ -795,7 +794,7 @@ describe(commands.DOCTOR, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { spfxVersion: '1.4.1' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ spfxVersion: '1.4.1' }) });
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
@@ -817,7 +816,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')));
   });
 
@@ -836,7 +835,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
     assert(loggerLogSpy.calledWith('- npm i -g yo@3'), 'No fix provided');
   });
@@ -856,7 +855,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     const checks: SpfxDoctorCheck[] = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(checks.filter(y => y.check === 'yo')[0].passed, false);
     assert(loggerLogSpyErr.calledWith('- npm i -g yo@3'), 'No fix provided');
@@ -882,7 +881,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')));
   });
 
@@ -905,7 +904,7 @@ describe(commands.DOCTOR, () => {
     try {
       getPackageVersionSpy = sinon.spy(command as any, 'getPackageVersion');
 
-      await command.action(logger, { options: { spfxVersion: '1.22.0' } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ spfxVersion: '1.22.0' }) });
       assert(getPackageVersionSpy.neverCalledWith('gulp-cli'));
     }
     finally {
@@ -929,7 +928,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'gulp-cli not found')));
     assert(loggerLogSpy.calledWith('- npm i -g gulp-cli@2'), 'No fix provided');
   });
@@ -953,7 +952,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, '@rushstack/heft v1.1.17')));
   });
 
@@ -976,7 +975,7 @@ describe(commands.DOCTOR, () => {
     try {
       getPackageVersionSpy = sinon.spy(command as any, 'getPackageVersion');
 
-      await command.action(logger, { options: { spfxVersion: '1.10.0' } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ spfxVersion: '1.10.0' }) });
       assert(getPackageVersionSpy.neverCalledWith('@rushstack/heft'));
     }
     finally {
@@ -1000,7 +999,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, '@rushstack/heft not found')));
     assert(loggerLogSpy.calledWith('- npm i -g @rushstack/heft@1'), 'No fix provided');
   });
@@ -1023,7 +1022,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'gulp should be removed')));
     assert(loggerLogSpy.calledWith('- npm un -g gulp'), 'No fix provided');
   });
@@ -1046,7 +1045,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')));
   });
 
@@ -1068,7 +1067,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
     assert(loggerLogSpy.calledWith('- npm un typescript'), 'No fix provided');
   });
@@ -1088,7 +1087,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`));
   });
 
   it('uses alternative symbols for win32', async () => {
@@ -1113,63 +1112,55 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
   });
 
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '-e, --env [env]') {
-        containsOption = true;
-      }
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      env: 'spo',
+      unknownOption: 'value'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  it('passes validation when no options specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when no options specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when sp2016 env specified', () => {
+    const actual = commandOptionsSchema.safeParse({ env: 'sp2016' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when sp2016 env specified', async () => {
-    const actual = await command.validate({ options: { env: 'sp2016' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when sp2019 env specified', () => {
+    const actual = commandOptionsSchema.safeParse({ env: 'sp2019' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when sp2019 env specified', async () => {
-    const actual = await command.validate({ options: { env: 'sp2019' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when spo env specified', () => {
+    const actual = commandOptionsSchema.safeParse({ env: 'spo' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when spo env specified', async () => {
-    const actual = await command.validate({ options: { env: 'spo' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when 2016 env specified', () => {
+    const actual = commandOptionsSchema.safeParse({ env: '2016' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when 2016 env specified', async () => {
-    const actual = await command.validate({ options: { env: '2016' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when supported version of SPFx specified', () => {
+    const actual = commandOptionsSchema.safeParse({ spfxVersion: '1.15.2' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when supported version of SPFx specified', async () => {
-    const actual = await command.validate({ options: { spfxVersion: '1.15.2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when unsupported version of SPFx specified', () => {
+    const actual = commandOptionsSchema.safeParse({ spfxVersion: '1.2.3' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when unsupported version of SPFx specified', async () => {
-    const actual = await command.validate({ options: { spfxVersion: '1.2.3' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when supported version of SPFx prefixed with v specified', async () => {
-    const actual = await command.validate({ options: { spfxVersion: 'v1.15.2' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when supported version of SPFx prefixed with v specified', () => {
+    const actual = commandOptionsSchema.safeParse({ spfxVersion: 'v1.15.2' });
+    assert.strictEqual(actual.success, false);
   });
 });

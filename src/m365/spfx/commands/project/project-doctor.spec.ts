@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './project-doctor.js';
+import command, { options } from './project-doctor.js';
 import { FindingToReport } from './report-model/index.js';
 
 describe(commands.PROJECT_DOCTOR, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let trackEvent: any;
   let telemetryCommandName: any;
   const validProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react';
@@ -32,6 +33,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,14 +96,14 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(null);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`Couldn't find project root folder`, 1));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`Couldn't find project root folder`, 1));
   });
 
   it('shows error if the project version couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
     sinon.stub(command as any, 'getProjectVersion').returns(undefined);
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3));
   });
 
@@ -109,7 +111,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
     sinon.stub(command as any, 'getProjectVersion').returns('0.0.1');
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`CLI for Microsoft 365 doesn't support validating projects built using SharePoint Framework v0.0.1`, 4));
   });
 
@@ -119,7 +121,7 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     (command as any).supportedVersions.splice(1, 0, '0');
 
-    await assert.rejects(command.action(logger, { options: {} } as any), (err) => {
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), (err) => {
       (command as any).supportedVersions.splice(1, 1);
       const message = (err as any).message;
       return message.indexOf('Cannot find module') > -1 &&
@@ -129,10 +131,9 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   it('returns markdown report with output format md', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
-    sinon.stub(cli, 'log').callsFake(msg => log.push(msg));
 
     try {
-      await cli.executeCommand(command, { options: { output: 'md' } } as any);
+      await  command.action(logger, { options: commandOptionsSchema.parse({ output: 'md' }) });
       assert(log[0].indexOf('## Findings') > -1);
     }
     finally {
@@ -149,21 +150,21 @@ describe(commands.PROJECT_DOCTOR, () => {
         'prop2': 'value2'
       }
     ];
-    const actual = command.getMdOutput(expected, command, { options: { output: 'md' } } as any);
+    const actual = command.getMdOutput(expected, command, { options: commandOptionsSchema.parse({ output: 'md' }) } as any);
     assert.deepStrictEqual(actual, expected);
   });
 
   it('returns text report with output format text', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: { output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text' }) });
     assert(log[0].indexOf('-----------------------') > -1);
   });
 
   it('returns json report with output format default', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(Array.isArray(log[0]));
   });
 
@@ -180,7 +181,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').resolves('');
 
-    await command.action(logger, { options: { output: 'tour' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'tour' }) });
     assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours/validation.tour')), 'Tour file not created');
     assert(mkDirSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours')), '.tours folder not created');
   });
@@ -198,7 +199,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').resolves('');
 
-    await command.action(logger, { options: { output: 'tour' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'tour' }) });
     assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours/validation.tour')), 'Tour file not created');
     assert(mkDirSyncStub.notCalled, '.tours folder created');
   });
@@ -206,7 +207,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.0.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-100-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 7);
   });
@@ -214,7 +215,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.0.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-101-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 7);
   });
@@ -222,7 +223,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.0.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-102-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 7);
   });
@@ -230,7 +231,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.1.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 14);
   });
@@ -238,7 +239,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.1.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-111-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 14);
   });
@@ -246,7 +247,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.1.3 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-113-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 14);
   });
@@ -254,7 +255,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.2.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-120-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 14);
   });
@@ -262,7 +263,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.3.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-130-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 15);
   });
@@ -270,7 +271,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.3.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-131-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 15);
   });
@@ -278,7 +279,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.3.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-132-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 15);
   });
@@ -286,7 +287,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.3.4 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-134-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 16);
   });
@@ -294,7 +295,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.4.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-140-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
@@ -302,7 +303,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.4.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-141-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
@@ -310,7 +311,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.5.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-150-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -318,7 +319,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.5.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -326,7 +327,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.6.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-160-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -334,7 +335,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.7.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-170-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -342,7 +343,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.8.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-180-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -350,7 +351,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.8.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-181-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -358,7 +359,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.8.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -366,7 +367,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.9.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-191-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -374,7 +375,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.10.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1100-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 8);
   });
@@ -382,7 +383,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.11.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -390,7 +391,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.12.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -398,7 +399,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.12.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -406,7 +407,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.13.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -414,7 +415,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.13.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -422,7 +423,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.14.0 project (json)', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), validProjectPath));
 
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -430,21 +431,21 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct message a valid 1.14.0 project (text)', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), validProjectPath));
 
-    await command.action(logger, { options: { output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'text' }) });
     assert.strictEqual(log[0], '✅ CLI for Microsoft 365 has found no issues in your project');
   });
 
   it('e2e: shows correct message for a valid 1.14.0 project (md)', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), validProjectPath));
 
-    await command.action(logger, { options: { output: 'md' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'md' }) });
     assert(log[0].indexOf('✅ CLI for Microsoft 365 has found no issues in your project') > -1);
   });
 
   it('e2e: shows yarn commands for yarn package manager', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: { output: 'json', packageManager: 'yarn' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', packageManager: 'yarn' }) });
     const findings: FindingToReport[] = log.pop();
     assert.strictEqual(findings[0].resolution.indexOf('yarn '), 0);
   });
@@ -452,7 +453,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows yarn commands for pnpm package manager', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: { output: 'json', packageManager: 'pnpm' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', packageManager: 'pnpm' }) });
     const findings: FindingToReport[] = log.pop();
     assert.strictEqual(findings[0].resolution.indexOf('pnpm '), 0);
   });
@@ -460,7 +461,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for an invalid 1.14.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 28);
   });
@@ -468,7 +469,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for an invalid 1.14.0 project (debug)', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
-    await command.action(logger, { options: { output: 'json', debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', debug: true }) });
     const findings: FindingToReport[] = log.pop();
     assert.strictEqual(findings.length, 28);
   });
@@ -476,7 +477,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.15.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -484,7 +485,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.15.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -492,7 +493,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.16.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1160-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -500,7 +501,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.16.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1161-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -508,7 +509,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.17.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1170-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -516,7 +517,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.17.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1171-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -524,7 +525,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.17.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1172-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 2);
   });
@@ -532,7 +533,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.17.3 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1173-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -540,7 +541,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.17.4 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1174-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -548,7 +549,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.18.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1180-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -556,7 +557,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.18.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1181-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -564,7 +565,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.18.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -572,7 +573,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.19.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1190-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -580,7 +581,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.20.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1200-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -588,7 +589,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.21.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1210-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -596,7 +597,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.22.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1220-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -604,7 +605,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.22.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1221-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -612,7 +613,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.22.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1222-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -620,7 +621,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.23.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1230-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -628,53 +629,66 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.23.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1232-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
 
-  it('passes validation when package manager not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      packageManager: 'npm',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when unsupported package manager specified', async () => {
-    const actual = await command.validate({ options: { packageManager: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when package manager not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when npm package manager specified', async () => {
-    const actual = await command.validate({ options: { packageManager: 'npm' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when unsupported package manager specified', () => {
+    const actual = commandOptionsSchema.safeParse({ packageManager: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when pnpm package manager specified', async () => {
-    const actual = await command.validate({ options: { packageManager: 'pnpm' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when npm package manager specified', () => {
+    const actual = commandOptionsSchema.safeParse({ packageManager: 'npm' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when yarn package manager specified', async () => {
-    const actual = await command.validate({ options: { packageManager: 'yarn' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when pnpm package manager specified', () => {
+    const actual = commandOptionsSchema.safeParse({ packageManager: 'pnpm' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when json output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'json' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when yarn package manager specified', () => {
+    const actual = commandOptionsSchema.safeParse({ packageManager: 'yarn' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when text output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'text' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when json output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'json' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when md output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'md' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when text output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'text' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when tour output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'tour' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when md output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'md' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when csv output specified', async () => {
-    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when tour output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'tour' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when csv output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'csv' });
+    assert.strictEqual(actual.success, false);
   });
 });

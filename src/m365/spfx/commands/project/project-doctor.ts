@@ -1,9 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../../Command.js';
 import { packageManager } from '../../../../utils/packageManager.js';
 import { Dictionary, Hash } from '../../../../utils/types.js';
 import commands from '../../commands.js';
@@ -15,16 +15,19 @@ import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report
 import { ReportData, ReportDataModification } from './report-model/ReportData.js';
 import { Rule } from './Rule.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  packageManager: z.enum(['npm', 'pnpm', 'yarn']).optional(),
+  output: z.enum(['json', 'text', 'md', 'tour']).optional().alias('o')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  packageManager?: string;
-}
-
 class SpfxProjectDoctorCommand extends BaseProjectCommand {
-  private static packageManagers: string[] = ['npm', 'pnpm', 'yarn'];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_NO_VERSION: number = 3;
@@ -97,48 +100,8 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     return 'Validates correctness of a SharePoint Framework project';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        packageManager: args.options.packageManager || 'npm'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = this.allowedOutputs;
-      }
-    });
-    this.options.unshift(
-      {
-        option: '--packageManager [packageManager]',
-        autocomplete: SpfxProjectDoctorCommand.packageManagers
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.packageManager) {
-          if (SpfxProjectDoctorCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
-            return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectDoctorCommand.packageManagers.join(', ')}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -260,7 +223,7 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getMdOutput(logStatement: any[], command: Command, options: GlobalOptions): string {
+  public getMdOutput(logStatement: any[], command: Command, options: Options): string {
     // overwrite markdown output to return the output as-is
     // because the command already implements its own logic to format the output
     return logStatement as any;
