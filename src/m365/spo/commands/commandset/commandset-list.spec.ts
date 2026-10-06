@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './commandset-list.js';
+import command, { options } from './commandset-list.js';
 
 describe(commands.COMMANDSET_LIST, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
 
   //#region Mocked Responses
   const validWebUrl = "https://contoso.sharepoint.com";
@@ -59,6 +60,7 @@ describe(commands.COMMANDSET_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -101,33 +103,24 @@ describe(commands.COMMANDSET_LIST, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the scope is not a valid scope', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: validWebUrl, scope: 'Invalid Scope'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl, scope: 'Invalid Scope'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation when the url options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('retrieves commandsets', async () => {
@@ -143,7 +136,7 @@ describe(commands.COMMANDSET_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: validWebUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: validWebUrl }) });
     assert(loggerLogSpy.calledWith([
       ...commandsetResponse.value,
       ...commandsetResponse.value
@@ -159,7 +152,7 @@ describe(commands.COMMANDSET_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, scope: 'Site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Site' }) });
     assert(loggerLogSpy.calledWith(commandsetResponse.value));
   });
 
@@ -172,7 +165,7 @@ describe(commands.COMMANDSET_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, scope: 'Web' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Web' }) });
     assert(loggerLogSpy.calledWith(commandsetResponse.value));
   });
 
@@ -185,18 +178,7 @@ describe(commands.COMMANDSET_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validWebUrl, scope: 'Site' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validWebUrl, scope: 'Site' }) }),
       new CommandError(error));
-  });
-
-  it('offers autocomplete for the scope option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--scope') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
   });
 });

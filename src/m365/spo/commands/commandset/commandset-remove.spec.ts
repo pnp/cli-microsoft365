@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './commandset-remove.js';
+import command, { options } from './commandset-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_REMOVE, () => {
@@ -20,6 +20,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
@@ -119,6 +120,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -164,54 +166,43 @@ describe(commands.COMMANDSET_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when all options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validUrl, id: validId, scope: validScope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all options specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validUrl, id: validId, scope: validScope });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if the specified URL is invalid', async () => {
-    const actual = await command.validate({ options: { id: validId, webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails if the specified URL is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id, title and clientSideComponentId are provided', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: validId, title: validTitle, clientSideComponentId: validClientSideComponentProperties, webUrl: validUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id, title and clientSideComponentId are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, title: validTitle, clientSideComponentId: validClientSideComponentProperties, webUrl: validUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid id', async () => {
-    const actual = await command.validate({ options: { id: '1', webUrl: validUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid id', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '1', webUrl: validUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid clientSideComponentId', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: '1', webUrl: validUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid clientSideComponentId', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: '1', webUrl: validUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: validUrl, id: validId, scope: 'Invalid scope' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validUrl, id: validId, scope: 'Invalid scope' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validUrl, id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified commandset when force option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        webUrl: validUrl, id: validId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, id: validId }) });
 
     assert(promptIssued);
   });
@@ -221,11 +212,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, {
-      options: {
-        webUrl: validUrl, id: validId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, id: validId }) });
     assert(postSpy.notCalled);
   });
 
@@ -239,9 +226,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: validUrl, id: validId, force: true
-      }
+      options: commandOptionsSchema.parse({ webUrl: validUrl, id: validId, force: true })
     }), new CommandError(`No user commandsets with id '${validId}' found`));
   });
 
@@ -255,9 +240,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: validUrl, title: validTitle, force: true
-      }
+      options: commandOptionsSchema.parse({ webUrl: validUrl, title: validTitle, force: true })
     }), new CommandError(`No user commandsets with title '${validTitle}' found`));
   });
 
@@ -282,9 +265,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: validUrl, title: validTitle, force: true
-      }
+      options: commandOptionsSchema.parse({ webUrl: validUrl, title: validTitle, force: true })
     }), new CommandError("Multiple user commandsets with title 'Commandset title' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
   });
 
@@ -313,7 +294,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, title: validTitle, force: true }) });
     assert(removeRequestIssued);
   });
 
@@ -327,9 +308,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true
-      }
+      options: commandOptionsSchema.parse({ webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true })
     }), new CommandError(`No user commandsets with ClientSideComponentId '${validClientSideComponentId}' found`));
   });
 
@@ -354,9 +333,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true
-      }
+      options: commandOptionsSchema.parse({ webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true })
     }), new CommandError("Multiple user commandsets with ClientSideComponentId 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
   });
 
@@ -381,9 +358,9 @@ describe(commands.COMMANDSET_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, webUrl: validUrl, id: validId
-      }
+      })
     }));
   });
 
@@ -410,9 +387,9 @@ describe(commands.COMMANDSET_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, webUrl: validUrl, id: validId, scope: 'Site'
-      }
+      })
     }));
   });
 
@@ -436,7 +413,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, title: validTitle, force: true }) });
 
   });
 
@@ -460,18 +437,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true } });
-  });
-
-  it('offers autocomplete for the scope option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--scope') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true }) });
   });
 
   it('correctly handles API OData error', async () => {
@@ -489,7 +455,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: validUrl, id: validId, force: true }) }),
       new CommandError(`Something went wrong removing the commandset`));
   });
 });
