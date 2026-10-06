@@ -199,7 +199,7 @@ describe(commands.CHANNEL_ADD, () => {
         name: 'Architecture Discussion',
         description: 'Architecture'
       })
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    }), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('creates channel within the Microsoft Teams team in the tenant with description by team id', async () => {

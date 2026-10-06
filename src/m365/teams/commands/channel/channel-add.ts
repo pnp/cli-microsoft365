@@ -17,7 +17,8 @@ export const options = z.strictObject({
     .alias('i'),
   teamName: z.string()
     .optional(),
-  name: z.string(),
+  name: z.string()
+    .alias('n'),
   description: z.string()
     .optional()
     .alias('d'),

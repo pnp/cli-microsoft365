@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command, { options } from './channel-member-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_SET, () => {
   const memberResponse = {
@@ -500,7 +501,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does multiple exist with username', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === 'prompt') {
+      if (settingName === settingsNames.prompt) {
         return false;
       }
 

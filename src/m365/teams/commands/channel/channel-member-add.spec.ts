@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command, { options } from './channel-member-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_ADD, () => {
   //#region Mocked Responses 
@@ -473,7 +474,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
   it('fails adding conversation members with multiple userDisplayNames', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === 'prompt') {
+      if (settingName === settingsNames.prompt) {
         return false;
       }
 
