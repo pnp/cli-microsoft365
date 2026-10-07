@@ -1,24 +1,35 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { MenuStateNode } from './NavigationNode.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.int().positive(),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  audienceIds: z.string()
+    .refine(audienceIds => audienceIds === '' || audienceIds.split(',').length <= 10, {
+      error: 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.'
+    })
+    .refine(audienceIds => audienceIds === '' || validation.isValidGuidArray(audienceIds) === true, {
+      error: e => `The following GUIDs are invalid for the option 'audienceIds': ${validation.isValidGuidArray(e.input as string)}.`
+    })
+    .optional(),
+  openInNewWindow: z.boolean().optional()
+});
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  audienceIds?: string;
-  id: string;
-  isExternal?: boolean;
-  title?: string;
-  url?: string;
-  webUrl: string;
-  openInNewWindow?: boolean;
 }
 
 class SpoNavigationNodeSetCommand extends SpoCommand {
@@ -27,156 +38,55 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Adds a navigation node to the specified site navigation';
+    return 'Updates a SharePoint navigation node';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        isExternal: typeof args.options.isExternal !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined',
-        openInNewWindow: typeof args.options.openInNewWindow !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.title, options.url, options.audienceIds, options.openInNewWindow].some(o => o !== undefined), {
+        error: 'Specify at least one property to update.'
       });
-    });
   }
 
-  #initTypes(): void {
-    this.types.boolean.push('isExternal');
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--audienceIds [audienceIds]'
-      },
-      {
-        option: '--isExternal [isExternal]'
-      },
-      {
-        option: '--openInNewWindow [openInNewWindow]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.audienceIds === undefined && args.options.url === undefined && args.options.isExternal === undefined && !args.options.title && args.options.openInNewWindow === undefined) {
-          return `Please specify at least one property to update.`;
-        }
-
-        if (args.options.audienceIds) {
-          const audienceIdsSplitted = args.options.audienceIds.split(',');
-          if (audienceIdsSplitted.length > 10) {
-            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.';
-          }
-
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.audienceIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'audienceIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const { webUrl, id, title, url, audienceIds, openInNewWindow } = args.options;
+
+    if (this.verbose) {
+      await logger.logToStderr(`Updating navigation node with id ${id}...`);
+    }
+
     try {
-      if (this.verbose) {
-        await logger.logToStderr(`Setting navigation node...`);
+      const { menuState, node } = await spo.getMenuStateNodeByKey(webUrl, id.toString());
+
+      if (title !== undefined) {
+        node.Title = title;
       }
 
-      let url = args.options.url;
-      if (url === '') {
-        url = 'http://linkless.header/';
+      if (url !== undefined) {
+        node.SimpleUrl = url;
       }
 
-      const requestBody: any = {
-        Title: args.options.title,
-        IsExternal: args.options.isExternal,
-        Url: url
-      };
-
-      if (args.options.audienceIds !== undefined) {
-        requestBody.AudienceIds = args.options.audienceIds === '' ? [] : args.options.audienceIds.split(',');
+      if (audienceIds !== undefined) {
+        node.AudienceIds = audienceIds === '' ? [] : audienceIds.split(',');
       }
 
-      const requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})`,
-        headers: {
-          accept: 'application/json;odata=nometadata',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        data: requestBody,
-        responseType: 'json'
-      };
-
-      const response = await request.patch<any>(requestOptions);
-      if (response['odata.null'] === true) {
-        throw `Navigation node does not exist.`;
+      if (openInNewWindow !== undefined) {
+        node.OpenInNewWindow = openInNewWindow;
       }
 
-      if (args.options.openInNewWindow !== undefined) {
-        if (this.verbose) {
-          await logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
-        }
-
-        let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
-        let menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
-        if (!menuStateItem) {
-          menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
-          menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
-        }
-        menuStateItem!.OpenInNewWindow = args.options.openInNewWindow;
-        await spo.saveMenuState(args.options.webUrl, menuState);
-      }
+      await spo.saveMenuState(webUrl, menuState);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private getMenuStateNode(nodes: MenuStateNode[], id: string): MenuStateNode {
-    let menuNode = nodes.find((node: MenuStateNode) => node.Key.toString() === id.toString());
-    if (menuNode === undefined) {
-      for (const node of nodes.filter(node => node.Nodes.length > 0)) {
-        menuNode = this.getMenuStateNode(node.Nodes, id);
-        if (menuNode) {
-          break;
-        }
-      }
-    }
-    return menuNode!;
   }
 }
 

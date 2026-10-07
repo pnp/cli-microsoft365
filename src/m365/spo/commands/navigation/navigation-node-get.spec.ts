@@ -16,31 +16,81 @@ import command, { options } from './navigation-node-get.js';
 describe(commands.NAVIGATION_NODE_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/team-a';
   const id = 2209;
-  const navigationNodeGetResponse = {
-    "AudienceIds": null,
-    "CurrentLCID": 1033,
-    "Id": id,
-    "IsDocLib": true,
-    "IsExternal": false,
-    "IsVisible": true,
-    "ListTemplateType": 100,
-    "Title": "Work Status",
-    "Url": "/sites/team-a/Lists/Work Status/AllItems.aspx",
-    "Children": [
+  const childNode = {
+    AudienceIds: [],
+    CurrentLCID: 1033,
+    CustomProperties: [],
+    FriendlyUrlSegment: '',
+    IsDeleted: false,
+    IsHidden: false,
+    IsTitleForExistingLanguage: false,
+    Key: '2209',
+    Nodes: [
       {
-        "AudienceIds": null,
-        "CurrentLCID": 1033,
-        "Id": 2005,
-        "IsDocLib": true,
-        "IsExternal": true,
-        "IsVisible": true,
-        "ListTemplateType": 0,
-        "Title": "External site",
-        "Url": "https://externalsite.com",
-        "Children": []
+        AudienceIds: [],
+        CurrentLCID: 1033,
+        CustomProperties: [],
+        FriendlyUrlSegment: '',
+        IsDeleted: false,
+        IsHidden: false,
+        IsTitleForExistingLanguage: false,
+        Key: '2210',
+        Nodes: [],
+        NodeType: 0,
+        OpenInNewWindow: true,
+        SimpleUrl: 'https://externalsite.com',
+        Title: 'External site',
+        Translations: []
       }
-    ]
+    ],
+    NodeType: 0,
+    OpenInNewWindow: null,
+    SimpleUrl: '/sites/team-a/Lists/Work Status/AllItems.aspx',
+    Title: 'Work Status',
+    Translations: []
   };
+  const quickLaunchMenuState = {
+    AudienceIds: [],
+    FriendlyUrlPrefix: '',
+    IsAudienceTargetEnabledForGlobalNav: false,
+    Nodes: [
+      {
+        AudienceIds: [],
+        CurrentLCID: 1033,
+        CustomProperties: [],
+        FriendlyUrlSegment: '',
+        IsDeleted: false,
+        IsHidden: false,
+        IsTitleForExistingLanguage: false,
+        Key: '2003',
+        Nodes: [childNode],
+        NodeType: 0,
+        OpenInNewWindow: null,
+        SimpleUrl: '',
+        Title: 'Lists',
+        Translations: []
+      }
+    ],
+    SimpleUrl: '',
+    SPSitePrefix: '/sites/team-a',
+    SPWebPrefix: '/sites/team-a',
+    StartingNodeKey: '1025',
+    StartingNodeTitle: 'Quick launch',
+    Version: '2026-10-07T19:21:10.213646Z'
+  };
+  const topNavigationMenuState = {
+    AudienceIds: [],
+    FriendlyUrlPrefix: '',
+    IsAudienceTargetEnabledForGlobalNav: false,
+    Nodes: [childNode],
+    SimpleUrl: '',
+    SPSitePrefix: '/sites/team-a',
+    SPWebPrefix: '/sites/team-a',
+    StartingNodeKey: '1002',
+    StartingNodeTitle: 'SharePoint Top Navigation Bar',
+    Version: '2026-10-07T19:21:10.213646Z'
+  };
+  const emptyQuickLaunchMenuState = { ...quickLaunchMenuState, Nodes: [] };
 
   let log: any[];
   let logger: Logger;
@@ -76,7 +126,7 @@ describe(commands.NAVIGATION_NODE_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.post
     ]);
   });
 
@@ -94,7 +144,7 @@ describe(commands.NAVIGATION_NODE_GET, () => {
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar' });
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id });
     assert.notStrictEqual(actual.success, true);
   });
 
@@ -108,43 +158,60 @@ describe(commands.NAVIGATION_NODE_GET, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it('retrieves navigation node by specified webUrl and id', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})?$expand=Children,Children/Children,Children/Children/Children`) {
-        return navigationNodeGetResponse;
+  it('retrieves navigation node from the quick launch', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState` && opts.data.menuNodeKey === null) {
+        return quickLaunchMenuState;
       }
 
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: webUrl, id: id, verbose: true } });
-    assert(loggerLogSpy.calledWith(navigationNodeGetResponse));
+    assert(loggerLogSpy.calledOnceWith(childNode));
   });
 
-  it('command correctly handles error when navigation node is not found', async () => {
-    sinon.stub(request, 'get').resolves(({ 'odata.null': true }));
+  it('retrieves navigation node from the top navigation', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
+        if (opts.data.menuNodeKey === null) {
+          return emptyQuickLaunchMenuState;
+        }
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        id: id
+        if (opts.data.menuNodeKey === '1002') {
+          return topNavigationMenuState;
+        }
       }
-    }), new CommandError(`No navigation node found with id ${id}.`));
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, id: id } });
+    assert(loggerLogSpy.calledOnceWith(childNode));
   });
 
-  it('command correctly handles navigation node get reject request', async () => {
-    sinon.stub(request, 'get').rejects({
+  it('throws an error when navigation node is not found', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
+        return emptyQuickLaunchMenuState;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id } }),
+      new CommandError(`Navigation node with id '${id}' not found.`));
+  });
+
+  it('correctly handles API error', async () => {
+    sinon.stub(request, 'post').rejects({
       error: {
         code: "-2147024891, System.UnauthorizedAccessException",
         message: "Attempted to perform an unauthorized operation."
       }
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        id: id
-      }
-    }), new CommandError("Attempted to perform an unauthorized operation."));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id } }),
+      new CommandError("Attempted to perform an unauthorized operation."));
   });
 });

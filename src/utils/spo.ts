@@ -8,7 +8,7 @@ import { BasePermissions } from '../m365/spo/base-permissions.js';
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from './formatting.js';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction.js';
-import { MenuState } from '../m365/spo/commands/navigation/NavigationNode.js';
+import { MenuState, MenuStateNode } from '../m365/spo/commands/navigation/NavigationNode.js';
 import { odata } from './odata.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
@@ -921,6 +921,48 @@ export const spo = {
     };
 
     return request.post(requestOptions);
+  },
+
+  /**
+  * Retrieves the navigation node with the specified key from the quick launch or the top navigation.
+  * Returns the node along with the menu state that contains it.
+  * @param webUrl Web url
+  * @param key Key (ID) of the navigation node
+  */
+  async getMenuStateNodeByKey(webUrl: string, key: string): Promise<{ menuState: MenuState, node: MenuStateNode }> {
+    let menuState: MenuState = await this.getQuickLaunchMenuState(webUrl);
+    let node: MenuStateNode | undefined = this.findMenuStateNode(menuState.Nodes, key);
+
+    if (!node) {
+      menuState = await this.getTopNavigationMenuState(webUrl);
+      node = this.findMenuStateNode(menuState.Nodes, key);
+    }
+
+    if (!node) {
+      throw `Navigation node with id '${key}' not found.`;
+    }
+
+    return { menuState, node };
+  },
+
+  /**
+  * Recursively searches the specified menu state nodes for the node with the specified key.
+  * @param nodes Menu state nodes to search
+  * @param key Key (ID) of the navigation node
+  */
+  findMenuStateNode(nodes: MenuStateNode[], key: string): MenuStateNode | undefined {
+    for (const node of nodes) {
+      if (node.Key === key) {
+        return node;
+      }
+
+      const childNode: MenuStateNode | undefined = this.findMenuStateNode(node.Nodes, key);
+      if (childNode) {
+        return childNode;
+      }
+    }
+
+    return undefined;
   },
 
   /**

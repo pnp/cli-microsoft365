@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -39,21 +39,9 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about navigation node with id ${args.options.id}`);
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})?$expand=Children,Children/Children,Children/Children/Children`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const listInstance = await request.get<any>(requestOptions);
-      if (listInstance['odata.null']) {
-        throw `No navigation node found with id ${args.options.id}.`;
-      }
-
-      await logger.log(listInstance);
+      const { node } = await spo.getMenuStateNodeByKey(args.options.webUrl, args.options.id.toString());
+      await logger.log(node);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
