@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
-import command from './engage-community-remove.js';
+import command, { options } from './engage-community-remove.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
@@ -23,6 +23,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +32,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,18 +76,28 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when entraGroupId is specified', async () => {
-    const actual = await command.validate({ options: { entraGroupId: entraGroupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when entraGroupId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ entraGroupId: entraGroupId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when entraGroupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { entraGroupId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when entraGroupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ entraGroupId: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: communityId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation without required option', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the community when confirm option not passed', async () => {
-    await command.action(logger, { options: { id: communityId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: communityId }) });
 
     assert(promptIssued);
   });
@@ -93,7 +105,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
   it('aborts removing the community when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { id: communityId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: communityId }) });
     assert(deleteSpy.notCalled);
   });
 
@@ -106,7 +118,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: communityId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: communityId, force: true, verbose: true }) });
     assert(deleteRequestStub.called);
   });
 
@@ -124,7 +136,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { displayName: displayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName }) });
     assert(deleteRequestStub.called);
   });
 
@@ -142,7 +154,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId }) });
     assert(deleteRequestStub.called);
   });
 
@@ -166,7 +178,7 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: communityId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: communityId, force: true }) }),
       new CommandError(error.error.message));
   });
 });
