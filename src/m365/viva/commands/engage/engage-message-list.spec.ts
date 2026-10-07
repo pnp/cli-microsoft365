@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-message-list.js';
+import command, { options } from './engage-message-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_LIST, () => {
@@ -19,6 +19,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const firstMessageBatch: any = {
     messages: [
@@ -48,6 +49,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -100,54 +102,62 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
-  it('passes validation without parameters', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation without parameters', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { limit: 10 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with parameters', () => {
+    const actual = commandOptionsSchema.safeParse({ limit: 10 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('limit must be a number', async () => {
-    const actual = await command.validate({ options: { limit: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('limit must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ limit: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('olderThanId must be a number', async () => {
-    const actual = await command.validate({ options: { olderThanId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('olderThanId must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ olderThanId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('groupId must be a number', async () => {
-    const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('groupId must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('threadId must be a number', async () => {
-    const actual = await command.validate({ options: { threadId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('threadId must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ threadId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('you are not allowed to use groupId and threadId at the same time', async () => {
-    const actual = await command.validate({ options: { groupId: 123, threadId: 123 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('you are not allowed to use groupId and threadId at the same time', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: 123, threadId: 123 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('you cannot specify the feedType with groupId or threadId at the same time', async () => {
-    const actual = await command.validate({ options: { feedType: 'All', threadId: 123 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('you cannot specify the feedType with groupId or threadId at the same time', () => {
+    const actual = commandOptionsSchema.safeParse({ feedType: 'All', threadId: 123 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('Fails in case FeedType is not correct', async () => {
-    const actual = await command.validate({ options: { feedType: 'WrongValue' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('Fails in case FeedType is not correct', () => {
+    const actual = commandOptionsSchema.safeParse({ feedType: 'WrongValue' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('you are not allowed to use groupId and threadId and feedType at the same time', async () => {
-    const actual = await command.validate({ options: { feedType: 'Private', groupId: 123, threadId: 123 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('you are not allowed to use groupId and threadId and feedType at the same time', () => {
+    const actual = commandOptionsSchema.safeParse({ feedType: 'Private', groupId: 123, threadId: 123 });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      limit: 10,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('returns messages without more results', async () => {
@@ -168,7 +178,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Top' } } as any,);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'Top' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -179,7 +189,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'My' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'My' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -190,7 +200,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Following' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'Following' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -201,7 +211,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Sent' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'Sent' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -212,7 +222,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Private' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'Private' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -223,7 +233,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'Received' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'Received' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -234,7 +244,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { feedType: 'All' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ feedType: 'All' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -245,7 +255,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { groupId: 123123 } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: 123123 }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -256,7 +266,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { threadId: 123123 } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ threadId: 123123 }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -271,7 +281,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
         return secondMessageBatch;
       }
     });
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 7);
   });
 
@@ -286,7 +296,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
         return secondMessageBatch;
       }
     });
-    await command.action(logger, { options: { limit: 6, output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ limit: 6, output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 6);
   });
 
@@ -306,7 +316,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) }), new CommandError('An error has occurred.'));
   });
 
   it('handles correct parameters older than', async () => {
@@ -316,7 +326,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ olderThanId: 10123190123128, output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -327,7 +337,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ olderThanId: 10123190123128, threaded: true, output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
@@ -338,7 +348,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { threaded: true, output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ threaded: true, output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 });

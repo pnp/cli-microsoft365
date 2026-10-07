@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-message-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './engage-message-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +28,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -49,8 +50,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      cli.promptForConfirmation,
-      cli.getSettingWithDefaultValue
+      cli.promptForConfirmation
     ]);
   });
 
@@ -67,22 +67,14 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('id must be a number', async () => {
-    const actual = await command.validate({ options: { id: 'nonumber' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('id is required', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('calls the messaging endpoint with the right parameters and confirmation', async () => {
@@ -93,7 +85,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 10123190123123, force: true }) });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
@@ -106,7 +98,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
     });
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 10123190123123, force: false }) });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
@@ -120,7 +112,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
 
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 10123190123123, force: false }) });
     assert(requestDeleteStub.notCalled);
   });
 
@@ -133,11 +125,6 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 10123190123123, force: true } } as any), new CommandError('An error has occurred.'));
-  });
-
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
-    assert.strictEqual(actual, true);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 10123190123123, force: true }) }), new CommandError('An error has occurred.'));
   });
 });

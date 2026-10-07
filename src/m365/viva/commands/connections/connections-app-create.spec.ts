@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './connections-app-create.js';
+import command, { options } from './connections-app-create.js';
 import { spo } from '../../../../utils/spo.js';
 import { WebProperties } from '../../../spo/commands/web/WebProperties.js';
 
@@ -28,6 +28,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const webResponse: WebProperties = {
     AllowRssFeeds: false,
     AlternateCssUrl: '',
@@ -72,6 +73,12 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     (command as any).archive = admZipMock;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
+    sinon.stub(fs, 'existsSync').callsFake((p) => {
+      const filePath = typeof p === 'string' ? p : p.toString();
+      // Return true for icon files, false for zip files (which would trigger the force check)
+      return filePath.endsWith('.png') || filePath.endsWith('.jpg');
+    });
   });
 
   beforeEach(() => {
@@ -91,7 +98,6 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      fs.existsSync,
       spo.getWeb,
       admZipMock.addFile,
       admZipMock.addLocalFile,
@@ -120,7 +126,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com',
         name: 'Contoso',
         description: 'Contoso',
@@ -129,7 +135,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         companyWebsiteUrl: 'https://contoso.com',
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
-      }
+      })
     });
     assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
     assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
@@ -145,7 +151,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
         name: 'Contoso',
         description: 'Contoso',
@@ -155,7 +161,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png',
         debug: true
-      }
+      })
     });
     assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
     assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
@@ -171,7 +177,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com/teams/contoso?param=value',
         name: 'Contoso',
         description: 'Contoso',
@@ -180,7 +186,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         companyWebsiteUrl: 'https://contoso.com',
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
-      }
+      })
     });
     assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
     assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
@@ -194,7 +200,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com',
         name: 'Contoso',
         description: 'Contoso',
@@ -203,7 +209,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         companyWebsiteUrl: 'https://contoso.com',
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
-      }
+      })
     } as any), new CommandError('404 - FILE NOT FOUND'));
     assert(admZipMockWriteZipSpy.notCalled);
   });
@@ -212,7 +218,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     sinon.stub(spo, 'getWeb').rejects(new Error('404 - FILE NOT FOUND'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com',
         name: 'Contoso',
         description: 'Contoso',
@@ -222,7 +228,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png',
         debug: true
-      }
+      })
     } as any), new CommandError('404 - FILE NOT FOUND'));
   });
 
@@ -232,7 +238,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     sinon.stub(spo, 'getWeb').resolves(webResponse1);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
         name: 'Contoso',
         description: 'Contoso',
@@ -242,7 +248,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png',
         debug: true
-      }
+      })
     } as any), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
   });
 
@@ -254,7 +260,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         portalUrl: 'https://contoso.sharepoint.com',
         name: 'Contoso',
         description: 'Contoso',
@@ -263,52 +269,47 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         companyWebsiteUrl: 'https://contoso.com',
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
-  it(`fails validation if the specified app name is longer than 30 chars`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: `Stay on top of what's happening at Contoso`,
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`fails validation if the specified app name is longer than 30 chars`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: `Stay on top of what's happening at Contoso`,
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified description is longer than 80 chars`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: `Stay on top of what's happening at Contoso Stay on top of what's happening at Contoso`,
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`fails validation if the specified description is longer than 80 chars`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: `Stay on top of what's happening at Contoso Stay on top of what's happening at Contoso`,
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified long description is longer than 4000 chars`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `
+  it(`fails validation if the specified long description is longer than 4000 chars`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque magna turpis, sollicitudin vitae dui non, rutrum tincidunt ipsum. Vestibulum finibus, lectus vel fermentum pretium, urna lectus fermentum nulla, eu condimentum lectus justo in elit. Cras et pretium nibh. Suspendisse et placerat enim, a convallis odio. Donec elementum efficitur leo, quis semper nisi venenatis sit amet. Integer pellentesque tellus sit amet mattis cursus. Vivamus at viverra elit, vel lobortis sem.
       
@@ -325,110 +326,115 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       Nunc vehicula quis lectus sed tristique. Nullam consequat auctor libero vel mattis. Praesent dapibus ornare faucibus. Proin id viverra eros. Nunc diam dui, aliquam sed nisi id, faucibus semper orci. Quisque lacinia purus non porta sollicitudin. Nullam sit amet eros interdum, pharetra tellus vel, auctor sapien. Suspendisse et augue imperdiet ante pellentesque bibendum eu vel arcu. Etiam arcu nulla, finibus vitae porta vitae, tempus nec sapien. Nunc vitae aliquam nunc. Proin nec congue dolor, eu congue tortor. Mauris sed turpis sed mauris fringilla faucibus. Integer neque libero, venenatis quis fringilla commodo, tempus quis leo. Maecenas rhoncus tellus et molestie iaculis. Nulla quis feugiat nibh, maximus imperdiet enim. Nam congue a justo quis blandit.
       
       Integer dignissim vitae leo vel sagittis. Vivamus interdum, ipsum sed dictum aliquam, est nisl euismod nisl, vel luctus tellus nibh a ante. Curabitur posuere sapien a ullamcorper pharetra. Etiam consectetur, nunc vitae ullamcorper consequat, enim quam vulputate diam, non tempus mauris ligula quis justo. Fusce porta dui dignissim mauris ullamcorper mollis. Aliquam eget tempus libero. Nam eget purus sit amet lacus commodo commodo. Cras faucibus tortor vel odio varius, nec dignissim sapien commodo. Ut a lacus eu donec. `,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if a file with the app name already exists and no force flag specified`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`fails validation if a file with the app name already exists and no force flag specified`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(() => true);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified colored icon doesn't exist`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => {
+  it(`fails validation if the specified colored icon doesn't exist`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake((path) => {
       const p = path.toString();
       if (p.indexOf('.zip') > -1) {
         return false;
       }
       return p.indexOf('color') < 0;
     });
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified outline icon doesn't exist`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => {
+  it(`fails validation if the specified outline icon doesn't exist`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake((path) => {
       const p = path.toString();
       if (p.indexOf('.zip') > -1) {
         return false;
       }
       return p.indexOf('outline') < 0;
     });
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it(`passes validation if a file with the app name already exists and force flag specified`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png',
-        force: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if a file with the app name already exists and force flag specified`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(() => true);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png',
+      force: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if all arguments are correct`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.zip') < 0);
-    const actual = await command.validate({
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        name: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if all arguments are correct`, () => {
+    (fs.existsSync as sinon.SinonStub).callsFake((path) => path.toString().indexOf('.zip') < 0);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    (fs.existsSync as sinon.SinonStub).callsFake((path) => path.toString().indexOf('.zip') < 0);
+    const actual = commandOptionsSchema.safeParse({
+      portalUrl: 'https://contoso.sharepoint.com',
+      name: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

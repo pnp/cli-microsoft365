@@ -1,7 +1,6 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GraphCommand from '../../../base/GraphCommand.js';
-import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -9,23 +8,27 @@ import auth from '../../../../Auth.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { setTimeout } from 'timers/promises';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string(),
+  description: z.string(),
+  privacy: z.enum(['public', 'private']),
+  adminEntraIds: z.string().optional(),
+  adminEntraUserNames: z.string().optional(),
+  wait: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  displayName: string;
-  description: string;
-  privacy: string;
-  adminEntraIds?: string;
-  adminEntraUserNames?: string;
-  wait?: boolean;
-}
-
 class VivaEngageCommunityAddCommand extends GraphCommand {
   private pollingInterval: number = 5000;
-  private readonly privacyOptions = ['public', 'private'];
 
   public get name(): string {
     return commands.ENGAGE_COMMUNITY_ADD;
@@ -35,92 +38,71 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
     return 'Creates a new community in Viva Engage';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        adminEntraIds: typeof args.options.adminEntraIds !== 'undefined',
-        adminEntraUserNames: typeof args.options.adminEntraUserNames !== 'undefined',
-        wait: !!args.options.wait
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.displayName.length <= 255, {
+        message: "The maximum amount of characters for 'displayName' is 255.",
+        params: { customCode: 'required' }
+      })
+      .refine(opts => opts.description.length <= 1024, {
+        message: "The maximum amount of characters for 'description' is 1024.",
+        params: { customCode: 'required' }
+      })
+      .superRefine((opts, ctx) => {
+        if (opts.adminEntraIds) {
+          const items = opts.adminEntraIds.split(',').map(s => s.trim());
+          const invalid = items.filter(item => !validation.isValidGuid(item));
+          if (invalid.length > 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `The following GUIDs are invalid for the option 'adminEntraIds': ${invalid.join(', ')}`,
+              params: { customCode: 'required' }
+            });
+          }
+        }
+      })
+      .refine(opts => {
+        if (!opts.adminEntraIds) {
+          return true;
+        }
+        return formatting.splitAndTrim(opts.adminEntraIds).length <= 20;
+      }, {
+        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.',
+        params: { customCode: 'required' }
+      })
+      .superRefine((opts, ctx) => {
+        if (opts.adminEntraUserNames) {
+          const items = opts.adminEntraUserNames.split(',').map(s => s.trim());
+          const invalid = items.filter(item => !validation.isValidUserPrincipalName(item));
+          if (invalid.length > 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `The following user principal names are invalid for the option 'adminEntraUserNames': ${invalid.join(', ')}`,
+              params: { customCode: 'required' }
+            });
+          }
+        }
+      })
+      .refine(opts => {
+        if (!opts.adminEntraUserNames) {
+          return true;
+        }
+        return formatting.splitAndTrim(opts.adminEntraUserNames).length <= 20;
+      }, {
+        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !opts.adminEntraIds || !opts.adminEntraUserNames, {
+        message: 'Specify either adminEntraIds or adminEntraUserNames, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['adminEntraIds', 'adminEntraUserNames']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--displayName <displayName>' },
-      { option: '--description <description>' },
-      {
-        option: '--privacy <privacy>',
-        autocomplete: this.privacyOptions
-      },
-      { option: '--adminEntraIds [adminEntraIds]' },
-      { option: '--adminEntraUserNames [adminEntraUserNames]' },
-      { option: '--wait' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.displayName.length > 255) {
-          return `The maximum amount of characters for 'displayName' is 255.`;
-        }
-
-        if (args.options.description.length > 1024) {
-          return `The maximum amount of characters for 'description' is 1024.`;
-        }
-
-        if (this.privacyOptions.indexOf(args.options.privacy) === -1) {
-          return `'${args.options.privacy}' is not a valid value for privacy. Allowed values are: ${this.privacyOptions.join(', ')}.`;
-        }
-
-        if (args.options.adminEntraIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.adminEntraIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'adminEntraIds': ${isValidGUIDArrayResult}.`;
-          }
-          if (formatting.splitAndTrim(args.options.adminEntraIds).length > 20) {
-            return `Maximum of 20 admins allowed. Please reduce the number of users and try again.`;
-          }
-        }
-
-        if (args.options.adminEntraUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.adminEntraUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'adminEntraUserNames': ${isValidUPNArrayResult}.`;
-          }
-          if (formatting.splitAndTrim(args.options.adminEntraUserNames).length > 20) {
-            return `Maximum of 20 admins allowed. Please reduce the number of users and try again.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('displayName', 'description', 'privacy', 'adminEntraIds', 'adminEntraUserNames');
-    this.types.boolean.push('wait');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['adminEntraIds', 'adminEntraUserNames'],
-        runsWhen: (args) => args.options.adminEntraIds || args.options.adminEntraUserNames
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
