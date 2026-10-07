@@ -20,13 +20,16 @@ m365 spo sitedesign get [options]
 
 `--title [title]`
 : Site design title. Specify either `id` or `title` but not both.
+
+`-b, --builtIn`
+: Retrieve the specified design from the built-in Microsoft site designs (e.g. Event, Department, Human Resources) instead of the site designs registered on the tenant.
 ```
 
 <Global />
 
 ## Remarks
 
-If the specified `id` or `title` doesn't refer to an existing site design, you will get a `File not found` error.
+If the specified `id` or `title` doesn't refer to an existing site design, you will get a `File not found` error. When using the `builtIn` option and no matching design is found, you will get a `The specified site design does not exist` error.
 
 ## Examples
 
@@ -40,6 +43,12 @@ Get information about the site design with title _Contoso Site Design_
 
 ```sh
 m365 spo sitedesign get --title "Contoso Site Design"
+```
+
+Get information about the built-in Microsoft site design with title _Event_
+
+```sh
+m365 spo sitedesign get --title Event --builtIn
 ```
 
 ## Response
@@ -152,6 +161,24 @@ m365 spo sitedesign get --title "Contoso Site Design"
   WebTemplate | 64
   Id | 00281728-3bc1-41d3-92b6-8fc493dcf4cc
   Version | 1
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `builtIn` response
+
+When using the `builtIn` option, the response contains only the `Id` and `Title` of the built-in site design, enriched with a `Template` property containing the matching template name that can be used with the [spo sitedesign apply](./sitedesign-apply.mdx) command's `template` option.
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42",
+    "Title": "Event",
+    "Template": "Event"
+  }
   ```
 
   </TabItem>

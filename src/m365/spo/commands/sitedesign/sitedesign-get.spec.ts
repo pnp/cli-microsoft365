@@ -420,11 +420,126 @@ describe(commands.SITEDESIGN_GET, () => {
     await assert.rejects(command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
   });
 
+  it('gets information about the specified built-in site design by id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({ store: 1 })) {
+        return {
+          value: [
+            {
+              "Title": "Event",
+              "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42"
+            },
+            {
+              "Title": "Department",
+              "Id": "73495f08-0140-499b-8927-dd26a546f26a"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: '3d5ef50b-88a0-42a7-9fb2-8036009f6f42', builtIn: true } });
+    assert(loggerLogSpy.calledWith({
+      "Title": "Event",
+      "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42",
+      "Template": "Event"
+    }));
+  });
+
+  it('gets information about the specified built-in site design by title', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({ store: 1 })) {
+        return {
+          value: [
+            {
+              "Title": "Event",
+              "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { title: 'Event', builtIn: true } });
+    assert(loggerLogSpy.calledWith({
+      "Title": "Event",
+      "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42",
+      "Template": "Event"
+    }));
+  });
+
+  it('handles selecting single result when multiple built-in site designs with the specified title are found', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({ store: 1 })) {
+        return {
+          value: [
+            {
+              "Title": "Event",
+              "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42"
+            },
+            {
+              "Title": "Event",
+              "Id": "73495f08-0140-499b-8927-dd26a546f26a"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
+      "Title": "Event",
+      "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42"
+    });
+
+    await command.action(logger, { options: { title: 'Event', builtIn: true } });
+    assert(loggerLogSpy.calledWith({
+      "Title": "Event",
+      "Id": "3d5ef50b-88a0-42a7-9fb2-8036009f6f42",
+      "Template": "Event"
+    }));
+  });
+
+  it('fails to get built-in site design when it does not exist', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: 'Non-existing built-in design',
+        builtIn: true
+      }
+    } as any), new CommandError('The specified site design does not exist'));
+  });
+
   it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying builtIn', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--builtIn') > -1) {
         containsOption = true;
       }
     });
