@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './model-get.js';
+import command, { options } from './model-get.js';
 import { spp } from '../../../../utils/spp.js';
 
 describe(commands.MODEL_GET, () => {
@@ -19,6 +19,7 @@ describe(commands.MODEL_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const model = {
     "AIBuilderHybridModelType": null,
     "AzureCognitivePrebuiltModelName": null,
@@ -175,6 +176,7 @@ describe(commands.MODEL_GET, () => {
     sinon.stub(spp, 'assertSiteIsContentCenter').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -214,34 +216,43 @@ describe(commands.MODEL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when required parameters are valid with id', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with id', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when required parameters are valid with title', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with title', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when required parameters are valid with id and withPublications', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', withPublications: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with id and withPublications', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', withPublications: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when required parameters are valid with title and withPublications', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName', withPublications: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with title and withPublications', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName', withPublications: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when siteUrl is not valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'invalidUrl', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when siteUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when id is not valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when id is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sales',
+      id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles a model is not found error by id', async () => {
@@ -257,42 +268,42 @@ describe(commands.MODEL_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' }) }),
       new CommandError('File Not Found.'));
   });
 
   it('retrieves model by id', async () => {
     sinon.stub(spp, 'getModelById').resolves(model);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('retrieves model by title', async () => {
     sinon.stub(spp, 'getModelByTitle').resolves(model);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('retrieves model without additional information by title', async () => {
     sinon.stub(spp, 'getModelByTitle').resolves(modelWithoutAdditionalData as any);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResultWithoutAdditionalData);
   });
 
   it('retrieves model by title with classifier suffix', async () => {
     sinon.stub(spp, 'getModelByTitle').resolves(model);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName.classifier' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName.classifier' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
   it('gets correct model when the site URL has a trailing slash', async () => {
     sinon.stub(spp, 'getModelById').resolves(model);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal/', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal/', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], modelResult);
   });
 
@@ -306,7 +317,7 @@ describe(commands.MODEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '164720c8-35ee-4157-ba26-db6726264f9d', withPublications: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '164720c8-35ee-4157-ba26-db6726264f9d', withPublications: true, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], { ...modelResult, Publications: publications });
   });
 
@@ -320,7 +331,7 @@ describe(commands.MODEL_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName', withPublications: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName', withPublications: true }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], { ...modelResult, Publications: publications });
   });
 });
