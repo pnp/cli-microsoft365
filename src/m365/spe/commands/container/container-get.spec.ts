@@ -170,7 +170,7 @@ describe(commands.CONTAINER_GET, () => {
       throw 'Invalid GET request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: containerName, containerTypeId: containerTypeId }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], containerResponse);
   });
 
@@ -197,7 +197,7 @@ describe(commands.CONTAINER_GET, () => {
       throw 'Invalid GET request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { name: containerName, containerTypeName: containerTypeName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: containerName, containerTypeName: containerTypeName, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], containerResponse);
   });
 
@@ -206,7 +206,7 @@ describe(commands.CONTAINER_GET, () => {
       value: deletedContainersResponse
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existing container', containerTypeId: containerTypeId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'Non-existing container', containerTypeId: containerTypeId }) }),
       new CommandError(`The specified container 'Non-existing container' does not exist.`));
   });
 
@@ -232,7 +232,7 @@ describe(commands.CONTAINER_GET, () => {
     });
 
     const stubMultiResults = sinon.stub(cli, 'handleMultipleResultsFound').resolves(deletedContainersResponse.find(c => c.id === containerId)!);
-    await command.action(logger, { options: { name: containerName, containerTypeId: containerTypeId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: containerName, containerTypeId: containerTypeId }) });
     assert(stubMultiResults.calledOnce);
   });
 
@@ -245,7 +245,7 @@ describe(commands.CONTAINER_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: containerId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: containerId }) }),
       new CommandError(errorMessage));
   });
 });
