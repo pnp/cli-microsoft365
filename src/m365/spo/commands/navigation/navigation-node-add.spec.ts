@@ -336,6 +336,11 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation if title is an empty string', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', title: '' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if audienceIds contains an invalid audienceId', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);

@@ -15,7 +15,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   location: z.enum(['QuickLaunch', 'TopNavigationBar']).optional().alias('l'),
-  title: z.string().alias('t'),
+  title: z.string().min(1, 'Cannot be empty.').alias('t'),
   url: z.string().optional(),
   parentNodeId: z.int().positive().optional(),
   audienceIds: z.string()

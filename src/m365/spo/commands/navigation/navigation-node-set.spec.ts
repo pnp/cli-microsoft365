@@ -224,6 +224,11 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation if title is an empty string', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, title: '' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if no options are set to be changed', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
     assert.notStrictEqual(actual.success, true);

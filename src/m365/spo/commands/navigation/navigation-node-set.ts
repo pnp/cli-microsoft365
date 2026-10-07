@@ -14,7 +14,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   id: z.int().positive(),
-  title: z.string().optional(),
+  title: z.string().min(1, 'Cannot be empty.').optional(),
   url: z.string().optional(),
   audienceIds: z.string()
     .refine(audienceIds => audienceIds === '' || audienceIds.split(',').length <= 10, {
