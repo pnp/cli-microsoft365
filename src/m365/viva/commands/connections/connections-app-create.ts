@@ -2,30 +2,38 @@ import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import commands from '../../commands.js';
 import { WebProperties } from '../../../spo/commands/web/WebProperties.js';
 import { spo } from '../../../../utils/spo.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  portalUrl: z.string(),
+  name: z.string().max(30, { message: 'App name must not exceed 30 characters' }),
+  description: z.string().max(80, { message: 'Description must not exceed 80 characters' }),
+  longDescription: z.string().max(4000, { message: 'Long description must not exceed 4000 characters' }),
+  privacyPolicyUrl: z.string().optional(),
+  termsOfUseUrl: z.string().optional(),
+  companyName: z.string(),
+  companyWebsiteUrl: z.string(),
+  coloredIconPath: z.string().refine(val => fs.existsSync(path.resolve(val)), {
+    error: e => `File ${path.resolve(e.input as string)} doesn't exist`
+  }),
+  outlineIconPath: z.string().refine(val => fs.existsSync(path.resolve(val)), {
+    error: e => `File ${path.resolve(e.input as string)} doesn't exist`
+  }),
+  accentColor: z.string().optional(),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  accentColor?: string;
-  name: string;
-  coloredIconPath: string;
-  companyName: string;
-  companyWebsiteUrl: string;
-  description: string;
-  force?: boolean;
-  longDescription: string;
-  outlineIconPath: string;
-  portalUrl: string;
-  privacyPolicyUrl?: string;
-  termsOfUseUrl?: string;
 }
 
 class VivaConnectionsAppCreateCommand extends AnonymousCommand {
@@ -39,65 +47,22 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
     return 'Creates Viva Connections app';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--portalUrl <portalUrl>' },
-      { option: '--name <name>' },
-      { option: '--description <description>' },
-      { option: '--longDescription <longDescription>' },
-      { option: '--privacyPolicyUrl [privacyPolicyUrl]' },
-      { option: '--termsOfUseUrl [termsOfUseUrl]' },
-      { option: '--companyName <companyName>' },
-      { option: '--companyWebsiteUrl <companyWebsiteUrl>' },
-      { option: '--coloredIconPath <coloredIconPath>' },
-      { option: '--outlineIconPath <outlineIconPath>' },
-      { option: '--accentColor [accentColor]' },
-      { option: '--force' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.name.length > 30) {
-          return `App name must not exceed 30 characters`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .superRefine((opts, ctx) => {
+        const appFilePath = path.resolve(`${opts.name}.zip`);
+        if (fs.existsSync(appFilePath) && !opts.force) {
+          ctx.addIssue({
+            message: `File ${path.resolve(`${opts.name}.zip`)} already exists. Delete the file or use the --force option to overwrite the existing file`,
+            code: z.ZodIssueCode.custom,
+            params: { customCode: 'required' }
+          });
         }
-
-        if (args.options.description &&
-          args.options.description.length > 80) {
-          return 'Description must not exceed 80 characters';
-        }
-
-        if (args.options.longDescription &&
-          args.options.longDescription.length > 4000) {
-          return 'Long description must not exceed 4000 characters';
-        }
-
-        const appFilePath = path.resolve(`${args.options.name}.zip`);
-        if (fs.existsSync(appFilePath) && !args.options.force) {
-          return `File ${appFilePath} already exists. Delete the file or use the --force option to overwrite the existing file`;
-        }
-
-        const coloredIconPath = path.resolve(args.options.coloredIconPath);
-        if (!fs.existsSync(coloredIconPath)) {
-          return `File ${coloredIconPath} doesn't exist`;
-        }
-
-        const outlineIconPath = path.resolve(args.options.outlineIconPath);
-        if (!fs.existsSync(outlineIconPath)) {
-          return `File ${outlineIconPath} doesn't exist`;
-        }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -216,7 +181,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
 
   private async getWeb(args: CommandArgs, logger: Logger): Promise<WebProperties> {
     if (this.verbose) {
-      await logger.logToStderr(`Checking if site ${args.options.url} exists...`);
+      await logger.logToStderr(`Checking if site ${args.options.portalUrl} exists...`);
     }
     return await spo.getWeb(args.options.portalUrl, logger, this.verbose);
   }

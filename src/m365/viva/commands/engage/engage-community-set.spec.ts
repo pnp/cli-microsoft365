@@ -9,7 +9,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-community-set.js';
+import command, { options } from './engage-community-set.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import { cli } from '../../../../cli/cli.js';
@@ -21,6 +21,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +30,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -65,59 +67,58 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when id is specified', async () => {
-    const actual = await command.validate({ options: { id: communityId, description: 'Community for all devs' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: communityId, description: 'Community for all devs' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when displayName is specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Software Engineers', description: 'Community for all devs' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when displayName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Software Engineers', description: 'Community for all devs' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when entraGroupId is specified', async () => {
-    const actual = await command.validate({ options: { entraGroupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1', description: 'Community for all devs' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when entraGroupId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ entraGroupId: '0bed8b86-5026-4a93-ac7d-56750cc099f1', description: 'Community for all devs' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when newDisplayName, description or privacy is not specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Software Engineers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when newDisplayName, description or privacy is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'Software Engineers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if newDisplayName is more than 255 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        id: communityId,
-        newDisplayName: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries."
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if newDisplayName is more than 255 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      newDisplayName: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries."
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if description is more than 1024 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.`
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if description is more than 1024 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.`
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid privacy option is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        privacy: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid privacy option is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      privacy: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when entraGroupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { entraGroupId: 'foo', description: 'Community for all devs' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when entraGroupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ entraGroupId: 'foo', description: 'Community for all devs' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: communityId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('updates info about a community specified by id', async () => {
@@ -129,7 +130,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: communityId, newDisplayName: 'Software Engineers', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: communityId, newDisplayName: 'Software Engineers', verbose: true }) });
     assert(patchRequestStub.called);
   });
 
@@ -143,7 +144,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: displayName, description: 'Community for all devs', privacy: 'Public', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName, description: 'Community for all devs', privacy: 'Public', verbose: true }) });
     assert(patchRequestStub.called);
   });
 
@@ -157,7 +158,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, description: 'Community for all devs', privacy: 'Public', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, description: 'Community for all devs', privacy: 'Public', verbose: true }) });
     assert(patchRequestStub.called);
   });
 
@@ -170,7 +171,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: { id: communityId } } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({ id: communityId, description: 'test' }) }),
       new CommandError('An error has occurred')
     );
   });

@@ -1,25 +1,28 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  olderThanId: z.coerce.number().optional(),
+  threaded: z.boolean().optional(),
+  limit: z.coerce.number().optional(),
+  feedType: z.enum(['All', 'Top', 'My', 'Following', 'Sent', 'Private', 'Received']).optional(),
+  groupId: z.coerce.number().optional(),
+  threadId: z.coerce.number().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  olderThanId?: number;
-  threaded?: boolean;
-  limit?: number;
-  feedType?: string;
-  groupId?: number;
-  threadId?: number;
-}
-
 class VivaEngageMessageListCommand extends VivaEngageCommand {
-  private items: any[];
-  private static readonly feedTypes: string[] = ['All', 'Top', 'My', 'Following', 'Sent', 'Private', 'Received'];
+  private items!: any[];
 
   public get name(): string {
     return commands.ENGAGE_MESSAGE_LIST;
@@ -33,86 +36,20 @@ class VivaEngageMessageListCommand extends VivaEngageCommand {
     return ['id', 'replied_to_id', 'thread_id', 'group_id', 'shortBody'];
   }
 
-  constructor() {
-    super();
-    this.items = [];
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        olderThanId: args.options.olderThanId !== undefined,
-        threaded: args.options.threaded,
-        limit: args.options.limit !== undefined,
-        feedType: args.options.feedType !== undefined,
-        threadId: args.options.threadId !== undefined,
-        groupId: args.options.groupId !== undefined
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !(opts.groupId && opts.threadId), {
+        message: 'You cannot specify groupId and threadId at the same time',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !(opts.feedType && (opts.groupId || opts.threadId)), {
+        message: 'You cannot specify the feedType with groupId or threadId at the same time',
+        params: { customCode: 'required' }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--olderThanId [olderThanId]'
-      },
-      {
-        option: '--feedType [feedType]',
-        autocomplete: VivaEngageMessageListCommand.feedTypes
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--threadId [threadId]'
-      },
-      {
-        option: '--threaded'
-      },
-      {
-        option: '--limit [limit]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && args.options.threadId) {
-          return `You cannot specify groupId and threadId at the same time`;
-        }
-
-        if (args.options.feedType && (args.options.groupId || args.options.threadId)) {
-          return `You cannot specify the feedType with groupId or threadId at the same time`;
-        }
-
-        if (args.options.feedType && VivaEngageMessageListCommand.feedTypes.indexOf(args.options.feedType) < 0) {
-          return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are ${VivaEngageMessageListCommand.feedTypes.join(', ')}`;
-        }
-
-        if (args.options.olderThanId && typeof args.options.olderThanId !== 'number') {
-          return `${args.options.olderThanId} is not a number`;
-        }
-
-        if (args.options.groupId && typeof args.options.groupId !== 'number') {
-          return `${args.options.groupId} is not a number`;
-        }
-
-        if (args.options.threadId && typeof args.options.threadId !== 'number') {
-          return `${args.options.threadId} is not a number`;
-        }
-
-        if (args.options.limit && typeof args.options.limit !== 'number') {
-          return `${args.options.limit} is not a number`;
-        }
-
-        return true;
-      }
-    );
   }
 
   private async getAllItems(logger: Logger, args: CommandArgs, messageId: number): Promise<void> {
