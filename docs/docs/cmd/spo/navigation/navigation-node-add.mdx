@@ -30,9 +30,6 @@ m365 spo navigation node add [options]
 `--parentNodeId [parentNodeId]`
 : ID of the node below which the node should be added. Specify either `location` or `parentNodeId` but not both.
 
-`--isExternal`
-: Set, if the navigation node points to an external URL.
-
 `--audienceIds [audienceIds]`
 : Comma-separated list of group IDs that will be used for audience targeting. The limit is 10 ids per navigation node.
 
@@ -57,7 +54,7 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
 Add a navigation node pointing to an external page to the quick launch.
 
 ```sh
-m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us
 ```
 
 Add a navigation node below an existing node and opens it in a new window.
@@ -72,6 +69,12 @@ Add a navigation node to the top navigation which is audience targetted and open
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx --audienceIds "7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a" --openInNewWindow
 ```
 
+Add a linkless label to the quick launch.
+
+```sh
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title Resources
+```
+
 ## Response
 
 <Tabs>
@@ -83,13 +86,18 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
       "7aa4a1ca-4035-4f2f-bac7-7beada59b5ba"
     ],
     "CurrentLCID": 1033,
-    "Id": 2030,
-    "IsDocLib": true,
-    "IsExternal": true,
-    "IsVisible": true,
-    "ListTemplateType": 0,
+    "CustomProperties": [],
+    "FriendlyUrlSegment": "",
+    "IsDeleted": false,
+    "IsHidden": false,
+    "IsTitleForExistingLanguage": false,
+    "Key": "2030",
+    "Nodes": [],
+    "NodeType": 0,
+    "OpenInNewWindow": true,
+    "SimpleUrl": "https://contoso.sharepoint.com",
     "Title": "Navigation Link",
-    "Url": "https://contoso.sharepoint.com"
+    "Translations": []
   }
   ```
 
@@ -97,45 +105,52 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
   <TabItem value="Text">
 
   ```text
-  AudienceIds     : ["7aa4a1ca-4035-4f2f-bac7-7beada59b5ba"]
-  CurrentLCID     : 1033
-  Id              : 2031
-  IsDocLib        : true
-  IsExternal      : true
-  IsVisible       : true
-  ListTemplateType: 0
-  Title           : Navigation Link
-  Url             : https://contoso.sharepoint.com
+  AudienceIds               : ["7aa4a1ca-4035-4f2f-bac7-7beada59b5ba"]
+  CurrentLCID               : 1033
+  CustomProperties          : []
+  FriendlyUrlSegment        :
+  IsDeleted                 : false
+  IsHidden                  : false
+  IsTitleForExistingLanguage: false
+  Key                       : 2030
+  NodeType                  : 0
+  Nodes                     : []
+  OpenInNewWindow           : true
+  SimpleUrl                 : https://contoso.sharepoint.com
+  Title                     : Navigation Link
+  Translations              : []
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
-  "[""7aa4a1ca-4035-4f2f-bac7-7beada59b5ba""]",1033,2032,1,1,1,0,Navigation Link,https://contoso.sharepoint.com
+  CurrentLCID,FriendlyUrlSegment,IsDeleted,IsHidden,IsTitleForExistingLanguage,Key,NodeType,OpenInNewWindow,SimpleUrl,Title
+  1033,,0,0,0,2030,0,1,https://contoso.sharepoint.com,Navigation Link
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # spo navigation node get --webUrl "https://contoso.sharepoint.com/sites/team-a" --location "TopNavigationBar" --title "Navigation Link" --url "https://contoso.sharepoint.com"
+  # spo navigation node add --webUrl "https://contoso.sharepoint.com/sites/team-a" --location "TopNavigationBar" --title "Navigation Link" --url "https://contoso.sharepoint.com" --openInNewWindow "true"
 
-  Date: 2/20/2023
+  Date: 10/7/2026
 
-  ## Navigation Link (2030)
+  ## Navigation Link
 
   Property | Value
   ---------|-------
   CurrentLCID | 1033
-  Id | 2030
-  IsDocLib | true
-  IsExternal | false
-  IsVisible | true
-  ListTemplateType | 0
+  FriendlyUrlSegment |
+  IsDeleted | false
+  IsHidden | false
+  IsTitleForExistingLanguage | false
+  Key | 2030
+  NodeType | 0
+  OpenInNewWindow | true
+  SimpleUrl | https://contoso.sharepoint.com
   Title | Navigation Link
-  Url | https://contoso.sharepoint.com
   ```
 
   </TabItem>

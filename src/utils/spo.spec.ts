@@ -961,6 +961,44 @@ describe('utils/spo', () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { menuState: topNavigation });
   });
 
+  it(`retrieves a nested navigation node from the quick launch`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState` && opts.data.menuNodeKey === null) {
+        return quickLaunchResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getMenuStateNodeByKey(webUrl, '2006');
+    assert.deepStrictEqual(actual, { menuState: quickLaunchResponse, node: quickLaunchResponse.Nodes[0].Nodes[0] });
+  });
+
+  it(`retrieves a nested navigation node from the top navigation when it's not in the quick launch`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
+        return opts.data.menuNodeKey === '1002' ? topNavigationResponse : quickLaunchResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getMenuStateNodeByKey(webUrl, '2041');
+    assert.deepStrictEqual(actual, { menuState: topNavigationResponse, node: topNavigationResponse.Nodes[0].Nodes[0] });
+  });
+
+  it(`throws an error when the navigation node is not found in the quick launch nor the top navigation`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
+        return opts.data.menuNodeKey === '1002' ? topNavigationResponse : quickLaunchResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(spo.getMenuStateNodeByKey(webUrl, '9999'), (err) => err === `Navigation node with id '9999' not found.`);
+  });
+
   it(`retrieves spo group by name sucessfully`, async () => {
     const groupResponse = {
       Id: 11,

@@ -58,31 +58,39 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marke
 
   ```json
   {
-    "Children": [
-      {
-        "AudienceIds": null,
-        "CurrentLCID": 1033,
-        "Id": 2033,
-        "IsDocLib": true,
-        "IsExternal": true,
-        "IsVisible": true,
-        "ListTemplateType": 0,
-        "Title": "Microsoft 365",
-        "Url": "https://microsoft365.com",
-        "Children": []
-      }
-    ],
     "AudienceIds": [
       "0d718612-8407-4d6b-833c-6891a553354f"
     ],
     "CurrentLCID": 1033,
-    "Id": 2209,
-    "IsDocLib": true,
-    "IsExternal": false,
-    "IsVisible": true,
-    "ListTemplateType": 100,
+    "CustomProperties": [],
+    "FriendlyUrlSegment": "",
+    "IsDeleted": false,
+    "IsHidden": false,
+    "IsTitleForExistingLanguage": false,
+    "Key": "2209",
+    "Nodes": [
+      {
+        "AudienceIds": [],
+        "CurrentLCID": 1033,
+        "CustomProperties": [],
+        "FriendlyUrlSegment": "",
+        "IsDeleted": false,
+        "IsHidden": false,
+        "IsTitleForExistingLanguage": false,
+        "Key": "2210",
+        "Nodes": [],
+        "NodeType": 0,
+        "OpenInNewWindow": true,
+        "SimpleUrl": "https://microsoft365.com",
+        "Title": "Microsoft 365",
+        "Translations": []
+      }
+    ],
+    "NodeType": 0,
+    "OpenInNewWindow": null,
+    "SimpleUrl": "/sites/Marketing/Lists/Work Status/AllItems.aspx",
     "Title": "Work Status",
-    "Url": "/sites/Marketing/Lists/Work Status/AllItems.aspx"
+    "Translations": []
   }
   ```
 
@@ -90,24 +98,28 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marke
   <TabItem value="Text">
 
   ```text
-  Children        : [{ AudienceIds: null, CurrentLCID: 1033, Id: 2033, IsDocLib: true, IsExternal: true, IsVisible: true, ListTemplateType: 0, Title: "Microsoft 365", Url: "https://microsoft365.com", Children: [] }]
-  AudienceIds     : ["0d718612-8407-4d6b-833c-6891a553354f"]
-  CurrentLCID     : 1033
-  Id              : 2209
-  IsDocLib        : true
-  IsExternal      : false
-  IsVisible       : true
-  ListTemplateType: 100
-  Title           : Work Status
-  Url             : /sites/Marketing/Lists/Work Status/AllItems.aspx
+  AudienceIds               : ["0d718612-8407-4d6b-833c-6891a553354f"]
+  CurrentLCID               : 1033
+  CustomProperties          : []
+  FriendlyUrlSegment        :
+  IsDeleted                 : false
+  IsHidden                  : false
+  IsTitleForExistingLanguage: false
+  Key                       : 2209
+  NodeType                  : 0
+  Nodes                     : [{"AudienceIds":[],"CurrentLCID":1033,"CustomProperties":[],"FriendlyUrlSegment":"","IsDeleted":false,"IsHidden":false,"IsTitleForExistingLanguage":false,"Key":"2210","Nodes":[],"NodeType":0,"OpenInNewWindow":true,"SimpleUrl":"https://microsoft365.com","Title":"Microsoft 365","Translations":[]}]
+  OpenInNewWindow           : null
+  SimpleUrl                 : /sites/Marketing/Lists/Work Status/AllItems.aspx
+  Title                     : Work Status
+  Translations              : []
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
-  1033,2209,1,,1,100,Work Status,/sites/Marketing/Lists/Work Status/AllItems.aspx
+  CurrentLCID,FriendlyUrlSegment,IsDeleted,IsHidden,IsTitleForExistingLanguage,Key,NodeType,OpenInNewWindow,SimpleUrl,Title
+  1033,,0,0,0,2209,0,,/sites/Marketing/Lists/Work Status/AllItems.aspx,Work Status
   ```
 
   </TabItem>
@@ -116,20 +128,21 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marke
   ```md
   # spo navigation node get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --id "2209"
 
-  Date: 1/29/2023
+  Date: 10/7/2026
 
-  ## Work Status (2209)
+  ## Work Status
 
   Property | Value
   ---------|-------
   CurrentLCID | 1033
-  Id | 2209
-  IsDocLib | true
-  IsExternal | false
-  IsVisible | true
-  ListTemplateType | 100
+  FriendlyUrlSegment |
+  IsDeleted | false
+  IsHidden | false
+  IsTitleForExistingLanguage | false
+  Key | 2209
+  NodeType | 0
+  SimpleUrl | /sites/Marketing/Lists/Work Status/AllItems.aspx
   Title | Work Status
-  Url | /sites/Marketing/Lists/Work Status/AllItems.aspx
   ```
 
   </TabItem>

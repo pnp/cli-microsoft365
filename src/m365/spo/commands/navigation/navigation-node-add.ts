@@ -1,25 +1,37 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { MenuState, MenuStateNode, NavigationNode } from './NavigationNode.js';
+import { MenuState, MenuStateNode } from './NavigationNode.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  location: z.enum(['QuickLaunch', 'TopNavigationBar']).optional().alias('l'),
+  title: z.string().min(1, 'Cannot be empty.').alias('t'),
+  url: z.string().optional(),
+  parentNodeId: z.int().positive().optional(),
+  audienceIds: z.string()
+    .refine(audienceIds => audienceIds.split(',').length <= 10, {
+      error: 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.'
+    })
+    .refine(audienceIds => validation.isValidGuidArray(audienceIds) === true, {
+      error: e => `The following GUIDs are invalid for the option 'audienceIds': ${validation.isValidGuidArray(e.input as string)}.`
+    })
+    .optional(),
+  openInNewWindow: z.boolean().optional()
+});
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  audienceIds?: string;
-  isExternal?: boolean;
-  location?: string;
-  parentNodeId?: number;
-  title: string;
-  url?: string;
-  webUrl: string;
-  openInNewWindow?: boolean
 }
 
 class SpoNavigationNodeAddCommand extends SpoCommand {
@@ -31,99 +43,19 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return 'Adds a navigation node to the specified site navigation';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        isExternal: args.options.isExternal,
-        location: typeof args.options.location !== 'undefined',
-        parentNodeId: typeof args.options.parentNodeId !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        openInNewWindow: !!args.options.openInNewWindow
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.location, options.parentNodeId].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'location' or 'parentNodeId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['location', 'parentNodeId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --location [location]',
-        autocomplete: ['QuickLaunch', 'TopNavigationBar']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--parentNodeId [parentNodeId]'
-      },
-      {
-        option: '--isExternal'
-      },
-      {
-        option: '--audienceIds [audienceIds]'
-      },
-      {
-        option: '--openInNewWindow'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.parentNodeId) {
-          if (isNaN(args.options.parentNodeId)) {
-            return `${args.options.parentNodeId} is not a number`;
-          }
-        }
-        else {
-          if (args.options.location !== 'QuickLaunch' &&
-            args.options.location !== 'TopNavigationBar') {
-            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
-          }
-        }
-
-        if (args.options.audienceIds) {
-          const audienceIdsSplitted = args.options.audienceIds.split(',');
-          if (audienceIdsSplitted.length > 10) {
-            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds is 10.';
-          }
-
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.audienceIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'audienceIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['location', 'parentNodeId'] }
-    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -131,72 +63,63 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const { webUrl, location, parentNodeId, title, url, audienceIds, openInNewWindow } = args.options;
+
     if (this.verbose) {
       await logger.logToStderr(`Adding navigation node...`);
     }
 
-    const nodesCollection: string = args.options.parentNodeId ?
-      `GetNodeById(${args.options.parentNodeId})/Children` :
-      (args.options.location as string).toLowerCase();
-
-    const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
-      headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;odata=nometadata'
-      },
-      responseType: 'json',
-      data: {
-        AudienceIds: args.options.audienceIds?.split(','),
-        Title: args.options.title,
-        Url: args.options.url ?? 'http://linkless.header/',
-        IsExternal: args.options.isExternal === true
-      }
-    };
-
     try {
-      const res = await request.post<NavigationNode>(requestOptions);
+      let menuState: MenuState;
+      let siblingNodes: MenuStateNode[];
 
-      if (args.options.openInNewWindow) {
-        if (this.verbose) {
-          await logger.logToStderr(`Making sure that the newly added navigation node opens in a new window.`);
-        }
-
-        const id: string = res.Id.toString();
-
-        let menuState: MenuState = args.options.location === 'TopNavigationBar' ? await spo.getTopNavigationMenuState(args.options.webUrl) : await spo.getQuickLaunchMenuState(args.options.webUrl);
-        let menuStateItem: MenuStateNode = this.getMenuStateNode(menuState.Nodes, id);
-
-        if (args.options.parentNodeId && !menuStateItem) {
-          menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
-          menuStateItem = this.getMenuStateNode(menuState.Nodes, id);
-        }
-
-        menuStateItem.OpenInNewWindow = true;
-        await spo.saveMenuState(args.options.webUrl, menuState);
+      if (parentNodeId) {
+        const parent = await spo.getMenuStateNodeByKey(webUrl, parentNodeId.toString());
+        menuState = parent.menuState;
+        siblingNodes = parent.node.Nodes;
+      }
+      else {
+        menuState = location === 'TopNavigationBar'
+          ? await spo.getTopNavigationMenuState(webUrl)
+          : await spo.getQuickLaunchMenuState(webUrl);
+        siblingNodes = menuState.Nodes;
       }
 
-      await logger.log(res);
-    }
+      const existingKeys: (string | null)[] = siblingNodes.map(node => node.Key);
+      const newNode: Partial<MenuStateNode> = {
+        AudienceIds: audienceIds ? audienceIds.split(',') : [],
+        IsDeleted: false,
+        IsHidden: false,
+        Key: null,
+        Nodes: [],
+        NodeType: 0,
+        OpenInNewWindow: openInNewWindow ? true : null,
+        SimpleUrl: url ?? '',
+        Title: title
+      };
+      siblingNodes.push(newNode as MenuStateNode);
+      await spo.saveMenuState(webUrl, menuState);
 
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving the added navigation node...`);
+      }
+
+      const updatedMenuState: MenuState = await spo.getMenuState(webUrl, menuState.StartingNodeKey);
+      const updatedSiblingNodes: MenuStateNode[] | undefined = parentNodeId
+        ? spo.findMenuStateNode(updatedMenuState.Nodes, parentNodeId.toString())?.Nodes
+        : updatedMenuState.Nodes;
+      const addedNode: MenuStateNode | undefined = updatedSiblingNodes?.find(node => !existingKeys.includes(node.Key) && node.Title === title);
+
+      if (!addedNode) {
+        throw `The navigation node was added, but it couldn't be retrieved.`;
+      }
+
+      await logger.log(addedNode);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
-
-  private getMenuStateNode(nodes: MenuStateNode[], id: string): MenuStateNode {
-    let menuNode = nodes.find((node: MenuStateNode) => node.Key !== null && node.Key === id);
-    if (menuNode === undefined) {
-      for (const node of nodes.filter(node => node.Nodes.length > 0)) {
-        menuNode = this.getMenuStateNode(node.Nodes, id);
-        if (menuNode) {
-          break;
-        }
-      }
-    }
-    return menuNode!;
-  }
-
 }
 
 export default new SpoNavigationNodeAddCommand();
