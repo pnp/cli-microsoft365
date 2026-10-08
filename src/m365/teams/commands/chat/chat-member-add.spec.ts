@@ -238,6 +238,6 @@ describe(commands.CHAT_MEMBER_ADD, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId }) }), new CommandError(error.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId }) }), new CommandError(error.error.message));
   });
 });
