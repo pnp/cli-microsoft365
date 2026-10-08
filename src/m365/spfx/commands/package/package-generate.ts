@@ -4,36 +4,39 @@ import os from 'os';
 import path from 'path';
 import url from 'url';
 import { v4 } from 'uuid';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { fsUtil } from '../../../../utils/fsUtil.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import commands from '../../commands.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webPartTitle: z.string().alias('t'),
+  webPartDescription: z.string().alias('d'),
+  name: z.string().alias('n'),
+  html: z.string(),
+  enableForTeams: z.enum(['tab', 'personalApp', 'all']).optional(),
+  exposePageContextGlobally: z.boolean().optional(),
+  exposeTeamsContextGlobally: z.boolean().optional(),
+  allowTenantWideDeployment: z.boolean().optional(),
+  developerName: z.string().optional(),
+  developerPrivacyUrl: z.string().optional(),
+  developerTermsOfUseUrl: z.string().optional(),
+  developerWebsiteUrl: z.string().optional(),
+  developerMpnId: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  allowTenantWideDeployment: boolean;
-  developerMpnId?: string;
-  developerName?: string;
-  developerPrivacyUrl?: string;
-  developerTermsOfUseUrl?: string;
-  developerWebsiteUrl?: string;
-  enableForTeams?: string;
-  exposePageContextGlobally: boolean;
-  exposeTeamsContextGlobally: boolean;
-  html: string;
-  name: string;
-  webPartDescription: string;
-  webPartTitle: string;
-}
-
 class SpfxPackageGenerateCommand extends AnonymousCommand {
-  private static readonly enableForTeamsOptions: string[] = ['tab', 'personalApp', 'all'];
   private archive?: AdmZip;
 
   public get name(): string {
@@ -44,62 +47,8 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
     return 'Generates SharePoint Framework solution package with a no-framework web part rendering the specified HTML snippet';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        allowTenantWideDeployment: args.options.allowTenantWideDeployment === true,
-        developerMpnId: typeof args.options.developerMpnId !== 'undefined',
-        developerName: typeof args.options.developerName !== 'undefined',
-        developerPrivacyUrl: typeof args.options.developerPrivacyUrl !== 'undefined',
-        developerTermsOfUseUrl: typeof args.options.developerTermsOfUseUrl !== 'undefined',
-        developerWebsiteUrl: typeof args.options.developerWebsiteUrl !== 'undefined',
-        enableForTeams: args.options.enableForTeams,
-        exposePageContextGlobally: args.options.exposePageContextGlobally === true,
-        exposeTeamsContextGlobally: args.options.exposeTeamsContextGlobally === true
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-t, --webPartTitle <webPartTitle>' },
-      { option: '-d, --webPartDescription <webPartDescription>' },
-      { option: '-n, --name <name>' },
-      { option: '--html <html>' },
-      {
-        option: '--enableForTeams [enableForTeams]',
-        autocomplete: SpfxPackageGenerateCommand.enableForTeamsOptions
-      },
-      { option: '--exposePageContextGlobally' },
-      { option: '--exposeTeamsContextGlobally' },
-      { option: '--allowTenantWideDeployment' },
-      { option: '--developerName [developerName]' },
-      { option: '--developerPrivacyUrl [developerPrivacyUrl]' },
-      { option: '--developerTermsOfUseUrl [developerTermsOfUseUrl]' },
-      { option: '--developerWebsiteUrl [developerWebsiteUrl]' },
-      { option: '--developerMpnId [developerMpnId]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.enableForTeams &&
-          SpfxPackageGenerateCommand.enableForTeamsOptions.indexOf(args.options.enableForTeams) < 0) {
-          return `${args.options.enableForTeams} is not a valid value for enableForTeams. Allowed values are: ${SpfxPackageGenerateCommand.enableForTeamsOptions.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

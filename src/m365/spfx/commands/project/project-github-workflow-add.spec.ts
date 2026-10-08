@@ -13,13 +13,14 @@ import { spfx } from '../../../../utils/spfx.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './project-github-workflow-add.js';
+import command, { options } from './project-github-workflow-add.js';
 import { GitHubWorkflow } from './project-github-workflow-model.js';
 
 describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const projectPath: string = path.resolve('/test-project');
 
   before(() => {
@@ -28,6 +29,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(spfx, 'getHighestNodeVersion').returns('22.0.x');
     sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -67,35 +69,35 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if loginMethod is not valid type', async () => {
-    const actual = await command.validate({ options: { loginMethod: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if loginMethod is not valid type', () => {
+    const actual = commandOptionsSchema.safeParse({ loginMethod: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scope is not valid type', async () => {
-    const actual = await command.validate({ options: { scope: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scope is not valid type', () => {
+    const actual = commandOptionsSchema.safeParse({ scope: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scope is sitecollection but the siteUrl was not defined', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scope is sitecollection but the siteUrl was not defined', () => {
+    const actual = commandOptionsSchema.safeParse({ scope: 'sitecollection' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if siteUrl is not valid', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection', siteUrl: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ scope: 'sitecollection', siteUrl: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all required properties are provided', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com/sites/project' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required properties are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com/sites/project' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(null);
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Couldn't find project root folder`, 1));
   });
 
@@ -134,7 +136,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
-    await command.action(logger, { options: { debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
@@ -178,7 +180,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').resolves({});
 
-    await command.action(logger, { options: { name: 'test', branchName: 'dev', manuallyTrigger: true, skipFeatureDeployment: true, loginMethod: 'user', scope: 'sitecollection' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'test', branchName: 'dev', manuallyTrigger: true, skipFeatureDeployment: true, loginMethod: 'user', scope: 'sitecollection', siteUrl: 'https://contoso.sharepoint.com/sites/test' }) });
     assert(writeFileSyncStub.calledWith(path.resolve(path.join(projectPath, '.github', 'workflows', 'deploy-spfx-solution.yml'))), 'workflow file not created');
   });
 
@@ -221,7 +223,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').returns();
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(writeFileSyncStub.calledOnce, 'writeFileSync not called or called multiple times.');
     const writtenWorkflow: GitHubWorkflow = yaml.parse(writeFileSyncStub.args[0][1] as string);
@@ -264,7 +266,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on the version property in the .yo-rc.json file.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Unable to determine the version of the current SharePoint Framework project. Could not find the correct version based on the version property in the .yo-rc.json file.'));
 
   });
 
@@ -303,7 +305,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
 
     sinon.stub(fs, 'writeFileSync').throws(new Error('writeFileSync failed'));
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError("Could not find Node version for version '99.99.99' of SharePoint Framework."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError("Could not find Node version for version '99.99.99' of SharePoint Framework."));
   });
 
   it('handles unexpected error', async () => {
@@ -343,7 +345,20 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
       new Error('writeFileSync failed')
     );
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('writeFileSync failed'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'test',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

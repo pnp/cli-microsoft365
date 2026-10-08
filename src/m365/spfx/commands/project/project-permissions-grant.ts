@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command, { CommandError } from '../../../../Command.js';
@@ -7,6 +9,8 @@ import spoServicePrincipalGrantAddCommand, { Options as SpoServicePrincipalGrant
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import { WebApiPermissionRequests } from './WebApiPermissionRequests.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -19,8 +23,8 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
     return 'Grants API permissions defined in the current SPFx project';
   }
 
-  constructor() {
-    super();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
