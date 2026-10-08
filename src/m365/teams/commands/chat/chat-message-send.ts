@@ -27,7 +27,7 @@ export const options = z.strictObject({
     message: 'The option userEmails contains one or more invalid email addresses.'
   }).alias('e').optional(),
   chatName: z.string().optional(),
-  message: z.string(),
+  message: z.string().alias('m'),
   contentType: z.enum(['text', 'html']).optional()
 });
 
