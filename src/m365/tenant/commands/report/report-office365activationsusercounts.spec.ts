@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './report-office365activationsusercounts.js';
+import command, { options } from './report-office365activationsusercounts.js';
 
 describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -60,6 +66,16 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('gets details of office 365 subscription user counts', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts`) {
@@ -71,7 +87,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -87,7 +103,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
     assert(loggerLogSpy.calledWith([{ "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT 365 APPS FOR ENTERPRISE", "Assigned": 3, "Activated": 2, "Shared Computer Activation": 0 }, { "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT EXCEL ADVANCED ANALYTICS", "Assigned": 3, "Activated": 0, "Shared Computer Activation": 0 }]));
@@ -96,6 +112,6 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });
