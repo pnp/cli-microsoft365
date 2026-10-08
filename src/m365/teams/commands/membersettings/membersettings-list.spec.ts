@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './membersettings-list.js';
+import command, { options } from './membersettings-list.js';
 
 describe(commands.MEMBERSETTINGS_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,7 +83,11 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        teamId: "2609af39-7775-4f94-a3dc-0dd67657e900"
+      })
+    });
     assert(loggerLogSpy.calledWith({
       "allowCreateUpdateChannels": true,
       "allowDeleteChannels": true,
@@ -108,7 +114,12 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        teamId: "2609af39-7775-4f94-a3dc-0dd67657e900"
+      })
+    });
     assert(loggerLogSpy.calledWith({
       "allowCreateUpdateChannels": true,
       "allowDeleteChannels": true,
@@ -118,22 +129,22 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
     }));
   });
 
-  it('fails validation if teamId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if teamId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when teamId is valid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '2609af39-7775-4f94-a3dc-0dd67657e900'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when teamId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: '2609af39-7775-4f94-a3dc-0dd67657e900' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '26be5f98-e66b-4e0a-bc37-1e6b1b8e5b7b',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('lists all properties for output json', async () => {
@@ -153,7 +164,12 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json' } });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        teamId: "2609af39-7775-4f94-a3dc-0dd67657e900",
+        output: 'json'
+      })
+    });
     assert(loggerLogSpy.calledWith({
       "allowCreateUpdateChannels": true,
       "allowDeleteChannels": true,
@@ -178,6 +194,10 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
 
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        teamId: "2609af39-7775-4f94-a3dc-0dd67657e900"
+      })
+    }), new CommandError('An error has occurred'));
   });
 });
