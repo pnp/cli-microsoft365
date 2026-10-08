@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -6,6 +8,8 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import { SiteProperties } from '../../../spo/commands/site/SiteProperties.js';
 import { SPOSitePropertiesEnumerable } from '../../../spo/commands/site/SPOSitePropertiesEnumerable.js';
 import commands from '../../commands.js';
+
+export const options = globalOptionsZod.strict();
 
 class SppContentCenterListCommand extends SpoCommand {
   public get name(): string {
@@ -18,6 +22,10 @@ class SppContentCenterListCommand extends SpoCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['Title', 'Url'];
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
