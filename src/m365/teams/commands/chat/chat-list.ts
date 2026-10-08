@@ -10,7 +10,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  type: z.enum(['oneOnOne', 'group', 'meeting']).optional(),
+  type: z.enum(['oneOnOne', 'group', 'meeting']).alias('t').optional(),
   userId: z.string().refine(val => validation.isValidGuid(val), {
     message: 'The value of the option userId must be a valid GUID.'
   }).optional(),
@@ -24,7 +24,6 @@ interface CommandArgs {
 }
 
 class TeamsChatListCommand extends GraphCommand {
-  public supportedTypes = ['oneOnOne', 'group', 'meeting'];
   public get name(): string {
     return commands.CHAT_LIST;
   }

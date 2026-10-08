@@ -211,6 +211,13 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if neither userId nor userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: chatId
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if both visibleHistoryStartDateTime and withAllHistory are specified', () => {
     const actual = commandOptionsSchema.safeParse({
       chatId: chatId,
