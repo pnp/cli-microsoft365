@@ -1,19 +1,32 @@
+import { z } from 'zod';
 import { ChatMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .alias('i'),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams ChannelId.'
+    })
+    .alias('c'),
+  messageId: z.string()
+    .alias('m')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId: string;
-  channelId: string;
-  messageId: string;
 }
 
 class TeamsMessageReplyListCommand extends GraphCommand {
@@ -29,41 +42,8 @@ class TeamsMessageReplyListCommand extends GraphCommand {
     return ['id', 'body'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '-c, --channelId <channelId>'
-      },
-      {
-        option: '-m, --messageId <messageId>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

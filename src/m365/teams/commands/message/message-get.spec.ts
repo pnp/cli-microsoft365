@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './message-get.js';
 
 describe(commands.MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -47,8 +48,7 @@ describe(commands.MESSAGE_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -65,81 +65,62 @@ describe(commands.MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if teamId, channelId and id are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if teamId, channelId and id are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation if channelId and id are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171"
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if channelId and id are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "5f5d7b71-1161-44",
+      channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
+      id: "1540911392778"
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "5f5d7b71-1161-44",
-        channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        id: "1540911392778"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('validates for a correct input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
+      channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
+      id: "1540911392778"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
-        channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        id: "1540911392778"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      id: "1540911392778"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect channelId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        id: "1540911392778"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing trailing @thread.skype.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+      id: "1540911392778"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect channelId missing trailing @thread.skype.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
-        id: "1540911392778"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
+      channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
+      id: "1540911392778",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves the specified message (debug)', async () => {
@@ -170,12 +151,12 @@ describe(commands.MESSAGE_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         id: "1540911392778"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       attachments: [],
@@ -226,11 +207,11 @@ describe(commands.MESSAGE_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         id: "1540911392778"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       attachments: [],
@@ -269,11 +250,11 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         id: "1540911392778"
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

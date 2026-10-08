@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-send.js';
+import command, { options } from './message-send.js';
 
 describe(commands.MESSAGE_SEND, () => {
   const teamId = '5f5d7b71-1161-44d8-bcc1-3da710eb4171';
@@ -61,6 +61,7 @@ describe(commands.MESSAGE_SEND, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -69,6 +70,7 @@ describe(commands.MESSAGE_SEND, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -106,37 +108,41 @@ describe(commands.MESSAGE_SEND, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        channelId: channelId,
-        message: message
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      channelId: channelId,
+      message: message
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the channelId is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        channelId: 'invalid',
-        message: message
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the channelId is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: 'invalid',
+      message: message
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        channelId: channelId,
-        message: message
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: channelId,
+      message: message
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: channelId,
+      message: message,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('sends a message to a channel in a Microsoft Teams team', async () => {
@@ -150,11 +156,11 @@ describe(commands.MESSAGE_SEND, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         channelId: channelId,
         message: message
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(messageSentResponse));
@@ -170,11 +176,11 @@ describe(commands.MESSAGE_SEND, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         channelId: channelId,
         message: message
-      }
+      })
     }), new CommandError('Channel does not belong to Team.'));
   });
 });

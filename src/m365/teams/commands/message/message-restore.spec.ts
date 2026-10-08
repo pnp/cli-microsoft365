@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-restore.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './message-restore.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { teams } from '../../../../utils/teams.js';
 
@@ -26,6 +25,7 @@ describe(commands.MESSAGE_RESTORE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +35,7 @@ describe(commands.MESSAGE_RESTORE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -50,14 +51,11 @@ describe(commands.MESSAGE_RESTORE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.getSettingWithDefaultValue,
-      accessToken.isAppOnlyAccessToken
+      request.post
     ]);
   });
 
@@ -74,92 +72,86 @@ describe(commands.MESSAGE_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if teamId or teamName options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: messageId,
-        channelId: channelId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if teamId or teamName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: messageId,
+      channelId: channelId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if teamId and teamName options are both passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: messageId,
-        teamId: teamId,
-        teamName: teamName,
-        channelId: channelId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if teamId and teamName options are both passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: messageId,
+      teamId: teamId,
+      teamName: teamName,
+      channelId: channelId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if channelId or channelName options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: messageId,
-        teamId: teamId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if channelId or channelName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: messageId,
+      teamId: teamId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if channelId and channelName options are both passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: messageId,
-        teamId: teamId,
-        channelName: channelName,
-        channelId: channelId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if channelId and channelName options are both passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: messageId,
+      teamId: teamId,
+      channelName: channelName,
+      channelId: channelId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: "5f5d7b71-1161-44",
-        channelId: channelId,
-        id: messageId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: "5f5d7b71-1161-44",
+      channelId: channelId,
+      id: messageId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        channelId: channelId,
-        id: messageId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: channelId,
+      id: messageId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation for an incorrect channelId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        id: messageId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an incorrect channelId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      id: messageId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for an incorrect channelId missing trailing @thread.skype.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
-        id: messageId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an incorrect channelId missing trailing @thread.skype.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+      id: messageId
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: channelId,
+      id: messageId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('restores the specified message', async () => {
@@ -172,11 +164,11 @@ describe(commands.MESSAGE_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         channelId: channelId,
         id: messageId
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -195,12 +187,12 @@ describe(commands.MESSAGE_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         teamName: teamName,
         channelName: channelName,
         id: messageId
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -222,11 +214,11 @@ describe(commands.MESSAGE_RESTORE, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         channelId: channelId,
         id: messageId
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 });
