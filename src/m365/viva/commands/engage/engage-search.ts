@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  queryText: z.string(),
+  show: z.enum(['summary', 'messages', 'users', 'topics', 'groups']).optional(),
+  limit: z.coerce.number().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  queryText: string;
-  show: string;
-  limit?: number;
 }
 
 interface VivaEngageSearchResponse {
@@ -81,15 +85,11 @@ interface VivaEngageBasicMessageResponse {
 }
 
 class VivaEngageSearchCommand extends VivaEngageCommand {
-  private static showOptions: string[] = [
-    'summary', 'messages', 'users', 'topics', 'groups'
-  ];
-
-  private summary: VivaEngageSearchSummary;
-  private messages: VivaEngageBasicMessageResponse[];
-  private groups: VivaEngageBasicGroupResponse[];
-  private topics: VivaEngageBasicTopicResponse[];
-  private users: VivaEngageBasicUserResponse[];
+  private summary!: VivaEngageSearchSummary;
+  private messages!: VivaEngageBasicMessageResponse[];
+  private groups!: VivaEngageBasicGroupResponse[];
+  private topics!: VivaEngageBasicTopicResponse[];
+  private users!: VivaEngageBasicUserResponse[];
 
   public get name(): string {
     return commands.ENGAGE_SEARCH;
@@ -99,76 +99,16 @@ class VivaEngageSearchCommand extends VivaEngageCommand {
     return 'Returns a list of messages, users, topics and groups that match the specified query.';
   }
 
-  constructor() {
-    super();
-    this.summary = {
-      messages: 0,
-      groups: 0,
-      topics: 0,
-      users: 0
-    };
-    this.messages = [];
-    this.groups = [];
-    this.topics = [];
-    this.users = [];
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        show: typeof args.options.show !== 'undefined',
-        limit: typeof args.options.limit !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.output !== 'json' || !opts.show, {
+        message: `show can't be used when --output set to json`,
+        params: { customCode: 'required' }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--queryText <queryText>'
-      },
-      {
-        option: '--show [show]',
-        autocomplete: VivaEngageSearchCommand.showOptions
-      },
-      {
-        option: '--limit [limit]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.queryText && typeof args.options.queryText !== 'string') {
-          return `${args.options.queryText} is not a string`;
-        }
-
-        if (args.options.limit && typeof args.options.limit !== 'number') {
-          return `${args.options.limit} is not a number`;
-        }
-
-        if (args.options.output !== 'json') {
-          if (typeof args.options.show !== 'undefined') {
-            const scope = args.options.show.toString().toLowerCase();
-            if (VivaEngageSearchCommand.showOptions.indexOf(scope) < 0) {
-              return `${scope} is not a valid value for show. Allowed values are ${VivaEngageSearchCommand.showOptions.join(', ')}`;
-            }
-          }
-        }
-        else {
-          if (typeof args.options.show !== 'undefined') {
-            return `${args.options.show} can't be used when --output set to json`;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   private async getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {

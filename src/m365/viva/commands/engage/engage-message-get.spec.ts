@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-message-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './engage-message-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_GET, () => {
@@ -20,6 +19,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const firstMessage: any = { "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1" };
   const secondMessage: any = { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123124, "thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2" };
 
@@ -31,6 +31,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -52,8 +53,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -70,22 +70,14 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('id must be a number', async () => {
-    const actual = await command.validate({ options: { id: 'nonumber' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('id is required', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('calls the messaging endpoint with the right parameters', async () => {
@@ -96,7 +88,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 10123190123123, debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 10123190123123, debug: true }) });
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123);
   });
@@ -110,7 +102,7 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 1 }) }), new CommandError('An error has occurred.'));
   });
 
   it('calls the messaging endpoint with id and json and json', async () => {
@@ -121,13 +113,8 @@ describe(commands.ENGAGE_MESSAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 10123190123124, output: "json" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 10123190123124, output: "json" }) });
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
-  });
-
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });

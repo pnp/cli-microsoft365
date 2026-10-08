@@ -152,7 +152,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityDisplayName: communityDisplayName, id: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityDisplayName: communityDisplayName, id: userId, force: true, verbose: true }) });
     assert(deleteStub.calledTwice);
   });
 
@@ -168,7 +168,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityId: communityId, verbose: true, userName: userName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, verbose: true, userName: userName, force: true }) });
     assert(deleteStub.calledTwice);
   });
 
@@ -194,7 +194,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { communityId: communityId, verbose: true, userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, verbose: true, userName: userName }) });
     assert(deleteStub.calledTwice);
   });
 
@@ -216,14 +216,14 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { entraGroupId: entraGroupId, id: userId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, id: userId }) }),
       new CommandError(errorMessage));
   });
 
   it('prompts before removal when confirmation argument not passed', async () => {
     const promptStub: sinon.SinonStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, id: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, id: userId }) });
 
     assert(promptStub.called);
   });
@@ -232,7 +232,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
     const deleteStub = sinon.stub(request, 'delete');
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, id: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, id: userId }) });
     assert(deleteStub.notCalled);
   });
 });

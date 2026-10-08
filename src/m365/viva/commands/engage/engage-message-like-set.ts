@@ -1,18 +1,22 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  messageId: z.coerce.number(),
+  enable: z.boolean().optional(),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  messageId: number;
-  enable?: boolean;
-  force?: boolean;
 }
 
 class VivaEngageMessageLikeSetCommand extends VivaEngageCommand {
@@ -24,53 +28,8 @@ class VivaEngageMessageLikeSetCommand extends VivaEngageCommand {
     return 'Likes or unlikes a Viva Engage message';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        enable: args.options.enable,
-        force: (!(!args.options.force)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--messageId <messageId>'
-      },
-      {
-        option: '--enable [enable]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('enable');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.messageId && typeof args.options.messageId !== 'number') {
-          return `${args.options.messageId} is not a number`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

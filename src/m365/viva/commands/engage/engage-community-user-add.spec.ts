@@ -166,7 +166,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly adds users specified by id as owner', async () => {
+  it('correctly adds users specified by id as admin', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/$batch`) {
         return {
@@ -180,7 +180,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityDisplayName: communityDisplayName, verbose: true, ids: userIds.join(','), role: 'Owner' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityDisplayName: communityDisplayName, verbose: true, ids: userIds.join(','), role: 'Admin' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -217,7 +217,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityId: communityId, verbose: true, ids: userIds.join(','), role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, verbose: true, ids: userIds.join(','), role: 'Member' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -254,7 +254,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, verbose: true, userNames: userNames.join(','), role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, verbose: true, userNames: userNames.join(','), role: 'Member' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -303,7 +303,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { entraGroupId: entraGroupId, ids: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, ids: userIds.join(','), role: 'Member' }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 });

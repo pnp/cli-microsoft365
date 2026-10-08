@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-user-list.js';
+import command, { options } from './engage-user-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_USER_LIST, () => {
@@ -19,6 +19,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,6 +72,51 @@ describe(commands.ENGAGE_USER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'full_name', 'email']);
   });
 
+  it('passes validation without parameters', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with parameters', () => {
+    const actual = commandOptionsSchema.safeParse({ letter: "A" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('letter does not allow numbers', () => {
+    const actual = commandOptionsSchema.safeParse({ letter: "1" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('groupId must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: "aasdf" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('limit must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ limit: "aasdf" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('sortBy validation check', () => {
+    const actual = commandOptionsSchema.safeParse({ sortBy: "aasdf" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if letter is set to a single character', () => {
+    const actual = commandOptionsSchema.safeParse({ letter: "a" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('does not pass validation if letter is set to a multiple characters', () => {
+    const actual = commandOptionsSchema.safeParse({ letter: "ab" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('returns all network users', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
@@ -79,7 +126,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
@@ -93,7 +140,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
@@ -107,7 +154,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { sortBy: "messages" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ sortBy: "messages" }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
@@ -132,7 +179,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
         };
       }
     });
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 4);
   });
 
@@ -199,7 +246,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
           { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }];
       }
     });
-    await command.action(logger, { options: { output: 'debug' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 52);
   });
 
@@ -223,7 +270,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
         });
       }
     });
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred.'));
   });
 
   it('sorts users in reverse order', async () => {
@@ -236,7 +283,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { reverse: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ reverse: true }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
@@ -253,7 +300,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: 5785177, reverse: true, limit: 2 }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 2);
   });
@@ -269,7 +316,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { groupId: 5785177 } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: 5785177 }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
@@ -282,7 +329,7 @@ describe(commands.ENGAGE_USER_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { letter: "P" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ letter: "P" }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
@@ -295,46 +342,6 @@ describe(commands.ENGAGE_USER_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
-  });
-
-  it('passes validation without parameters', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { letter: "A" } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('letter does not allow numbers', async () => {
-    const actual = await command.validate({ options: { letter: "1" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('groupId must be a number', async () => {
-    const actual = await command.validate({ options: { groupId: "aasdf" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('limit must be a number', async () => {
-    const actual = await command.validate({ options: { limit: "aasdf" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('sortBy validation check', async () => {
-    const actual = await command.validate({ options: { sortBy: "aasdf" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if letter is set to a single character', async () => {
-    const actual = await command.validate({ options: { letter: "a" } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('does not pass validation if letter is set to a multiple characters', async () => {
-    const actual = await command.validate({ options: { letter: "ab" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred.'));
   });
 });
