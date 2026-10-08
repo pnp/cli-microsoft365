@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo contenttype field set
 
@@ -34,6 +36,25 @@ m365 spo contenttype field set [options]
 ## Remarks
 
 If the field reference already exists, the command will update its _required_ and _hidden_ properties as specified in the command.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions     |
+  |------------|-----------------|
+  | SharePoint | AllSites.Manage |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions      |
+  |------------|------------------|
+  | SharePoint | Sites.Manage.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
