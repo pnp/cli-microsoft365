@@ -1,27 +1,37 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  chatId: z.string().refine(val => validation.isValidTeamsChatId(val), {
+    message: 'The value of the option chatId must be a valid Teams ChatId.'
+  }).alias('i'),
+  userId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value of the option userId must be a valid GUID.'
+  }).optional(),
+  userName: z.string().refine(val => validation.isValidUserPrincipalName(val), {
+    message: 'The value of the option userName must be a valid user principal name.'
+  }).optional(),
+  role: z.enum(['owner', 'guest']).optional(),
+  visibleHistoryStartDateTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    message: 'The value of the option visibleHistoryStartDateTime is not a valid ISO date.'
+  }).optional(),
+  withAllHistory: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  chatId: string;
-  userId?: string;
-  userName?: string;
-  role?: string;
-  visibleHistoryStartDateTime?: string;
-  withAllHistory?: boolean;
-}
-
 class TeamsChatMemberAddCommand extends GraphCommand {
-  private static readonly roles: string[] = ['owner', 'guest'];
-
   public get name(): string {
     return commands.CHAT_MEMBER_ADD;
   }
@@ -30,85 +40,26 @@ class TeamsChatMemberAddCommand extends GraphCommand {
     return 'Adds a member to a Microsoft Teams chat conversation.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        role: typeof args.options.role !== 'undefined',
-        visibleHistoryStartDateTime: typeof args.options.visibleHistoryStartDateTime !== 'undefined',
-        withAllHistory: !!args.options.withAllHistory
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --chatId <chatId>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--role [role]',
-        autocomplete: TeamsChatMemberAddCommand.roles
-      },
-      {
-        option: '--visibleHistoryStartDateTime [visibleHistoryStartDateTime]'
-      },
-      {
-        option: '--withAllHistory'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid chatId.`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.userId, options.userName].filter(x => x !== undefined).length === 1, {
+        error: 'Specify either userId or userName.'
+      })
+      .refine(opts => {
+        if (opts.visibleHistoryStartDateTime && opts.withAllHistory) {
+          return false;
         }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid userId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName.`;
-        }
-
-        if (args.options.role && TeamsChatMemberAddCommand.roles.indexOf(args.options.role) < 0) {
-          return `${args.options.role} is not a valid role. Allowed values are ${TeamsChatMemberAddCommand.roles.join(', ')}`;
-        }
-
-        if (args.options.visibleHistoryStartDateTime && !validation.isValidISODateTime(args.options.visibleHistoryStartDateTime)) {
-          return `'${args.options.visibleHistoryStartDateTime}' is not a valid visibleHistoryStartDateTime.`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['userId', 'userName'] },
-      {
-        options: ['visibleHistoryStartDateTime', 'withAllHistory'],
-        runsWhen: (args) => args.options.visibleHistoryStartDateTime || args.options.withAllHistory
+      }, {
+        message: 'Specify either visibleHistoryStartDateTime or withAllHistory, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['visibleHistoryStartDateTime', 'withAllHistory']
+        }
       });
   }
 
