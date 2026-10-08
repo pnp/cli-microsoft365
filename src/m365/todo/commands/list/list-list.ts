@@ -1,10 +1,18 @@
 import { Logger } from '../../../../cli/Logger.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 import { ToDoList } from '../../ToDoList.js';
 
+export const options = globalOptionsZod.strict();
+
 class TodoListListCommand extends GraphDelegatedCommand {
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
   public get name(): string {
     return commands.LIST_LIST;
   }

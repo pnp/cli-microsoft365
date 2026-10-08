@@ -1,23 +1,33 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 import { ToDoTask } from '../../ToDoTask.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
+
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  listName: z.string().optional(),
+  listId: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  listName?: string;
-  listId?: string;
-}
 
 class TodoTaskListCommand extends GraphDelegatedCommand {
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
   public get name(): string {
     return commands.TASK_LIST;
   }
@@ -30,36 +40,16 @@ class TodoTaskListCommand extends GraphDelegatedCommand {
     return ['id', 'title', 'status', 'createdDateTime', 'lastModifiedDateTime'];
   }
 
-  constructor() {
-    super();
 
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listName: typeof args.options.listName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listName].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'listId' or 'listName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   private async getTodoListId(args: CommandArgs): Promise<string> {

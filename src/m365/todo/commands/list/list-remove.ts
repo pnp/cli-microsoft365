@@ -1,19 +1,23 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().optional().alias('n'),
+  id: z.string().optional().alias('i'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
-  force?: boolean;
 }
 
 class TodoListRemoveCommand extends GraphDelegatedCommand {
@@ -25,40 +29,15 @@ class TodoListRemoveCommand extends GraphDelegatedCommand {
     return 'Removes a Microsoft To Do task list';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        force: typeof args.options.force !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema.refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+      message: `Specify either 'id' or 'name', but not both.`,
+      params: { customCode: 'optionSet', options: ['id', 'name'] }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
