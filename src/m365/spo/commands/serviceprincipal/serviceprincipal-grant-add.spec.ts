@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -11,12 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-grant-add.js';
+import command, { options } from './serviceprincipal-grant-add.js';
 
 describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +35,8 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,7 +98,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' }) });
     assert(loggerLogSpy.calledWith({
       "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
     }));
@@ -121,7 +127,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ resource: 'Microsoft Graph', scope: 'Mail.Read' }) });
     assert(loggerLogSpy.calledWith({
       "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
     }));
@@ -137,7 +143,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ resource: 'Microsoft Graph1', scope: 'Mail.Read' }) }),
       new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName'));
   });
 
@@ -151,7 +157,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ resource: 'Microsoft Graph', scope: 'Calendar.Read' }) }),
       new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest'));
   });
 
@@ -165,14 +171,23 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ resource: 'Microsoft Graph', scope: 'Mail.Read' }) }),
       new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
-    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ resource: 'Microsoft Graph', scope: 'Mail.Read' }) }),
       new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: 'Microsoft Graph',
+      scope: 'Mail.Read',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('defines alias', () => {

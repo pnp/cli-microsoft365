@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-permissionrequest-approve.js';
+import command, { options } from './serviceprincipal-permissionrequest-approve.js';
 import spoServicePrincipalPermissionRequestListCommand from './serviceprincipal-permissionrequest-list.js';
 
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
@@ -21,6 +21,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validId = "4dc4c043-25ee-40f2-81d3-b3bf63da7538";
 
   before(() => {
@@ -37,6 +38,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -101,7 +103,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: validId }) });
     assert(loggerLogSpy.calledWith({
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -137,7 +139,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
     assert(loggerLogSpy.calledWith({
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -215,7 +217,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { all: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ all: true }) });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -306,7 +308,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { resource: "Microsoft Graph" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ resource: "Microsoft Graph" }) });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -334,13 +336,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { id: validId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) }),
       new CommandError('Permission entry already exists.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
-    await assert.rejects(command.action(logger, { options: { id: validId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -349,39 +351,33 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
-  it('allows specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (all)', () => {
+    const actual = commandOptionsSchema.safeParse({ all: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (all)', async () => {
-    const actual = await command.validate({ options: { all: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (resource)', () => {
+    const actual = commandOptionsSchema.safeParse({ resource: "Microsoft Graph" });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (resource)', async () => {
-    const actual = await command.validate({ options: { resource: "Microsoft Graph" } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

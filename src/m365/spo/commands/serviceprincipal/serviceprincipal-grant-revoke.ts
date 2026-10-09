@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -8,13 +9,16 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  scope: z.string().optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  scope?: string;
 }
 
 class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
@@ -30,21 +34,8 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
     return [commands.SP_GRANT_REVOKE];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-s, --scope [scope]'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

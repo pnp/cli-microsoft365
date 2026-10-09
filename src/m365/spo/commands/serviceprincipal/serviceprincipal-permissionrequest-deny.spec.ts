@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-permissionrequest-deny.js';
+import command, { options } from './serviceprincipal-permissionrequest-deny.js';
 
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -36,6 +37,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -96,7 +98,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -121,7 +123,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -135,35 +137,29 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'f0feaecf-24be-402b-a080-3a55738ec56a' }) }),
       new CommandError('A permission request with the ID f0feaecf-24be-402b-a080-3a55738ec56a could not be found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
-    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'f0feaecf-24be-402b-a080-3a55738ec56a' }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('allows specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('defines alias', () => {

@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-set.js';
+import command, { options } from './serviceprincipal-set.js';
 
 describe(commands.SERVICEPRINCIPAL_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -36,6 +37,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,7 +104,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, enabled: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, enabled: 'true', force: true }) });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -133,7 +135,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { enabled: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true', force: true }) });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -164,7 +166,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, enabled: false, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, enabled: 'false', force: true }) });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: false,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -184,18 +186,18 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
   it('prompts before enabling service principal when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { enabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true' }) });
 
     assert(promptIssued);
   });
 
   it('prompts before disabling service principal when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { enabled: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'false' }) });
 
     assert(promptIssued);
   });
@@ -204,7 +206,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     const requestPostSpy = sinon.spy(request, 'post');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { enabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true' }) });
     assert(requestPostSpy.notCalled);
   });
 
@@ -223,7 +225,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { enabled: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true' }) });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -235,7 +237,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { enabled: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ enabled: 'true', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -244,24 +246,18 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
-  it('allows specifying the enabled option', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--enabled') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ enabled: 'true', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the enabled option is true', async () => {
-    const actual = await command.validate({ options: { enabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the enabled option is true', () => {
+    const actual = commandOptionsSchema.safeParse({ enabled: 'true' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the enabled option is false', async () => {
-    const actual = await command.validate({ options: { enabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the enabled option is false', () => {
+    const actual = commandOptionsSchema.safeParse({ enabled: 'false' });
+    assert.strictEqual(actual.success, true);
   });
 });
