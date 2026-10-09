@@ -24,6 +24,7 @@ Each change has a unique ID (for example, `SPO-1`) and uses the same structure:
 
 ID | Area | Change | Change type | Affected commands
 -- | ---- | ------ | ----------- | -----------------
+[AUTH-1](#AUTH-1) | Authentication | Token cache moved to the OS credential store, sign in again | Authentication | `login`
 [SPO-1](#SPO-1) | SharePoint Online | Existing files are no longer overwritten by default | Default behavior | `spo file add`
 [SPO-2](#SPO-2) | SharePoint Online | Options that you don't specify are no longer reset to default values | Default behavior | `spo page header set`
 [SPO-3](#SPO-3) | SharePoint Online | SharePoint write permissions required, Microsoft Graph permissions no longer required | Permissions | `spo contenttype sync`
@@ -37,6 +38,7 @@ ID | Area | Change | Change type | Affected commands
 
 Change | Action required when | Action
 ------ | -------------------- | ------
+[AUTH-1](#AUTH-1) | You signed in using device code or browser authentication | Run `m365 login` again after upgrading
 [SPO-1](#SPO-1) | You use `spo file add` to replace files that already exist | Add `--overwrite`
 [SPO-2](#SPO-2) | You use `spo page header set` and rely on unspecified options being set to default values | Specify these options explicitly
 [SPO-3](#SPO-3) | You use `spo contenttype sync` | Consent SharePoint `AllSites.Manage` (delegated) or `Sites.Manage.All` (application)
@@ -45,6 +47,53 @@ Change | Action required when | Action
 [GEN-1](#GEN-1) | You use an affected `remove` command | Remove `--recycle`, replace `--skipRecycleBin` with `--permanent`, add `--permanent` where items must be deleted permanently
 [GEN-2](#GEN-2) | You use `spo web alert list` or `spo web alert remove` | Use `spo web rule list` or `spo web rule remove`
 [GEN-3](#GEN-3) | You use `spo listitem get` with `--properties` | Use `--fields`
+
+## Authentication
+
+### AUTH-1: Token cache moved to the OS credential store {/* #AUTH-1 */}
+
+- **Affected commands**: [login](./cmd/login.mdx) and all commands that require authentication
+- **Change type**: Authentication
+- **Action required when**: you signed in to CLI for Microsoft 365 v11 using device code (default) or browser authentication.
+
+:::warning
+
+After upgrading to v12, users who signed in using device code or browser authentication must sign in again using `m365 login`.
+
+:::
+
+#### What changed
+
+In v11, the MSAL token cache, which contains access and refresh tokens, was stored as an unencrypted JSON file in `~/.cli-m365-msal.json`. In v12, the token cache is stored securely in the credential store of your operating system:
+
+Operating system | Credential store
+---------------- | ----------------
+Windows | DPAPI
+macOS | Keychain
+Linux | libsecret. If libsecret isn't available, the CLI falls back to an unencrypted file in `~/.cli-m365-msal-cache.json`
+
+The first time you run v12, the CLI deletes the old `~/.cli-m365-msal.json` file. Tokens from that file aren't migrated, so the new token cache starts empty. Your connections, stored in `~/.cli-m365-connection.json` and `~/.cli-m365-all-connections.json`, are kept.
+
+The impact depends on the authentication type of your connection:
+
+Authentication type | Impact
+------------------- | ------
+`deviceCode`, `browser` | Sign in again. The CLI can no longer refresh tokens silently. As soon as the access token stored with the connection expires, typically within an hour, the CLI prompts you to sign in.
+`password`, `certificate`, `secret` | No action required. The CLI retrieves new tokens using the credentials stored with the connection.
+`identity`, `federatedIdentity` | No action required. These authentication types don't use the token cache.
+
+For more information, see [Persisting connection information](./concepts/persisting-connection.mdx).
+
+#### Action required
+
+1. After upgrading, sign in again using `m365 login`. If you have multiple connections, use [connection list](./cmd/connection/connection-list.mdx) to find the connections with the `DeviceCode` or `Browser` authentication type, and sign in again for each of them.
+2. If you persist the CLI's token cache between runs, for example by mounting your home directory in a Linux container without libsecret, persist `~/.cli-m365-msal-cache.json` instead of `~/.cli-m365-msal.json`.
+
+#### Example
+
+```sh title="v12: sign in again after upgrading"
+m365 login
+```
 
 ## SharePoint Online
 
@@ -76,7 +125,7 @@ m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --fold
 
 #### What changed
 
-In v11, options you didn't specify were set to their default values, which could unintentionally reset existing header properties. In v12, unspecified options are left untouched, so the header properties keep their current values. The `type`, `altText`, `layout`, `textAlignment`, `showTopicHeader`, and `showPublishDate` options no longer have default values.
+In v11, options you didn't specify were set to their default values, which could unintentionally reset existing header properties. In v12, unspecified options are left untouched, so the header properties keep their current values. The `type`, `altText`, `layout`, `textAlignment`, `showTopicHeader`, `showTimeToRead`, and `showPublishDate` options no longer have default values.
 
 #### Action required
 
