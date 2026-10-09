@@ -98,6 +98,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
       userName: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid user principal name.`);
   });
 
   it('fails validation if communityId, communityDisplayName or entraGroupId are not specified', () => {

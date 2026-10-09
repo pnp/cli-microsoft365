@@ -176,6 +176,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if specified location is not valid', async () => {

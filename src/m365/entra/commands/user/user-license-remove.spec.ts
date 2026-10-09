@@ -84,6 +84,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
       ids: 'Invalid GUID', userId: validUserId
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid GUID' contains one or more invalid GUIDs.`);
   });
 
   it('fails validation if userId is not a valid guid.', () => {
@@ -98,6 +99,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
       ids: validIds, userName: 'Invalid upn'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid upn' is not a valid user principal name (UPN).`);
   });
 
   it('passes validation if required options specified (userId)', () => {

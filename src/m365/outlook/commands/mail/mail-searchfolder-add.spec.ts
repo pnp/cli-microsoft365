@@ -131,6 +131,7 @@ describe(commands.MAIL_SEARCHFOLDER_ADD, () => {
       sourceFoldersIds: sourceFolderId1
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName is specified', () => {

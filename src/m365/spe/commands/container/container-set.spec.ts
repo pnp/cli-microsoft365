@@ -94,6 +94,7 @@ describe(commands.CONTAINER_SET, () => {
   it('fails validation if itemMajorVersionLimit is not a positive integer', () => {
     const actual = baseSchema.safeParse({ id: containerId, itemMajorVersionLimit: -1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a valid positive integer.`);
   });
 
   it('fails validation if itemMajorVersionLimit is a decimal number', () => {

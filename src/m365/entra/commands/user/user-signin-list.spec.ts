@@ -319,6 +319,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
   it('fails validation when userName has an invalid value', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid userName.`);
   });
 
   it('fails validation if appId and appDisplayName specified', () => {

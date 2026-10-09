@@ -949,11 +949,13 @@ describe(commands.ADD, () => {
     sinon.stub(fs, 'existsSync').returns(false);
     const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Specified source file file.pdf doesn't exist`);
   });
 
   it(`fails validation if the specified folderUrl is invalid`, async () => {
     const actual = commandOptionsSchema.safeParse({ filePath: 'file.pdf', folderUrl: '/' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'/' is not a valid SharePoint Online folder URL.`);
   });
 
   it(`fails validation if the specified siteUrl is invalid`, async () => {
@@ -963,6 +965,7 @@ describe(commands.ADD, () => {
       siteUrl: '/'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'/' is not a valid SharePoint Online site URL.`);
   });
 
   it(`passes validation if the target file is a URL`, async () => {

@@ -142,6 +142,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
       userName: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid UPN.`);
   });
 
   it('passes validation if userName is specified', () => {

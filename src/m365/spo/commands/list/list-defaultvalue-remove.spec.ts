@@ -85,6 +85,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
   it('fails validation if webUrl is not a valid URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listId: listId, fieldName: fieldName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not a valid GUID', async () => {

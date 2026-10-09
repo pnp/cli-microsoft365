@@ -112,6 +112,7 @@ describe(commands.OPENEXTENSION_SET, () => {
       language: 'English'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if resoruceType is user and resourceId is neiter a valid GUID nor a valid UPN', () => {
@@ -124,6 +125,7 @@ describe(commands.OPENEXTENSION_SET, () => {
       language: 'English'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID or user principal name`);
   });
 
   it('fails validation if resourceType is not a valid resource type', () => {
