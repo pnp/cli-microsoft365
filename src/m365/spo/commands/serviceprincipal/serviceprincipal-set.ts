@@ -1,19 +1,23 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  enabled: z.enum(['true', 'false']).transform(v => v === 'true').alias('e'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  enabled: boolean;
-  force?: boolean;
 }
 
 class SpoServicePrincipalSetCommand extends SpoCommand {
@@ -25,36 +29,8 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     return 'Enables or disables the service principal';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        enabled: args.options.enabled
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --enabled <enabled>',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('enabled');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public alias(): string[] | undefined {
