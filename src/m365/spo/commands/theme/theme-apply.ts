@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -8,14 +9,19 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    message: 'The value of the webUrl is not a valid SharePoint URL.'
+  }).alias('u'),
+  sharePointTheme: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  webUrl: string;
-  sharePointTheme?: boolean;
 }
 
 const SharePointThemes = {
@@ -38,42 +44,18 @@ class SpoThemeApplyCommand extends SpoCommand {
     return 'Applies theme to the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--sharePointTheme'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => !opts.sharePointTheme || (opts.name in SharePointThemes), {
+        message: 'Please check if the theme name is entered correctly.',
+        params: {
+          customCode: 'required'
         }
-
-        if (args.options.sharePointTheme && !(args.options.name in SharePointThemes)) {
-          return 'Please check if the theme name is entered correctly.';
-        }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -14,13 +14,14 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
-import command from './theme-set.js';
+import command, { options } from './theme-set.js';
 
 describe(commands.THEME_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.THEME_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,6 +78,7 @@ describe(commands.THEME_SET, () => {
   });
 
   it('adds theme when correct parameters are passed', async () => {
+    sinon.stub(validation, 'isValidTheme').callsFake(() => true);
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]);
@@ -85,11 +88,11 @@ describe(commands.THEME_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Contoso',
         theme: '123',
         isInverted: false
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
     assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -98,6 +101,7 @@ describe(commands.THEME_SET, () => {
   });
 
   it('adds theme when correct parameters are passed (debug)', async () => {
+    sinon.stub(validation, 'isValidTheme').callsFake(() => true);
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]);
@@ -107,12 +111,12 @@ describe(commands.THEME_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         theme: '123',
         isInverted: true
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
     assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -120,6 +124,7 @@ describe(commands.THEME_SET, () => {
   });
 
   it('handles error command error correctly', async () => {
+    sinon.stub(validation, 'isValidTheme').callsFake(() => true);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
@@ -128,16 +133,17 @@ describe(commands.THEME_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-        inverted: false
-      }
-    } as any), new CommandError('requestObjectIdentity ClientSvc error'));
+        isInverted: false
+      })
+    }), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('handles unknown error command error correctly', async () => {
+    sinon.stub(validation, 'isValidTheme').callsFake(() => true);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
@@ -146,21 +152,21 @@ describe(commands.THEME_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-        inverted: false
-      }
-    } as any), new CommandError('ClientSvc unknown error'));
+        isInverted: false
+      })
+    }), new CommandError('ClientSvc unknown error'));
   });
 
-  it('fails validation if the specified theme is invalid', async () => {
-    const actual = await command.validate({ options: { name: 'abc', theme: '{ not valid }', isInverted: false } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified theme is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'abc', theme: '{ not valid }', isInverted: false });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when specified theme is valid', async () => {
+  it('passes validation when specified theme is valid', () => {
     const theme = `{
       "themePrimary": "#d81e05",
       "themeLighterAlt": "#fdf5f4",
@@ -185,9 +191,17 @@ describe(commands.THEME_SET, () => {
       "black": "#1d1d1d",
       "white": "#f5f5f5"
     }`;
-    sinon.stub(validation, 'isValidTheme').callsFake(() => true);
-    const actual = await command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } }, commandInfo);
+    const actual = commandOptionsSchema.safeParse({ name: 'contoso-blue', theme, isInverted: false });
+    assert.strictEqual(actual.success, true);
+  });
 
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso', theme: '{}', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 });

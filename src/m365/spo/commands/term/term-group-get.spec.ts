@@ -13,14 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './term-group-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './term-group-get.js';
 
 describe(commands.TERM_GROUP_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +36,7 @@ describe(commands.TERM_GROUP_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -133,7 +134,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '36a62501-17ea-455a-bed4-eff862242def' }) });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-06-20T07:23:21.033Z",
       "Id": "36a62501-17ea-455a-bed4-eff862242def",
@@ -203,7 +204,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: '36a62501-17ea-455a-bed4-eff862242def' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: '36a62501-17ea-455a-bed4-eff862242def' }) });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-06-20T07:23:21.033Z",
       "Id": "36a62501-17ea-455a-bed4-eff862242def",
@@ -273,7 +274,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, name: 'People' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'People' }) });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-06-20T07:23:21.033Z",
       "Id": "36a62501-17ea-455a-bed4-eff862242def",
@@ -304,10 +305,10 @@ describe(commands.TERM_GROUP_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: '36a62501-17ea-455a-bed4-eff862242def'
-      }
-    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+      })
+    }), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term group not found via name', async () => {
@@ -328,7 +329,7 @@ describe(commands.TERM_GROUP_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'People' }) }), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
@@ -340,64 +341,53 @@ describe(commands.TERM_GROUP_GET, () => {
       }
     ]));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'People' }) }), new CommandError('File Not Found.'));
   });
 
-  it('fails validation if neither id nor name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither id nor name specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'People' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'People' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when webUrl is not a valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: 'abc', id: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when webUrl is not a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'abc', id: '9e54299e-208a-4000-8546-cc4139091b26' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the webUrl is a valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the webUrl is a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: '9e54299e-208a-4000-8546-cc4139091b26' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when id specified', async () => {
-    const actual = await command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '9e54299e-208a-4000-8546-cc4139091b26' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when name specified', async () => {
-    const actual = await command.validate({ options: { name: 'People' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'People' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '9e54299e-208a-4000-8546-cc4139091b26', unknown: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').rejects(new Error('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '36a62501-17ea-455a-bed4-eff862242def' }) }), new CommandError('getRequestDigest error'));
   });
 });

@@ -1,18 +1,22 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  force?: boolean;
 }
 
 class SpoThemeRemoveCommand extends SpoCommand {
@@ -24,30 +28,8 @@ class SpoThemeRemoveCommand extends SpoCommand {
     return 'Removes existing theme';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -63,7 +45,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
     }
   }
 
-  private async removeTheme(logger: Logger, options: GlobalOptions): Promise<void> {
+  private async removeTheme(logger: Logger, options: Options): Promise<void> {
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
       if (this.verbose) {
