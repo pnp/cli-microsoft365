@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitescript-add.js';
+import command, { options } from './sitescript-add.js';
 
 describe(commands.SITESCRIPT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.SITESCRIPT_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -91,7 +93,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) }) });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "My contoso script",
@@ -119,7 +121,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) }) });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "My contoso script",
@@ -147,7 +149,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) }) });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "",
@@ -175,7 +177,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) }) });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "My contoso script",
@@ -188,49 +190,25 @@ describe(commands.SITESCRIPT_ADD, () => {
   it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: { title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'Contoso', content: JSON.stringify({}) }) }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying title', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--title') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if script content is not a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ title: 'Contoso', content: 'abc' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when title specified and script content is valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({ title: 'Contoso', content: JSON.stringify({}) });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: 'Contoso',
+      content: JSON.stringify({}),
+      unknownOption: 'value'
     });
-    assert(containsOption);
-  });
-
-  it('supports specifying description', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--description') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying script content', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--content') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('fails validation if script content is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { title: 'Contoso', content: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when title specified and  script content is valid JSON', async () => {
-    const actual = await command.validate({ options: { title: 'Contoso', content: JSON.stringify({}) } }, commandInfo);
-    assert.strictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 });
