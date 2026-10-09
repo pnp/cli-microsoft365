@@ -287,6 +287,7 @@ describe(commands.HOMESITE_SET, () => {
   it('fails validation if the url is not a valid SharePoint url', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'invalid', audienceIds: '00000000-0000-0000-0000-000000000001' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
@@ -308,6 +309,7 @@ describe(commands.HOMESITE_SET, () => {
   it('correctly handles invalid GUIDs in audiences', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', audienceIds: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid: invalid-guid.`);
   });
 
   it('passes validation if only audienceIds is specified', async () => {
@@ -329,5 +331,6 @@ describe(commands.HOMESITE_SET, () => {
   it('correctly handles non-integer order', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', order: -1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a positive integer.`);
   });
 });

@@ -311,11 +311,13 @@ describe(commands.RUN_LIST, () => {
   it('fails validation if the triggerStartTime is not a valid ISO datetime', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, triggerStartTime: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid datetime.`);
   });
 
   it('fails validation if the triggerEndTime is not a valid ISO datetime', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, triggerEndTime: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid datetime.`);
   });
 
   it('fails validation if the output is not json and withTrigger is specified', () => {

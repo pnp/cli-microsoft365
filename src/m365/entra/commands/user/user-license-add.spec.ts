@@ -90,6 +90,7 @@ describe(commands.USER_LICENSE_ADD, () => {
       ids: 'Invalid GUID', userId: validUserId
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid GUID' contains one or more invalid GUIDs.`);
   });
 
   it('fails validation if userId is not a valid guid.', () => {

@@ -183,6 +183,7 @@ describe(commands.COPY, () => {
       targetUrl: '/teams/finance/Shared Documents'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation with valid options', async () => {

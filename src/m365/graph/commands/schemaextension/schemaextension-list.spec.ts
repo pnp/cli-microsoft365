@@ -486,6 +486,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('fails validation if the owner is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ owner: '123' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, '123 is not a valid GUID');
   });
   it('fails validation if the status is not a valid status', () => {
     const actual = commandOptionsSchema.safeParse({ status: 'test' });

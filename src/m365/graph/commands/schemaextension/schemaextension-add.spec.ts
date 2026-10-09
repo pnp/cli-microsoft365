@@ -202,6 +202,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The specified owner 'invalid' is not a valid App Id`);
   });
 
   it('fails validation if properties is not valid JSON string', () => {
@@ -224,6 +225,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       properties: '[{"name":"MyInt","type":"Foo"},{"name":"MyString","type":"String"}]'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, 'Foo is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String');
   });
 
   it('fails validation if a specified property has missing type', () => {
@@ -235,6 +237,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       properties: '[{"name":"MyInt"},{"name":"MyString","type":"String"}]'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, 'undefined is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String');
   });
 
   it('fails validation if a specified property has missing name', () => {
@@ -246,6 +249,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       properties: '[{"type":"Integer"},{"name":"MyString","type":"String"}]'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, 'Property {"type":"Integer"} misses name');
   });
 
   it('fails validation if properties JSON string is not an array', () => {
@@ -257,6 +261,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       properties: '{}'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, 'The specified JSON string is not an array');
   });
 
   it('passes validation if the owner is a valid GUID', () => {

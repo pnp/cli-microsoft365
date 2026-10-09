@@ -93,30 +93,35 @@ describe(commands.GROUP_SET, () => {
     const mailNickname = 'lorem ipsum';
     const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', mailNickname: mailNickname });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `Value 'lorem ipsum' for option 'mailNickname' must contain only characters in the ASCII character set 0-127 except the following: @ () \\ [] " ; : <> , SPACE.`);
   });
 
   it('fails validation if ownerIds contains invalid GUID', async () => {
     const ownerIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
     const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerIds: ownerIds.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for option 'ownerIds': foo.`);
   });
 
   it('fails validation if ownerUserNames contains invalid user principal name', async () => {
     const ownerUserNames = ['john.doe@contoso.com', 'foo'];
     const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', ownerUserNames: ownerUserNames.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for option 'ownerUserNames': foo.`);
   });
 
   it('fails validation if memberIds contains invalid GUID', async () => {
     const memberIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
     const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberIds: memberIds.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for option 'memberIds': foo.`);
   });
 
   it('fails validation if memberUserNames contains invalid user principal name', async () => {
     const memberUserNames = ['john.doe@contoso.com', 'foo'];
     const actual = commandOptionsSchema.safeParse({ displayName: 'Cli group', memberUserNames: memberUserNames.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for option 'memberUserNames': foo.`);
   });
 
   it('fails validation if visibility contains invalid value', async () => {

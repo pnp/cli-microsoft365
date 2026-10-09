@@ -74,6 +74,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
   it('fails validation if siteUrl is not a valid URL', () => {
     const actual = baseSchema.safeParse({ siteUrl: 'invalid', disabled: true });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when none of disabled, ownerGroup or email are provided', () => {
@@ -94,6 +95,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
   it('fails validation when email is invalid', () => {
     const actual = refinedSchema.safeParse({ siteUrl, email: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid email address.`);
   });
 
   it('passes validation when disabled specified', () => {

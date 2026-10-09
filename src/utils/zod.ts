@@ -62,7 +62,7 @@ function parseBoolean(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo
   return;
 }
 
-function getParseFn(typeName?: "object" | "array" | "string" | "number" | "boolean" | "null" | "integer"): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
+function getParseFn(typeName?: JSONSchema.JSONSchema['type']): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
   switch (typeName) {
     case 'object':
       return parseObject;

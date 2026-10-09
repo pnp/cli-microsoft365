@@ -1759,12 +1759,14 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = commandOptionsSchema.safeParse({ sourceFile: 'file.docx', targetFile: 'file.pdf' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Specified source file file.docx doesn't exist`);
   });
 
   it(`fails validation if another file exists at the path specified in the target file`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = commandOptionsSchema.safeParse({ sourceFile: 'file.docx', targetFile: 'file.pdf' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Another file found at file.pdf`);
   });
 
   it(`passes validation if the source file is a URL`, async () => {

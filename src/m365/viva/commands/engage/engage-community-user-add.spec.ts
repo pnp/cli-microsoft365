@@ -93,6 +93,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       role: 'Member'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid: ${userIds.join(',')},invalid.`);
   });
 
   it('fails validation if userNames contains invalid user principal names', () => {
@@ -102,6 +103,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       role: 'Member'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid: ${userNames.join(',')},invalid.`);
   });
 
   it('fails validation if communityId, communityDisplayName or entraGroupId are not specified', () => {

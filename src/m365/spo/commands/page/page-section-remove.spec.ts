@@ -1005,6 +1005,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await commandOptionsSchema.safeParse({ webUrl: 'foo', pageName: 'home.aspx', section: 1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the section option is not a number', async () => {

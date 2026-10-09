@@ -608,6 +608,7 @@ describe(commands.WEB_ADD, () => {
       parentWebUrl: 'foo'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('fails validation if the specified locale is not a number', () => {
@@ -615,6 +616,7 @@ describe(commands.WEB_ADD, () => {
       title: "subsite", url: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'abc is not a valid locale number');
   });
 
   it('fails validation with unknown options', () => {

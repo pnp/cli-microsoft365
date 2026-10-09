@@ -122,6 +122,7 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
   it('fails validation if webUrl is invalid', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', pageName: pageName, id: controlId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint URL.`);
   });
 
   it('fails validation if id is invalid', async () => {

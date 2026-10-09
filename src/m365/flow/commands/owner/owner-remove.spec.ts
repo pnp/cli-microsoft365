@@ -244,16 +244,19 @@ describe(commands.OWNER_REMOVE, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, userId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if groupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, groupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if username is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environmentName, flowName: flowName, userName: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid userName.`);
   });
 
   it('fails validation when no owner identifier is provided', () => {

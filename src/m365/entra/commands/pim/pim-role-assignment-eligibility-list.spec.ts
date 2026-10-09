@@ -273,6 +273,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ELIGIBILITY_LIST, () => {
   it('fails validation when userName is not a valid user principal name', async () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid user principal name for option 'userName'.`);
   });
 
   it('fails validation when groupId is not a valid GUID', async () => {

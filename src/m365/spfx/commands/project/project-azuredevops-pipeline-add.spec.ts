@@ -85,10 +85,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((fakePath, options) => {
-      if (fakePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (fakePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (fakePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -163,10 +163,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -201,10 +201,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -229,10 +229,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -268,10 +268,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -307,10 +307,10 @@ describe(commands.PROJECT_AZUREDEVOPS_PIPELINE_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 

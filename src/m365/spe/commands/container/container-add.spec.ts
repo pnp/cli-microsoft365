@@ -114,6 +114,7 @@ describe(commands.CONTAINER_ADD, () => {
   it('fails validation if itemMajorVersionLimit is not a positive integer', async () => {
     const actual = commandOptionsSchema.safeParse({ name: containerName, itemMajorVersionLimit: 12.5 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'12.5' is not a valid positive integer.`);
   });
 
   it('correctly logs an output', async () => {

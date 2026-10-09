@@ -79,6 +79,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       userId: userId
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[1].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if roleId is a valid GUID', () => {
@@ -119,6 +120,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       userId: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[1].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if userId is a valid GUID', () => {
@@ -135,6 +137,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       userName: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid UPN.`);
   });
 
   it('passes validation if userName is specified', () => {

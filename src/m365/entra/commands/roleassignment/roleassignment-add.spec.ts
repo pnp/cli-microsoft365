@@ -166,6 +166,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       principal: '@foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'@foo' is not a valid GUID, UPN or group mail nickname.`);
   });
 
   it('fails validation if principal is not specified', () => {
@@ -191,6 +192,7 @@ describe(commands.ROLEASSIGNMENT_ADD, () => {
       userName: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if groupId is specified, but it is not a valid GUID', () => {
