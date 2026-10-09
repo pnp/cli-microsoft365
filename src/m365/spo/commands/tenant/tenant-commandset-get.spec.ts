@@ -11,12 +11,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-commandset-get.js';
+import command, { options } from './tenant-commandset-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_COMMANDSET_GET, () => {
   const title = 'Some ListView Command Set';
-  const id = 4;
+  const id = '4';
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -52,6 +52,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -61,6 +62,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -107,78 +109,72 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when no options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when all options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: id,
+      clientSideComponentId: clientSideComponentId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and id options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when no options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and clientSideComponentId options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: title,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when title and id options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: id
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when id and clientSideComponentId options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when title and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      clientSideComponentId: clientSideComponentId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is a valid number', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when id and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      clientSideComponentId: clientSideComponentId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passed validation when title specified', async () => {
-    const actual = await command.validate({ options: { title: title } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if clientSideComponentId is valid', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation when title specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if clientSideComponentId is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: clientSideComponentId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('throws error when tenant app catalog doesn\'t exist', async () => {
@@ -193,9 +189,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     }), new CommandError(errorMessage));
   });
 
@@ -211,9 +205,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     }), new CommandError(errorMessage));
   });
 
@@ -231,9 +223,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
@@ -258,9 +248,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     }), new CommandError("Multiple ListView Command Sets with Some ListView Command Set were found. Found: 3, 4."));
   });
 
@@ -286,9 +274,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
 
     await command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
@@ -307,9 +293,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        id: id
-      }
+      options: commandOptionsSchema.parse({ id: id })
     });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
@@ -328,9 +312,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId
-      }
+      options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId })
     });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetResponse.value[0]));
   });
@@ -349,10 +331,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        id: id,
-        tenantWideExtensionComponentProperties: true
-      }
+      options: commandOptionsSchema.parse({ id: id, tenantWideExtensionComponentProperties: true })
     });
     assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(commandSetResponse.value[0].TenantWideExtensionComponentProperties)));
   });
@@ -377,9 +356,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId
-      }
+      options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId })
     }), new CommandError("Multiple ListView Command Sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 3, 4."));
   });
 
@@ -398,9 +375,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     }), new CommandError(errorMessage));
   });
 
@@ -419,9 +394,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        title: title
-      }
+      options: commandOptionsSchema.parse({ title: title })
     }), new CommandError(errorMessage));
   });
 
@@ -441,9 +414,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId
-      }
+      options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId })
     }), new CommandError(errorMessage));
   });
 });

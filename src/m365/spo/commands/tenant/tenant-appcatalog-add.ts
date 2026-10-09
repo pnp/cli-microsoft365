@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { CommandError, globalOptionsZod } from '../../../../Command.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -10,16 +10,19 @@ import spoSiteGetCommand from '../site/site-get.js';
 import spoSiteRemoveCommand from '../site/site-remove.js';
 import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string().refine(val => validation.isValidSharePointUrl(val) === true, { message: 'The value is not a valid SharePoint site URL.' }).alias('u'),
+  owner: z.string().optional(),
+  timeZone: z.string().refine(val => !isNaN(Number(val)), { message: 'timeZone is not a number' }).optional().alias('z'),
+  wait: z.boolean().optional(),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  force: boolean;
-  owner: string;
-  timeZone: string | number;
-  url: string;
-  wait: boolean;
 }
 
 class SpoTenantAppCatalogAddCommand extends SpoCommand {
@@ -31,58 +34,8 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     return 'Creates new tenant app catalog site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        wait: args.options.wait || false,
-        force: args.options.force || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-z, --timeZone <timeZone>'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (typeof args.options.timeZone !== 'number') {
-          return `${args.options.timeZone} is not a number`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -103,9 +56,9 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       }
 
       //Using JSON.parse
-      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
+      await this.ensureNoExistingSite(appCatalogUrl, args.options.force ?? false, logger);
     }
-    await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
+    await this.ensureNoExistingSite(args.options.url, args.options.force ?? false, logger);
     await this.createAppCatalog(args.options, logger);
   }
 

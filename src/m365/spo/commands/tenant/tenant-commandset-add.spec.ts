@@ -14,7 +14,7 @@ import commands from '../../commands.js';
 import spoListItemAddCommand from '../listitem/listitem-add.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
 import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
-import command from './tenant-commandset-add.js';
+import command, { options } from './tenant-commandset-add.js';
 
 describe(commands.TENANT_COMMANDSET_ADD, () => {
   const clientSideComponentId = '9748c81b-d72e-4048-886a-e98649543743';
@@ -33,6 +33,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,6 +42,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -103,7 +105,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'List', title: customizerTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, listType: 'List', title: customizerTitle, verbose: true }) });
     assert.strictEqual(executeCommandCalled, true);
   });
 
@@ -132,7 +134,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'Library', location: 'ContextMenu', title: customizerTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, listType: 'Library', location: 'ContextMenu', title: customizerTitle, verbose: true }) });
     assert.strictEqual(executeCommandCalled, true);
   });
 
@@ -161,7 +163,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'SitePages', location: 'CommandBar', title: customizerTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, listType: 'SitePages', location: 'CommandBar', title: customizerTitle, verbose: true }) });
     assert.strictEqual(executeCommandCalled, true);
   });
 
@@ -190,7 +192,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'Library', title: customizerTitle, webTemplate: webTemplate, location: 'Both', clientSideComponentProperties: clientSideComponentProperties, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, listType: 'Library', title: customizerTitle, webTemplate: webTemplate, location: 'Both', clientSideComponentProperties: clientSideComponentProperties, verbose: true }) });
     assert.strictEqual(executeCommandCalled, true);
   });
 
@@ -202,7 +204,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError('Cannot add tenant-wide ListView Command Set as app catalog cannot be found'));
   });
 
@@ -219,7 +221,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError('No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog'));
   });
 
@@ -239,7 +241,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError(`The extension type of this component is not of type 'ListViewCommandSet' but of type 'FormCustomizer'`));
   });
 
@@ -259,7 +261,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError(`No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`));
   });
 
@@ -281,7 +283,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError(`The solution does not contain an extension that can be deployed to all sites. Make sure that you've entered the correct component Id.`));
   });
 
@@ -303,27 +305,37 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, verbose: true }) }),
       new CommandError(`The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.`));
   });
 
-  it('fails validation if clientSideComponentId is not a valid Guid', async () => {
-    const actual = await command.validate({ options: { title: customizerTitle, listType: 'List', clientSideComponentId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if clientSideComponentId is not a valid Guid', () => {
+    const actual = commandOptionsSchema.safeParse({ title: customizerTitle, listType: 'List', clientSideComponentId: 'foo' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if location value is not valid', async () => {
-    const actual = await command.validate({ options: { title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, location: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if location value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, location: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if listType value is not valid', async () => {
-    const actual = await command.validate({ options: { title: customizerTitle, listType: 'invalid', clientSideComponentId: clientSideComponentId, location: 'Both' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listType value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ title: customizerTitle, listType: 'invalid', clientSideComponentId: clientSideComponentId, location: 'Both' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation when all properties are specified', async () => {
-    const actual = await command.validate({ options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all properties are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: customizerTitle, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: customizerTitle, listType: 'List', clientSideComponentId: clientSideComponentId, unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
   });
 });
