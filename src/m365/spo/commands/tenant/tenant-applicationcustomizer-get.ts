@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
@@ -10,15 +11,18 @@ import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().optional().alias('t'),
+  id: z.string().refine(val => !isNaN(Number(val)), { message: 'id is not a number' }).optional().alias('i'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
+  tenantWideExtensionComponentProperties: z.boolean().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title?: string;
-  id?: string;
-  clientSideComponentId?: string;
-  tenantWideExtensionComponentProperties?: boolean;
 }
 
 class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
@@ -30,67 +34,14 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
     return 'Gets an application customizer that is installed tenant wide';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        tenantWideExtensionComponentProperties: !!args.options.tenantWideExtensionComponentProperties
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => [opts.title, opts.id, opts.clientSideComponentId].filter(v => v !== undefined).length === 1, {
+      error: `Specify exactly one of the following options: 'title', 'id', or 'clientSideComponentId'.`
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-c, --clientSideComponentId [clientSideComponentId]'
-      },
-      {
-        option: '-p, --tenantWideExtensionComponentProperties'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && isNaN(parseInt(args.options.id))) {
-          return `${args.options.id} is not a number`;
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('title', 'id', 'clientSideComponentId');
-    this.types.boolean.push('tenantWideExtensionComponentProperties');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

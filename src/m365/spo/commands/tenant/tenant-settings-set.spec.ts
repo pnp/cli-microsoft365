@@ -14,12 +14,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './tenant-settings-set.js';
+import command, { options } from './tenant-settings-set.js';
 
 describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerStderrLogSpy: sinon.SinonSpy;
 
   const defaultRequestsSuccessStub = (): sinon.SinonStub => {
@@ -51,6 +52,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     auth.connection.spoUrl = 'https://contoso-admin.sharepoint.com';
     auth.connection.spoTenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -103,16 +105,20 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('sets the tenant settings successfully', async () => {
     defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         NotificationsInSharePointEnabled: true
-      }
+      })
     });
   });
 
@@ -120,9 +126,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const request = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
-      }
+      })
     });
 
     assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xml</Object><Object Type="String">xslt</Object><Object Type="String">xsd</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
@@ -133,9 +139,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const request = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         AllowedDomainListForSyncClient: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
-      }
+      })
     });
 
     assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="AllowedDomainListForSyncClient"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
@@ -146,9 +152,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const request = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
-      }
+      })
     });
 
     assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
@@ -158,16 +164,16 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const request = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77',
         ExcludedFileExtensionsForSyncClient: 'xsl,doc,ttf',
         OfficeClientADALDisabled: true,
-        OneDriveStorageQuota: 256,
+        OneDriveStorageQuota: '256',
         OrgNewsSiteUrl: 'https://contoso-admin.sharepoint.com'
-      }
+      })
     });
 
-    assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /><SetProperty Id="44" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xsl</Object><Object Type="String">doc</Object><Object Type="String">ttf</Object></Parameter></SetProperty><Method Name="Update" Id="45" ObjectPathId="7" /><SetProperty Id="46" ObjectPathId="7" Name="OfficeClientADALDisabled"><Parameter Type="String">true</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="OneDriveStorageQuota"><Parameter Type="String">256</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="OrgNewsSiteUrl"><Parameter Type="String">https://contoso-admin.sharepoint.com</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+    assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="OfficeClientADALDisabled"><Parameter Type="String">true</Parameter></SetProperty><SetProperty Id="43" ObjectPathId="7" Name="OneDriveStorageQuota"><Parameter Type="String">256</Parameter></SetProperty><SetProperty Id="44" ObjectPathId="7" Name="OrgNewsSiteUrl"><Parameter Type="String">https://contoso-admin.sharepoint.com</Parameter></SetProperty><SetProperty Id="45" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xsl</Object><Object Type="String">doc</Object><Object Type="String">ttf</Object></Parameter></SetProperty><Method Name="Update" Id="46" ObjectPathId="7" /><SetProperty Id="47" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="48" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
   });
 
   it('handles tenant settings SelectAllProperties (first \'POST\') request error', async () => {
@@ -186,7 +192,12 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd',
+        debug: true
+      })
+    }), new CommandError('Timed out'));
   });
 
   it('handles tenant settings set (second \'POST\') request error', async () => {
@@ -226,14 +237,18 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
+      })
+    }), new CommandError('Timed out'));
   });
 
   it('should turn enums to int in the request successfully', async () => {
     const stubRequest: sinon.SinonStub = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         SharingCapability: 'ExternalUserSharingOnly',
@@ -247,21 +262,20 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         ConditionalAccessPolicy: 'AllowLimitedAccess',
         LimitedAccessFileType: 'WebPreviewableFiles',
         SpecialCharactersStateInFileFolderNames: 'Allowed'
-      }
+      })
     });
     assert.strictEqual(stubRequest.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="SharingCapability"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="43" ObjectPathId="7" Name="SharingDomainRestrictionMode"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="44" ObjectPathId="7" Name="DefaultSharingLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="45" ObjectPathId="7" Name="ODBMembersCanShare"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="46" ObjectPathId="7" Name="ODBAccessRequests"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="FileAnonymousLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="FolderAnonymousLinkType"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="49" ObjectPathId="7" Name="DefaultLinkPermission"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="50" ObjectPathId="7" Name="ConditionalAccessPolicy"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="51" ObjectPathId="7" Name="LimitedAccessFileType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="52" ObjectPathId="7" Name="SpecialCharactersStateInFileFolderNames"><Parameter Type="String">1</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
   });
 
-  it('validation fails if wrong enum value', async () => {
-    const options: any = {
+  it('validation fails if wrong enum value', () => {
+    const actual = commandOptionsSchema.safeParse({
       SharingCapability: 'abc'
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validation passes if right enum value', async () => {
-    const options: any = {
+  it('validation passes if right enum value', () => {
+    const actual = commandOptionsSchema.safeParse({
       debug: true,
       SharingCapability: 'ExternalUserSharingOnly',
       SharingDomainRestrictionMode: 'AllowList',
@@ -274,9 +288,8 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       ConditionalAccessPolicy: 'AllowLimitedAccess',
       LimitedAccessFileType: 'WebPreviewableFiles',
       SpecialCharactersStateInFileFolderNames: 'Allowed'
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, true);
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('validation fails if wrong enum key', async () => {
@@ -285,38 +298,40 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, -1);
   });
 
-  it('validation passes if right prop value', async () => {
-    const options: any = {
+  it('validation passes if right prop value', () => {
+    const actual = commandOptionsSchema.safeParse({
       OrgNewsSiteUrl: 'abc'
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, true);
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validation fails if no options specified', async () => {
-    const options: any = {
+  it('validation fails if no options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
       debug: true,
       verbose: true
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, `You must specify at least one option`);
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validation passes autocomplete check if has the right value specified', async () => {
-    const options: any = {
+  it('validation passes autocomplete check if has the right value specified', () => {
+    const actual = commandOptionsSchema.safeParse({
       ShowAllUsersClaim: true
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, true);
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('shows warning when option EnableAzureADB2BIntegration is used with value true', async () => {
     defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         EnableAzureADB2BIntegration: true
-      }
+      })
     });
     assert.strictEqual(loggerStderrLogSpy.calledWith(chalk.yellow("WARNING: Make sure to also enable the Microsoft Entra one-time passcode authentication preview. If it is not enabled then SharePoint will not use Microsoft Entra B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.")), true);
   });
@@ -325,11 +340,24 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const stubRequest = defaultRequestsSuccessStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled: true
-      }
+      })
     });
 
     assert.strictEqual(stubRequest.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled"><Parameter Type="String">true</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+  });
+
+  it('validates all numeric options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      MinCompatibilityLevel: '15',
+      MaxCompatibilityLevel: '16',
+      RequireAnonymousLinksExpireInDays: '30',
+      IPAddressWACTokenLifetime: '15',
+      OrphanedPersonalSitesRetentionPeriod: '30',
+      EmailAttestationReAuthDays: '30'
+    });
+
+    assert.strictEqual(actual.success, true);
   });
 });
