@@ -17,7 +17,7 @@ describe('googleAnalytics', () => {
 
   afterEach(() => {
     sinon.restore();
-    process.env = env;
+    process.env = { ...env };
   });
 
   it('sends command and option usage using Measurement Protocol', async () => {
