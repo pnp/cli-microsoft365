@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,13 +11,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './theme-remove.js';
+import command, { options } from './theme-remove.js';
 
 describe(commands.THEME_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean = false;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +28,8 @@ describe(commands.THEME_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,7 +76,7 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('should prompt before removing theme when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { name: 'Contoso' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'Contoso' }) });
 
     assert(promptIssued);
   });
@@ -87,10 +92,10 @@ describe(commands.THEME_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Contoso',
         force: true
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
     assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
@@ -109,11 +114,11 @@ describe(commands.THEME_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         force: true
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
     assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
@@ -134,10 +139,10 @@ describe(commands.THEME_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso'
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
     assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
@@ -158,11 +163,21 @@ describe(commands.THEME_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 });
