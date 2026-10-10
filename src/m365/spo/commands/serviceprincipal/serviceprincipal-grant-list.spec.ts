@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-grant-list.js';
+import command, { options } from './serviceprincipal-grant-list.js';
 
 describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const spoServicePrincipalDisplayName = 'SharePoint Online Web Client Extensibility';
   const spoServicePrincipalID = '00000000-0000-0000-0000-000000000000';
   const graphUrl = 'https://graph.microsoft.com/v1.0';
@@ -45,6 +49,8 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,7 +105,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(oauth2PermissionGrants.value));
   });
 
@@ -112,7 +118,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Service principal '${spoServicePrincipalDisplayName}' not found`));
   });
 
@@ -130,8 +136,20 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     };
 
     sinon.stub(request, 'get').rejects(error);
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Resource '20c5353f-acc6-424a-bf81-bc80fbd74cdb' does not exist or one of its queried reference-property objects are not present.`));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('defines alias', () => {

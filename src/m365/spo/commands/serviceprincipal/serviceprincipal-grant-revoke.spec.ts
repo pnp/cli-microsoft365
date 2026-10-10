@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -11,13 +13,15 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './serviceprincipal-grant-revoke.js';
+import command, { options } from './serviceprincipal-grant-revoke.js';
 
 describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +36,8 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -96,7 +102,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -125,7 +131,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -139,7 +145,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' }) }),
       new CommandError('The given key was not present in the dictionary.'));
   });
 
@@ -177,7 +183,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -199,7 +205,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' }) }),
       new CommandError('The given key was not present in the dictionary.'));
   });
 
@@ -237,29 +243,26 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg', scope: 'Mail.Read' }) }),
       new CommandError('An error has occurred.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' }) }),
       new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('defines alias', () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('allows specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
