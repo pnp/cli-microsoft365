@@ -2936,6 +2936,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder unarchive',
+              id: 'cmd/spo/folder/folder-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'folder retentionlabel ensure',
               id: 'cmd/spo/folder/folder-retentionlabel-ensure'
             },
