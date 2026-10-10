@@ -51,13 +51,13 @@ class SpoTermSetGetCommand extends SpoCommand {
           return false;
         }
         return true;
-      }, { message: 'is not a valid GUID' })
+      }, { error: e => `'${e.input}' is not a valid GUID.` })
       .refine(opts => {
         if (opts.termGroupId && !validation.isValidGuid(opts.termGroupId)) {
           return false;
         }
         return true;
-      }, { message: 'is not a valid GUID' })
+      }, { error: e => `'${e.input}' is not a valid GUID.` })
       .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
         message: 'Specify either id or name, but not both.',
         params: { customCode: 'optionSet', options: ['id', 'name'] }

@@ -50,11 +50,8 @@ class SpoThemeApplyCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
     return schema
-      .refine(opts => !opts.sharePointTheme || (opts.name in SharePointThemes), {
-        message: 'Please check if the theme name is entered correctly.',
-        params: {
-          customCode: 'required'
-        }
+      .refine(opts => !opts.sharePointTheme || (Object.prototype.hasOwnProperty.call(SharePointThemes, opts.name)), {
+        message: 'Please check if the theme name is entered correctly.'
       });
   }
 
