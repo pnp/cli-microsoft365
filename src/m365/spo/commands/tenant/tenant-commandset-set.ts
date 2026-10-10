@@ -1,4 +1,5 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -8,24 +9,27 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const listTypes = ['List', 'Library', 'SitePages'] as const;
+const locations = ['ContextMenu', 'CommandBar', 'Both'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  newTitle: z.string().optional().alias('t'),
+  listType: z.enum(listTypes).optional().alias('l'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
+  clientSideComponentProperties: z.string().optional().alias('p'),
+  webTemplate: z.string().optional().alias('w'),
+  location: z.enum(locations).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id: string;
-  newTitle?: string;
-  listType?: string;
-  clientSideComponentId?: string;
-  clientSideComponentProperties?: string;
-  webTemplate?: string;
-  location?: string;
-}
-
 class SpoTenantCommandSetSetCommand extends SpoCommand {
-  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
-  private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
-
   public get name(): string {
     return commands.TENANT_COMMANDSET_SET;
   }
@@ -34,82 +38,14 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
     return 'Updates a ListView Command Set that is installed tenant wide.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        newTitle: typeof args.options.newTitle !== 'undefined',
-        listType: args.options.listType,
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        webTemplate: typeof args.options.webTemplate !== 'undefined',
-        location: args.options.location
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => opts.newTitle || opts.listType || opts.clientSideComponentId || opts.clientSideComponentProperties || opts.webTemplate || opts.location, {
+      error: 'Specify at least one property to update'
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --newTitle [newTitle]'
-      },
-      {
-        option: '-l, --listType [listType]',
-        autocomplete: SpoTenantCommandSetSetCommand.listTypes
-      },
-      {
-        option: '-c, --clientSideComponentId [clientSideComponentId]'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--location [location]',
-        autocomplete: SpoTenantCommandSetSetCommand.locations
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.newTitle &&
-          !args.options.listType &&
-          !args.options.clientSideComponentId &&
-          !args.options.clientSideComponentProperties &&
-          !args.options.webTemplate &&
-          !args.options.location) {
-          return 'Specify at least one property to update';
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.listType && SpoTenantCommandSetSetCommand.listTypes.indexOf(args.options.listType) < 0) {
-          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoTenantCommandSetSetCommand.listTypes.join(', ')}`;
-        }
-
-        if (args.options.location && SpoTenantCommandSetSetCommand.locations.indexOf(args.options.location) < 0) {
-          return `${args.options.location} is not a valid location. Allowed values are ${SpoTenantCommandSetSetCommand.locations.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

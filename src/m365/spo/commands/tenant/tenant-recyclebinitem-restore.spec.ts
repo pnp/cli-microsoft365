@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-recyclebinitem-restore.js';
+import command, { options } from './tenant-recyclebinitem-restore.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -19,6 +19,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const siteUrl = 'https://contoso.sharepoint.com/sites/hr';
   const siteRestoreUrl = 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RestoreDeletedSite';
@@ -32,6 +33,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,14 +72,19 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`restores deleted group from a deleted team site`, async () => {
@@ -103,7 +110,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, verbose: true }) });
     assert.strictEqual(postStub.lastCall.args[0].url, groupRestoreUrl);
   });
 
@@ -124,7 +131,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, verbose: true }) });
     assert(postStub.lastCall.args[0].url === siteRestoreUrl);
   });
 
@@ -143,6 +150,6 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, verbose: true } } as any), new CommandError(error.error['odata.error'].message.value));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, verbose: true }) }), new CommandError(error.error['odata.error'].message.value));
   });
 });
