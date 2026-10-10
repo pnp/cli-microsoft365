@@ -144,17 +144,27 @@ describe(commands.NAVIGATION_NODE_GET, () => {
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id });
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'QuickLaunch', id: id });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if id is not a valid number', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: 12.48 });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: 12.48 });
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation when webUrl and id are specified', async () => {
+  it('fails validation if location is not specified', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if location is not valid', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'invalid', id: id });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('passes validation when webUrl, location and id are specified', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', id: id });
     assert.strictEqual(actual.success, true);
   });
 
@@ -167,40 +177,34 @@ describe(commands.NAVIGATION_NODE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, verbose: true } });
     assert(loggerLogSpy.calledOnceWith(childNode));
   });
 
   it('retrieves navigation node from the top navigation', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
-        if (opts.data.menuNodeKey === null) {
-          return emptyQuickLaunchMenuState;
-        }
-
-        if (opts.data.menuNodeKey === '1002') {
-          return topNavigationMenuState;
-        }
+      if (opts.url === `${webUrl}/_api/navigation/MenuState` && opts.data.menuNodeKey === '1002') {
+        return topNavigationMenuState;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', id: id } });
     assert(loggerLogSpy.calledOnceWith(childNode));
   });
 
-  it('throws an error when navigation node is not found', async () => {
+  it('throws an error when navigation node is not found in the specified location', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/navigation/MenuState`) {
-        return emptyQuickLaunchMenuState;
+        return opts.data.menuNodeKey === '1002' ? topNavigationMenuState : emptyQuickLaunchMenuState;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id } }),
-      new CommandError(`Navigation node with id '${id}' not found.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id } }),
+      new CommandError(`Navigation node with id '${id}' not found in QuickLaunch.`));
   });
 
   it('correctly handles API error', async () => {
@@ -211,7 +215,7 @@ describe(commands.NAVIGATION_NODE_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id } }),
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id } }),
       new CommandError("Attempted to perform an unauthorized operation."));
   });
 });

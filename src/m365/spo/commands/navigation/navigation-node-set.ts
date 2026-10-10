@@ -13,6 +13,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
+  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l'),
   id: z.int().positive(),
   title: z.string().min(1, 'Cannot be empty.').optional(),
   url: z.string().optional(),
@@ -57,14 +58,14 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const { webUrl, id, title, url, audienceIds, openInNewWindow } = args.options;
+    const { webUrl, location, id, title, url, audienceIds, openInNewWindow } = args.options;
 
     if (this.verbose) {
       await logger.logToStderr(`Updating navigation node with id ${id}...`);
     }
 
     try {
-      const { menuState, node } = await spo.getMenuStateNodeByKey(webUrl, id.toString());
+      const { menuState, node } = await spo.getMenuStateNodeByKey(webUrl, id.toString(), location);
 
       if (title !== undefined) {
         node.Title = title;

@@ -13,6 +13,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
+  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l'),
   id: z.int().positive()
 });
 declare type Options = z.infer<typeof options>;
@@ -40,7 +41,7 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
     }
 
     try {
-      const { node } = await spo.getMenuStateNodeByKey(args.options.webUrl, args.options.id.toString());
+      const { node } = await spo.getMenuStateNodeByKey(args.options.webUrl, args.options.id.toString(), args.options.location);
       await logger.log(node);
     }
     catch (err: any) {

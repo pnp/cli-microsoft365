@@ -924,25 +924,29 @@ export const spo = {
   },
 
   /**
-  * Retrieves the navigation node with the specified key from the quick launch or the top navigation.
+  * Retrieves the navigation node with the specified key.
   * Returns the node along with the menu state that contains it.
   * @param webUrl Web url
   * @param key Key (ID) of the navigation node
+  * @param location Navigation to search. When not specified, searches the quick launch first and then the top navigation
   */
-  async getMenuStateNodeByKey(webUrl: string, key: string): Promise<{ menuState: MenuState, node: MenuStateNode }> {
-    let menuState: MenuState = await this.getQuickLaunchMenuState(webUrl);
-    let node: MenuStateNode | undefined = this.findMenuStateNode(menuState.Nodes, key);
+  async getMenuStateNodeByKey(webUrl: string, key: string, location?: 'QuickLaunch' | 'TopNavigationBar'): Promise<{ menuState: MenuState, node: MenuStateNode }> {
+    const locations: string[] = location ? [location] : ['QuickLaunch', 'TopNavigationBar'];
 
-    if (!node) {
-      menuState = await this.getTopNavigationMenuState(webUrl);
-      node = this.findMenuStateNode(menuState.Nodes, key);
+    for (const navigationLocation of locations) {
+      const menuState: MenuState = navigationLocation === 'TopNavigationBar'
+        ? await this.getTopNavigationMenuState(webUrl)
+        : await this.getQuickLaunchMenuState(webUrl);
+      const node: MenuStateNode | undefined = this.findMenuStateNode(menuState.Nodes, key);
+
+      if (node) {
+        return { menuState, node };
+      }
     }
 
-    if (!node) {
-      throw `Navigation node with id '${key}' not found.`;
-    }
-
-    return { menuState, node };
+    throw location
+      ? `Navigation node with id '${key}' not found in ${location}.`
+      : `Navigation node with id '${key}' not found.`;
   },
 
   /**

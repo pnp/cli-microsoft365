@@ -18,6 +18,9 @@ m365 spo navigation node get [options]
 `-u, --webUrl <webUrl>`
 : Absolute URL of the site.
 
+`-l, --location <location>`
+: Navigation type where the node is located. Available options: `QuickLaunch`, `TopNavigationBar`.
+
 `--id <id>`
 : Id of the navigation node.
 ```
@@ -45,10 +48,16 @@ m365 spo navigation node get [options]
 
 ## Examples
 
-Retrieve information for a specific navigation node.
+Retrieve information for a specific navigation node from the quick launch.
 
 ```sh
-m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2209
+m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marketing --location QuickLaunch --id 2209
+```
+
+Retrieve information for a specific navigation node from the top navigation.
+
+```sh
+m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --id 2209
 ```
 
 ## Response
@@ -126,7 +135,7 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marke
   <TabItem value="Markdown">
 
   ```md
-  # spo navigation node get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --id "2209"
+  # spo navigation node get --webUrl "https://contoso.sharepoint.com/sites/Marketing" --location "QuickLaunch" --id "2209"
 
   Date: 10/7/2026
 

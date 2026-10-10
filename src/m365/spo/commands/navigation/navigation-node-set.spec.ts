@@ -151,7 +151,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('updates all properties of a navigation node in the quick launch', async () => {
     const postStub = stubMenuStateRequests();
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
     assert.deepStrictEqual(getSavedMenuState(postStub).Nodes[0].Nodes[0], {
       ...node,
       AudienceIds: audienceIds.split(','),
@@ -164,7 +164,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('updates the title of a navigation node in the top navigation', async () => {
     const postStub = stubMenuStateRequests(true);
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, title: title } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', id: id, title: title } });
     const savedMenuState = getSavedMenuState(postStub);
     assert.strictEqual(savedMenuState.StartingNodeKey, '1002');
     assert.deepStrictEqual(savedMenuState.Nodes[0], { ...node, Title: title });
@@ -173,29 +173,37 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('sets a navigation node not to open in a new window', async () => {
     const postStub = stubMenuStateRequests();
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, openInNewWindow: false } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, openInNewWindow: false } });
     assert.deepStrictEqual(getSavedMenuState(postStub).Nodes[0].Nodes[0], { ...node, OpenInNewWindow: false });
   });
 
   it('clears audienceIds of a navigation node', async () => {
     const postStub = stubMenuStateRequests();
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: '' } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: '' } });
     assert.deepStrictEqual(getSavedMenuState(postStub).Nodes[0].Nodes[0], { ...node, AudienceIds: [] });
   });
 
   it('sets a navigation node as linkless', async () => {
     const postStub = stubMenuStateRequests();
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, url: '' } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, url: '' } });
     assert.deepStrictEqual(getSavedMenuState(postStub).Nodes[0].Nodes[0], { ...node, SimpleUrl: '' });
   });
 
   it('throws an error when the navigation node does not exist', async () => {
     stubMenuStateRequests();
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: 9999, title: title } }),
-      new CommandError(`Navigation node with id '9999' not found.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: 9999, title: title } }),
+      new CommandError(`Navigation node with id '9999' not found in QuickLaunch.`));
+  });
+
+  it('throws an error when the navigation node exists in a different location than specified', async () => {
+    const postStub = stubMenuStateRequests(true);
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, title: title } }),
+      new CommandError(`Navigation node with id '${id}' not found in QuickLaunch.`));
+    assert(postStub.getCalls().every(call => call.args[0].url !== `${webUrl}/_api/navigation/SaveMenuState`));
   });
 
   it('correctly handles API error', async () => {
@@ -210,52 +218,62 @@ describe(commands.NAVIGATION_NODE_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id, title: title } }),
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', id: id, title: title } }),
       new CommandError('An error has occurred'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id, title: title });
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'QuickLaunch', id: id, title: title });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if id is not a valid number', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: 'invalid', title: title });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: 'invalid', title: title });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if location is not specified', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, title: title });
+    assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation if location is not valid', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'invalid', id: id, title: title });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if title is an empty string', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, title: '' });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, title: '' });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if no options are set to be changed', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if audienceIds contains more than 10 guids', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, audienceIds: Array(11).fill('7aa4a1ca-4035-4f2f-bac7-7beada59b5ba').join(',') });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: Array(11).fill('7aa4a1ca-4035-4f2f-bac7-7beada59b5ba').join(',') });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if audienceIds contains invalid guid', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, audienceIds: `${audienceIds},invalid` });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the removed isExternal option is specified', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, isExternal: true });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, isExternal: true });
     assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation if all options are set properly', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if audienceIds is an empty string', async () => {
-    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, audienceIds: '' });
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: '' });
     assert.strictEqual(actual.success, true);
   });
 });
