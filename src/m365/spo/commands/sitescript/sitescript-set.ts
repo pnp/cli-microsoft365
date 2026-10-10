@@ -1,21 +1,45 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).alias('i'),
+  title: z.string().optional().alias('t'),
+  description: z.string().optional().alias('d'),
+  version: z.string().optional()
+    .refine(val => val === undefined || !isNaN(parseInt(val)), {
+      message: 'Version must be a number.'
+    })
+    .alias('v'),
+  content: z.string().optional()
+    .refine(val => {
+      if (val === undefined) {
+        return true;
+      }
+      try {
+        JSON.parse(val);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      message: 'Specified content value is not a valid JSON string.'
+    })
+    .alias('c')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  title?: string;
-  description?: string;
-  version?: string;
-  content?: string;
 }
 
 class SpoSiteScriptSetCommand extends SpoCommand {
@@ -27,71 +51,8 @@ class SpoSiteScriptSetCommand extends SpoCommand {
     return 'Updates existing site script';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: (!(!args.options.title)).toString(),
-        description: (!(!args.options.description)).toString(),
-        version: (!(!args.options.version)).toString(),
-        content: (!(!args.options.content)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-v, --version [version]'
-      },
-      {
-        option: '-c, --content [content]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.version) {
-          const version: number = parseInt(args.options.version);
-          if (isNaN(version)) {
-            return `${args.options.version} is not a number`;
-          }
-        }
-
-        if (args.options.content) {
-          try {
-            JSON.parse(args.options.content);
-          }
-          catch (e) {
-            return `Specified content value is not a valid JSON string. Error: ${e}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
