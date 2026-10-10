@@ -18,4 +18,7 @@ export interface TsConfigJson extends JsonFile {
   };
   exclude?: string[];
   include?: string[];
+  watchOptions?: {
+    excludeDirectories?: string[];
+  };
 }
