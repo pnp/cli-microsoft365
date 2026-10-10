@@ -135,11 +135,13 @@ describe(commands.CONTAINER_PERMISSION_ADD, () => {
   it('fails validation if userId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ containerId: containerId, roles: 'reader', userId: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, "'foo' is not a valid GUID.");
   });
 
   it('fails validation if userName is not a valid UPN', async () => {
     const actual = commandOptionsSchema.safeParse({ containerId: containerId, roles: 'reader', userName: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, "'foo' is not a valid UPN.");
   });
 
   it('fails validation if correct role is not passed', async () => {
