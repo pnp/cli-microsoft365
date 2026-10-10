@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -8,13 +9,17 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  resource: z.string().alias('r'),
+  scope: z.string().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+export { Options };
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  resource: string;
-  scope: string;
 }
 
 class SpoServicePrincipalGrantAddCommand extends SpoCommand {
@@ -30,21 +35,8 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
     return [commands.SP_GRANT_ADD];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-r, --resource <resource>'
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
