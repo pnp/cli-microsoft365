@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './theme-apply.js';
+import command, { options } from './theme-apply.js';
 
 describe(commands.THEME_APPLY, () => {
   let log: string[];
@@ -21,6 +21,7 @@ describe(commands.THEME_APPLY, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.THEME_APPLY, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,10 +86,10 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery', 'url');
     assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC', 'request digest');
@@ -104,11 +106,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-      }
+      })
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
     assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -138,11 +140,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -177,11 +179,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Orange",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -216,11 +218,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Red",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -255,11 +257,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Purple",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -294,11 +296,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Green",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -333,11 +335,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Gray",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -372,11 +374,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Dark Yellow",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -411,11 +413,11 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "Dark Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
+      })
     });
     let setRequestIssued = false;
     requests.forEach(r => {
@@ -436,12 +438,12 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-      }
-    } as any), new CommandError('requestObjectIdentity ClientSvc error'));
+      })
+    }), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('handles unknown error command error correctly', async () => {
@@ -453,13 +455,12 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json',
-        inverted: false
-      }
-    } as any), new CommandError('ClientSvc unknown error'));
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+      })
+    }), new CommandError('ClientSvc unknown error'));
   });
 
   it('handles command error correctly', async () => {
@@ -483,13 +484,13 @@ describe(commands.THEME_APPLY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
-        name: 'Some color',
+        name: 'Blue',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
-      }
-    } as any), new CommandError('Access denied. You do not have permission to perform this action or access this resource.'));
+      })
+    }), new CommandError('Access denied. You do not have permission to perform this action or access this resource.'));
     let correctRequestIssued = false;
 
     requests.forEach(r => {
@@ -505,35 +506,64 @@ describe(commands.THEME_APPLY, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Some color',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+      })
+    }), new CommandError('An error has occurred'));
+  });
+
+  it('passes validation when name is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if webUrl is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso-Blue', webUrl: '' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso-Blue', webUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when webUrl is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if name is not a valid SharePoint theme name', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Contoso', webUrl: 'https://contoso.sharepoint.com/sites/project-x', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('uses an empty palette for an unsupported SharePoint theme', async () => {
+    const postStub = sinon.stub(request, 'post').resolves(JSON.stringify({
+      value: '/sites/project-x/_catalogs/theme/Themed/6735E8EF'
+    }));
+
+    await command.action(logger, {
+      options: {
+        name: 'Unsupported',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
       }
-    } as any), new CommandError('An error has occurred'));
-  });
+    });
 
-  it('passes validation when name is passed', async () => {
-    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if webUrl is not passed', async () => {
-    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: '' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when webUrl is passed', async () => {
-    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if name is not a valid SharePoint theme name', async () => {
-    const actual = await command.validate({ options: { name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(postStub.lastCall.args[0].data, `{
+      'name': 'Unsupported' ,
+      'themeJson': '{"palette": {}}'
+    }`);
   });
 });
