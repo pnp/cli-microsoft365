@@ -106,7 +106,12 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com',
+      timeZone: '4',
+      force: true 
+    }) });
 
     const siteRemoveCalls = executeCommandStub.getCalls().filter(call => call.args[0] === spoSiteRemoveCommand);
     assert.strictEqual(siteRemoveCalls.length, 1);
@@ -155,7 +160,15 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true }) });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true,
+        debug: true
+      })
+    });
 
     const siteRemoveCalls = executeCommandStub.getCalls().filter(call => call.args[0] === spoSiteRemoveCommand);
     assert.strictEqual(siteRemoveCalls.length, 2);
@@ -204,7 +217,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('handles error when app catalog and site with different URL already exist, force used and deleting the existing site failed', async () => {
@@ -243,7 +263,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('Error deleting site new-app-catalog'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    }), new CommandError('Error deleting site new-app-catalog'));
   });
 
   it('creates app catalog when app catalog already exists, site with different URL does not exist and force used', async () => {
@@ -285,7 +312,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    });
   });
 
   it('creates app catalog when app catalog already exists, site with different URL does not exist and force used (debug)', async () => {
@@ -327,7 +361,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true, 
+      debug: true 
+    }) });
   });
 
   it('handles error when creating app catalog when app catalog already exists, site with different URL does not exist and force used', async () => {
@@ -369,7 +409,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true, 
+      debug: true 
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving site with different URL failed and app catalog already exists, and force used', async () => {
@@ -403,7 +449,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true, 
+      debug: true 
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('handles error when deleting existing app catalog failed', async () => {
@@ -436,7 +488,12 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true 
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('handles error app catalog exists and no force used', async () => {
@@ -458,7 +515,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/old-app-catalog'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4'
+      })
+    }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/old-app-catalog'));
   });
 
   it('creates app catalog when app catalog does not exist, site with different URL already exists and force used', async () => {
@@ -500,7 +563,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+        owner: 'user@contoso.com', 
+        timeZone: '4', 
+        force: true
+      })
+    });
   });
 
   it('handles error when creating app catalog when app catalog does not exist, site with different URL already exists and force used', async () => {
@@ -542,7 +612,12 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true 
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('handles error when deleting existing site, when app catalog does not exist, site with different URL already exists and force used', async () => {
@@ -576,7 +651,12 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4', 
+      force: true 
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('handles error when app catalog does not exist, site with different URL already exists and force not used', async () => {
@@ -602,7 +682,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog', 
+      owner: 'user@contoso.com', 
+      timeZone: '4'
+    }) }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
   });
 
   it(`creates app catalog when app catalog and site with different URL don't exist`, async () => {
@@ -634,7 +718,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+      owner: 'user@contoso.com',
+      timeZone: '4'
+    }) });
   });
 
   it(`handles error when creating app catalog fails, when app catalog when app catalog does and site with different URL don't exist`, async () => {
@@ -666,7 +754,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4'
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it(`handles error when checking if the app catalog site exists`, async () => {
@@ -691,7 +785,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4'
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it(`creates app catalog when app catalog not registered, site with different URL exists and force used`, async () => {
@@ -730,7 +830,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    });
   });
 
   it(`creates app catalog when app catalog not registered, site with different URL exists and force used (debug)`, async () => {
@@ -769,7 +876,15 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true }) });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true,
+        debug: true
+      })
+    });
   });
 
   it(`handles error when creating app catalog when app catalog not registered, site with different URL exists and force used`, async () => {
@@ -808,7 +923,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it(`handles error when deleting existing site when app catalog not registered, site with different URL exists and force used`, async () => {
@@ -839,7 +961,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4',
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it(`handles error when app catalog not registered, site with different URL exists and force not used`, async () => {
@@ -859,7 +988,13 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+        owner: 'user@contoso.com',
+        timeZone: '4'
+      })
+    }), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
   });
 
   it(`creates app catalog when app catalog not registered and site with different URL doesn't exist`, async () => {
@@ -890,7 +1025,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+      owner: 'user@contoso.com',
+      timeZone: '4'
+    }) });
   });
 
   it(`handles error when creating app catalog when app catalog not registered and site with different URL doesn't exist`, async () => {
@@ -921,7 +1060,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+      owner: 'user@contoso.com',
+      timeZone: '4'
+    }) }), new CommandError('An error has occurred'));
   });
 
   it(`handles error when app catalog not registered and checking if the site with different URL exists throws error`, async () => {
@@ -941,7 +1084,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+      owner: 'user@contoso.com',
+      timeZone: '4'
+    }) }), new CommandError('An error has occurred'));
   });
 
   it(`handles error when checking if app catalog registered throws error`, async () => {
@@ -953,7 +1100,11 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/new-app-catalog' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ 
+      url: 'https://contoso.sharepoint.com/sites/new-app-catalog',
+      owner: 'user@contoso.com',
+      timeZone: '4'
+    }) }), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the specified url is not a valid SharePoint URL', () => {
