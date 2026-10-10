@@ -261,7 +261,7 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'agent blueprintprincipal list',
               id: 'cmd/entra/agent/agent-blueprintprincipal-list'
-            
+            }
           ]
         },
         {
