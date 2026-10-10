@@ -612,6 +612,7 @@ describe(commands.TERM_SET_LIST, () => {
   it('fails validation if id is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ termGroupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation when webUrl is not a valid url', () => {

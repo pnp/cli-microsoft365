@@ -591,6 +591,7 @@ describe(commands.TERM_ADD, () => {
   it('fails validation if id is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ termGroupName: termGroupName, name: name, id: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', () => {
@@ -606,6 +607,7 @@ describe(commands.TERM_ADD, () => {
   it('fails validation if termGroupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: 'invalid', termSetName: termSetName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if neither termSetId, termSetName nor parentTermId specified', () => {
@@ -631,11 +633,13 @@ describe(commands.TERM_ADD, () => {
   it('fails validation if both parentTermId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, parentTermId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if termSetId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, termSetId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if custom properties is not a valid JSON string', () => {

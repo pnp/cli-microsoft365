@@ -54,13 +54,13 @@ class SpoTermSetAddCommand extends SpoCommand {
           return false;
         }
         return true;
-      }, { error: e => `'${e.input}' is not a valid GUID.` })
+      }, { error: e => `${(e.input as any).id} is not a valid GUID.` })
       .refine(opts => {
         if (opts.termGroupId && !validation.isValidGuid(opts.termGroupId)) {
           return false;
         }
         return true;
-      }, { error: e => `'${e.input}' is not a valid GUID.` })
+      }, { error: e => `${(e.input as any).termGroupId} is not a valid GUID.` })
       .refine(opts => {
         if (opts.customProperties) {
           try {
