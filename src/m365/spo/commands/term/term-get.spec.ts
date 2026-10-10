@@ -337,6 +337,7 @@ describe(commands.TERM_GET, () => {
   it('fails validation if id is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('passes validation if only id specified', async () => {
@@ -352,11 +353,13 @@ describe(commands.TERM_GET, () => {
   it('fails validation if termGroupId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ name: termName, termGroupId: 'invalid', termSetName: termSetName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if termSetId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ name: termName, termSetId: 'invalid', termGroupName: termGroupId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('passes validation when name, termGroupName and termSetName specified', async () => {

@@ -914,6 +914,7 @@ describe(commands.TERM_SET_ADD, () => {
   it('fails validation if id is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ termGroupName: 'PnPTermSets', name: 'PnP-Organizations', id: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID.');
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', () => {
@@ -929,6 +930,7 @@ describe(commands.TERM_SET_ADD, () => {
   it('fails validation if termGroupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: 'PnP-Organizations', termGroupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID.');
   });
 
   it('fails validation if custom properties is not a valid JSON string', () => {

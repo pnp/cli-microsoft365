@@ -597,6 +597,7 @@ describe(commands.TERM_GROUP_ADD, () => {
   it('fails validation if id is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: 'PnPTermSets', id: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if webUrl is not a valid webUrl', () => {

@@ -723,6 +723,7 @@ describe(commands.TERM_LIST, () => {
   it('fails validation if termSetId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ termSetId: 'invalid', termGroupName: 'PnPTermSets' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', async () => {
@@ -738,6 +739,7 @@ describe(commands.TERM_LIST, () => {
   it('fails validation if termGroupId is not a valid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ termSetId: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('passes validation when id and termGroupName specified', async () => {
