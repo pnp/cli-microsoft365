@@ -12,11 +12,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './applicationcustomizer-remove.js';
+import command, { options } from './applicationcustomizer-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const webUrl = 'https://contoso.sharepoint.com';
   const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
   const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
@@ -119,6 +120,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -174,58 +176,55 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if at least one of the parameters has a value', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if at least one of the parameters has a value', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when all parameters are empty', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, id: null, clientSideComponentId: null, title: '' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when all parameters are empty', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: null, clientSideComponentId: null, title: '' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, clientSideComponentId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, clientSideComponentId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the scope option is not a valid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, scope: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope option is not a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, scope: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should prompt before removing application customizer when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id }) });
     assert(promptIssued);
   });
 
   it('aborts removing application customizer when prompt not confirmed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: webUrl, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id }) });
     assert(requests.length === 0);
   });
 
@@ -239,7 +238,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { id: id, webUrl: webUrl, force: true }
+        options: commandOptionsSchema.parse({ id: id, webUrl: webUrl, force: true })
       }
       ), new CommandError(`No application customizer with id '${id}' found`));
   });
@@ -254,7 +253,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, force: true }
+        options: commandOptionsSchema.parse({ title: title, webUrl: webUrl, force: true })
       }
       ), new CommandError(`No application customizer with title '${title}' found`));
   });
@@ -269,7 +268,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, force: true }
+        options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, webUrl: webUrl, force: true })
       }
       ), new CommandError(`No application customizer with ClientSideComponentId '${clientSideComponentId}' found`));
   });
@@ -292,7 +291,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, scope: 'Site', force: true }
+        options: commandOptionsSchema.parse({ title: title, webUrl: webUrl, scope: 'Site', force: true })
       }
       ), new CommandError("Multiple application customizer with title 'SiteGuidedTour' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
@@ -315,7 +314,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', force: true }
+        options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', force: true })
       }
       ), new CommandError("Multiple application customizer with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
@@ -334,7 +333,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Web', force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, title: title, webUrl: webUrl, scope: 'Web', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -350,7 +349,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, webUrl: webUrl, scope: 'Web' }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -365,7 +364,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: id, webUrl: webUrl, scope: 'Site', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -381,7 +380,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', force: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', force: true }) });
     assert(deleteCallsSpy.calledOnce);
   });
 });
