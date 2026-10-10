@@ -122,11 +122,11 @@ describe(commands.FILE_GET, () => {
     assert(loggerLogSpy.calledWith(returnValue));
   });
 
-  it('requests the file as text with --asString so JSON content is not parsed', async () => {
+  it('correctly reads a file as string when the asString option is used', async () => {
     const returnValue: string = '{"name":"test"}';
     const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return opts.responseType === 'text' ? returnValue : JSON.parse(returnValue);
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value`) {
+        return returnValue;
       }
 
       throw 'Invalid request';

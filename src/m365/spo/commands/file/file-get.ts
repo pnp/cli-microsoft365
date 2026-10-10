@@ -178,9 +178,9 @@ class SpoFileGetCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      // Set responseType to arraybuffer, otherwise binary data will be encoded
-      // to utf8 and binary data is corrupt. Use text for --asString, otherwise
-      // JSON content is parsed and printed as [object Object]
+      // Use stream for --asFile, so binary data is piped to disk as-is and
+      // isn't encoded to utf8 (which would corrupt it). Use text for
+      // --asString. Use json for all other cases.
       responseType: args.options.asFile ? 'stream' : args.options.asString ? 'text' : 'json'
     };
 
