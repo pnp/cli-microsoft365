@@ -40,7 +40,11 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema.refine(opts => [opts.title, opts.id, opts.clientSideComponentId].filter(v => v !== undefined).length === 1, {
-      error: `Specify exactly one of the following options: 'title', 'id', or 'clientSideComponentId'.`
+      error: `Specify exactly one of the following options: 'title', 'id', or 'clientSideComponentId'.`,
+      params: {
+        customCode: 'optionSet',
+        options: ['title', 'id', 'clientSideComponentId']
+      }
     });
   }
 

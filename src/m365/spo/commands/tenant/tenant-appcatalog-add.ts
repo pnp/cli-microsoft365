@@ -13,8 +13,8 @@ import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   url: z.string().refine(val => validation.isValidSharePointUrl(val) === true, { message: 'The value is not a valid SharePoint site URL.' }).alias('u'),
-  owner: z.string().optional(),
-  timeZone: z.string().refine(val => !isNaN(Number(val)), { message: 'timeZone is not a number' }).optional().alias('z'),
+  owner: z.string(),
+  timeZone: z.string().refine(val => !isNaN(Number(val)), { message: 'timeZone is not a number' }).alias('z'),
   wait: z.boolean().optional(),
   force: z.boolean().optional()
 });
