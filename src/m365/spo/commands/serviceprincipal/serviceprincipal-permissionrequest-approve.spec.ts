@@ -351,6 +351,26 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
+  it('fails validation if neither id, all, or resource options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id and all options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, all: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id and resource options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, resource: "Microsoft Graph" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if all and resource options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ all: true, resource: "Microsoft Graph" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if the id option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: '123' });
     assert.strictEqual(actual.success, false);
