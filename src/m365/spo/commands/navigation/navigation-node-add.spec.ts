@@ -309,6 +309,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar', title: title });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the specified parentNodeId is not a number', async () => {
@@ -344,6 +345,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('fails validation if audienceIds contains an invalid audienceId', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'audienceIds': invalid.`);
   });
 
   it('fails validation if audienceIds contains more than 10 guids', async () => {

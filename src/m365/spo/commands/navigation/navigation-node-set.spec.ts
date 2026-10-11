@@ -225,6 +225,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'QuickLaunch', id: id, title: title });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if id is not a valid number', async () => {
@@ -260,6 +261,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('fails validation if audienceIds contains invalid guid', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'audienceIds': invalid.`);
   });
 
   it('fails validation if the removed isExternal option is specified', async () => {

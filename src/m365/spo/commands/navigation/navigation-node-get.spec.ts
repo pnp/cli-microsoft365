@@ -146,6 +146,7 @@ describe(commands.NAVIGATION_NODE_GET, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'QuickLaunch', id: id });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if id is not a valid number', async () => {
