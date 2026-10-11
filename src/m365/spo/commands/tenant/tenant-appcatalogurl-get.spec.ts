@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-appcatalogurl-get.js';
+import command, { options } from './tenant-appcatalogurl-get.js';
 
 describe(commands.TENANT_APPCATALOGURL_GET, () => {
   let log: any[];
   let requests: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
@@ -26,6 +30,8 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -66,6 +72,16 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('handles promise error while getting tenant appcatalog', async () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -76,7 +92,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 
   it('gets the tenant appcatalog url (debug)', async () => {
@@ -90,9 +106,9 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
   });
@@ -108,8 +124,8 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
-      }
+      options: commandOptionsSchema.parse({
+      })
     });
   });
 
@@ -124,9 +140,9 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith('Tenant app catalog is not configured.'));
   });

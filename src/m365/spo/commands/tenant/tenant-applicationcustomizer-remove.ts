@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -11,15 +12,18 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().optional().alias('t'),
+  id: z.string().refine(val => !isNaN(Number(val)), { message: 'id is not a valid list item ID' }).optional().alias('i'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title?: string;
-  id?: string;
-  clientSideComponentId?: string;
-  force?: boolean;
 }
 
 class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
@@ -31,65 +35,18 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
     return 'Removes an application customizer that is installed tenant wide.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        force: !!args.options.force
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => [opts.title, opts.id, opts.clientSideComponentId].filter(v => v !== undefined).length === 1, {
+      error: `Specify exactly one of the following options: 'title', 'id', or 'clientSideComponentId'.`,
+      params: {
+        customCode: 'optionSet',
+        options: ['title', 'id', 'clientSideComponentId']
+      }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-c, --clientSideComponentId  [clientSideComponentId]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id) {
-          const id: number = parseInt(args.options.id);
-          if (isNaN(id)) {
-            return `${args.options.id} is not a valid list item ID`;
-          }
-        }
-
-        if (args.options.clientSideComponentId &&
-          !validation.isValidGuid(args.options.clientSideComponentId as string)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

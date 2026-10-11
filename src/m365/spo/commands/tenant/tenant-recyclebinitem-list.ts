@@ -1,13 +1,20 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import {
-  CommandArgs
-} from '../../../../Command.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
 import request from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { DeletedSitePropertiesEnumerable } from './DeletedSitePropertiesEnumerable.js';
+
+export const options = globalOptionsZod.strict();
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
 
 class SpoTenantRecycleBinItemListCommand extends SpoCommand {
   public get name(): string {
@@ -16,6 +23,10 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Returns all modern and classic site collections in the tenant scoped recycle bin';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {

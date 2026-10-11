@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -11,16 +12,35 @@ import spoListItemListCommand, { Options as spoListItemListCommandOptions } from
 import spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogurl-get.js';
 import { Solution } from './Solution.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).alias('i'),
+  clientSideComponentProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, { message: 'clientSideComponentProperties is not a valid JSON string' }).optional().alias('p'),
+  hostProperties: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, { message: 'hostProperties is not a valid JSON string' }).optional(),
+  webTemplate: z.string().optional().alias('w')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title: string;
-  clientSideComponentId: string;
-  clientSideComponentProperties?: string;
-  hostProperties?: string;
-  webTemplate?: string;
 }
 
 class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
@@ -32,72 +52,8 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     return 'Adds an application customizer as a tenant wide extension.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        hostProperties: typeof args.options.hostProperties !== 'undefined',
-        webTemplate: typeof args.options.webTemplate !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-i, --clientSideComponentId <clientSideComponentId>'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '--hostProperties [hostProperties]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentProperties) {
-          try {
-            JSON.parse(args.options.clientSideComponentProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
-          }
-        }
-
-        if (args.options.hostProperties) {
-          try {
-            JSON.parse(args.options.hostProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing hostProperties: ${e}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
