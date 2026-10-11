@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitescript-get.js';
+import command, { options } from './sitescript-get.js';
 
 describe(commands.SITESCRIPT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.SITESCRIPT_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,7 +99,7 @@ describe(commands.SITESCRIPT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.calledOnceWithExactly({
       "Content": {
         "$schema": "schema.json",
@@ -142,7 +144,7 @@ describe(commands.SITESCRIPT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.calledOnceWithExactly({
       "Content": {
         "$schema": "schema.json",
@@ -187,7 +189,7 @@ describe(commands.SITESCRIPT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: true }) });
     assert(loggerLogSpy.calledOnceWithExactly({
       "$schema": "schema.json",
       "actions": [
@@ -204,16 +206,24 @@ describe(commands.SITESCRIPT_GET, () => {
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) }), new CommandError('File Not Found.'));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

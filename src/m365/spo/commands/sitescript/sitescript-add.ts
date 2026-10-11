@@ -1,19 +1,34 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  content: z.string()
+    .refine(val => {
+      try {
+        JSON.parse(val);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      message: 'Specified content value is not a valid JSON string.'
+    })
+    .alias('c'),
+  description: z.string().optional().alias('d')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title: string;
-  description?: string;
-  content: string;
 }
 
 class SpoSiteScriptAddCommand extends SpoCommand {
@@ -25,49 +40,8 @@ class SpoSiteScriptAddCommand extends SpoCommand {
     return 'Adds site script for use with site designs';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-c, --content <content>'
-      },
-      {
-        option: '-d, --description [description]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        try {
-          JSON.parse(args.options.content);
-        }
-        catch (e) {
-          return `Specified content value is not a valid JSON string. Error: ${e}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
