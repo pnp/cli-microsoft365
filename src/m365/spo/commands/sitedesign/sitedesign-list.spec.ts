@@ -8,13 +8,17 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './sitedesign-list.js';
+import command, { options } from './sitedesign-list.js';
 
 describe(commands.SITEDESIGN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -23,6 +27,8 @@ describe(commands.SITEDESIGN_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -103,7 +109,7 @@ describe(commands.SITEDESIGN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "Description": null,
@@ -172,7 +178,7 @@ describe(commands.SITEDESIGN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "Description": null,
@@ -241,7 +247,7 @@ describe(commands.SITEDESIGN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(loggerLogSpy.calledWith([
       {
         "Description": null,
@@ -275,6 +281,16 @@ describe(commands.SITEDESIGN_LIST, () => {
   it('correctly handles OData error when retrieving available site designs', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
