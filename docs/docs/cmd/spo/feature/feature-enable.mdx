@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo feature enable
 
@@ -31,6 +33,25 @@ m365 spo feature enable [options]
 ## Remarks
 
 If the specified url doesn't refer to an existing site collection, you will get a `"404 FILE NOT FOUND"` error.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions     |
+  |------------|-----------------|
+  | SharePoint | AllSites.Manage |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions      |
+  |------------|------------------|
+  | SharePoint | Sites.Manage.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
