@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './customaction-add.js';
+import command, { options } from './customaction-add.js';
 
 describe(commands.CUSTOMACTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let defaultCommandOptions: any;
   const initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -40,6 +41,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -90,18 +92,19 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
   it('correct https data send when custom action with location StandardMenu', async () => {
     const postRequestSpy = initDefaultPostStubs();
-    const options: any = {
-      webUrl: 'https://contoso.sharepoint.com',
-      title: 'title1',
-      name: 'name1',
-      sequence: 102,
-      location: 'Microsoft.SharePoint.StandardMenu',
-      description: 'description1',
-      group: 'SiteActions',
-      actionUrl: '~site/Shared%20Documents/Forms/AllItems.aspx'
-    };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        webUrl: 'https://contoso.sharepoint.com',
+        title: 'title1',
+        name: 'name1',
+        sequence: 102,
+        location: 'Microsoft.SharePoint.StandardMenu',
+        description: 'description1',
+        group: 'SiteActions',
+        actionUrl: '~site/Shared%20Documents/Forms/AllItems.aspx'
+      })
+    });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -117,19 +120,20 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
   it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', async () => {
     const postRequestSpy = initDefaultPostStubs();
-    const options: any = {
-      webUrl: 'https://contoso.sharepoint.com',
-      title: 'title1',
-      name: 'name1',
-      sequence: 101,
-      location: 'ClientSideExtension.ApplicationCustomizer',
-      description: 'description1',
-      clientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
-      clientSideComponentProperties: '{"testMessage":"Test message"}',
-      debug: true
-    };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        webUrl: 'https://contoso.sharepoint.com',
+        title: 'title1',
+        name: 'name1',
+        sequence: 101,
+        location: 'ClientSideExtension.ApplicationCustomizer',
+        description: 'description1',
+        clientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+        clientSideComponentProperties: '{"testMessage":"Test message"}',
+        debug: true
+      })
+    });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -145,20 +149,21 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
   it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', async () => {
     const postRequestSpy = initDefaultPostStubs();
-    const options: any = {
-      webUrl: 'https://contoso.sharepoint.com',
-      title: 'title1',
-      name: 'name1',
-      sequence: 103,
-      location: 'ClientSideExtension.ListViewCommandSet',
-      description: 'description1',
-      clientSideComponentId: 'db3e6e35-363c-42b9-a254-ca661e437848',
-      clientSideComponentProperties: '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}',
-      registrationId: 100,
-      registrationType: 'List'
-    };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        webUrl: 'https://contoso.sharepoint.com',
+        title: 'title1',
+        name: 'name1',
+        sequence: 103,
+        location: 'ClientSideExtension.ListViewCommandSet',
+        description: 'description1',
+        clientSideComponentId: 'db3e6e35-363c-42b9-a254-ca661e437848',
+        clientSideComponentProperties: '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}',
+        registrationId: '100',
+        registrationType: 'List'
+      })
+    });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -184,11 +189,11 @@ describe(commands.CUSTOMACTION_ADD, () => {
       location: 'EditControlBlock',
       description: 'description1',
       actionUrl: 'javascript:(function(){ return console.log("CLI for Microsoft 365 rocks!"); })();',
-      registrationId: 101,
+      registrationId: '101',
       registrationType: 'List'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -216,7 +221,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scope: 'Site'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -240,7 +245,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scriptBlock: '(function(){ return console.log("Hello CLI for Microsoft 365!"); })();'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -266,7 +271,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scope: 'Web'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -293,7 +298,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
       rights: 'AddListItems,DeleteListItems,ManageLists'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Title: 'title1',
@@ -345,7 +350,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
     defaultCommandOptions.verbose = true;
 
-    await command.action(logger, { options: defaultCommandOptions } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(defaultCommandOptions) });
     assert(loggerLogToStderrSpy.calledWith({
       ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
       ClientSideComponentProperties: '{"testMessage":"Test message"}',
@@ -372,41 +377,8 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: defaultCommandOptions } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(defaultCommandOptions) }),
       new CommandError('An error has occurred'));
-  });
-
-  it('offers autocomplete for the registrationType option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--registrationType') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('offers autocomplete for the rights option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--rights') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('offers autocomplete for the scope option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--scope') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
   });
 
   it('getRegistrationType returns 0 if registrationType wrong value', () => {
@@ -434,102 +406,176 @@ describe(commands.CUSTOMACTION_ADD, () => {
     assert(registrationType === 4);
   });
 
-  it('fails if non existing PermissionKind rights specified', async () => {
-    defaultCommandOptions.rights = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
+  it('fails if non existing PermissionKind rights specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      rights: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
   });
 
-  it('has correct PermissionKind rights specified', async () => {
-    defaultCommandOptions.rights = 'FullMask';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert(actual === true);
+  it('has correct PermissionKind rights specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      rights: 'FullMask'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if clientSideComponentId not specified', async () => {
-    defaultCommandOptions.clientSideComponentProperties = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`);
+  it('fails if clientSideComponentId not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      clientSideComponentProperties: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if clientSideComponentId is not a valid GUID', async () => {
-    defaultCommandOptions.clientSideComponentId = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
+  it('fails if clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      clientSideComponentId: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'ClientSideComponentId abc is not a valid GUID');
   });
 
-  it('fails if the sequence value less than 0', async () => {
-    defaultCommandOptions.sequence = -1;
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+  it('fails if the sequence value less than 0', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      sequence: -1
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if the sequence value is higher than 65536', async () => {
-    defaultCommandOptions.sequence = 65537;
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+  it('fails if the sequence value is higher than 65536', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      sequence: 65537
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if both option scriptSrc and scriptBlock specified', async () => {
-    defaultCommandOptions.location = 'ScriptLink';
-    defaultCommandOptions.scriptSrc = 'abc';
-    defaultCommandOptions.scriptBlock = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
+  it('fails if both option scriptSrc and scriptBlock specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'ScriptLink',
+      scriptSrc: 'abc',
+      scriptBlock: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if scriptSrc or scriptBlock, but the location is not ScriptLink', async () => {
-    defaultCommandOptions.location = 'abc';
-    defaultCommandOptions.scriptSrc = 'abc';
-    defaultCommandOptions.scriptBlock = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink`);
+  it('fails if scriptSrc or scriptBlock, but the location is not ScriptLink', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'abc',
+      scriptSrc: 'abc',
+      scriptBlock: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if scriptSrc and scriptBlock not specified when location ScriptLink', async () => {
-    defaultCommandOptions.location = 'ScriptLink';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Option scriptSrc or scriptBlock is required when the location is set to ScriptLink`);
+  it('fails if scriptSrc and scriptBlock not specified when location ScriptLink', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'ScriptLink',
+      group: 'SiteActions'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if registrationType, but not registrationId', async () => {
-    defaultCommandOptions.registrationType = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Option registrationType is specified, but registrationId is missing`);
+  it('fails if registrationType, but not registrationId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      registrationType: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if registrationId, but not registrationType', async () => {
-    defaultCommandOptions.registrationId = 'abc';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `Option registrationId is specified, but registrationType is missing`);
+  it('fails if registrationId, but not registrationType', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      registrationId: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if the specified URL is invalid', async () => {
-    defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
-    defaultCommandOptions.group = 'SiteActions';
-    defaultCommandOptions.webUrl = 'foo';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails if the specified URL is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('fails if location that requires group option is set, but group is not set', async () => {
-    defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
-    defaultCommandOptions.group = undefined;
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert.strictEqual(actual, `The location specified requires the group option to be specified as well`);
+  it('fails if location that requires group option is set, but group is not set', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('success if location that requires group option is set, but group is also set', async () => {
-    defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
-    defaultCommandOptions.group = 'SiteActions';
-    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
-    assert(actual === true);
+  it('success if location that requires group option is set, but group is also set', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('calls the correct endpoint (url) when scope is Web', async () => {
     const postRequestSpy = initDefaultPostStubs();
 
-    await command.action(logger, { options: defaultCommandOptions } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(defaultCommandOptions) });
     assert(postRequestSpy.calledWith(sinon.match({
       url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
     })));
@@ -539,36 +585,59 @@ describe(commands.CUSTOMACTION_ADD, () => {
     const postRequestSpy = initDefaultPostStubs();
 
     defaultCommandOptions.scope = "Site";
-    await command.action(logger, { options: defaultCommandOptions } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(defaultCommandOptions) });
     assert(postRequestSpy.calledWith(sinon.match({
       url: 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
     })));
   });
 
-  it('rejects invalid string scope', async () => {
-    defaultCommandOptions.scope = 'All';
-    const actual = await command.validate({
-      options: defaultCommandOptions
-    }, commandInfo);
-    assert.strictEqual(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web`);
-  });
-
-  it('doesn\'t fail validation if the optional scope option not specified', async () => {
-    const actual = await command.validate(
-      {
-        options: defaultCommandOptions
-      }, commandInfo);
-    assert(actual === true);
-  });
-
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[scope]') > -1) {
-        containsScopeOption = true;
-      }
+  it('rejects invalid string scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      scope: 'All'
     });
-    assert(containsScopeOption);
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('doesn\'t fail validation if the optional scope option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      location: 'Microsoft.SharePoint.StandardMenu',
+      group: 'SiteActions',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('does not apply location-specific validation when location is not specified', () => {
+    const schemaWithOptionalLocation = command.getRefinedSchema(
+      options.partial({ location: true }) as unknown as typeof options
+    );
+
+    const actual = schemaWithOptionalLocation!.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      title: 'title',
+      name: 'name',
+      scriptSrc: 'https://contoso.sharepoint.com/SiteAssets/script.js'
+    });
+
+    assert.strictEqual(actual.success, true);
   });
 });
