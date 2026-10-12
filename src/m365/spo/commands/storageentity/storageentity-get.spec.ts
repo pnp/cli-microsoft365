@@ -171,6 +171,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('fails validation if appCatalogUrl is not a valid URL', () => {
     const actual = commandOptionsSchema.safeParse({ key: 'prop', appCatalogUrl: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation when appCatalogUrl is a valid SharePoint URL', () => {

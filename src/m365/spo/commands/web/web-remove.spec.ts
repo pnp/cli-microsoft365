@@ -76,6 +76,7 @@ describe(commands.WEB_REMOVE, () => {
   it('should fail validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ url: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('passes validation if all required options are specified', () => {

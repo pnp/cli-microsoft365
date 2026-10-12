@@ -89,6 +89,7 @@ describe(commands.FOLDER_ARCHIVE, () => {
       force: true
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid-url' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if both url and id are specified', async () => {

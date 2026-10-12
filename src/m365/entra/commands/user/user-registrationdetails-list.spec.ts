@@ -145,28 +145,33 @@ describe(commands.USER_REGISTRATIONDETAILS_LIST, () => {
   it('fails validation if userPreferredMethodForSecondaryAuthentication contains invalid value', () => {
     const actual = commandOptionsSchema.safeParse({ userPreferredMethodForSecondaryAuthentication: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid userPreferredMethodForSecondaryAuthentication value. Allowed values push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none.`);
   });
 
   it('fails validation if systemPreferredAuthenticationMethods contains invalid value', () => {
     const actual = commandOptionsSchema.safeParse({ systemPreferredAuthenticationMethods: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid systemPreferredAuthenticationMethods value. Allowed values push, oath, voiceMobile, voiceAlternateMobile, voiceOffice, sms, none.`);
   });
 
   it('fails validation if methodsRegistered contains invalid value', () => {
     const actual = commandOptionsSchema.safeParse({ methodsRegistered: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid methodsRegistered value. Allowed values mobilePhone, email, fido2, microsoftAuthenticatorPush, softwareOneTimePasscode.`);
   });
 
   it('fails validation if userIds contains invalid GUID', () => {
     const userIds = ['7167b488-1ffb-43f1-9547-35969469bada', 'foo'];
     const actual = commandOptionsSchema.safeParse({ userIds: userIds.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'userIds': foo.`);
   });
 
   it('fails validation if userPrincipalNames contains invalid user principal name', () => {
     const userPrincipalNames = ['john.doe@contoso.com', 'foo'];
     const actual = commandOptionsSchema.safeParse({ userPrincipalNames: userPrincipalNames.join(',') });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for the option 'userPrincipalNames': foo.`);
   });
 
   it('passes validation if all optional parameters are valid', () => {

@@ -112,6 +112,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid user principal name.`);
   });
 
   it('retrieves groups memberships for a user specified by id', async () => {
@@ -183,6 +184,7 @@ describe(commands.USER_GROUPMEMBERSHIP_LIST, () => {
   it('fails validation if userEmail is not a valid email', () => {
     const actual = commandOptionsSchema.safeParse({ userEmail: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid user email.`);
   });
 
   it('handles random API error', async () => {

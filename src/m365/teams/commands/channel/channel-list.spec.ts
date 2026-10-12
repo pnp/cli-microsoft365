@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './channel-list.js';
 
 describe(commands.CHANNEL_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.CHANNEL_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -65,76 +66,55 @@ describe(commands.CHANNEL_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both teamId and teamName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both teamId and teamName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      teamName: 'Team Name'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        teamName: 'Team Name'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both channelId and channelName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both channelId and channelName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid type specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        type: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid type specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      type: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid channel type', async () => {
+  it('rejects invalid channel type', () => {
     const type = 'foo';
-    const actual = await command.validate({ options: { teamId: '00000000-0000-0000-0000-000000000000', type: type } }, commandInfo);
-    assert.strictEqual(actual, `${type} is not a valid type value. Allowed values standard|private|shared`);
+    const actual = commandOptionsSchema.safeParse({ teamId: '00000000-0000-0000-0000-000000000000', type: type });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly lists all channels in a Microsoft teams team by team id', async () => {
@@ -173,9 +153,9 @@ describe(commands.CHANNEL_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       [
@@ -219,7 +199,7 @@ describe(commands.CHANNEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { teamName: 'Team Name' } } as any), new CommandError("The specified team 'Team Name' does not exist."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ teamName: 'Team Name' }) }), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('correctly lists all channels in a Microsoft teams team with specified type parameter', async () => {
@@ -252,10 +232,10 @@ describe(commands.CHANNEL_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         type: 'private'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       [
@@ -373,9 +353,9 @@ describe(commands.CHANNEL_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       [
@@ -417,7 +397,7 @@ describe(commands.CHANNEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, teamId: "00000000-0000-0000-0000-000000000000" }) });
     assert(loggerLogSpy.calledWith([{ "id": "19:17de660d16844149ab3f0240405f9316@thread.skype", "displayName": "General", "description": "Test group for office cli commands", "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype", "displayName": "Development", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype", "displayName": "Social", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }]));
   });
 
@@ -457,10 +437,10 @@ describe(commands.CHANNEL_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       [
@@ -507,9 +487,9 @@ describe(commands.CHANNEL_LIST, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

@@ -119,11 +119,13 @@ describe(commands.MODEL_APPLY, () => {
   it('fails validation when webUrl is not valid', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalidUrl', contentCenterUrl: 'https://contoso.sharepoint.com/sites/contentCenter', title: 'ModelTitle', listId: '421b1e42-794b-4c71-93ac-5ed92488b67d', viewOption: 'NewViewAsDefault' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when contentCenterUrl is not valid', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentCenterUrl: 'invalidUrl', title: 'ModelTitle', listId: '421b1e42-794b-4c71-93ac-5ed92488b67d', viewOption: 'NewViewAsDefault' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when model id is not valid', async () => {

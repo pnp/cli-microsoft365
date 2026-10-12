@@ -25,7 +25,6 @@ describe(commands.LISTITEM_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const expectedTitle = `List Item 1`;
@@ -147,7 +146,6 @@ describe(commands.LISTITEM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -250,8 +248,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object by id when list item is requested', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
@@ -265,8 +261,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('returns listItemInstance object by uniqueId when list item is requested', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-
-    command.allowUnknownOptions();
 
     const options: any = {
       debug: true,
@@ -291,8 +285,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested and with permissions', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
@@ -307,8 +299,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-
-    command.allowUnknownOptions();
 
     const options: any = {
       listTitle: 'Demo List',
@@ -337,8 +327,6 @@ describe(commands.LISTITEM_GET, () => {
       throw 'Invalid request';
     });
 
-    command.allowUnknownOptions();
-
     const options: any = {
       listTitle: 'Demo List',
       webUrl: webUrl,
@@ -358,8 +346,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       listTitle: 'Demo List',
       webUrl: webUrl,
@@ -373,8 +359,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-
-    command.allowUnknownOptions();
 
     const options: any = {
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
@@ -390,8 +374,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested with an output type of text from a list specified by url, and a list of fields are being specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       verbose: true,
       webUrl: webUrl,
@@ -403,54 +385,6 @@ describe(commands.LISTITEM_GET, () => {
 
     await command.action(logger, { options: options } as any);
     assert.strictEqual(actualId, expectedId);
-  });
-
-  it('maps deprecated properties option to fields and shows deprecation warning', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts: any) => {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return {
-        "ID": actualId,
-        "Modified": "2018-03-15T10:43:10Z",
-        "Title": expectedTitle
-      };
-    });
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: webUrl,
-      id: expectedId,
-      output: "json",
-      properties: "ID,Modified"
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert(loggerLogToStderrSpy.calledWith(sinon.match(`Option 'properties' is deprecated. Please use 'fields' instead.`)));
-    assert.strictEqual(actualId, expectedId);
-  });
-
-  it('prefers fields over deprecated properties when both are specified', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts: any) => {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return {
-        "ID": actualId,
-        "Modified": "2018-03-15T10:43:10Z",
-        "Title": expectedTitle
-      };
-    });
-
-    const options: any = {
-      listTitle: 'Demo List',
-      webUrl: webUrl,
-      id: expectedId,
-      output: "json",
-      fields: "Title",
-      properties: "ID,Modified"
-    };
-
-    await command.action(logger, { options: options } as any);
-    const requestUrl = (request.get as sinon.SinonStub).lastCall.args[0].url;
-    assert(requestUrl.includes('$select=Title'));
-    assert(!requestUrl.includes('$select=ID'));
   });
 
   it('correctly handles random API error', async () => {

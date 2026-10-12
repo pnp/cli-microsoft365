@@ -497,11 +497,13 @@ describe(commands.MESSAGE_LIST, () => {
   it('fails validation if startTime is not a valid ISO datetime', () => {
     const actual = commandOptionsSchema.safeParse({ startTime: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid ISO date string for option startTime.`);
   });
 
   it('fails validation if endTime is not a valid ISO datetime', () => {
     const actual = commandOptionsSchema.safeParse({ endTime: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid ISO date string for option endTime.`);
   });
 
   it('fails validation if endTime is in the future', () => {
@@ -534,11 +536,13 @@ describe(commands.MESSAGE_LIST, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid GUID for option userId.`);
   });
 
   it('fails validation if userName is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid UPN for option userName.`);
   });
 
   it('passes validation if userId is a valid GUID', () => {

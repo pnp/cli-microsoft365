@@ -191,11 +191,13 @@ describe(commands.EVENT_GET, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: id, userId: 'foo', calendarId: calendarId });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ id: id, userName: 'foo', calendarId: calendarId });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both calendarId and calendarName are specified', () => {

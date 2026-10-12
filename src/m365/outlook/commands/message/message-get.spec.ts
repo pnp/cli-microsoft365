@@ -273,11 +273,13 @@ describe(commands.MESSAGE_GET, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid-guid' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userName: 'invalid-upn' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid-upn' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName are specified', () => {

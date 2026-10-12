@@ -9785,6 +9785,7 @@ describe(commands.LIST, () => {
       webUrl: '/'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'/' is not a valid SharePoint Online site URL.`);
   });
 
   it(`passes validation if the target file is a URL`, async () => {

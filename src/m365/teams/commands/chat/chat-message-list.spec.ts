@@ -199,6 +199,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       chatId: "2da4c29f6d7041"
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'2da4c29f6d7041' is not a valid value for option chatId.`);
   });
 
 
@@ -222,6 +223,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       endDateTime: 'invalid date time'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date time' is not a valid ISO date-time string for option endDateTime.`);
   });
 
   it('fails validation if the createdEndDateTime is not valid', async () => {
@@ -230,6 +232,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       createdEndDateTime: 'invalid date time'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date time' is not a valid ISO date-time string for option createdEndDateTime.`);
   });
 
   it('fails validation if the modifiedStartDateTime is not valid', async () => {
@@ -238,6 +241,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       modifiedStartDateTime: 'not a date'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'not a date' is not a valid ISO date-time string for option modifiedStartDateTime.`);
   });
 
   it('fails validation if the modifiedEndDateTime is not valid', async () => {
@@ -246,6 +250,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       modifiedEndDateTime: 'not a date'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'not a date' is not a valid ISO date-time string for option modifiedEndDateTime.`);
   });
 
   it('fails validation if both endDateTime and createdEndDateTime are specified', async () => {

@@ -120,10 +120,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -156,10 +156,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -206,13 +206,13 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     });
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, '.yo-rc.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, '.yo-rc.json') && (options as unknown) === 'utf-8') {
         return '{"@microsoft/generator-sharepoint": {"version": "1.22.0"}}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -233,10 +233,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -272,10 +272,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 
@@ -310,10 +310,10 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(projectPath);
 
     sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
-      if (filePath.toString() === path.join(projectPath, 'package.json') && options === 'utf-8') {
+      if (filePath.toString() === path.join(projectPath, 'package.json') && (options as unknown) === 'utf-8') {
         return '{"name": "test"}';
       }
-      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && options === 'utf-8') {
+      else if (filePath.toString() === path.join(projectPath, 'config', 'package-solution.json') && (options as unknown) === 'utf-8') {
         return '{"paths": {"zippedPackage": "solution/test.sppkg"}}';
       }
 

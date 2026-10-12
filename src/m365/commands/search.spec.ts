@@ -477,6 +477,7 @@ describe(commands.SEARCH, () => {
       scopes: 'chatMessage,message,event,drive,driveItem,list,listItem,site,bookmarks,acronyms,person,foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'bookmarks' is not a valid scope. Allowed scopes are chatMessage, message, event, drive, driveItem, list, listItem, site, bookmark, acronym, person.`);
   });
 
   it('fails validation if startIndex is less than 0', async () => {
@@ -485,6 +486,7 @@ describe(commands.SEARCH, () => {
       startIndex: -1
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a valid value for option 'startIndex'. Start index must be greater or equal to 0.`);
   });
 
   it('fails validation if pageSize is less than 1', async () => {
@@ -493,6 +495,7 @@ describe(commands.SEARCH, () => {
       pageSize: -1
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a valid value for option 'pageSize'. Page size must be between 1 and 500.`);
   });
 
   it('fails validation if pageSize is greater than 500', async () => {
@@ -501,6 +504,7 @@ describe(commands.SEARCH, () => {
       pageSize: 501
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'501' is not a valid value for option 'pageSize'. Page size must be between 1 and 500.`);
   });
 
   it('fails validation if enableTopResults is specified together with scope other than message or chatMessage', async () => {

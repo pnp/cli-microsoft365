@@ -74,6 +74,7 @@ describe(commands.WEB_RULE_REMOVE, () => {
   it('fails validation if webUrl is not a valid URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: alertId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint URL.`);
   });
 
   it('fails validation if alertId is not a valid GUID', async () => {

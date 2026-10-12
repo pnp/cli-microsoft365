@@ -146,6 +146,7 @@ describe(commands.MAILBOX_SETTINGS_GET, () => {
       userName: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('retrieves mailbox settings of the signed-in user', async () => {

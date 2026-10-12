@@ -167,6 +167,7 @@ describe(commands.WEB_RULE_LIST, () => {
   it('fails validation if webUrl is not a valid URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint site URL.`);
   });
 
   it('fails validation if listId is not a valid GUID', async () => {
@@ -192,6 +193,7 @@ describe(commands.WEB_RULE_LIST, () => {
   it('fails validation if userName is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName are specified', async () => {

@@ -244,11 +244,13 @@ describe(commands.EVENT_LIST, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ userId: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both calendarId and calendarName are specified', () => {
@@ -264,11 +266,13 @@ describe(commands.EVENT_LIST, () => {
   it('fails validation if startDateTime is not a valid ISO date-time', () => {
     const actual = commandOptionsSchema.safeParse({ startDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO date-time.`);
   });
 
   it('fails validation if endDateTime is not a valid ISO date-time', () => {
     const actual = commandOptionsSchema.safeParse({ endDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO date-time.`);
   });
 
   it('retrieves events for the user specified by id', async () => {

@@ -115,6 +115,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       targetObjects: 'User'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if appObjectId is not a valid GUID', () => {
@@ -125,6 +126,7 @@ describe(commands.DIRECTORYEXTENSION_ADD, () => {
       targetObjects: 'User'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if dataType is not a valid enum value', () => {

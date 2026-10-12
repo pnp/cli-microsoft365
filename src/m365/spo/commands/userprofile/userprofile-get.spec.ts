@@ -182,6 +182,7 @@ describe(commands.USERPROFILE_GET, () => {
   it('fails validation if the user principal name is not a valid', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'abc' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'abc is not a valid user principal name');
   });
 
   it('passes validation when the user principal name is a valid', () => {

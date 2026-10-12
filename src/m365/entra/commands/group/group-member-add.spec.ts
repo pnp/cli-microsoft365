@@ -82,16 +82,19 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   it('fails validation if userIds contains an invalid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ groupId: groupId, userIds: `${userIds[0]},foo`, role: 'Member' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'userIds': foo.`);
   });
 
   it('fails validation if subgroupIds contains an invalid GUID', async () => {
     const actual = commandOptionsSchema.safeParse({ groupId: groupId, subgroupIds: `${groupIds[0]},foo`, role: 'Member' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'subgroupIds': foo.`);
   });
 
   it('fails validation if userNames contains an invalid UPN', async () => {
     const actual = commandOptionsSchema.safeParse({ groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for the option 'userNames': foo.`);
   });
 
   it('fails validation if role is not a valid role', async () => {

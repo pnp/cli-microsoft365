@@ -305,6 +305,7 @@ describe(commands.USER_GET, () => {
   it('fails validation when userName has an invalid value', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid userName.`);
   });
 
   it('passes validation if the id is a valid GUID', () => {

@@ -33,6 +33,27 @@ m365 spo file sharinglink set [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions     |
+  |-----------------|-----------------|
+  | Microsoft Graph | Files.ReadWrite |
+  | SharePoint      | AllSites.Read   |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions         |
+  |-----------------|---------------------|
+  | Microsoft Graph | Files.ReadWrite.All |
+  | SharePoint      | Sites.Read.All      |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Updates an anonymous sharing link from a file by a specified site-relative URL with the expirationDateTime parameter.

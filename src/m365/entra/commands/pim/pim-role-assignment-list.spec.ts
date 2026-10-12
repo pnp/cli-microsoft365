@@ -199,11 +199,13 @@ describe(commands.PIM_ROLE_ASSIGNMENT_LIST, () => {
   it('fails validation when userName is not a valid UPN', async () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid user principal name for option 'userName'.`);
   });
 
   it('fails validation when startDateTime is not a valid ISO 8601 date', async () => {
     const actual = commandOptionsSchema.safeParse({ startDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO 8601 date time string.`);
   });
 
   it('should get a list of role assignments', async () => {

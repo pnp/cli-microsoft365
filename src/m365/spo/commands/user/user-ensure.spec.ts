@@ -333,16 +333,19 @@ describe(commands.USER_ENSURE, () => {
   it('fails validation if entraId is not a valid id', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID.');
   });
 
   it('fails validation if userName is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, userName: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid userName.');
   });
 
   it('fails validation if entraGroupId is not a valid id', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraGroupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid GUID for option 'entraGroupId'.`);
   });
 
   it('fails validation without a user selector', () => {

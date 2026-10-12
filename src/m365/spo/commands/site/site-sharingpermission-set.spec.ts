@@ -83,6 +83,7 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
   it('fails validation if siteUrl is not a valid URL', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid', capability: 'full' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation when capability is not a valid value', async () => {

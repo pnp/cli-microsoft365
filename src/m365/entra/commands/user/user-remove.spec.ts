@@ -88,6 +88,7 @@ describe(commands.USER_REMOVE, () => {
       userName: 'Invalid upn'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid upn' is not a valid user principal name (UPN).`);
   });
 
   it('passes validation if required options specified (userId)', () => {

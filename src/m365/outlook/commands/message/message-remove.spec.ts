@@ -100,11 +100,13 @@ describe(commands.MESSAGE_REMOVE, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userId: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `Value 'invalid' is not a valid GUID for option 'userId'.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ id: messageId, userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `Value 'invalid' is not a valid user principal name for option 'userName'.`);
   });
 
   it('removes specific message using delegated permissions without prompting for confirmation', async () => {
