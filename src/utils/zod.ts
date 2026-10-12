@@ -95,7 +95,8 @@ function parseJSONSchema(jsonSchema: JSONSchema.JSONSchema, options: CommandOpti
       parsedSchema.allOf.forEach(s => parseJSONSchema(s, options, currentOption));
     }
 
-    const parse = getParseFn(parsedSchema.type);
+    const schemaType = Array.isArray(parsedSchema.type) ? parsedSchema.type[0] : parsedSchema.type;
+    const parse = getParseFn(schemaType);
     if (!parse) {
       break;
     }
