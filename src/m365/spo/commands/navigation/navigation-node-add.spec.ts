@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './navigation-node-add.js';
+import command, { options } from './navigation-node-add.js';
 
 describe(commands.NAVIGATION_NODE_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/team-a';
@@ -26,6 +26,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -103,7 +105,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
@@ -138,7 +140,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, openInNewWindow: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, openInNewWindow: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
     assert.strictEqual(saveCalled, true);
   });
@@ -179,7 +181,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, parentNodeId: parentNodeId, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, parentNodeId: parentNodeId, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
     assert.strictEqual(saveCalled, true);
   });
@@ -210,7 +212,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, parentNodeId: 1000, title: title, url: nodeUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, parentNodeId: 1000, title: title, url: nodeUrl, verbose: true }) });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
@@ -246,7 +248,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     });
 
 
-    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
     assert.strictEqual(saveCalled, true);
   });
@@ -276,7 +278,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -289,7 +291,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
@@ -301,63 +303,120 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl }) }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', title: title, url: nodeUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar', title: title, url: nodeUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the specified parentNodeId is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, url: nodeUrl, parentNodeId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified parentNodeId is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, url: nodeUrl, parentNodeId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified location is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, location: 'invalid', title: title, url: nodeUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified location is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'invalid', title: title, url: nodeUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if audienceIds contains an invalid audienceId', async () => {
+  it('fails validation if audienceIds contains an invalid audienceId', () => {
     const invalidAudienceIds = `${audienceIds},invalid`;
-    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if audienceIds contains more than 10 guids', async () => {
+  it('fails validation if audienceIds contains more than 10 guids', () => {
     const invalidAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
-    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is TopNavigationBar and all required properties are present', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when location is QuickLaunch and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is QuickLaunch and all required properties are present', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when location is TopNavigationBar and the link is external', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, isExternal: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is TopNavigationBar and the link is external', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, isExternal: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when location is QuickLaunch and the link is external', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, isExternal: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is QuickLaunch and the link is external', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, isExternal: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when location is not specified but parentNodeId is', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is not specified but parentNodeId is', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when audienceIds contains less than 10 ids and all are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: audienceIds } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when audienceIds contains less than 10 ids and all are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: audienceIds });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when audienceIds is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      url: nodeUrl,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('returns a validation error when audienceIds contains more than 10 GUIDs', () => {
+    const manyAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: manyAudienceIds
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.'
+      );
+    }
+  });
+
+  it('returns a validation error when audienceIds contains an invalid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: `${audienceIds},invalid`
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The following GUIDs are invalid for the option \'audienceIds\': invalid.'
+      );
+    }
   });
 });

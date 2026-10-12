@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './navigation-node-set.js';
+import command, { options } from './navigation-node-set.js';
 
 describe(commands.NAVIGATION_NODE_SET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/team-a';
@@ -28,6 +28,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,6 +38,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -100,7 +102,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     });
 
 
-    await command.action(logger, { options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: false, audienceIds: audienceIds, openInNewWindow: true, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: false, audienceIds: audienceIds, openInNewWindow: true, verbose: true }) });
     assert.strictEqual(saveCalled, true);
   });
 
@@ -118,7 +120,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: "" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, audienceIds: "" }) });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
@@ -135,7 +137,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, id: id, url: "" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, url: "" }) });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
@@ -150,33 +152,76 @@ describe(commands.NAVIGATION_NODE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id, title: title, verbose: true } } as any), new CommandError('Navigation node does not exist.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: id, title: title, verbose: true }) }), new CommandError('Navigation node does not exist.'));
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is no options are set to be changed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if no options are set to be changed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if audienceIds contains more than 10 guids', async () => {
+  it('fails validation if audienceIds contains more than 10 guids', () => {
     const manyAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, audienceIds: manyAudienceIds } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, audienceIds: manyAudienceIds });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if audienceIds contains invalid guid', async () => {
+  it('fails validation if audienceIds contains invalid guid', () => {
     const invalidAudienceIds = `${audienceIds},invalid`;
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, audienceIds: invalidAudienceIds } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, audienceIds: invalidAudienceIds });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all options are set properly', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: true, audienceIds: audienceIds } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are set properly', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: true, audienceIds: audienceIds });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      id: id,
+      title: title,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('returns a validation error when audienceIds contains more than 10 GUIDs', () => {
+    const manyAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      id: id,
+      audienceIds: manyAudienceIds
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.'
+      );
+    }
+  });
+
+  it('returns a validation error when audienceIds contains an invalid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      id: id,
+      audienceIds: `${audienceIds},invalid`
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The following GUIDs are invalid for the option \'audienceIds\': invalid.'
+      );
+    }
   });
 });
