@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -11,19 +12,28 @@ import commands from '../../commands.js';
 import getCommand, { Options as SpoEventReceiverGetOptions } from './eventreceiver-get.js';
 import { EventReceiver } from './EventReceiver.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listId: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `${e.input} is not a valid GUID.`
+  }).optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `${e.input} is not a valid GUID.`
+  }).optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  scope: z.enum(['web', 'site']).optional().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+export type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  scope?: string;
-  id?: string;
-  name?: string;
-  force?: boolean;
 }
 
 class SpoEventreceiverRemoveCommand extends SpoCommand {
@@ -35,91 +45,34 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
     return 'Removes event receivers for the specified web, site, or list.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        scope: args.options.scope || 'web',
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        message: `Specify either 'id' or 'name', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
+      })
+      .refine(opts => {
+        const listOptions = [opts.listId, opts.listTitle, opts.listUrl];
+        return !(listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1);
+      }, {
+        message: `Specify either list id or title or list url`,
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !(opts.scope === 'site' && (opts.listId || opts.listUrl || opts.listTitle)), {
+        message: 'Scope cannot be set to site when retrieving list event receivers.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listId  [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['web', 'site']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
-          return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
-        }
-
-        if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
-          return 'Scope cannot be set to site when retrieving list event receivers.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
