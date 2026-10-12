@@ -698,6 +698,12 @@ describe('validation/validation', () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('isValidSharePointUrl returns an error message if url is not a string', () => {
+    const actual = validation.isValidSharePointUrl(undefined as unknown as string);
+
+    assert.strictEqual(actual, 'SharePoint Online site URL must be a string.');
+  });
+
   it('isValidGraphDateTime returns true for a valid Graph API date time', () => {
     const result = validation.isValidGraphDateTime('2019-04-16T09:00:00');
     assert.strictEqual(result, true);
