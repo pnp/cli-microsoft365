@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, IdentityResponse, spo } from '../../../../utils/spo.js';
@@ -9,15 +10,21 @@ import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import { SpoPropertyBagBaseCommand } from './propertybag-base.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  key: z.string().alias('k'),
+  folder: z.string().optional(),
+  force: z.boolean().optional()
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  key: string;
-  folder?: string;
-  force?: boolean;
 }
 
 class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
@@ -29,44 +36,8 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     return 'Removes specified property from the property bag';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folder: (!(!args.options.folder)).toString(),
-        force: args.options.force === true
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-k, --key <key>'
-      },
-      {
-        option: '--folder [folder]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

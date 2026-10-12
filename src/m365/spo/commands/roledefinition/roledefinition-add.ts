@@ -1,20 +1,27 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { BasePermissions, PermissionKind } from '../../base-permissions.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string().alias('n'),
+  description: z.string().optional().alias('d'),
+  rights: z.string().optional()
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  description?: string;
-  rights?: string;
 }
 
 class SpoRoleDefinitionAddCommand extends SpoCommand {
@@ -24,6 +31,10 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
 
   public get description(): string {
     return 'Adds a new roledefinition to web';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   protected get permissionsKindMap(): string[] {
@@ -37,59 +48,33 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     return result;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        rights: args.options.rights,
-        description: (!(!args.options.description)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--rights [rights]',
-        autocomplete: this.permissionsKindMap
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.rights) {
-          const rights = args.options.rights.split(',');
-
-          for (const item of rights) {
-            const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-
-            if (!kind) {
-              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are ${this.permissionsKindMap.join('|')}.`;
-            }
-          }
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine((opts: { rights?: string }) => {
+        if (!opts.rights) {
+          return true;
         }
 
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
+        const rights = opts.rights.split(',');
+        for (const item of rights) {
+          const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
+          if (!kind) {
+            return false;
+          }
+        }
+        return true;
+      }, {
+        error: (e: any) => {
+          const rights = (e.input as { rights?: string }).rights!.split(',');
+          const invalid = rights.filter((item: string) => {
+            const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
+            return !kind;
+          });
+          return {
+            message: `Rights option '${invalid[0]}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are ${this.permissionsKindMap.join('|')}.`
+          };
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
