@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -12,13 +13,15 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './knowledgehub-remove.js';
+import command, { options } from './knowledgehub-remove.js';
 
 describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let requests: any[];
   let promptIssued: boolean = false;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -49,6 +52,8 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
       throw 'Invalid request';
     });
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,7 +98,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ force: true }) });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -107,7 +112,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument (debug)', async () => {
-    await command.action(logger, { options: { debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -121,7 +126,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
 
     assert(promptIssued);
   });
@@ -130,7 +135,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(requests.length === 0);
   });
 
@@ -138,7 +143,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
   });
 
   it('correctly handles an error when removing Knowledge Hub settings from tenant', async () => {
@@ -171,6 +176,16 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, force: true }) }), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

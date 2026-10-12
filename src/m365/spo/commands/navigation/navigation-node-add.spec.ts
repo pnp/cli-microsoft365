@@ -342,13 +342,13 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if audienceIds contains an invalid audienceId', async () => {
+  it('fails validation if audienceIds contains an invalid audienceId', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);
     assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'audienceIds': invalid.`);
   });
 
-  it('fails validation if audienceIds contains more than 10 guids', async () => {
+  it('fails validation if audienceIds contains more than 10 guids', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'TopNavigationBar', title: title, audienceIds: Array(11).fill('7aa4a1ca-4035-4f2f-bac7-7beada59b5ba').join(',') });
     assert.notStrictEqual(actual.success, true);
   });
@@ -371,5 +371,62 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('passes validation when location is not specified but parentNodeId is', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentNodeId: 2003, title: title });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when audienceIds is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      url: nodeUrl,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('returns a validation error when audienceIds contains more than 10 GUIDs', () => {
+    const manyAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: manyAudienceIds
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.'
+      );
+    }
+  });
+
+  it('returns a validation error when audienceIds contains an invalid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: `${audienceIds},invalid`
+    });
+
+    assert.strictEqual(actual.success, false);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues[0].message,
+        'The following GUIDs are invalid for the option \'audienceIds\': invalid.'
+      );
+    }
   });
 });

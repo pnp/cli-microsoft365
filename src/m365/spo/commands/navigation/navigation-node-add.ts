@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';

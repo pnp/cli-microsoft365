@@ -259,7 +259,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if audienceIds contains invalid guid', async () => {
+  it('fails validation if audienceIds contains invalid guid', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id, audienceIds: `${audienceIds},invalid` });
     assert.notStrictEqual(actual.success, true);
     assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'audienceIds': invalid.`);
