@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -8,12 +9,15 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { TermGroupCollection } from './TermGroupCollection.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().optional().alias('u').refine(val => val === undefined || validation.isValidSharePointUrl(val) === true, { message: 'Invalid SharePoint URL' })
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl?: string;
 }
 
 class SpoTermGroupListCommand extends SpoCommand {
@@ -25,47 +29,12 @@ class SpoTermGroupListCommand extends SpoCommand {
     return 'Lists taxonomy term groups';
   }
 
+  public get schema(): z.ZodType | undefined {
+    return options;
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['Id', 'Name'];
-  }
-
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl [webUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.webUrl) {
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
