@@ -13,13 +13,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoGroupMemberListCommand from './group-member-list.js';
-import command from './group-member-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './group-member-remove.js';
 
 describe(commands.GROUP_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/SiteA';
   const groupId = 4;
@@ -54,6 +54,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,8 +77,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       request.get,
       request.post,
       cli.promptForConfirmation,
-      cli.executeCommandWithOutput,
-      cli.getSettingWithDefaultValue
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -117,12 +117,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         entraGroupName: "Microsoft Entra Security Group"
-      }
+      })
     });
 
     assert(postStub.called);
@@ -151,12 +151,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         entraGroupName: "Microsoft Entra Security Group"
-      }
+      })
     });
 
     assert(postStub.called);
@@ -181,13 +181,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         entraGroupId: "5786b8e8-c495-4734-b345-756733960730",
         force: true
-      }
+      })
     });
     assert(postStub.called);
   });
@@ -211,13 +211,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         entraGroupId: "5786b8e8-c495-4734-b345-756733960730",
         force: true
-      }
+      })
     });
     assert(postStub.called);
   });
@@ -244,12 +244,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         entraGroupId: "4b468129-3b44-4414-bd45-aa5bde29df2f"
-      }
+      })
     });
     assert(postStub.called);
   });
@@ -266,13 +266,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         entraGroupName: "Not existing group",
         force: true
-      }
+      })
     }), new CommandError('The Microsoft Entra group Not existing group is not found in SharePoint group Site A Visitors'));
   });
 
@@ -285,205 +285,137 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
         force: true
-      }
+      })
     });
     assert(postStub.called);
   });
 
-  it('fails validation if the userName is not a valid UPN.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        userName: "no-an-email"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the email is not valid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        email: "no-an-email"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if groupId and groupName is entered', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the userName is not a valid UPN.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userName: "no-an-email"
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        groupName: groupName,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'no-an-email' is not a valid userName.`);
   });
 
-  it('fails validation if neither groupId nor groupName is entered', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the email is not valid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      email: "no-an-email"
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'no-an-email' is not a valid email.`);
   });
 
-  it('fails validation if both userId and email options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if groupId and groupName is entered', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      groupName: groupName,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        userId: userId,
-        email: email
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userName and email options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if neither groupId nor groupName is entered', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        email: email,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userName and userId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both userId and email options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userId: userId,
+      email: email
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        userId: userId,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both email and userId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both userName and email options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      email: email,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        email: email,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName, email, and userId options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both userName and userId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userId: userId,
+      userName: userName
     });
-
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if groupId is Invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: "INVALIDGROUP",
-        userName: userName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both email and userId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      email: email,
+      userId: userId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userId is Invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        userId: "INVALIDUSER"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName, email, and userId options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all the required options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: webUrl,
-        groupId: groupId,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if groupId is Invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: "INVALIDGROUP",
+      userName: userName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if userId is Invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userId: "INVALIDUSER"
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userName: userName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if all the required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: groupId,
+      userName: userName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('removes user from SharePoint group by groupId and userName with force option (debug)', async () => {
@@ -497,14 +429,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
         force: true
-      }
+      })
     });
 
     assert(postStub.called);
@@ -524,13 +456,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
         force: false
-      }
+      })
     });
 
     assert(postStub.called);
@@ -549,13 +481,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         userId: userId,
         force: false
-      }
+      })
     });
 
     assert(postStub.called);
@@ -580,13 +512,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         email: email,
         force: false
-      }
+      })
     });
 
     assert(postStub.called);
@@ -602,13 +534,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupName: groupName,
         userId: userId,
         force: true
-      }
+      })
     });
 
     assert(postStub.called);
@@ -630,13 +562,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupName: groupName,
         email: email,
         force: true
-      }
+      })
     });
 
     assert(postStub.called);
@@ -648,13 +580,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
         force: false
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -670,42 +602,34 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
         force: true
-      }
+      })
     }), new CommandError('The user does not exist or is not unique.'));
   });
 
-  it('fails validation if webURL is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 4, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webURL is Invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "InvalidWEBURL", groupId: 4, userName: "Alex.Wilber@contoso.com" });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'InvalidWEBURL' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if groupid and groupName is entered', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if groupid and groupName is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 4, groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation if entraGroupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+      groupId: 3,
+      entraGroupId: 'Invalid GUID'
     });
-
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if entraGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 3,
-        entraGroupId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid GUID' is not a valid GUID.`);
   });
 });

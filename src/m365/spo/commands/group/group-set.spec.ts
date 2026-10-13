@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-set.js';
+import command, { options } from './group-set.js';
 
 const validId = 1;
 const validName = "Project leaders";
@@ -31,6 +31,7 @@ describe(commands.GROUP_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -39,6 +40,7 @@ describe(commands.GROUP_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -78,47 +80,65 @@ describe(commands.GROUP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when group id is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        id: 'invalid id'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when group id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: 'invalid id'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both ownerEmail and ownerUserName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        id: validId,
-        ownerEmail: validOwnerEmail,
-        ownerUserName: validOwnerUserName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both ownerEmail and ownerUserName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: validId,
+      ownerEmail: validOwnerEmail,
+      ownerUserName: validOwnerUserName
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid web URL is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'invalid',
-        id: validId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid web URL is passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'invalid',
+      id: validId
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when valid options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        id: validId,
-        allowRequestToJoinLeave: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: validId,
+      name: validName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when neither id nor name is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when valid options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: validId,
+      allowRequestToJoinLeave: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully updates group settings by id', async () => {
@@ -131,12 +151,12 @@ describe(commands.GROUP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         id: validId,
         allowRequestToJoinLeave: true,
         verbose: true
-      }
+      })
     });
   });
 
@@ -150,12 +170,12 @@ describe(commands.GROUP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         name: validName,
         allowRequestToJoinLeave: true,
         verbose: true
-      }
+      })
     });
   });
 
@@ -184,12 +204,12 @@ describe(commands.GROUP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         id: validId,
         ownerEmail: validOwnerEmail,
         verbose: true
-      }
+      })
     });
   });
 
@@ -218,12 +238,12 @@ describe(commands.GROUP_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         name: validName,
         ownerUserName: validOwnerUserName,
         verbose: true
-      }
+      })
     });
   });
 
@@ -248,12 +268,12 @@ describe(commands.GROUP_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         name: validName,
         autoAcceptRequestToJoinLeave: true,
         verbose: true
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 });

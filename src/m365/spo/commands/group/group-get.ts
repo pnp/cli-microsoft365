@@ -1,20 +1,35 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-interface CommandArgs {
-  options: Options;
+enum AssociatedGroup {
+  Owner = 'Owner',
+  Member = 'Member',
+  Visitor = 'Visitor'
 }
 
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: number;
-  name?: string;
-  associatedGroup?: string;
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.number().optional().alias('i'),
+  name: z.string().optional(),
+  associatedGroup: zod.coercedEnum(AssociatedGroup).optional()
+});
+
+export declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class SpoGroupGetCommand extends SpoCommand {
@@ -26,61 +41,19 @@ class SpoGroupGetCommand extends SpoCommand {
     return 'Gets site group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        name: (!(!args.options.name)).toString(),
-        associatedGroup: args.options.associatedGroup
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => [o.id, o.name, o.associatedGroup].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'id', 'name', or 'associatedGroup', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name', 'associatedGroup']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--name [name]'
-      },
-      {
-        option: '--associatedGroup [associatedGroup]',
-        autocomplete: ['Owner', 'Member', 'Visitor']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && isNaN(args.options.id)) {
-          return `Specified id ${args.options.id} is not a number`;
-        }
-
-        if (args.options.associatedGroup && ['owner', 'member', 'visitor'].indexOf(args.options.associatedGroup.toLowerCase()) === -1) {
-          return `${args.options.associatedGroup} is not a valid associatedGroup value. Allowed values are Owner|Member|Visitor.`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name', 'associatedGroup'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
