@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -9,19 +10,28 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option listId is not a valid GUID`
+  }).optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option id is not a valid GUID`
+  }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  internalName: z.string().optional(),
+  updateExistingLists: z.boolean().optional()
+}).catchall(z.unknown());
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  internalName?: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  updateExistingLists?: boolean;
-  webUrl: string;
 }
 
 class SpoFieldSetCommand extends SpoCommand {
@@ -33,88 +43,22 @@ class SpoFieldSetCommand extends SpoCommand {
     return 'Updates existing list or site column';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        internalName: typeof args.options.internalName !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        updateExistingLists: !!args.options.updateExistingLists
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title, opts.internalName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: id, title, internalName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'internalName']
+        }
+      })
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length <= 1, {
+        error: 'Specify either list id or title or list url, but not multiple'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--internalName [internalName]'
-      },
-      {
-        option: '--updateExistingLists'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url, but not multiple`;
-        }
-
-        if (args.options.listId &&
-          !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
-        }
-
-        if (args.options.id &&
-          !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} in option id is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'internalName'] });
   }
 
   public allowUnknownOptions(): boolean | undefined {
