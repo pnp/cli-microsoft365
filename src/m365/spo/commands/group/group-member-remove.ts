@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -10,20 +10,39 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import SpoGroupMemberListCommand, { Options as SpoGroupMemberListCommandOptions } from './group-member-list.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  groupId: z.number().optional(),
+  groupName: z.string().optional(),
+  userName: z.string()
+    .refine(userName => validation.isValidUserPrincipalName(userName), {
+      error: e => `'${e.input}' is not a valid userName.`
+    })
+    .optional(),
+  email: z.string()
+    .refine(email => validation.isValidUserPrincipalName(email), {
+      error: e => `'${e.input}' is not a valid email.`
+    })
+    .optional(),
+  userId: z.number().optional(),
+  entraGroupId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID.`
+    })
+    .optional(),
+  entraGroupName: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  groupId?: number;
-  groupName?: string;
-  userName?: string;
-  email?: string;
-  userId?: number;
-  entraGroupId?: string;
-  entraGroupName?: string;
-  force?: boolean;
 }
 
 class SpoGroupMemberRemoveCommand extends SpoCommand {
@@ -35,95 +54,26 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     return 'Removes the specified member from a SharePoint group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: (!(!args.options.groupId)).toString(),
-        groupName: (!(!args.options.groupName)).toString(),
-        userName: (!(!args.options.userName)).toString(),
-        email: (!(!args.options.email)).toString(),
-        userId: (!(!args.options.userId)).toString(),
-        entraGroupId: (!(!args.options.entraGroupId)).toString(),
-        entraGroupName: (!(!args.options.entraGroupName)).toString(),
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => [o.groupId, o.groupName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'groupId' or 'groupName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
+      })
+      .refine(o => [o.userName, o.email, o.userId, o.entraGroupId, o.entraGroupName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'userName', 'email', 'userId', 'entraGroupId', or 'entraGroupName', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userName', 'email', 'userId', 'entraGroupId', 'entraGroupName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '--entraGroupName [entraGroupName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && isNaN(args.options.groupId)) {
-          return `Specified "groupId" ${args.options.groupId} is not valid`;
-        }
-
-        if (args.options.userId && isNaN(args.options.userId)) {
-          return `Specified "userId" ${args.options.userId} is not valid`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName`;
-        }
-
-        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
-          return `${args.options.email} is not a valid email`;
-        }
-
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId as string)) {
-          return `${args.options.entraGroupId} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['groupName', 'groupId'] },
-      { options: ['userName', 'email', 'userId', 'entraGroupId', 'entraGroupName'] }
-    );
   }
 
   private async getUserName(logger: Logger, args: CommandArgs): Promise<string> {
