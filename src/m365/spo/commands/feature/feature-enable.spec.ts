@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './feature-enable.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './feature-enable.js';
 
 describe(commands.FEATURE_ENABLE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
 
   before(() => {
@@ -27,6 +27,7 @@ describe(commands.FEATURE_ENABLE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -47,8 +48,7 @@ describe(commands.FEATURE_ENABLE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -65,20 +65,8 @@ describe(commands.FEATURE_ENABLE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
-  });
-
-  it('configures scope as string option', () => {
-    const types = command.types;
-    ['s', 'scope'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
-  });
-
   it('enables web feature (scope not defined, so defaults to web), no force', async () => {
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
+    const requestUrl = `https://contoso.sharepoint.com/_api/Web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
@@ -94,7 +82,7 @@ describe(commands.FEATURE_ENABLE, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' }) });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -109,7 +97,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('enables site feature, force', async () => {
-    const requestUrl = `https://contoso.sharepoint.com/_api/site/features/add(featureId=guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3',force=true)`;
+    const requestUrl = `https://contoso.sharepoint.com/_api/Site/features/add(featureId=guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3',force=true)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
@@ -125,7 +113,7 @@ describe(commands.FEATURE_ENABLE, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: true, id: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', webUrl: 'https://contoso.sharepoint.com', scope: 'site', force: true } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', webUrl: 'https://contoso.sharepoint.com', scope: 'site', force: true }) });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -154,111 +142,82 @@ describe(commands.FEATURE_ENABLE, () => {
     sinon.stub(request, 'post').rejects(err);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         id: id,
         scope: 'web'
-      }
+      })
     }), new CommandError(err.error['odata.error'].message.value));
   });
 
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[scope]') > -1) {
-        containsScopeOption = true;
-      }
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      id: 'invalid',
+      scope: 'Web'
     });
-    assert(containsScopeOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID for option id.');
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        id: 'invalid',
-        scope: 'Web'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      id: '00bfea71-5932-4f9c-ad71-1557e5751100'
     });
-
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo',
-        id: '00bfea71-5932-4f9c-ad71-1557e5751100'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when the required options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        id: "00bfea71-5932-4f9c-ad71-1557e5751100"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the required options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts scope to be Site', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
-        scope: 'Site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts scope to be Site', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+      scope: 'Site'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts scope to be Web', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
-        scope: 'Web'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts scope to be Web', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+      scope: 'Web'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid string scope', async () => {
-    const scope = 'foo';
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
+  it('rejects invalid string scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+      scope: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('doesn\'t fail validation if the optional scope option not specified', async () => {
-    const actual = await command.validate(
-      {
-        options:
-        {
-          id: "00bfea71-5932-4f9c-ad71-1557e5751100",
-          webUrl: "https://contoso.sharepoint.com"
-        }
-      }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('doesn\'t fail validation if the optional scope option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
