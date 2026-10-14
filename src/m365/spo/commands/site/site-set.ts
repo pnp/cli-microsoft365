@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -17,29 +18,38 @@ interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
-  classification?: string;
-  disableFlows?: boolean;
-  socialBarOnSitePagesDisabled?: boolean;
-  isPublic?: boolean;
-  owners?: string;
-  shareByEmailEnabled?: boolean;
-  siteDesignId?: string;
-  title?: string;
-  description?: string;
-  url: string;
-  sharingCapability?: string;
-  siteLogoUrl?: string;
-  siteThumbnailUrl?: string;
-  resourceQuota?: string | number;
-  resourceQuotaWarningLevel?: string | number;
-  storageQuota?: string | number;
-  storageQuotaWarningLevel?: string | number;
-  allowSelfServiceUpgrade?: boolean;
-  lockState?: string;
-  noScriptSite?: boolean;
-  wait?: boolean;
-}
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    }).alias('u'),
+  title: z.string().optional().alias('t'),
+  description: z.string().optional().alias('d'),
+  classification: z.string().optional(),
+  disableFlows: z.boolean().optional(),
+  socialBarOnSitePagesDisabled: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
+  owners: z.string().optional(),
+  shareByEmailEnabled: z.boolean().optional(),
+  siteDesignId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID.`
+    }).optional(),
+  sharingCapability: z.enum(['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']).optional(),
+  siteLogoUrl: z.string().optional(),
+  siteThumbnailUrl: z.string().optional(),
+  resourceQuota: z.coerce.number().optional(),
+  resourceQuotaWarningLevel: z.coerce.number().optional(),
+  storageQuota: z.coerce.number().optional(),
+  storageQuotaWarningLevel: z.coerce.number().optional(),
+  allowSelfServiceUpgrade: z.boolean().optional(),
+  lockState: z.enum(['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']).optional(),
+  noScriptSite: z.boolean().optional(),
+  wait: z.boolean().optional()
+});
+
+export declare type Options = z.infer<typeof options>;
 
 class SpoSiteSetCommand extends SpoCommand {
   private groupId: string | undefined;
@@ -56,212 +66,51 @@ class SpoSiteSetCommand extends SpoCommand {
     return 'Updates properties of the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        classification: typeof args.options.classification !== 'undefined',
-        disableFlows: !!args.options.disableFlows,
-        socialBarOnSitePagesDisabled: !!args.options.socialBarOnSitePagesDisabled,
-        isPublic: !!args.options.isPublic,
-        owners: typeof args.options.owners !== 'undefined',
-        shareByEmailEnabled: !!args.options.shareByEmailEnabled,
-        title: typeof args.options.title !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        siteDesignId: typeof args.options.siteDesignId !== 'undefined',
-        sharingCapabilities: typeof args.options.sharingCapability !== 'undefined',
-        siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
-        siteThumbnailUrl: typeof args.options.siteThumbnailUrl !== 'undefined',
-        resourceQuota: typeof args.options.resourceQuota !== 'undefined',
-        resourceQuotaWarningLevel: typeof args.options.resourceQuotaWarningLevel !== 'undefined',
-        storageQuota: typeof args.options.storageQuota !== 'undefined',
-        storageQuotaWarningLevel: typeof args.options.storageQuotaWarningLevel !== 'undefined',
-        allowSelfServiceUpgrade: !!args.options.allowSelfServiceUpgrade,
-        lockState: typeof args.options.lockState !== 'undefined',
-        noScriptSite: !!args.options.noScriptSite,
-        wait: !!args.options.wait
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--classification [classification]'
-      },
-      {
-        option: '--disableFlows [disableFlows]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--socialBarOnSitePagesDisabled [socialBarOnSitePagesDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--isPublic [isPublic]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--shareByEmailEnabled [shareByEmailEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
-      },
-      {
-        option: '--siteLogoUrl [siteLogoUrl]'
-      },
-      {
-        option: '--siteThumbnailUrl [siteThumbnailUrl]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--lockState [lockState]',
-        autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
-      },
-      {
-        option: '--noScriptSite [noScriptSite]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--wait'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(
+        (opts: Options) =>
+          opts.classification !== undefined ||
+          opts.disableFlows !== undefined ||
+          opts.socialBarOnSitePagesDisabled !== undefined ||
+          opts.title !== undefined ||
+          opts.description !== undefined ||
+          opts.isPublic !== undefined ||
+          opts.owners !== undefined ||
+          opts.shareByEmailEnabled !== undefined ||
+          opts.siteDesignId !== undefined ||
+          opts.sharingCapability !== undefined ||
+          opts.siteLogoUrl !== undefined ||
+          opts.siteThumbnailUrl !== undefined ||
+          opts.resourceQuota !== undefined ||
+          opts.resourceQuotaWarningLevel !== undefined ||
+          opts.storageQuota !== undefined ||
+          opts.storageQuotaWarningLevel !== undefined ||
+          opts.noScriptSite !== undefined ||
+          opts.allowSelfServiceUpgrade !== undefined ||
+          opts.lockState !== undefined,
+        {
+          error: 'Specify at least one property to update'
         }
-
-        if (typeof args.options.classification === 'undefined' &&
-          typeof args.options.disableFlows === 'undefined' &&
-          typeof args.options.socialBarOnSitePagesDisabled === 'undefined' &&
-          typeof args.options.title === 'undefined' &&
-          typeof args.options.description === 'undefined' &&
-          typeof args.options.isPublic === 'undefined' &&
-          typeof args.options.owners === 'undefined' &&
-          typeof args.options.shareByEmailEnabled === 'undefined' &&
-          typeof args.options.siteDesignId === 'undefined' &&
-          typeof args.options.sharingCapability === 'undefined' &&
-          typeof args.options.siteLogoUrl === 'undefined' &&
-          typeof args.options.siteThumbnailUrl === 'undefined' &&
-          typeof args.options.resourceQuota === 'undefined' &&
-          typeof args.options.resourceQuotaWarningLevel === 'undefined' &&
-          typeof args.options.storageQuota === 'undefined' &&
-          typeof args.options.storageQuotaWarningLevel === 'undefined' &&
-          typeof args.options.noScriptSite === 'undefined' &&
-          typeof args.options.allowSelfServiceUpgrade === 'undefined' &&
-          typeof args.options.lockState === 'undefined') {
-          return 'Specify at least one property to update';
+      )
+      .refine(
+        (opts: Options) => !opts.resourceQuota || !opts.resourceQuotaWarningLevel || opts.resourceQuotaWarningLevel <= opts.resourceQuota,
+        {
+          message: 'resourceQuotaWarningLevel must not exceed the resourceQuota',
+          path: ['resourceQuotaWarningLevel']
         }
-
-        if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
-          return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
+      )
+      .refine(
+        (opts: Options) => !opts.storageQuota || !opts.storageQuotaWarningLevel || opts.storageQuotaWarningLevel <= opts.storageQuota,
+        {
+          message: 'storageQuotaWarningLevel must not exceed the storageQuota',
+          path: ['storageQuotaWarningLevel']
         }
-
-        if (typeof args.options.siteThumbnailUrl !== 'undefined' && typeof args.options.siteThumbnailUrl !== 'string') {
-          return `${args.options.siteThumbnailUrl} is not a valid value for the siteThumbnailUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
-        }
-
-        if (args.options.siteDesignId) {
-          if (!validation.isValidGuid(args.options.siteDesignId)) {
-            return `${args.options.siteDesignId} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.sharingCapability &&
-          this.sharingCapabilities.indexOf(args.options.sharingCapability) < 0) {
-          return `${args.options.sharingCapability} is not a valid value for the sharingCapability option. Allowed values are ${this.sharingCapabilities.join('|')}`;
-        }
-
-        if (args.options.resourceQuota &&
-          typeof args.options.resourceQuota !== 'number') {
-          return `${args.options.resourceQuota} is not a number`;
-        }
-
-        if (args.options.resourceQuotaWarningLevel &&
-          typeof args.options.resourceQuotaWarningLevel !== 'number') {
-          return `${args.options.resourceQuotaWarningLevel} is not a number`;
-        }
-
-        if (args.options.resourceQuota &&
-          args.options.resourceQuotaWarningLevel &&
-          args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
-          return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
-        }
-
-        if (args.options.storageQuota &&
-          typeof args.options.storageQuota !== 'number') {
-          return `${args.options.storageQuota} is not a number`;
-        }
-
-        if (args.options.storageQuotaWarningLevel &&
-          typeof args.options.storageQuotaWarningLevel !== 'number') {
-          return `${args.options.storageQuotaWarningLevel} is not a number`;
-        }
-
-        if (args.options.storageQuota &&
-          args.options.storageQuotaWarningLevel &&
-          args.options.storageQuotaWarningLevel > args.options.storageQuota) {
-          return `storageQuotaWarningLevel must not exceed the storageQuota`;
-        }
-
-        if (args.options.lockState &&
-          ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
-          return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('classification');
-    this.types.boolean.push('isPublic', 'disableFlows', 'socialBarOnSitePagesDisabled', 'shareByEmailEnabled', 'allowSelfServiceUpgrade', 'noScriptSite');
+      );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -706,21 +555,6 @@ class SpoSiteSetCommand extends SpoCommand {
     return this.groupId !== '00000000-0000-0000-0000-000000000000';
   }
 
-  /**
-   * Maps the base sharingCapability enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get sharingCapabilities(): string[] {
-    const result: string[] = [];
-
-    for (const sharingCapability in SharingCapabilities) {
-      if (typeof SharingCapabilities[sharingCapability] === 'number') {
-        result.push(sharingCapability);
-      }
-    }
-
-    return result;
-  }
 }
 
 export default new SpoSiteSetCommand();
