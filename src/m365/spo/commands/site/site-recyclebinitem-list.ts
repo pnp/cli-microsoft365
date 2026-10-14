@@ -1,18 +1,33 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-interface CommandArgs {
-  options: Options;
+enum RecycleBinItemType {
+  files = 'files',
+  listItems = 'listItems',
+  folders = 'folders'
 }
 
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  type?: string;
-  secondary?: boolean;
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  type: zod.coercedEnum(RecycleBinItemType).optional().alias('t'),
+  secondary: z.boolean().optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class SpoSiteRecycleBinItemListCommand extends SpoCommand {
@@ -28,54 +43,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
     return ['Id', 'Title', 'DirName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: args.options.type,
-        secondary: args.options.secondary
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value)
-      },
-      {
-        option: '-s, --secondary'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (typeof args.options.type !== 'undefined' &&
-          !SpoSiteRecycleBinItemListCommand.recycleBinItemType.some(item => item.value === args.options.type)) {
-          return `${args.options.type} is not a valid value. Allowed values are ${SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value).join(', ')}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

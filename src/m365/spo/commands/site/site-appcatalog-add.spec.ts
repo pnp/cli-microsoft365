@@ -13,14 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-appcatalog-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './site-appcatalog-add.js';
 
 describe(commands.SITE_APPCATALOG_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +36,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -106,7 +107,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/site' }) });
   });
 
   it('creates site collection app catalog (debug=true)', async () => {
@@ -140,7 +141,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -165,56 +166,40 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' }) }), new CommandError('Unknown Error'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' }) }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying site url', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--siteUrl') > -1) {
-        assert(true);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('passes validation when the url option specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when the url option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation when the url option specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site'
     });
-
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.notDeepEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the url option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

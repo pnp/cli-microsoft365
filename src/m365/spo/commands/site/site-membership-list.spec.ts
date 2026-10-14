@@ -9,7 +9,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-membership-list.js';
+import command, { options } from './site-membership-list.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandError } from '../../../../Command.js';
@@ -19,6 +19,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const ownerMembershipList = [
     {
       email: 'owner1Email@email.com',
@@ -123,6 +124,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -162,19 +164,25 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if the role option is a valid role', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', role: 'Owner' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the role option is a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', role: 'Owner' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the siteUrl option is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the siteUrl option is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the role option is not a valid role', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', role: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the role option is not a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', role: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('lists all site membership groups', async () => {
@@ -186,7 +194,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, output: 'json' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], {
       AssociatedOwnerGroup: ownerMembershipList,
       AssociatedMemberGroup: membersMembershipList,
@@ -203,7 +211,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Owner", output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Owner", output: 'json' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], {
       AssociatedOwnerGroup: ownerMembershipList
     });
@@ -218,7 +226,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Member", output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Member", output: 'json' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], {
       AssociatedMemberGroup: membersMembershipList
     });
@@ -233,7 +241,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Visitor", output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Visitor", output: 'json' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], {
       AssociatedVisitorGroup: visitorsMembershipList
     });
@@ -248,7 +256,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, output: 'csv' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, output: 'csv' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...ownerMembershipListCSVOutput,
       ...membersMembershipListCSVOutput,
@@ -265,7 +273,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, output: 'text' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...ownerMembershipListCSVOutput,
       ...membersMembershipListCSVOutput,
@@ -282,7 +290,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, output: 'md' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, output: 'md' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...ownerMembershipListCSVOutput,
       ...membersMembershipListCSVOutput,
@@ -299,7 +307,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, output: 'text' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], []);
   });
 
@@ -312,7 +320,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Owner", output: 'csv' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Owner", output: 'csv' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...ownerMembershipListCSVOutput
     ]);
@@ -327,7 +335,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Member", output: 'csv' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Member", output: 'csv' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...membersMembershipListCSVOutput
     ]);
@@ -342,7 +350,7 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, role: "Visitor", output: 'csv' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, role: "Visitor", output: 'csv' }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], [
       ...visitorsMembershipListCSVOutput
     ]);
@@ -357,6 +365,6 @@ describe(commands.SITE_MEMBERSHIP_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, verbose: true } }), new CommandError(`Cannot get site ${siteUrl}.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, verbose: true }) }), new CommandError(`Cannot get site ${siteUrl}.`));
   });
 });
