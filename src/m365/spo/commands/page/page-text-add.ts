@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -13,17 +14,30 @@ import {
 } from './clientsidepages.js';
 import { Page } from './Page.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  pageName: z.string().alias('n'),
+  text: z.string().alias('t'),
+  section: z.number()
+    .int()
+    .min(1, { error: 'The value of parameter section must be 1 or higher' })
+    .optional(),
+  column: z.number()
+    .int()
+    .min(1, { error: 'The value of parameter column must be 1 or higher' })
+    .optional(),
+  order: z.number().int().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  column?: number;
-  order?: number;
-  pageName: string;
-  section?: number;
-  text: string;
-  webUrl: string;
 }
 
 class SpoPageTextAddCommand extends SpoCommand {
@@ -35,61 +49,8 @@ class SpoPageTextAddCommand extends SpoCommand {
     return 'Adds text to a modern page';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        section: typeof args.options.section !== 'undefined',
-        column: typeof args.options.column !== 'undefined',
-        order: typeof args.options.order !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-t, --text <text>'
-      },
-      {
-        option: '--section [section]'
-      },
-      {
-        option: '--column [column]'
-      },
-      {
-        option: '--order [order]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.section && (!Number.isInteger(args.options.section) || args.options.section < 1)) {
-          return 'The value of parameter section must be 1 or higher';
-        }
-
-        if (args.options.column && (!Number.isInteger(args.options.column) || args.options.column < 1)) {
-          return 'The value of parameter column must be 1 or higher';
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

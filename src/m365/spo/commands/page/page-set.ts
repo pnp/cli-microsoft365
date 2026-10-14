@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Auth } from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -10,23 +11,42 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string().alias('n'),
+  layoutType: z.enum(supportedPageLayouts).optional().alias('l'),
+  promoteAs: z.enum(supportedPromoteAs).optional().alias('p'),
+  demoteFrom: z.enum(['NewsPage']).optional(),
+  commentsEnabled: z.boolean().optional(),
+  publish: z.boolean().optional(),
+  publishMessage: z.string().optional(),
+  description: z.string().optional(),
+  title: z.string().optional(),
+  content: z.string()
+    .refine(content => {
+      try {
+        JSON.parse(content);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      error: 'Specified content is not a valid JSON string.'
+    })
+    .optional(),
+  isRetired: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  webUrl: string;
-  layoutType?: string;
-  promoteAs?: string;
-  commentsEnabled?: boolean;
-  publish: boolean;
-  publishMessage?: string;
-  description?: string;
-  title?: string;
-  demoteFrom?: string;
-  content?: string;
-  isRetired?: boolean;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -38,130 +58,24 @@ class SpoPageSetCommand extends SpoCommand {
     return 'Updates modern page properties';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        layoutType: args.options.layoutType || false,
-        promoteAs: args.options.promoteAs || false,
-        demotefrom: args.options.demoteFrom || false,
-        commentsEnabled: args.options.commentsEnabled || false,
-        publish: args.options.publish || false,
-        publishMessage: typeof args.options.publishMessage !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        content: typeof args.options.content !== 'undefined',
-        isRetired: typeof args.options.isRetired !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !!(opts.layoutType || opts.promoteAs || opts.demoteFrom || opts.commentsEnabled !== undefined ||
+        opts.publish || opts.description || opts.title || opts.content || opts.isRetired !== undefined), {
+        error: 'Specify at least one option to update.'
+      })
+      .refine(opts => opts.promoteAs !== 'HomePage' || opts.layoutType === 'Home', {
+        error: 'You can only promote home pages as site home page',
+        path: ['promoteAs']
+      })
+      .refine(opts => opts.promoteAs !== 'NewsPage' || !opts.layoutType || opts.layoutType === 'Article', {
+        error: 'You can only promote article pages as news article',
+        path: ['promoteAs']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --layoutType [layoutType]',
-        autocomplete: supportedPageLayouts
-      },
-      {
-        option: '-p, --promoteAs [promoteAs]',
-        autocomplete: supportedPromoteAs
-      },
-      {
-        option: '--demoteFrom [demoteFrom]',
-        autocomplete: ['NewsPage']
-      },
-      {
-        option: '--commentsEnabled [commentsEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--publish'
-      },
-      {
-        option: '--publishMessage [publishMessage]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '--content [content]'
-      },
-      {
-        option: '--isRetired [isRetired]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('commentsEnabled', 'isRetired');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (!args.options.layoutType && !args.options.promoteAs && !args.options.demoteFrom && args.options.commentsEnabled === undefined &&
-          !args.options.publish && !args.options.description && !args.options.title && !args.options.content && args.options.isRetired === undefined) {
-          return 'Specify at least one option to update.';
-        }
-
-        if (args.options.layoutType &&
-          supportedPageLayouts.indexOf(args.options.layoutType) < 0) {
-          return `${args.options.layoutType} is not a valid option for layoutType. Allowed values ${supportedPageLayouts.join(', ')}`;
-        }
-
-        if (args.options.promoteAs &&
-          supportedPromoteAs.indexOf(args.options.promoteAs) < 0) {
-          return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values ${supportedPromoteAs.join(', ')}`;
-        }
-
-        if (args.options.demoteFrom &&
-          args.options.demoteFrom !== 'NewsPage') {
-          return `${args.options.demoteFrom} is not a valid option for demoteFrom. The only allowed value is 'NewsPage'`;
-        }
-
-        if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
-          return 'You can only promote home pages as site home page';
-        }
-
-        if (args.options.promoteAs === 'NewsPage' && args.options.layoutType && args.options.layoutType !== 'Article') {
-          return 'You can only promote article pages as news article';
-        }
-
-        if (args.options.content) {
-          try {
-            JSON.parse(args.options.content);
-          }
-          catch (e) {
-            return `Specified content is not a valid JSON string. Input: ${args.options.content}. Error: ${e}`;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

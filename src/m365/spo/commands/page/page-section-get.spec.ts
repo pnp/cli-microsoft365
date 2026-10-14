@@ -12,8 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
-import command from './page-section-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './page-section-get.js';
 import { mockOneColumnSectionHTML, mockPageSettingsHTML, mockVerticalSectionHTML } from './page.mock.js';
 
 describe(commands.PAGE_SECTION_GET, () => {
@@ -21,6 +20,7 @@ describe(commands.PAGE_SECTION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const apiResponse = {
     "ListItemAllFields": {
@@ -89,6 +89,7 @@ describe(commands.PAGE_SECTION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -137,7 +138,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' }) });
     assert(loggerLogSpy.calledWith({
       columns: [{
         "order": 1,
@@ -218,7 +219,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -231,7 +232,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' }) });
     assert(loggerLogSpy.calledWith({
       "order": 1,
       "columns": [
@@ -256,7 +257,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', section: 1, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', section: 1, output: 'text' }) });
     assert(loggerLogSpy.calledWith({
       "order": 1,
       "columns": [
@@ -281,7 +282,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1 }) });
     const result = JSON.stringify(log[0]).replace(/zoneId&quot;&#58;&quot;[a-f0-9-]+&quot;/g, 'zoneId&quot;&#58;&quot;086e39eb-ac57-42d3-8f6d-7bbdb7b2fbdb&quot;');
     assert.strictEqual(result, JSON.stringify({
       "order": 1,
@@ -362,7 +363,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'text', section: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'text', section: 1 }) });
     assert(loggerLogSpy.calledWith({
       "order": 1,
       "columns": [{
@@ -436,7 +437,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', sectipn: 1 } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', sectipn: 1 } }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
@@ -455,7 +456,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) }),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -464,35 +465,33 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', pageName: 'home.aspx', section: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', pageName: 'home.aspx', section: 1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the section option is not specifed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the section option is not specifed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the section option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the section option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1 });
+    assert.strictEqual(actual.success, true);
   });
 });

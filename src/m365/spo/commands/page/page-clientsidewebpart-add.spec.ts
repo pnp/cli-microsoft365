@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './page-clientsidewebpart-add.js';
+import command, { options } from './page-clientsidewebpart-add.js';
 
 describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const clientSideWebParts = {
     value: [
       {
@@ -52,6 +53,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -142,11 +144,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-      }
+      })
     }));
     assert.deepEqual(checkedOut, true);
   });
@@ -204,12 +206,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-      }
+      })
     }));
     assert.deepEqual(checkedOut, true);
   });
@@ -267,11 +269,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-      }
+      })
     });
     assert.deepEqual(checkingOut, false);
   });
@@ -304,11 +306,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -389,12 +391,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -475,12 +477,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 5
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -561,11 +563,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -687,12 +689,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -814,12 +816,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 2
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -941,12 +943,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1108,12 +1110,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1275,12 +1277,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 2
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1442,12 +1444,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 5
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1609,11 +1611,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1735,11 +1737,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1810,12 +1812,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           verticalSection: true
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1906,12 +1908,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           verticalSection: true
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -1982,12 +1984,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           verticalSection: true
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([{
@@ -2071,13 +2073,13 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           webPartProperties: '{"title":"Location"}'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -2183,11 +2185,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'foo.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       }), new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist'));
   });
 
@@ -2209,11 +2211,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       }), new CommandError('An error has occurred'));
   });
 
@@ -2239,11 +2241,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       }), new CommandError('An error has occurred'));
   });
 
@@ -2280,8 +2282,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           webPartProperties: '{"foo" }'
-        }
-      });
+        }    });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
         {
@@ -2400,12 +2401,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
-        }
-      }), new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`));
+          webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaaaa'
+        })
+      }), new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaaaa.`));
   });
 
   it('correctly handles error if target page is not a modern page', async () => {
@@ -2429,11 +2430,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
-        }
+          webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaaaa'
+        })
       }), new CommandError(`This page does not have the site page content type. Only site pages can be served with this API.`));
   });
 
@@ -2455,12 +2456,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           section: 8
-        }
+        })
       }), new CommandError("Invalid section '8'"));
   });
 
@@ -2482,13 +2483,13 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           section: 1,
           column: 7
-        }
+        })
       }), new CommandError("Invalid column '7'"));
   });
 
@@ -2520,12 +2521,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","serverProcessedContent": {"htmlStrings": {},"searchablePlainTexts": {},"imageSources": {},"links": {}},"properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}}}'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -2642,13 +2643,13 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","serverProcessedContent": {"htmlStrings": {},"searchablePlainTexts": {},"imageSources": {},"links": {}},"properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}}}'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -2765,13 +2766,13 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","dataVersion": "1.0", "dynamicDataPaths":{"dynamicProperty0":"WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText"},"dynamicDataValues":{"dynamicProperty1":""}}'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -2892,12 +2893,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"innerHTML\\":\\"<p>test</p>\\",\\"emphasis\\":{\\"zoneEmphasis\\":0},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"}},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}}]"}');
   });
@@ -2928,12 +2929,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":0,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"zoneGroupMetadata\\":{\\"type\\":0,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"innerHTML\\":\\"<p>test</p>\\"},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}},{\\"controlType\\":14,\\"webPartData\\":{\\"properties\\":{\\"zoneBackground\\":{\\"e524fc79-e526-4da5-82e6-361018dedc67\\":{\\"type\\":\\"gradient\\",\\"gradient\\":\\"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%),linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)\\",\\"useLightText\\":true,\\"overlay\\":{\\"color\\":\\"#000000\\",\\"opacity\\":60}}}},\\"serverProcessedContent\\":{\\"htmlStrings\\":{},\\"searchablePlainTexts\\":{},\\"imageSources\\":{},\\"links\\":{}},\\"dataVersion\\":\\"1.0\\"}}]"}');
   });
@@ -2964,11 +2965,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(postStub.lastCall.args[0].data)), '{"CanvasContent1":"[{\\"controlType\\":4,\\"editorType\\":\\"CKEditor\\",\\"id\\":\\"24cebf73-d376-48e5-9b76-39b967c8dfd9\\",\\"position\\":{\\"controlIndex\\":1,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"addedFromPersistedData\\":true,\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"innerHTML\\":\\"<p>test</p>\\"},{\\"controlType\\":3,\\"displayMode\\":2,\\"id\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"position\\":{\\"controlIndex\\":2,\\"sectionFactor\\":12,\\"sectionIndex\\":1,\\"zoneIndex\\":1,\\"zoneId\\":\\"e524fc79-e526-4da5-82e6-361018dedc67\\"},\\"webPartId\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"emphasis\\":{},\\"zoneGroupMetadata\\":{\\"type\\":1,\\"isExpanded\\":true,\\"showDividerLine\\":false,\\"iconAlignment\\":\\"left\\",\\"displayName\\":\\"Test\\"},\\"webPartData\\":{\\"dataVersion\\":\\"1.0\\",\\"description\\":\\"Display a key location on a map\\",\\"id\\":\\"e377ea37-9047-43b9-8cdb-a761be2f8e09\\",\\"instanceId\\":\\"89c644b3-f69c-4e84-85d7-dfa04c6163b5\\",\\"properties\\":{\\"pushPins\\":[],\\"maxNumberOfPushPins\\":1,\\"shouldShowPushPinTitle\\":true,\\"zoomLevel\\":12,\\"mapType\\":\\"road\\"},\\"title\\":\\"Bing maps\\"}},{\\"controlType\\":0,\\"pageSettingsSlice\\":{\\"isDefaultDescription\\":true,\\"isDefaultThumbnail\\":true,\\"isSpellCheckEnabled\\":true,\\"globalRichTextStylingVersion\\":1,\\"rtePageSettings\\":{\\"contentVersion\\":5,\\"indentationVersion\\":2},\\"isEmailReady\\":false,\\"webPartsPageSettings\\":{\\"isTitleHeadingLevelsEnabled\\":false}}},{\\"controlType\\":14,\\"webPartData\\":{\\"properties\\":{\\"zoneBackground\\":{\\"e524fc79-e526-4da5-82e6-361018dedc67\\":{\\"type\\":\\"gradient\\",\\"gradient\\":\\"radial-gradient(55.05% 96.28% at -5.05% -8.89%, #585984 0%, rgba(88, 89, 132, 0) 100%), linear-gradient(72.98deg, #AD8D8E 0.02%, #2A2A56 102.53%)\\",\\"useLightText\\":true,\\"overlay\\":{\\"color\\":\\"#000000\\",\\"opacity\\":60}}}},\\"serverProcessedContent\\":{\\"htmlStrings\\":{},\\"searchablePlainTexts\\":{},\\"imageSources\\":{},\\"links\\":{}},\\"dataVersion\\":\\"1.0\\"}}]"}');
   });
@@ -2999,14 +3000,13 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       throw 'Invalid request';
     });
 
-
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
-        }
+        })
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
       CanvasContent1: JSON.stringify([
@@ -3090,309 +3090,190 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert(containsOption);
   });
 
-  it('supports specifying page name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--pageName') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webUrl is not an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'foo', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'http://foo',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'http://foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('supports specifying webUrl', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--webUrl') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webPartId value is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: 'FooBar'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The webPartId 'FooBar' is not a valid GUID`);
   });
 
-  it('supports specifying webPartId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--webPartId') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webPartProperties and webPartData are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      webPartProperties: '{}',
+      webPartData: '{}'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying standardWebPart', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--standardWebPart') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webPartProperties value is not valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      webPartProperties: '{Foo:bar'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'Specified webPartProperties is not a valid JSON string.');
   });
 
-  it('supports specifying webPartProperties', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--webPartProperties') > -1) {
-        containsOption = true;
-      }
+  it('passes validation when webPartProperties value is valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      webPartProperties: '{}'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying section', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--section') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webPartData value is not valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      webPartData: '{Foo:bar'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'Specified webPartData is not a valid JSON string.');
   });
 
-  it('supports specifying column', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--column') > -1) {
-        containsOption = true;
-      }
+  it('passes validation when webPartData value is valid JSON', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      webPartData: '{}'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying order', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--order') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if standardWebPart is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'Foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'Foo is not a valid standard web part type');
+  });
+
+  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying verticalSection', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--verticalSection') > -1) {
-        containsOption = true;
-      }
+  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when name has no extension', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if webUrl is not an absolute URL', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'foo', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if standardWebPart is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'http://foo',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if section has invalid (negative) value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      section: -1
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The value of parameter section must be 1 or higher');
   });
 
-  it('fails validation if webPartId value is not valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: 'FooBar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if section has invalid (non number) value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      section: 'foobar'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webPartProperties and webPartData are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        webPartProperties: '{}',
-        webPartData: '{}'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if column has invalid (negative) value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      column: -1
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The value of parameter column must be 1 or higher');
   });
 
-  it('fails validation if webPartProperties value is not valid JSON', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        webPartProperties: '{Foo:bar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if column has invalid (non number) value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      column: 'foobar'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when webPartProperties value is valid JSON', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        webPartProperties: '{}'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if both the section and verticalSection parameters are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      section: 1,
+      verticalSection: true
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webPartData value is not valid JSON', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        webPartData: '{Foo:bar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('Fails validation if both the column and verticalSection parameters are specified.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      column: 1,
+      verticalSection: true
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when webPartData value is valid JSON', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        webPartData: '{}'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if standardWebPart is not valid', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'Foo' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when name has no extension', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if standardWebPart is valid', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if section has invalid (negative) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        section: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if section has invalid (non number) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        section: 'foobar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if column has invalid (negative) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        column: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if column has invalid (non number) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        column: 'foobar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both the section and verticalSection parameters are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        section: 1,
-        verticalSection: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('Fails validation if both the column and verticalSection parameters are specified.', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        column: 1,
-        verticalSection: true
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
