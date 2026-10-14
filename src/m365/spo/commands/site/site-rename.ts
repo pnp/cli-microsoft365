@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { FormDigestInfo, spo } from '../../../../utils/spo.js';
@@ -7,17 +8,20 @@ import { timersUtil } from '../../../../utils/timersUtil.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string().alias('u'),
+  newUrl: z.string(),
+  newTitle: z.string().optional(),
+  suppressMarketplaceAppCheck: z.boolean().optional(),
+  suppressWorkflow2013Check: z.boolean().optional(),
+  wait: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
-  newUrl: string;
-  newTitle?: string;
-  suppressMarketplaceAppCheck?: boolean;
-  suppressWorkflow2013Check?: boolean;
-  wait?: boolean;
 }
 
 interface SiteRenameJob {
@@ -38,58 +42,16 @@ class SpoSiteRenameCommand extends SpoCommand {
     return 'Renames the URL and title of a site collection';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        newTitle: typeof args.options.newTitle !== 'undefined',
-        suppressMarketplaceAppCheck: !!args.options.suppressMarketplaceAppCheck,
-        suppressWorkflow2013Check: !!args.options.suppressWorkflow2013Check,
-        wait: !!args.options.wait
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => o.url.toLowerCase() !== o.newUrl.toLowerCase(), {
+        error: 'The new URL cannot be the same as the target URL.',
+        path: ['newUrl']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--newUrl <newUrl>'
-      },
-      {
-        option: '--newTitle [newTitle]'
-      },
-      {
-        option: '--suppressMarketplaceAppCheck'
-      },
-      {
-        option: '--suppressWorkflow2013Check'
-      },
-      {
-        option: '--wait'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.url.toLowerCase() === args.options.newUrl.toLowerCase()) {
-          return 'The new URL cannot be the same as the target URL.';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
