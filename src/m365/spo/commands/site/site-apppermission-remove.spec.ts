@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-apppermission-remove.js';
+import command, { options } from './site-apppermission-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   let deleteRequestStub: sinon.SinonStub;
@@ -65,6 +66,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -119,7 +121,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation with an incorrect URL', async () => {
+  it('fails validation with an incorrect URL', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -128,35 +130,31 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, "'https;//contoso,sharepoint:com/sites/sitecollection-name' is not a valid SharePoint Online site URL.");
   });
 
-  it('passes validation with a correct URL and a filter value', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appId: '00000000-0000-0000-0000-000000000000'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with a correct URL and a filter value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appId: '00000000-0000-0000-0000-000000000000'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appId: '123'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appId: '123'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, "'123' is not a valid GUID.");
   });
 
-  it('fails validation if appId or appDisplayName or id options are not passed', async () => {
+  it('fails validation if appId or appDisplayName or id options are not passed', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -165,15 +163,13 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId, appDisplayName and id options are passed (multiple options)', async () => {
+  it('fails validation if appId, appDisplayName and id options are passed (multiple options)', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -182,18 +178,16 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
-        appDisplayName: 'Foo',
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
+      appDisplayName: 'Foo',
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId and appDisplayName both are passed (multiple options)', async () => {
+  it('fails validation if appId and appDisplayName both are passed (multiple options)', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -202,17 +196,15 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
-        appDisplayName: 'Foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
+      appDisplayName: 'Foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId and id options are passed (multiple options)', async () => {
+  it('fails validation if appId and id options are passed (multiple options)', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -221,17 +213,15 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appDisplayName and id options are passed (multiple options)', async () => {
+  it('fails validation if appDisplayName and id options are passed (multiple options)', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -240,22 +230,20 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        appDisplayName: 'Foo',
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appDisplayName: 'Foo',
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the site apppermission when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
-      }
+      })
     });
     assert(promptIssued);
   });
@@ -266,10 +254,10 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
-      }
+      })
     });
     assert(deleteRequestStub.notCalled);
   });
@@ -297,11 +285,11 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
@@ -329,11 +317,11 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
         force: true
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
@@ -361,11 +349,11 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
         force: true
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
@@ -376,11 +364,11 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
         force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });
