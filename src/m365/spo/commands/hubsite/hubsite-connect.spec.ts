@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-connect.js';
+import command, { options } from './hubsite-connect.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_CONNECT, () => {
@@ -45,6 +45,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
@@ -54,6 +55,7 @@ describe(commands.HUBSITE_CONNECT, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -108,39 +110,68 @@ describe(commands.HUBSITE_CONNECT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'Invalid', parentTitle: parentTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'Invalid', parentTitle: parentTitle });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid GUID`);
   });
 
-  it('fails validation if parentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { title: title, parentId: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if parentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, parentId: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid GUID`);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'Invalid', parentTitle: parentTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'Invalid', parentTitle: parentTitle });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if parentUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { title: title, parentUrl: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if parentUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, parentUrl: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if valid id and parentId are specified', async () => {
-    const actual = await command.validate({ options: { id: id, parentId: parentId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, title: title, parentId: parentId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if title and parentTitle are specified', async () => {
-    const actual = await command.validate({ options: { title: title, parentTitle: parentTitle } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if parentId and parentTitle are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, parentId: parentId, parentTitle: parentTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if url and parentUrl are specified', async () => {
-    const actual = await command.validate({ options: { url: url, parentUrl: parentUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if no hub site is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ parentId: parentId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if no parent hub site is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, parentId: parentId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if valid id and parentId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, parentId: parentId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if title and parentTitle are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, parentTitle: parentTitle });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if url and parentUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: url, parentUrl: parentUrl });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly connects hub site to parent hub site by id', async () => {
@@ -156,11 +187,11 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: id,
         parentId: parentId
-      }
+      })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: parentId });
     assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
@@ -179,11 +210,11 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         title: title,
         parentTitle: parentTitle
-      }
+      })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: parentId });
     assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
@@ -202,11 +233,11 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         url: url,
         parentUrl: parentUrl
-      }
+      })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: parentId });
     assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
@@ -216,10 +247,10 @@ describe(commands.HUBSITE_CONNECT, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         parentId: parentId
-      }
+      })
     }), new CommandError(`The specified hub site '${id}' does not exist.`));
   });
 
@@ -227,10 +258,10 @@ describe(commands.HUBSITE_CONNECT, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         parentTitle: parentTitle
-      }
+      })
     }), new CommandError(`The specified hub site '${title}' does not exist.`));
   });
 
@@ -238,10 +269,10 @@ describe(commands.HUBSITE_CONNECT, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: url,
         parentUrl: parentUrl
-      }
+      })
     }), new CommandError(`The specified hub site '${url}' does not exist.`));
   });
 
@@ -268,10 +299,10 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         parentUrl: parentUrl
-      }
+      })
     }), new CommandError("Multiple hub sites with name 'Hub Site' found. Found: 55b979e7-36b6-4968-b3af-6ae221a3483f, f7510a39-8423-43fd-aed8-e3b11d043e0f."));
   });
 
@@ -313,11 +344,11 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         title: title,
         parentTitle: parentTitle
-      }
+      })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
   });
@@ -334,10 +365,10 @@ describe(commands.HUBSITE_CONNECT, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         parentUrl: parentUrl
-      }
+      })
     }), new CommandError('Something went wrong'));
   });
 });

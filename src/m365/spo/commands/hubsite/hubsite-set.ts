@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -9,15 +10,20 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { HubSiteProperties } from './HubSiteProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} is not a valid GUID`
+  }).alias('i'),
+  title: z.string().optional().alias('t'),
+  description: z.string().optional().alias('d'),
+  logoUrl: z.string().optional().alias('l')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  title?: string;
-  description?: string;
-  logoUrl?: string;
 }
 
 class SpoHubSiteSetCommand extends SpoCommand {
@@ -29,62 +35,15 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return 'Updates properties of the specified hub site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title === 'string',
-        description: typeof args.options.description === 'string',
-        logoUrl: typeof args.options.logoUrl === 'string'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.title !== undefined || opts.description !== undefined || opts.logoUrl !== undefined, {
+        error: 'Specify title, description or logoUrl to update'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --logoUrl [logoUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (!args.options.title &&
-          !args.options.description &&
-          !args.options.logoUrl) {
-          return 'Specify title, description or logoUrl to update';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('t', 'title', 'd', 'description', 'l', 'logoUrl');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
