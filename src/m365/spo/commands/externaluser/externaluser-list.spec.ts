@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './externaluser-list.js';
+import command, { options } from './externaluser-list.js';
 
 describe(commands.EXTERNALUSER_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +36,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -98,7 +100,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -134,7 +136,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -170,7 +172,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, pageSize: '50' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageSize: '50' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -206,7 +208,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, position: '1', pageSize: '50' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, position: '1', pageSize: '50' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -242,7 +244,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, filter: 'Vesa' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, filter: 'Vesa' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -278,7 +280,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, sortOrder: 'desc' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, sortOrder: 'desc' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -314,7 +316,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -350,7 +352,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -386,7 +388,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -422,7 +424,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, position: '1', pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, position: '1', pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -458,7 +460,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, filter: 'Vesa', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, filter: 'Vesa', siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -494,7 +496,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, sortOrder: 'desc', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, sortOrder: 'desc', siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -530,7 +532,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, filter: '<Vesa', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, filter: '<Vesa', siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([{
       DisplayName: '<Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -557,7 +559,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]);
     });
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -571,138 +573,94 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('File Not Found.'));
   });
 
   it('correctly handles a random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying page size', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--pageSize') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying page number', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--position') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when no options have been specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying filter', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--filter') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation when page size is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: 'a' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying sort order', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--sortOrder') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation when page size is a negative number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '-10' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'pageSize must be between 1 and 50. The specified value -10 is not valid.');
   });
 
-  it('supports specifying site URL', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--siteUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation when page size is > 50', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '51' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'pageSize must be between 1 and 50. The specified value 51 is not valid.');
   });
 
-  it('passes validation when no options have been specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when page size is 0 < x <= 50 (min)', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when page size is not a number', async () => {
-    const actual = await command.validate({ options: { pageSize: 'a' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when page size is 0 < x <= 50 (max)', () => {
+    const actual = commandOptionsSchema.safeParse({ pageSize: '50' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when page size is a negative number', async () => {
-    const actual = await command.validate({ options: { pageSize: '-10' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when page number is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ position: 'a' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'position must be greater than or equal to 0. The specified value a is not valid.');
   });
 
-  it('fails validation when page size is > 50', async () => {
-    const actual = await command.validate({ options: { pageSize: '51' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when page number is a negative number', () => {
+    const actual = commandOptionsSchema.safeParse({ position: '-1' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'position must be greater than or equal to 0. The specified value -1 is not valid.');
   });
 
-  it('passes validation when page size is 0 < x <= 50 (min)', async () => {
-    const actual = await command.validate({ options: { pageSize: '1' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when page number is a positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ position: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when page size is 0 < x <= 50 (max)', async () => {
-    const actual = await command.validate({ options: { pageSize: '50' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when sort order contains invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ sortOrder: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when page number is not a number', async () => {
-    const actual = await command.validate({ options: { position: 'a' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when sort order is set to asc', () => {
+    const actual = commandOptionsSchema.safeParse({ sortOrder: 'asc' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when page number is a negative number', async () => {
-    const actual = await command.validate({ options: { position: '-1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when sort order is set to desc', () => {
+    const actual = commandOptionsSchema.safeParse({ sortOrder: 'desc' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when page number is a positive number', async () => {
-    const actual = await command.validate({ options: { position: '1' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when site URL is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
   });
 
-  it('fails validation when sort order contains invalid value', async () => {
-    const actual = await command.validate({ options: { sortOrder: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when sort order is set to asc', async () => {
-    const actual = await command.validate({ options: { sortOrder: 'asc' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when sort order is set to desc', async () => {
-    const actual = await command.validate({ options: { sortOrder: 'desc' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when site URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when site URL is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when site URL is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 });
+
 
