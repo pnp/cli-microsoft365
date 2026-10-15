@@ -1,21 +1,38 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
+const appCatalogScopeOptions = { tenant: 'tenant', sitecollection: 'sitecollection' } as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional()
+    .alias('i'),
+  name: z.string().optional().alias('n'),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u'),
+  skipFeatureDeployment: z.boolean().optional(),
+  appCatalogScope: zod.coercedEnum(appCatalogScopeOptions).optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appCatalogScope?: string;
-  appCatalogUrl?: string;
-  id?: string;
-  name?: string;
-  skipFeatureDeployment?: boolean;
 }
 
 class SpoAppDeployCommand extends SpoAppBaseCommand {
@@ -27,78 +44,26 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     return 'Deploys the specified app in the specified app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        name: (!(!args.options.name)).toString(),
-        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
-        skipFeatureDeployment: args.options.skipFeatureDeployment || false,
-        appCatalogScope: (!(!args.options.appCatalogScope)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'id' or 'name', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
+      })
+      .refine(opts => opts.appCatalogScope !== 'sitecollection' || opts.appCatalogUrl !== undefined, {
+        error: 'You must specify appCatalogUrl when the appCatalogScope is sitecollection',
+        path: ['appCatalogUrl'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      },
-      {
-        option: '--skipFeatureDeployment'
-      },
-      {
-        option: '-s, --appCatalogScope [appCatalogScope]',
-        autocomplete: ['tenant', 'sitecollection']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        // verify either 'tenant' or 'sitecollection' specified if scope provided
-        if (args.options.appCatalogScope) {
-          const testScope: string = args.options.appCatalogScope.toLowerCase();
-          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `appCatalogScope must be either 'tenant' or 'sitecollection'`;
-          }
-
-          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
-          }
-        }
-
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.appCatalogUrl) {
-          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

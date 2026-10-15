@@ -13,12 +13,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-teamspackage-download.js';
+import command, { options } from './app-teamspackage-download.js';
 
 describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -105,7 +107,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' }) });
     assert(fsStub.calledOnce);
   });
 
@@ -142,7 +144,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemId: 2 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2 }) });
     assert(fsStub.calledOnce);
   });
 
@@ -179,7 +181,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemId: 2, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2, debug: true }) });
     assert(fsStub.calledOnce);
   });
 
@@ -217,7 +219,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: 'm365-spfx-wellbeing.sppkg' }) });
     assert(fsStub.calledOnce);
   });
 
@@ -255,7 +257,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: 'm365-spfx-wellbeing.sppkg' }) });
     assert(fsStub.calledWith('m365-spfx-wellbeing.zip'));
   });
 
@@ -296,7 +298,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', fileName: 'package.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', fileName: 'package.zip' }) });
     assert(fsStub.calledWith('package.zip'));
   });
 
@@ -335,7 +337,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemId: 2, fileName: 'package.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2, fileName: 'package.zip' }) });
     assert(fsStub.calledWith('package.zip'));
   });
 
@@ -373,7 +375,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', fileName: 'package.zip' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: 'm365-spfx-wellbeing.sppkg', fileName: 'package.zip' }) });
     assert(fsStub.calledWith('package.zip'));
   });
 
@@ -408,7 +410,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appItemId: 2, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) });
     assert(fsStub.calledOnce);
   });
 
@@ -421,7 +423,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: 'm365-spfx-wellbeing.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }) }),
       new CommandError(`404 FILE NOT FOUND`));
   });
 
@@ -448,7 +450,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' }) }),
       new CommandError(`Value does not fall within the expected range.`));
   });
 
@@ -475,7 +477,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2 }) }),
       new CommandError('Item does not exist. It may have been deleted by another user.'));
   });
 
@@ -502,7 +504,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: 'm365-spfx-wellbeing.sppkg' }) }),
       new CommandError('File Not Found.'));
   });
 
@@ -527,7 +529,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2 }) }),
       new CommandError('Request failed with status code 404'));
   });
 
@@ -566,74 +568,88 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appItemId: 2 }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { appItemId: 1, appCatalogUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, appCatalogUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when the appCatalogUrl is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { appItemId: 1, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the appCatalogUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the appCatalogUrl is not specified', async () => {
-    const actual = await command.validate({ options: { appItemId: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the appCatalogUrl is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the appItemId is not a number', async () => {
-    const actual = await command.validate({ options: { appItemId: 'a' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the appItemId is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 'a' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Invalid input: expected number, received string');
   });
 
-  it('passes validation when the appItemId is a number', async () => {
-    const actual = await command.validate({ options: { appItemId: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the appItemId is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the appItemUniqueId is not a GUID', async () => {
-    const actual = await command.validate({ options: { appItemUniqueId: 'a' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the appItemUniqueId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemUniqueId: 'a' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'a is not a valid GUID');
   });
 
-  it('passes validation when the appItemUniqueId is a GUID', async () => {
-    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the appItemUniqueId is a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the specified file already exists', async () => {
+  it('fails validation when the specified file already exists', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { appItemId: 1, fileName: 'file.zip' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, fileName: 'file.zip' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'File file.zip already exists');
   });
 
-  it('passes validation when the specified file does not exist', async () => {
+  it('passes validation when the specified file does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { appItemId: 1, fileName: 'file.zip' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, fileName: 'file.zip' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the appItemUniqueId and appItemId specified', async () => {
-    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the appItemUniqueId and appItemId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appItemId: 1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify appItemUniqueId, appItemId or appName but not multiple');
   });
 
-  it('fails validation when the appItemUniqueId and appName specified', async () => {
-    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appName: 'app.sppkg' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the appItemUniqueId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appName: 'app.sppkg' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify appItemUniqueId, appItemId or appName but not multiple');
   });
 
-  it('fails validation when the appItemId and appName specified', async () => {
-    const actual = await command.validate({ options: { appItemId: 1, appName: 'app.sppkg' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the appItemId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, appName: 'app.sppkg' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify appItemUniqueId, appItemId or appName but not multiple');
   });
 
-  it('fails validation when no app identifier specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when no app identifier specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify appItemUniqueId, appItemId or appName but not multiple');
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appItemId: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 });
