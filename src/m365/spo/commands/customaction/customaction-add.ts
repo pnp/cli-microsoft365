@@ -1,35 +1,54 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { BasePermissions, PermissionKind } from '../../base-permissions.js';
 import commands from '../../commands.js';
 import { CustomAction } from './customaction.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  name: z.string().alias('n'),
+  title: z.string().alias('t'),
+  location: z.string().alias('l'),
+  group: z.string().optional().alias('g'),
+  description: z.string().optional().alias('d'),
+  sequence: z.coerce.number().refine(val => val >= 0 && val <= 65536, {
+    message: 'Invalid option sequence. Expected value in range from 0 to 65536'
+  }).optional(),
+  actionUrl: z.string().optional(),
+  imageUrl: z.string().optional(),
+  commandUIExtension: z.string().optional().alias('e'),
+  registrationId: z.string().optional(),
+  registrationType: z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType']).optional(),
+  rights: z.string().refine(val => {
+    const items = val.split(',').map(s => s.trim());
+    return items.every(item => PermissionKind[(item as keyof typeof PermissionKind)] !== undefined);
+  }, {
+    error: e => {
+      const items = (e.input as string).split(',').map((s: string) => s.trim());
+      const invalid = items.find((item: string) => !PermissionKind[(item as keyof typeof PermissionKind)]);
+      return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
+    }
+  }).optional(),
+  scriptSrc: z.string().optional(),
+  scriptBlock: z.string().optional(),
+  scope: z.enum(['Site', 'Web']).optional().alias('s'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `ClientSideComponentId ${e.input} is not a valid GUID`
+  }).optional().alias('c'),
+  clientSideComponentProperties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  title: string;
-  location: string;
-  group?: string;
-  description?: string;
-  sequence?: number;
-  actionUrl?: string;
-  imageUrl?: string;
-  commandUIExtension?: string;
-  registrationId?: string;
-  registrationType?: string;
-  rights?: string;
-  scriptSrc?: string;
-  scriptBlock?: string;
-  scope?: string;
-  clientSideComponentId?: string;
-  clientSideComponentProperties?: string;
 }
 
 class SpoCustomActionAddCommand extends SpoCommand {
@@ -41,176 +60,71 @@ class SpoCustomActionAddCommand extends SpoCommand {
     return 'Adds a user custom action for site or site collection';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        location: args.options.location,
-        scope: args.options.scope || 'Web',
-        group: (!(!args.options.group)).toString(),
-        description: (!(!args.options.description)).toString(),
-        sequence: (!(!args.options.sequence)).toString(),
-        actionUrl: (!(!args.options.actionUrl)).toString(),
-        imageUrl: (!(!args.options.imageUrl)).toString(),
-        commandUIExtension: (!(!args.options.commandUIExtension)).toString(),
-        registrationId: args.options.registrationId,
-        registrationType: args.options.registrationType,
-        rights: args.options.rights,
-        scriptSrc: (!(!args.options.scriptSrc)).toString(),
-        scriptBlock: (!(!args.options.scriptBlock)).toString(),
-        clientSideComponentId: (!(!args.options.clientSideComponentId)).toString(),
-        clientSideComponentProperties: (!(!args.options.clientSideComponentProperties)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-l, --location <location>'
-      },
-      {
-        option: '-g, --group [group]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--sequence [sequence]'
-      },
-      {
-        option: '--actionUrl [actionUrl]'
-      },
-      {
-        option: '--imageUrl [imageUrl]'
-      },
-      {
-        option: '-e, --commandUIExtension [commandUIExtension]'
-      },
-      {
-        option: '--registrationId [registrationId]'
-      },
-      {
-        option: '--registrationType [registrationType]',
-        autocomplete: ['None', 'List', 'ContentType', 'ProgId', 'FileType']
-      },
-      {
-        option: '--rights [rights]',
-        autocomplete: this.permissionsKindMap
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web']
-      },
-      {
-        option: '--scriptBlock [scriptBlock]'
-      },
-      {
-        option: '--scriptSrc [scriptSrc]'
-      },
-      {
-        option: '-c, --clientSideComponentId [clientSideComponentId]'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.registrationId || opts.registrationType, {
+        message: 'Option registrationId is specified, but registrationType is missing',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !opts.registrationType || opts.registrationId, {
+        message: 'Option registrationType is specified, but registrationId is missing',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => {
+        if (!opts.location) {
+          return true;
         }
-
-        if (args.options.registrationId && !args.options.registrationType) {
-          return 'Option registrationId is specified, but registrationType is missing';
-        }
-
-        if (args.options.registrationType && !args.options.registrationId) {
-          return 'Option registrationType is specified, but registrationId is missing';
-        }
-
-        const location: string = args.options.location.toLowerCase();
-        const locationsRequireGroup: string[] = [
+        const location = opts.location.toLowerCase();
+        const locationsRequireGroup = [
           'microsoft.sharepoint.standardmenu', 'microsoft.sharepoint.contenttypesettings',
           'microsoft.sharepoint.contenttypetemplatesettings', 'microsoft.sharepoint.create',
           'microsoft.sharepoint.groupspage', 'microsoft.sharepoint.listedit',
           'microsoft.sharepoint.listedit.documentlibrary', 'microsoft.sharepoint.peoplepage',
           'microsoft.sharepoint.sitesettings'
         ];
-
-        if (locationsRequireGroup.indexOf(location) > -1 && !args.options.group) {
-          return `The location specified requires the group option to be specified as well`;
+        return !locationsRequireGroup.includes(location) || !!opts.group;
+      }, {
+        message: 'The location specified requires the group option to be specified as well',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => {
+        if (!opts.location) {
+          return true;
         }
-
-        if (location === 'scriptlink' &&
-          !args.options.scriptSrc &&
-          !args.options.scriptBlock
-        ) {
-          return 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink';
+        const location = opts.location.toLowerCase();
+        if (location === 'scriptlink') {
+          return !!opts.scriptSrc || !!opts.scriptBlock;
         }
-
-        if ((args.options.scriptSrc || args.options.scriptBlock) && location !== 'scriptlink') {
-          return 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink';
-        }
-
-        if (args.options.scriptSrc && args.options.scriptBlock) {
-          return 'Either option scriptSrc or scriptBlock can be specified, but not both';
-        }
-
-        if (args.options.sequence && (args.options.sequence < 0 || args.options.sequence > 65536)) {
-          return 'Invalid option sequence. Expected value in range from 0 to 65536';
-        }
-
-        if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
-          return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentProperties && !args.options.clientSideComponentId) {
-          return `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`;
-        }
-
-        if (args.options.scope &&
-          args.options.scope !== 'Site' &&
-          args.options.scope !== 'Web'
-        ) {
-          return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web`;
-        }
-
-        if (args.options.rights) {
-          const rights = args.options.rights.split(',');
-
-          for (const item of rights) {
-            const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-
-            if (!kind) {
-              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
-            }
-          }
-        }
-
         return true;
-      }
-    );
+      }, {
+        message: 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => {
+        if (!opts.location) {
+          return true;
+        }
+        const location = opts.location.toLowerCase();
+        if ((opts.scriptSrc || opts.scriptBlock) && location !== 'scriptlink') {
+          return false;
+        }
+        return true;
+      }, {
+        message: 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !(opts.scriptSrc && opts.scriptBlock), {
+        message: 'Either option scriptSrc or scriptBlock can be specified, but not both',
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !opts.clientSideComponentProperties || opts.clientSideComponentId, {
+        message: 'Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing',
+        params: { customCode: 'required' }
+      });
   }
 
   /**
