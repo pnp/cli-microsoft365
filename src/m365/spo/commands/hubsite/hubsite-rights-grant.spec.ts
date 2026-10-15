@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-rights-grant.js';
+import command, { options } from './hubsite-rights-grant.js';
 
 describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   let log: string[];
@@ -21,6 +21,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -91,7 +93,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -111,7 +113,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -131,7 +133,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -151,7 +153,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -171,7 +173,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -191,7 +193,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -210,27 +212,34 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' }) }),
       new CommandError('File Not Found.'));
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'abc', principals: 'admin', rights: 'Join' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'abc', principals: 'admin', rights: 'Join' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if specified rights value is invalid', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified rights value is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'Invalid is not a valid rights value. Allowed values Join');
   });
 
-  it('passes validation if all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if all required parameters are valid (multiple principals)', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required parameters are valid (multiple principals)', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

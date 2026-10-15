@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-register.js';
+import command, { options } from './hubsite-register.js';
 
 describe(commands.HUBSITE_REGISTER, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +34,7 @@ describe(commands.HUBSITE_REGISTER, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -88,7 +90,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -119,7 +121,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/sales' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -145,17 +147,23 @@ describe(commands.HUBSITE_REGISTER, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' }) }),
       new CommandError('This site is already a HubSite.'));
   });
 
-  it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'site.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the specified site collection URL is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'site.com' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'site.com' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
