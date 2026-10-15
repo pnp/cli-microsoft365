@@ -22,7 +22,7 @@ m365 spo file sharinginfo get [options]
 : The server- or site-relative decoded URL of the file for which to build the report. Specify either `fileUrl` or `fileId` but not both.
 
 `-i, --fileId [fileId]`
-: The UniqueId (GUID) of the file for which to build the report. Specify either `fileUrl` or `fileId` but not both.
+: The unique ID (GUID) of the file for which to build the report. Specify either `fileUrl` or `fileId` but not both.
 ```
 
 <Global />
@@ -54,7 +54,7 @@ Get file sharing information report for the file with the specified server-relat
 m365 spo file sharinginfo get --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl "/sites/M365CLI/Shared Documents/SharedFile.docx"
 ```
 
-Get file sharing information report for file with the specified id (UniqueId) located in the specified site.
+Get file sharing information report for file with the specified id (unique ID) located in the specified site.
 
 ```sh
 m365 spo file sharinginfo get --webUrl https://contoso.sharepoint.com/sites/project-x --fileId "b2307a39-e878-458b-bc90-03bc578531d6"
