@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { Chat } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -11,14 +12,27 @@ import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
 import { cli } from '../../../../cli/cli.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidTeamsChatId(val), {
+    message: 'The value is not a valid Teams ChatId.'
+  }).alias('i').optional(),
+  participants: z.string().refine(val => {
+    const participants = val.trim().toLowerCase().split(',').filter(e => e && e !== '');
+    if (!participants || participants.length === 0) {
+      return false;
+    }
+    return participants.every(e => validation.isValidUserPrincipalName(e));
+  }, {
+    message: 'The option participants contains one or more invalid email addresses.'
+  }).alias('p').optional(),
+  name: z.string().alias('n').optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  participants?: string;
-  name?: string;
 }
 
 class TeamsChatGetCommand extends GraphCommand {
@@ -30,60 +44,19 @@ class TeamsChatGetCommand extends GraphCommand {
     return 'Gets a Microsoft Teams chat conversation by id, participants or chat name.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        participants: typeof args.options.participants !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.participants, opts.name].filter(x => x !== undefined).length === 1, {
+        message: 'Specify one of id, participants or name, but not more than one.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'participants', 'name']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-p, --participants [participants]'
-      },
-      {
-        option: '-n, --name [name]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidTeamsChatId(args.options.id)) {
-          return `${args.options.id} is not a valid Teams ChatId.`;
-        }
-
-        if (args.options.participants) {
-          const participants = args.options.participants.trim().toLowerCase().split(',').filter(e => e && e !== '');
-          if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
-            return `${args.options.participants} contains one or more invalid email addresses.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'participants', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
