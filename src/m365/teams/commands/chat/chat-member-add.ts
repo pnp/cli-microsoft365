@@ -47,7 +47,11 @@ class TeamsChatMemberAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.userId, options.userName].filter(x => x !== undefined).length === 1, {
-        error: 'Specify either userId or userName.'
+        message: 'Specify either userId or userName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       })
       .refine(opts => {
         if (opts.visibleHistoryStartDateTime && opts.withAllHistory) {
