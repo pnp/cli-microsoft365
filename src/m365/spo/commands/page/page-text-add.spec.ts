@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './page-text-add.js';
+import command, { options } from './page-text-add.js';
 import { mockBackgroundControlHTML, mockEmptyPage, mockFullWidthSectionHTML, mockOneColumnSectionHTML, mockPageSettingsHTML, mockThreeColumnSectionHTML, mockTwoColumnLeftSectionHTML, mockTwoColumnRightSectionHTML, mockTwoColumnsSectionHTML, mockVerticalSectionHTML } from './page.mock.js';
 
 describe(commands.PAGE_TEXT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -34,6 +35,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -148,11 +150,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -237,12 +239,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
     assert(loggerLogToStderrSpy.called);
   });
@@ -323,12 +325,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com',
           text: 'Hello world'
-        }
+        })
       });
     assert(loggerLogToStderrSpy.called);
   });
@@ -411,11 +413,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -502,12 +504,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world 1.1',
           order: 2
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world 1.1</p></div></div>';
@@ -593,11 +595,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -683,11 +685,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;false,&quot;iconAlignment&quot;&#58;&quot;left&quot;,&quot;headingLevel&quot;&#58;2,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -772,11 +774,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;false,&quot;iconAlignment&quot;&#58;&quot;left&quot;,&quot;headingLevel&quot;&#58;2,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -861,11 +863,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -950,13 +952,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1,
           column: 2
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -1041,13 +1043,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1,
           column: 2
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;,&quot;zoneGroupMetadata&quot;&#58;&#123;&quot;type&quot;&#58;1,&quot;isExpanded&quot;&#58;true,&quot;showDividerLine&quot;&#58;false,&quot;iconAlignment&quot;&#58;&quot;left&quot;,&quot;headingLevel&quot;&#58;2,&quot;displayName&quot;&#58;&quot;Test&quot;&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -1132,12 +1134,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 2
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;2,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -1222,12 +1224,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -1312,12 +1314,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1
-        }
+        })
       });
 
     const newPart = '<div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;4,&quot;editorType&quot;&#58;&quot;CKEditor&quot;,&quot;id&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;zoneId&quot;&#58;&quot;([0-9a-fA-F-]{36})&quot;,&quot;layoutIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world</p></div></div>';
@@ -1337,11 +1339,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'foo.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       }), new CommandError('The file /sites/team-a/SitePages/foo.aspx does not exist'));
   });
 
@@ -1418,11 +1420,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       }), new CommandError('An error has occurred'));
   });
 
@@ -1487,11 +1489,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
-        }
+        })
       }), new CommandError(`Page page.aspx is not a modern page.`));
   });
 
@@ -1564,12 +1566,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 8
-        }
+        })
       }), new CommandError("Invalid section '8'"));
   });
 
@@ -1642,13 +1644,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1,
           column: 7
-        }
+        })
       }), new CommandError("Invalid column '7'"));
   });
 
@@ -1729,13 +1731,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
     await assert.rejects(command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
           section: 1,
           column: 1
-        }
+        })
       }), new CommandError(errorMessage));
   });
 
@@ -1750,146 +1752,52 @@ describe(commands.PAGE_TEXT_ADD, () => {
     assert(containsOption);
   });
 
-  it('supports specifying page name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--pageName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if webUrl is not an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'foo', text: 'Hello world' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('supports specifying webUrl', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--webUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'http://foo', text: 'Hello world' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'http://foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('supports specifying section', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--section') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying column', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--column') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when name and webUrl specified, webUrl is a valid SharePoint URL and text is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying order', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option.indexOf('--order') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when name has no extension', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if webUrl is not an absolute URL', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'foo', text: 'Hello world' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if section has invalid (negative) value', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', section: -1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The value of parameter section must be 1 or higher');
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'http://foo',
-        text: 'Hello world'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if section has invalid (non number) value', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', section: 'foobar' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when name and webUrl specified, webUrl is a valid SharePoint URL and text is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if column has invalid (negative) value', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', column: -1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The value of parameter column must be 1 or higher');
   });
 
-  it('passes validation when name has no extension', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if section has invalid (negative) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world',
-        section: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if section has invalid (non number) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world',
-        section: 'foobar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if column has invalid (negative) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world',
-        column: -1
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if column has invalid (non number) value', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        text: 'Hello world',
-        column: 'foobar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if column has invalid (non number) value', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', column: 'foobar' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -12,25 +12,32 @@ import { Page } from './Page.js';
 import { PageControl } from './PageControl.js';
 import { CustomPageHeader, CustomPageHeaderProperties, CustomPageHeaderServerProcessedContent, PageHeader } from './PageHeader.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  altText: z.string().optional(),
+  authors: z.string().optional(),
+  imageUrl: z.string().optional(),
+  topicHeader: z.string().optional(),
+  layout: z.enum(['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']).optional(),
+  pageName: z.string().alias('n'),
+  showTopicHeader: z.boolean().optional(),
+  showPublishDate: z.boolean().optional(),
+  showTimeToRead: z.boolean().optional(),
+  textAlignment: z.enum(['Left', 'Center']).optional(),
+  translateX: z.number().optional().alias('x'),
+  translateY: z.number().optional().alias('y'),
+  type: z.enum(['None', 'Default', 'Custom']).optional().alias('t'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  altText?: string;
-  authors?: string;
-  imageUrl?: string;
-  topicHeader?: string;
-  layout?: string;
-  pageName: string;
-  showTopicHeader?: boolean;
-  showPublishDate?: boolean;
-  showTimeToRead?: boolean;
-  textAlignment?: string;
-  translateX?: number;
-  translateY?: number;
-  type?: string;
-  webUrl: string;
 }
 
 const BannerWebPartId: string = 'cbe7b0a9-3504-44dd-a3a3-0e5cacd07788';
@@ -44,117 +51,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return 'Sets modern page header';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        altText: typeof args.options.altText !== 'undefined',
-        authors: typeof args.options.authors !== 'undefined',
-        imageUrl: typeof args.options.imageUrl !== 'undefined',
-        topicHeader: typeof args.options.topicHeader !== 'undefined',
-        layout: args.options.layout,
-        showTopicHeader: !!args.options.showTopicHeader,
-        showPublishDate: !!args.options.showPublishDate,
-        showTimeToRead: !!args.options.showTimeToRead,
-        textAlignment: args.options.textAlignment,
-        translateX: typeof args.options.translateX !== 'undefined',
-        translateY: typeof args.options.translateY !== 'undefined',
-        type: args.options.type
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['None', 'Default', 'Custom']
-      },
-      {
-        option: '--imageUrl [imageUrl]'
-      },
-      {
-        option: '--altText [altText]'
-      },
-      {
-        option: '-x, --translateX [translateX]'
-      },
-      {
-        option: '-y, --translateY [translateY]'
-      },
-      {
-        option: '--layout [layout]',
-        autocomplete: ['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']
-      },
-      {
-        option: '--textAlignment [textAlignment]',
-        autocomplete: ['Left', 'Center']
-      },
-      {
-        option: '--showTopicHeader [showTopicHeader]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--showPublishDate [showPublishDate]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--showTimeToRead [showTimeToRead]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--topicHeader [topicHeader]'
-      },
-      {
-        option: '--authors [authors]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type && !['None', 'Default', 'Custom'].includes(args.options.type)) {
-          return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
-        }
-
-        if (args.options.translateX && isNaN(args.options.translateX)) {
-          return `${args.options.translateX} is not a valid number`;
-        }
-
-        if (args.options.translateY && isNaN(args.options.translateY)) {
-          return `${args.options.translateY} is not a valid number`;
-        }
-
-        if (args.options.layout && !['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape'].includes(args.options.layout)) {
-          return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape`;
-        }
-
-        if (args.options.textAlignment && !['Left', 'Center'].includes(args.options.textAlignment)) {
-          return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('showTimeToRead', 'showPublishDate', 'showTopicHeader');
+  public get schema(): z.ZodType {
+    return options;
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

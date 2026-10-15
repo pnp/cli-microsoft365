@@ -1,21 +1,29 @@
 import chalk from 'chalk';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ClientSidePageProperties } from './ClientSidePageProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  sourceName: z.string(),
+  targetUrl: z.string(),
+  overwrite: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  sourceName: string;
-  targetUrl: string;
-  webUrl: string;
-  overwrite?: boolean;
 }
 
 class SpoPageCopyCommand extends SpoCommand {
@@ -27,43 +35,8 @@ class SpoPageCopyCommand extends SpoCommand {
     return 'Creates a copy of a modern page or template';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        overwrite: !!args.options.overwrite
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--sourceName <sourceName>'
-      },
-      {
-        option: '--targetUrl <targetUrl>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--overwrite'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
