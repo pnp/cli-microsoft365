@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import auth from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import { globalOptionsZod } from '../../../Command.js';
+import { CommandError, globalOptionsZod } from '../../../Command.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
@@ -34,10 +35,18 @@ class CliConsentCommand extends AnonymousCommand {
       scope = 'https://api.yammer.com/user_impersonation';
     }
 
-    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${cli.getTenant()}/oauth2/v2.0/authorize?client_id=${cli.getClientId()}&response_type=code&scope=${encodeURIComponent(scope)}`);
+    const appId = auth.connection.active ? auth.connection.appId : cli.getClientId();
+    if (!appId) {
+      throw new CommandError(`Unable to determine the client ID of the Microsoft Entra application used by the CLI. Log in to Microsoft 365 first or store the client ID using 'm365 cli config set --key clientId --value <appId>'.`);
+    }
+
+    const tenant = auth.connection.active ? auth.connection.tenant : cli.getTenant();
+
+    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?client_id=${appId}&response_type=code&scope=${encodeURIComponent(scope)}`);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    await auth.restoreAuth();
     await this.initAction(args, logger);
     await this.commandAction(logger, args);
   }
