@@ -1,10 +1,14 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { OrgAssets, OrgAssetsResponse } from './OrgAssets.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   public get name(): string {
@@ -13,6 +17,10 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists all libraries that are assigned as asset library';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

@@ -13,12 +13,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './orgassetslibrary-add.js';
+import command, { options } from './orgassetslibrary-add.js';
 
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,7 +86,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' }) });
   });
 
   it('adds a new library as org assets Office font library with CDN Type (debug)', async () => {
@@ -104,7 +106,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', orgAssetType: 'OfficeFontLibrary' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', orgAssetType: 'OfficeFontLibrary' }) });
     assert(orgAssetLibAddCallIssued);
   });
 
@@ -125,7 +127,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png', orgAssetType: 'OfficeTemplateLibrary' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png', orgAssetType: 'OfficeTemplateLibrary' }) });
     assert(orgAssetLibAddCallIssued);
   });
 
@@ -146,7 +148,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' }) }),
       new CommandError(`This library is already an organization assets library.`));
   });
 
@@ -176,31 +178,39 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: 'https://contoso.sharepoint.com/siteassets' }) }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the libraryUrl is not valid', async () => {
-    const actual = await command.validate({ options: { libraryUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the libraryUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ libraryUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the orgAssetType is not valid', async () => {
-    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', orgAssetType: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the orgAssetType is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ libraryUrl: 'https://contoso.sharepoint.com/siteassets', orgAssetType: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the cdnType is not valid', async () => {
-    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the cdnType is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the thumbnail is not valid', async () => {
-    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the thumbnail is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the libraryUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the libraryUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ libraryUrl: 'https://contoso.sharepoint.com/siteassets' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      libraryUrl: 'https://contoso.sharepoint.com/siteassets',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
