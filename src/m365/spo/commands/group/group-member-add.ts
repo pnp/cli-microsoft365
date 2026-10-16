@@ -1,6 +1,7 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -8,19 +9,42 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  groupId: z.number().int().positive().optional(),
+  groupName: z.string().optional(),
+  userNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `Option 'userNames' contains one or more invalid UPNs: ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional(),
+  emails: z.string()
+    .refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+      error: e => `Option 'emails' contains one or more invalid UPNs: ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional(),
+  userIds: z.string()
+    .refine(ids => validation.isValidPositiveIntegerArray(ids) === true, {
+      error: e => `Option 'userIds' contains one or more invalid numbers: ${validation.isValidPositiveIntegerArray(e.input as string)}.`
+    })
+    .optional(),
+  entraGroupIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `Option 'entraGroupIds' contains one or more invalid GUIDs: ${validation.isValidGuidArray(e.input as string)}.`
+    })
+    .optional(),
+  entraGroupNames: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  groupId?: number;
-  groupName?: string;
-  userNames?: string;
-  emails?: string;
-  userIds?: string;
-  entraGroupIds?: string;
-  entraGroupNames?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -32,113 +56,26 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     return 'Adds members to a SharePoint Group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined',
-        emails: typeof args.options.emails !== 'undefined',
-        userIds: typeof args.options.userIds !== 'undefined',
-        entraGroupIds: typeof args.options.entraGroupIds !== 'undefined',
-        entraGroupNames: typeof args.options.entraGroupNames !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => [o.groupId, o.groupName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'groupId' or 'groupName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
+      })
+      .refine(o => [o.userNames, o.emails, o.userIds, o.entraGroupIds, o.entraGroupNames].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'userNames', 'emails', 'userIds', 'entraGroupIds', or 'entraGroupNames', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userNames', 'emails', 'userIds', 'entraGroupIds', 'entraGroupNames']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '--emails [emails]'
-      },
-      {
-        option: '--userIds [userIds]'
-      },
-      {
-        option: '--entraGroupIds [entraGroupIds]'
-      },
-      {
-        option: '--entraGroupNames [entraGroupNames]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.groupId && !validation.isValidPositiveInteger(args.options.groupId)) {
-          return `Specified groupId ${args.options.groupId} is not a positive number.`;
-        }
-
-        if (args.options.userIds) {
-          const isValidArray = validation.isValidPositiveIntegerArray(args.options.userIds);
-          if (isValidArray !== true) {
-            return `Option 'userIds' contains one or more invalid numbers: ${isValidArray}.`;
-          }
-        }
-
-        if (args.options.userNames) {
-          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (isValidArray !== true) {
-            return `Option 'userNames' contains one or more invalid UPNs: ${isValidArray}.`;
-          }
-        }
-
-        if (args.options.emails) {
-          const isValidArray = validation.isValidUserPrincipalNameArray(args.options.emails);
-          if (isValidArray !== true) {
-            return `Option 'emails' contains one or more invalid UPNs: ${isValidArray}.`;
-          }
-        }
-
-        if (args.options.entraGroupIds) {
-          const isValidArray = validation.isValidGuidArray(args.options.entraGroupIds);
-          if (isValidArray !== true) {
-            return `Option 'entraGroupIds' contains one or more invalid GUIDs: ${isValidArray}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['groupId', 'groupName'] },
-      { options: ['userNames', 'emails', 'userIds', 'entraGroupIds', 'entraGroupNames'] }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'groupName', 'userNames', 'emails', 'userIds', 'entraGroupIds', 'entraGroupNames');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
