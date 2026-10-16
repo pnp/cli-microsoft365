@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  body: z.string(),
+  repliedToId: z.coerce.number().optional(),
+  directToUserIds: z.string().optional(),
+  groupId: z.coerce.number().optional(),
+  networkId: z.coerce.number().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  body: string;
-  repliedToId?: number;
-  directToUserIds?: string;
-  groupId?: number;
-  networkId?: number;
 }
 
 class VivaEngageMessageAddCommand extends VivaEngageCommand {
@@ -25,69 +29,16 @@ class VivaEngageMessageAddCommand extends VivaEngageCommand {
     return 'Posts a Viva Engage network message on behalf of the current user';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        repliedToId: args.options.repliedToId !== undefined,
-        directToUserIds: args.options.directToUserIds !== undefined,
-        groupId: args.options.groupId !== undefined,
-        networkId: args.options.networkId !== undefined
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.groupId !== undefined || opts.directToUserIds !== undefined || opts.repliedToId !== undefined, {
+        message: 'You must either specify groupId, repliedToId or directToUserIds',
+        params: { customCode: 'required' }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-b, --body <body>'
-      },
-      {
-        option: '-r, --repliedToId [repliedToId]'
-      },
-      {
-        option: '-d, --directToUserIds [directToUserIds]'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--networkId [networkId]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && typeof args.options.groupId !== 'number') {
-          return `${args.options.groupId} is not a number`;
-        }
-
-        if (args.options.networkId && typeof args.options.networkId !== 'number') {
-          return `${args.options.networkId} is not a number`;
-        }
-
-        if (args.options.repliedToId && typeof args.options.repliedToId !== 'number') {
-          return `${args.options.repliedToId} is not a number`;
-        }
-
-        if (args.options.groupId === undefined &&
-          args.options.directToUserIds === undefined &&
-          args.options.repliedToId === undefined) {
-          return "You must either specify groupId, repliedToId or directToUserIds";
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

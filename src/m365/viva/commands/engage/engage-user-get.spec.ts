@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-user-get.js';
+import command, { options } from './engage-user-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_USER_GET, () => {
@@ -19,6 +19,7 @@ describe(commands.ENGAGE_USER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.ENGAGE_USER_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -66,6 +68,31 @@ describe(commands.ENGAGE_USER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation without parameters', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if id set', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1496550646 });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if email set', () => {
+    const actual = commandOptionsSchema.safeParse({ email: "pl@nubo.eu" });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('does not pass with id and e-mail', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1496550646, email: "pl@nubo.eu" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('calls user by e-mail', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/by_email.json?email=pl%40nubo.eu') {
@@ -73,7 +100,7 @@ describe(commands.ENGAGE_USER_GET, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { email: "pl@nubo.eu" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ email: "pl@nubo.eu" }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
@@ -84,7 +111,7 @@ describe(commands.ENGAGE_USER_GET, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { id: 1496550646 } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 1496550646 }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
@@ -95,7 +122,7 @@ describe(commands.ENGAGE_USER_GET, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
@@ -104,7 +131,7 @@ describe(commands.ENGAGE_USER_GET, () => {
       throw { "error": { "base": "An error has occurred." } };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred.'));
   });
 
   it('correctly handles 404 error', async () => {
@@ -114,26 +141,6 @@ describe(commands.ENGAGE_USER_GET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Not found (404)'));
-  });
-
-  it('passes validation without parameters', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if id set ', async () => {
-    const actual = await command.validate({ options: { id: 1496550646 } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if email set', async () => {
-    const actual = await command.validate({ options: { email: "pl@nubo.eu" } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('does not pass with id and e-mail', async () => {
-    const actual = await command.validate({ options: { id: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
-    assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Not found (404)'));
   });
 });

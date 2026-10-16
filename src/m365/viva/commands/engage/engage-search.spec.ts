@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import { settingsNames } from '../../../../settingsNames.js';
-import command from './engage-search.js';
+import command, { options } from './engage-search.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_SEARCH, () => {
@@ -20,6 +19,7 @@ describe(commands.ENGAGE_SEARCH, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const messageTrimming: any = {
     "count": {
@@ -210,6 +210,7 @@ describe(commands.ENGAGE_SEARCH, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -231,8 +232,7 @@ describe(commands.ENGAGE_SEARCH, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -259,60 +259,60 @@ describe(commands.ENGAGE_SEARCH, () => {
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
-  it('does not pass validation without parameters', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('does not pass validation without parameters', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation with one parameter', async () => {
-    const actual = await command.validate({ options: { queryText: '123123' } }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('passes validation with one parameter', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '123123' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { queryText: '123', limit: 10, output: 'json' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with parameters', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '123', limit: 10, output: 'json' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation with parameters', async () => {
-    const actual = await command.validate({ options: { queryText: '123', show: "summary", output: 'json' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with parameters', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '123', show: "summary", output: 'json' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails if a wrong option is passed', async () => {
-    const actual = await command.validate({ options: { queryText: '123', show: 'wrongOption' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails if a wrong option is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '123', show: 'wrongOption' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes if a correct option is passed', async () => {
-    const options = ['summary', 'messages', 'users', 'topics', 'groups'];
-    options.forEach(async (option) => {
-      const actual = await command.validate({ options: { queryText: '123', show: option } }, commandInfo);
-      assert.strictEqual(actual, true, option);
+  it('passes if a correct option is passed', () => {
+    const showOptions = ['summary', 'messages', 'users', 'topics', 'groups'];
+    showOptions.forEach((showOption) => {
+      const actual = commandOptionsSchema.safeParse({ queryText: '123', show: showOption });
+      assert.strictEqual(actual.success, true, showOption);
     });
   });
 
-  it('limit must be a number', async () => {
-    const actual = await command.validate({ options: { queryText: '123', limit: 'abc', output: 'json' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('limit must be a number', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '123', limit: 'abc', output: 'json' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if queryText is a string', async () => {
-    const actual = await command.validate({ options: { queryText: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if queryText is a string', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: 'abc' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('does not pass validation if queryText is a number', async () => {
-    const actual = await command.validate({ options: { queryText: 123 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('does not pass validation if queryText is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: 123 });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      queryText: '123',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('returns all items', async () => {
@@ -323,7 +323,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 15);
@@ -355,7 +355,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "messages", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 24);
@@ -369,7 +369,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "summary", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "summary", output: 'text' }) });
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2);
@@ -385,7 +385,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 4);
@@ -406,7 +406,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "messages", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 4);
@@ -427,7 +427,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "messages", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 4);
@@ -445,7 +445,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "topics", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "topics", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 5);
@@ -464,7 +464,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "groups", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "groups", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 2);
@@ -480,7 +480,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", show: "users", output: 'text' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", show: "users", output: 'text' }) });
 
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 4);
@@ -498,7 +498,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", limit: 1, output: "json" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", limit: 1, output: "json" }) });
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
     assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "summary returns 2 groups");
@@ -521,7 +521,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { queryText: "contents", output: "json" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", output: "json" }) });
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
     assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "summary returns 2 groups");
@@ -549,6 +549,6 @@ describe(commands.ENGAGE_SEARCH, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { queryText: "contents", output: "json" } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ queryText: "contents", output: "json" }) } as any), new CommandError('An error has occurred.'));
   });
 }); 
