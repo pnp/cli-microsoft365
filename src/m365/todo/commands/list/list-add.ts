@@ -1,15 +1,19 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
 }
 
 class TodoListAddCommand extends GraphDelegatedCommand {
@@ -21,18 +25,8 @@ class TodoListAddCommand extends GraphDelegatedCommand {
     return 'Adds a new Microsoft To Do task list';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
