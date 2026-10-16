@@ -287,7 +287,10 @@ export class Auth {
     };
     this.connection.active = true;
     this.connection.identityName = accessTokenUtil.accessToken.getUserNameFromAccessToken(response.accessToken);
-    this.connection.identityId = accessTokenUtil.accessToken.getUserIdFromAccessToken(response.accessToken);
+    // the oid claim is not available on app-only access tokens issued while
+    // the service principal hasn't been provisioned in the tenant yet. Fall
+    // back to the appId so that the connection still has a valid identity
+    this.connection.identityId = accessTokenUtil.accessToken.getUserIdFromAccessToken(response.accessToken) || this.connection.appId;
     this.connection.identityTenantId = accessTokenUtil.accessToken.getTenantIdFromAccessToken(response.accessToken);
     this.connection.name = this.connection.name || this.connection.identityId;
 
