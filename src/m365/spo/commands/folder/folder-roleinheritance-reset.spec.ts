@@ -11,7 +11,7 @@ import commands from '../../commands.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import command from './folder-roleinheritance-reset.js';
+import command, { options } from './folder-roleinheritance-reset.js';
 
 describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -21,6 +21,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -30,6 +31,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,22 +75,28 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: folderUrl, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderUrl: folderUrl, force: true });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if webUrl and folderUrl are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderUrl: folderUrl, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and folderUrl are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderUrl: folderUrl, force: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderUrl: folderUrl, force: true, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before resetting role inheritance for the folder when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderUrl: folderUrl
-      }
+      })
     });
 
 
@@ -99,10 +107,10 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderUrl: folderUrl
-      }
+      })
     });
 
     assert(postSpy.notCalled);
@@ -118,12 +126,12 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         folderUrl: folderUrl,
         force: true
-      }
+      })
     });
   });
 
@@ -140,10 +148,10 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderUrl: folderUrl
-      }
+      })
     });
   });
 
@@ -160,10 +168,10 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderUrl: rootFolderUrl
-      }
+      })
     });
   });
 
@@ -180,12 +188,12 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         folderUrl: folderUrl,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

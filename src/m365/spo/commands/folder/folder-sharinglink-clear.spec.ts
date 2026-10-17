@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './folder-sharinglink-clear.js';
+import command, { options } from './folder-sharinglink-clear.js';
 import { spo } from '../../../../utils/spo.js';
 import { drive } from '../../../../utils/drive.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
@@ -21,6 +21,7 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -87,6 +88,7 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -136,32 +138,45 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderId: folderId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderId: folderId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the folderId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the folderId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option 'folderId'.`);
   });
 
-  it('fails validation if invalid scope specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderId: folderId, scope: 'invalid scope' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid scope specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, scope: 'invalid scope' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid scope' is not a valid scope. Allowed values are: anonymous, users, organization`);
   });
 
-  it('passes validation if options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderId: folderId, scope: 'organization' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if both folderId and folderUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, folderUrl: folderUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, scope: 'organization' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before clearing the sharing links from a folder when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderId: folderId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -173,10 +188,10 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         folderUrl: folderUrl
-      }
+      })
     });
 
     assert(deleteSpy.notCalled);
@@ -199,12 +214,12 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         folderId: folderId,
         scope: scope
-      }
+      })
     });
 
     assert(requestDeleteStub.called);
@@ -223,12 +238,12 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         folderUrl: folderUrl,
         force: true
-      }
+      })
     });
 
     assert(requestDeleteStub.called);
@@ -247,7 +262,7 @@ describe(commands.FOLDER_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, force: true }) }),
       new CommandError(`Drive 'https://contoso.sharepoint.com/sites/project-x/shared%20documents/folder1' not found`));
   });
 });
