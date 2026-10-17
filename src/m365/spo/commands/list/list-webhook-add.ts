@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -12,18 +13,42 @@ const maxExpirationDateTime: Date = new Date();
 // 180 days from now is the maximum expiration date for a webhook
 maxExpirationDateTime.setDate(maxExpirationDateTime.getDate() + expirationDateTimeMaxDays);
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('l')
+    .optional(),
+  listTitle: z.string().alias('t').optional(),
+  listUrl: z.string().optional(),
+  notificationUrl: z.string().alias('n'),
+  expirationDateTime: z.string()
+    .refine(date => !isNaN(Date.parse(date)), {
+      error: `Provide the date in one of the following formats:
+          'YYYY-MM-DD'
+          'YYYY-MM-DDThh:mm'
+          'YYYY-MM-DDThh:mmZ'
+          'YYYY-MM-DDThh:mm±hh:mm'`
+    })
+    .refine(date => Date.parse(date) >= Date.now() && new Date(Date.parse(date)) < maxExpirationDateTime, {
+      error: 'Provide an expiration date which is a date time in the future and within 6 months from now'
+    })
+    .alias('e')
+    .optional(),
+  clientState: z.string().alias('c').optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  notificationUrl: string;
-  expirationDateTime?: string;
-  clientState?: string;
 }
 
 class SpoListWebhookAddCommand extends SpoCommand {
@@ -35,87 +60,19 @@ class SpoListWebhookAddCommand extends SpoCommand {
     return 'Adds a new webhook to the specified list';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
-        clientState: typeof args.options.clientState !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-n, --notificationUrl <notificationUrl>'
-      },
-      {
-        option: '-e, --expirationDateTime [expirationDateTime]'
-      },
-      {
-        option: '-c, --clientState [clientState]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId) {
-          if (!validation.isValidGuid(args.options.listId)) {
-            return `${args.options.listId} is not a valid GUID`;
-          }
-        }
-
-        const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
-        if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-          return `Provide the date in one of the following formats:
-          'YYYY-MM-DD'
-          'YYYY-MM-DDThh:mm'
-          'YYYY-MM-DDThh:mmZ'
-          'YYYY-MM-DDThh:mm±hh:mm'`;
-        }
-
-        if (parsedDateTime < Date.now() || new Date(parsedDateTime) >= maxExpirationDateTime) {
-          return `Provide an expiration date which is a date time in the future and within 6 months from now`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

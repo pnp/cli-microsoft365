@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-webhook-add.js';
+import command, { options } from './list-webhook-add.js';
 
 describe(commands.LIST_WEBHOOK_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -74,12 +76,11 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
   });
 
@@ -93,12 +94,11 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
   });
 
@@ -118,13 +118,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: '0987cfd9-f02c-479b-9fb4-3f0550462848',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       'clientState': 'null',
@@ -152,13 +151,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         verbose: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       'clientState': 'null',
@@ -186,13 +184,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listUrl: '/sites/ninja/lists/Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       'clientState': 'null',
@@ -220,13 +217,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         clientState: 'awesome state'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       'clientState': 'awesome state',
@@ -254,13 +250,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2019-01-09'
-      }
+        expirationDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().substring(0, 10)
+      })
     });
     assert(loggerLogSpy.calledWith({
       'clientState': 'null',
@@ -287,140 +282,132 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2019-01-09'
-      }
-    } as any), new CommandError(errorMessage));
+        expirationDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().substring(0, 10)
+      })
+    }), new CommandError(errorMessage));
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
-    }, commandInfo);
-    assert.strictEqual(typeof (actual), 'string');
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the list id option is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '12345',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
-    }, commandInfo);
-    assert.strictEqual(typeof (actual), 'string');
+  it('fails validation if the list id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '12345',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the listid option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the expirationDateTime is in the past', async () => {
+  it('fails validation if the expirationDateTime is in the past', () => {
     const currentDate: Date = new Date();
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() - 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: dateString
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: dateString
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
-  it('fails validation if the expirationDateTime more than six months from now', async () => {
+  it('fails validation if the expirationDateTime more than six months from now', () => {
     const currentDate: Date = new Date();
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() + 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: dateString
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: dateString
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
-  it('passes validation if the expirationDateTime is in the future but no more than six months from now', async () => {
+  it('passes validation if the expirationDateTime is in the future but no more than six months from now', () => {
     const currentDate: Date = new Date();
     currentDate.setMonth(currentDate.getMonth() + 4);
     currentDate.setDate(1);
     const dateString: string = currentDate.toISOString().substring(0, 10);
 
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: dateString
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: dateString
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-X-09'
-      }
-    }, commandInfo);
-    assert.strictEqual(typeof (actual), 'string');
+  it('fails validation if the expirationDateTime option is not a valid date string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-X-09'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Provide the date in one of the following formats:
+          'YYYY-MM-DD'
+          'YYYY-MM-DDThh:mm'
+          'YYYY-MM-DDThh:mmZ'
+          'YYYY-MM-DDThh:mm±hh:mm'`);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string (json output)', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-X-09',
-        output: 'json'
-      }
-    }, commandInfo);
-    assert.strictEqual(typeof (actual), 'string');
+  it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-X-09',
+      output: 'json'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().substring(0, 10),
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
