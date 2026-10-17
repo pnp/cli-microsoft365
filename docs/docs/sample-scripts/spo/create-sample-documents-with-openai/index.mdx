@@ -109,7 +109,7 @@ Prerequisites:
 
       Write-Host "Uploading file $randomWord.docx..."
       $path = Join-Path (Get-Location).Path "$randomWord.docx"
-      m365 spo file add --webUrl $SiteURL --folder $Folder --path $path
+      m365 spo file add --webUrl $SiteURL --folder $Folder --path $path --overwrite
 
       Remove-Item -Path $path -Force
 
