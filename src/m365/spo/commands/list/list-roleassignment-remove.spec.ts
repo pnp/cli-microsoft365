@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-roleassignment-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-roleassignment-remove.js';
 import { spo } from '../../../../utils/spo.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
@@ -20,6 +19,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/Marketing';
@@ -121,7 +121,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
+
     sinon.stub(entraGroup, 'getGroupById').withArgs(graphGroup.id).resolves(graphGroup);
     sinon.stub(entraGroup, 'getGroupByDisplayName').withArgs(graphGroup.displayName).resolves(graphGroup);
     sinon.stub(spo, 'ensureEntraGroup').withArgs(webUrl, graphGroup).resolves(entraGroupResponse);
@@ -170,54 +171,59 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', principalId: 11 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID for option listId.`);
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: -5 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'-5' is not a valid number for option principalId.`);
   });
 
-  it('passes validation if the principalId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the principalId option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the upn option is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', upn: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the upn option is not a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', upn: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid user principal name for option upn.`);
   });
 
-  it('passes validation if the upn option is a valid user principal name', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', upn: 'john.doe@contoso.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the upn option is a valid user principal name', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', upn: 'john.doe@contoso.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', entraGroupId: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entraGroupId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', entraGroupId: '12345' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID for option entraGroupId.`);
   });
 
-  it('passes validation if the entraGroupId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', entraGroupId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the entraGroupId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', entraGroupId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('removes role assignment from list by title', async () => {
@@ -230,13 +236,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         principalId: 11,
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -252,13 +258,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         principalId: 11,
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -274,13 +280,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         principalId: 11,
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -298,13 +304,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'ensureUser').withArgs('https://contoso.sharepoint.com', 'someaccount@tenant.onmicrosoft.com').resolves(userResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -323,14 +329,14 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'ensureUser').rejects({ error: { 'odata.error': { message: { value: error } } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('remove role assignment from list get principal id by group name', async () => {
@@ -345,13 +351,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').withArgs('https://contoso.sharepoint.com', 'someGroup', logger, true).resolves(groupResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
         force: true
-      }
+      })
     });
   });
 
@@ -368,13 +374,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').rejects({ error: { 'odata.error': { message: { value: error } } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
         force: true
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -382,12 +388,12 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup'
-      }
+      })
     });
 
     assert(postStub.notCalled);
@@ -397,12 +403,12 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: '/Lists/Tasks',
         groupName: 'someGroup'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -412,12 +418,12 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'someList',
         groupName: 'someGroup'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -438,12 +444,12 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup'
-      }
+      })
     });
   });
 
@@ -457,13 +463,13 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         entraGroupId: graphGroup.id,
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
@@ -479,15 +485,22 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         entraGroupName: graphGroup.displayName,
         force: true
-      }
+      })
     });
 
     assert(postStub.calledOnce);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', entraGroupId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

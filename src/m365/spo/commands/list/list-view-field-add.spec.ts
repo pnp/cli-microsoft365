@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-view-field-add.js';
+import command, { options } from './list-view-field-add.js';
 
 describe(commands.LIST_VIEW_FIELD_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   const stubAllGetRequests: any = () => {
     return sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -85,6 +86,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -123,34 +125,38 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('fails validation if the viewId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: '12345', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the viewId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: '12345', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '12345' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the position option is defined and is not a valid number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', position: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the position option is defined and is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', position: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('add the field by title to viewId and listTitle (debug)', async () => {
@@ -164,7 +170,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
@@ -193,7 +199,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listUrl: '/sites/ninja/Shared Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listUrl: '/sites/ninja/Shared Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/GetList('%2Fsites%2Fninja%2FShared%20Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
@@ -222,7 +228,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', title: 'Created By' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', title: 'Created By' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
@@ -251,7 +257,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', title: 'Created By' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', title: 'Created By' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
@@ -280,7 +286,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
@@ -309,7 +315,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
@@ -338,7 +344,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
@@ -367,7 +373,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')/viewfields/addviewfield('`) > -1 &&
@@ -395,7 +401,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('`) > -1 &&
@@ -420,7 +426,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By', position: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By', position: 1 }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
@@ -445,7 +451,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', title: 'Created By', position: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', title: 'Created By', position: 1 }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/viewfields/moveviewfieldto`) > -1 &&
@@ -471,13 +477,19 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
         id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
         webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        force: true
-      }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+        listTitle: 'Documents'
+      })
+    }), new CommandError(error.error['odata.error'].message.value));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

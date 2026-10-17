@@ -36,7 +36,7 @@ class SpoListSensitivityLabelRemoveCommand extends SpoCommand {
     return 'Clears a default sensitivity label from a document library';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

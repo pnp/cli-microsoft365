@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-roleinheritance-break.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-roleinheritance-break.js';
 
 describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -27,6 +27,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -52,8 +53,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      cli.promptForConfirmation,
-      cli.getSettingWithDefaultValue
+      cli.promptForConfirmation
     ]);
   });
 
@@ -70,76 +70,46 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('fails validation if listId and listTitle are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId and listTitle are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listId and listUrl are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId and listUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listTitle and listUrl are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listTitle and listUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither listTitle nor listId or listUrl is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither listTitle nor listId or listUrl is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `12345 is not a valid GUID`);
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('break role inheritance on list by title', async () => {
@@ -152,12 +122,12 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         force: true
-      }
+      })
     });
   });
 
@@ -171,13 +141,13 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         clearExistingPermissions: true,
         force: true
-      }
+      })
     });
   });
 
@@ -191,16 +161,15 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         clearExistingPermissions: true,
         force: true
-      }
+      })
     });
   });
-
 
   it('break role inheritance on list by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -212,12 +181,12 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         force: true
-      }
+      })
     });
   });
 
@@ -231,13 +200,13 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         clearExistingPermissions: true,
         force: true
-      }
+      })
     });
   });
 
@@ -261,12 +230,12 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         force: true
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
@@ -276,33 +245,33 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
 
     const postSpy = sinon.spy(request, 'post');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
 
   it('prompts before breaking role inheritance when confirmation argument not passed (Title)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
-      }
+      })
     });
     assert(promptIssued);
   });
 
   it('prompts before breaking role inheritance when confirmation argument not passed (id)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
-      }
+      })
     });
     assert(promptIssued);
   });
@@ -320,11 +289,18 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
-      }
+      })
     });
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
