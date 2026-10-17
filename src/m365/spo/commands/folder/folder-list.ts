@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,16 +9,23 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FolderProperties } from './FolderProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  parentFolderUrl: z.string().alias('p'),
+  fields: z.string().optional(),
+  filter: z.string().optional(),
+  recursive: z.boolean().optional().alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  parentFolderUrl: string;
-  recursive?: boolean;
-  fields?: string;
-  filter?: string;
 }
 
 interface FieldProperties {
@@ -40,54 +48,8 @@ class SpoFolderListCommand extends SpoCommand {
     return ['Name', 'ServerRelativeUrl'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        recursive: !!args.options.recursive,
-        fields: typeof args.options.fields !== 'undefined',
-        filter: typeof args.options.filter !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-p, --parentFolderUrl <parentFolderUrl>'
-      },
-      {
-        option: '--fields [fields]'
-      },
-      {
-        option: '--filter [filter]'
-      },
-      {
-        option: '-r, --recursive'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'parentFolderUrl', 'fields', 'filter');
-    this.types.boolean.push('recursive');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

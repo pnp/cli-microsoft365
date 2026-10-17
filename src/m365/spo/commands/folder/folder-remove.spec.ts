@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-remove.js';
+import command, { options } from './folder-remove.js';
 
 describe(commands.FOLDER_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
   let stubPost: sinon.SinonStub;
@@ -28,6 +29,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,8 +83,12 @@ describe(commands.FOLDER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('prompts before removing folder when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' }) });
 
     assert(promptIssued);
   });
@@ -90,7 +96,7 @@ describe(commands.FOLDER_REMOVE, () => {
   it('aborts removing folder when prompt not confirmed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' }) });
     assert(requests.length === 0);
   });
 
@@ -98,26 +104,26 @@ describe(commands.FOLDER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1',
-        permanent: true
-      }
+      options: commandOptionsSchema.parse(
+        {
+          webUrl: 'https://contoso.sharepoint.com',
+          url: '/Shared Documents/Folder1',
+          permanent: true
+        })
     });
     assert(stubPost.called);
   });
 
   it('should send params for remove request', async () => {
     await command.action(logger, {
-      options:
-      {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1',
-        permanent: true,
-        force: true
-      }
+      options: commandOptionsSchema.parse(
+        {
+          verbose: true,
+          webUrl: 'https://contoso.sharepoint.com',
+          url: '/Shared Documents/Folder1',
+          permanent: true,
+          force: true
+        })
     });
     const lastCall: any = stubPost.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolder1\')');
@@ -130,13 +136,13 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options:
-      {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com/sites/test1',
-        url: '/Shared Documents/Folder1',
-        permanent: true
-      }
+      options: commandOptionsSchema.parse(
+        {
+          verbose: true,
+          webUrl: 'https://contoso.sharepoint.com/sites/test1',
+          url: '/Shared Documents/Folder1',
+          permanent: true
+        })
     });
     const lastCall: any = stubPost.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
@@ -149,12 +155,12 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options:
-      {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1'
-      }
+      options: commandOptionsSchema.parse(
+        {
+          debug: true,
+          webUrl: 'https://contoso.sharepoint.com',
+          url: '/Shared Documents/Folder1'
+        })
     });
     const lastCall: any = stubPost.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolder1\')/recycle()');
@@ -181,22 +187,28 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
-      options:
-      {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents/Folder1'
-      }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+      options: commandOptionsSchema.parse(
+        {
+          debug: true,
+          webUrl: 'https://contoso.sharepoint.com',
+          url: '/Shared Documents/Folder1'
+        })
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', url: '/Shared Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', url: '/Shared Documents' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

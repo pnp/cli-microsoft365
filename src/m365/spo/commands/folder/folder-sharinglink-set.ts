@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -9,16 +10,35 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderUrl: z.string().optional(),
+  folderId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'folderId'.`
+    })
+    .optional(),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'id'.`
+    })
+    .alias('i'),
+  expirationDateTime: z.string()
+    .refine(dateTime => validation.isValidISODateTime(dateTime), {
+      error: e => `'${e.input}' is not a valid ISO date string.`
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl?: string;
-  folderId?: string;
-  id: string;
-  expirationDateTime?: string;
 }
 
 class SpoFolderSharingLinkSetCommand extends SpoCommand {
@@ -30,63 +50,19 @@ class SpoFolderSharingLinkSetCommand extends SpoCommand {
     return 'Updates a specific sharing link to a folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
-        folderId: typeof args.options.folderId !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.folderId, opts.folderUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify one of the following options: folderId, folderUrl.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['folderId', 'folderUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '--folderUrl [folderUrl]' },
-      { option: '--folderId [folderId]' },
-      { option: '-i, --id <id>' },
-      { option: '--expirationDateTime [expirationDateTime]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.folderId && !validation.isValidGuid(args.options.folderId)) {
-          return `${args.options.folderId} is not a valid GUID`;
-        }
-
-        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
-          return `${args.options.expirationDateTime} is not a valid ISO date string.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['folderId', 'folderUrl'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folderId', 'folderUrl', 'id', 'expirationDateTime');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
