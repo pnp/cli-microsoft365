@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-version-get.js';
+import command, { options } from './file-version-get.js';
 
 describe(commands.FILE_VERSION_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validWebUrl = "https://contoso.sharepoint.com";
   const validFileUrl = "/Shared Documents/Document.docx";
   const validFileId = "7a9b8bb6-d5c4-4de9-ab76-5210a7879e89";
@@ -47,6 +48,7 @@ describe(commands.FILE_VERSION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -84,30 +86,34 @@ describe(commands.FILE_VERSION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if fileId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        label: validLabel,
-        fileId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if fileId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      label: validLabel,
+      fileId: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', label: validLabel, fileUrl: validFileUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', label: validLabel, fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if required options specified (fileUrl)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, label: validLabel, fileUrl: validFileUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileUrl)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, label: validLabel, fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (fileId)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, label: validLabel, fileId: validFileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileId)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, label: validLabel, fileId: validFileId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, label: validLabel, fileId: validFileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves version from a file with the fileUrl options', async () => {
@@ -119,12 +125,12 @@ describe(commands.FILE_VERSION_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         label: validLabel,
         fileUrl: validFileUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileVersionResponse.value[0]));
   });
@@ -138,12 +144,12 @@ describe(commands.FILE_VERSION_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         label: validLabel,
         fileId: validFileId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileVersionResponse.value[0]));
   });
@@ -158,11 +164,11 @@ describe(commands.FILE_VERSION_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         label: validLabel,
         fileUrl: `Shared Documents/Fo'lde'r`
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileVersionResponse.value[0]));
   });
@@ -188,11 +194,12 @@ describe(commands.FILE_VERSION_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
-        label: validLabel
-      }
+        label: validLabel,
+        fileId: validFileId
+      })
     }), new CommandError(err));
   });
 });
