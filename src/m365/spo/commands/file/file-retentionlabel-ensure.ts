@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -9,16 +10,23 @@ import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { spo } from '../../../../utils/spo.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string(),
+  fileUrl: z.string().optional(),
+  fileId: z.uuid().optional().alias('i'),
+  assetId: z.string().optional().alias('a')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  fileUrl?: string;
-  fileId?: string;
-  assetId?: string;
 }
 
 class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
@@ -30,70 +38,19 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     return 'Applies a retention label to a file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined',
-        assetId: typeof args.options.assetId !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileUrl, opts.fileId].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileUrl' or 'fileId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileUrl', 'fileId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--name <name>'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
-        option: '-i, --fileId [fileId]'
-      },
-      {
-        option: '-a, --assetId [assetId]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.fileId &&
-          !validation.isValidGuid(args.options.fileId as string)) {
-          return `${args.options.fileId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileUrl', 'fileId'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'name', 'fileUrl', 'fileId', 'assetId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

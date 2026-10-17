@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -10,19 +11,31 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FileProperties } from './FileProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  url: z.string().optional(),
+  id: z.uuid().optional().alias('i'),
+  asString: z.boolean().optional(),
+  asListItem: z.boolean().optional(),
+  asFile: z.boolean().optional(),
+  path: z.string()
+    .refine(p => fs.existsSync(path.dirname(p)), {
+      error: 'Specified path where to save the file does not exits'
+    })
+    .optional()
+    .alias('p'),
+  withPermissions: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  url?: string;
-  id?: string;
-  asString?: boolean;
-  asListItem?: boolean;
-  asFile?: boolean;
-  path?: string;
-  withPermissions?: boolean;
 }
 
 class SpoFileGetCommand extends SpoCommand {
@@ -34,105 +47,29 @@ class SpoFileGetCommand extends SpoCommand {
     return 'Gets information about the specified file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        asString: !!args.options.asString,
-        asListItem: !!args.options.asListItem,
-        asFile: !!args.options.asFile,
-        path: typeof args.options.path !== 'undefined',
-        withPermissions: !!args.options.withPermissions
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.url].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'id' or 'url', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'url']
+        }
+      })
+      .refine(opts => !opts.asFile || !!opts.path, {
+        error: 'The path should be specified when the --asFile option is used',
+        path: ['path'],
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => [opts.asFile, opts.asListItem, opts.asString].filter(o => o === true).length <= 1, {
+        error: 'Specify to retrieve the file either as file, list item or string but not multiple'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--asString'
-      },
-      {
-        option: '--asListItem'
-      },
-      {
-        option: '--asFile'
-      },
-      {
-        option: '-p, --path [path]'
-      },
-      {
-        option: '--withPermissions'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.asFile && !args.options.path) {
-          return 'The path should be specified when the --asFile option is used';
-        }
-
-        if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-          return 'Specified path where to save the file does not exits';
-        }
-
-        if (args.options.asFile) {
-          if (args.options.asListItem || args.options.asString) {
-            return 'Specify to retrieve the file either as file, list item or string but not multiple';
-          }
-        }
-
-        if (args.options.asListItem) {
-          if (args.options.asFile || args.options.asString) {
-            return 'Specify to retrieve the file either as file, list item or string but not multiple';
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'url'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'url', 'id', 'path');
-    this.types.boolean.push('asString', 'asListItem', 'asFile', 'withPermissions');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,17 +9,24 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.uuid().optional().alias('i'),
+  url: z.string().optional(),
+  permanent: z.boolean().optional(),
+  bypassSharedLock: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+export declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  url?: string;
-  permanent?: boolean;
-  bypassSharedLock?: boolean;
-  force?: boolean;
 }
 
 class SpoFileRemoveCommand extends SpoCommand {
@@ -34,76 +42,19 @@ class SpoFileRemoveCommand extends SpoCommand {
     return [commands.PAGE_TEMPLATE_REMOVE];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        permanent: !!args.options.permanent,
-        bypassSharedLock: !!args.options.bypassSharedLock,
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.url].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'id' or 'url', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'url']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--permanent'
-      },
-      {
-        option: '--bypassSharedLock'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id &&
-          !validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'url'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'id', 'url');
-    this.types.boolean.push('permanent', 'bypassSharedLock', 'force');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

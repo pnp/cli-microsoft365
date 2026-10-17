@@ -1,26 +1,39 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+
+enum SharingLinkScope {
+  anonymous = 'anonymous',
+  users = 'users',
+  organization = 'organization'
+}
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  fileId: z.uuid().optional(),
+  fileUrl: z.string().optional(),
+  scope: zod.coercedEnum(SharingLinkScope).optional().alias('s')
+});
+
+export declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  fileId?: string;
-  fileUrl?: string;
-  scope?: string;
-}
-
 class SpoFileSharingLinkListCommand extends SpoCommand {
-  private static readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
-
   public get name(): string {
     return commands.FILE_SHARINGLINK_LIST;
   }
@@ -33,71 +46,19 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     return ['id', 'scope', 'roles', 'link'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileId: typeof args.options.fileId !== 'undefined',
-        fileUrl: typeof args.options.fileUrl !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileId, opts.fileUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileId' or 'fileUrl', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileId', 'fileUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--fileId [fileId]'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: SpoFileSharingLinkListCommand.allowedScopes
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
-          return `${args.options.fileId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && SpoFileSharingLinkListCommand.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${SpoFileSharingLinkListCommand.allowedScopes.join(',')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'fileId', 'fileUrl', 'scope');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

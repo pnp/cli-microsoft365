@@ -1,7 +1,8 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -12,20 +13,29 @@ import commands from '../../commands.js';
 import { FileProperties } from './FileProperties.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  fileUrl: z.string().optional(),
+  fileId: z.uuid().optional().alias('i'),
+  principalId: z.number().optional(),
+  upn: z.string().optional(),
+  groupName: z.string().optional(),
+  entraGroupId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID for option entraGroupId.`
+  }).optional(),
+  entraGroupName: z.string().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  fileUrl?: string;
-  fileId?: string;
-  principalId?: number;
-  upn?: string;
-  groupName?: string;
-  entraGroupId?: string;
-  entraGroupName?: string;
-  force?: boolean;
 }
 
 class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
@@ -37,98 +47,26 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
     return 'Removes a role assignment from a file.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined',
-        principalId: typeof args.options.principalId !== 'undefined',
-        upn: typeof args.options.upn !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
-        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileUrl, opts.fileId].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileUrl' or 'fileId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileUrl', 'fileId']
+        }
+      })
+      .refine(opts => [opts.upn, opts.groupName, opts.principalId, opts.entraGroupId, opts.entraGroupName].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'upn', 'groupName', 'principalId', 'entraGroupId', or 'entraGroupName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['upn', 'groupName', 'principalId', 'entraGroupId', 'entraGroupName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
-        option: '-i, --fileId [fileId]'
-      },
-      {
-        option: '--principalId [principalId]'
-      },
-      {
-        option: '--upn [upn]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '--entraGroupName [entraGroupName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.principalId && isNaN(args.options.principalId)) {
-          return `Specified principalId ${args.options.principalId} is not a number`;
-        }
-
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId`;
-        }
-
-        if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
-          return `${args.options.fileId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['fileUrl', 'fileId'] },
-      { options: ['upn', 'groupName', 'principalId', 'entraGroupId', 'entraGroupName'] }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'fileUrl', 'fileId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName');
-    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

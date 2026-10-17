@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { GraphFileDetails } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './file-sharinglink-add.js';
+import command, { options } from './file-sharinglink-add.js';
 
 describe(commands.FILE_SHARINGLINK_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com';
   const fileId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
@@ -68,6 +69,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -123,7 +125,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, type: 'view', scope: 'anonymous', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, type: 'view', scope: 'anonymous', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponseOne));
   });
 
@@ -144,7 +146,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'anonymous', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'anonymous', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponseTwo));
   });
 
@@ -157,47 +159,54 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, type: 'view', verbose: true }) } as any),
       new CommandError(`File Not Found.`));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, type: 'view' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'invalid', type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'invalid', type: 'view' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: 'invalid date', type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the expirationDateTime option is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: 'invalid date', type: 'view' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date' is not a valid ISO date string.`);
   });
 
-  it('fails validation if invalid scope specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, scope: 'invalid scope', type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid scope specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, scope: 'invalid scope', type: 'view' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid type specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, type: 'invalid type' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid type specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, type: 'invalid type' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if expirationDateTime option is specified for a non anonymous link', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: '2023-01-09T16:20:00Z', type: 'view', scope: 'organization' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if expirationDateTime option is specified for a non anonymous link', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: '2023-01-09T16:20:00Z', type: 'view', scope: 'organization' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the expirationDateTime option a valid date along with the anonymous scope', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: '2023-01-09T16:20:00Z', type: 'view', scope: 'anonymous' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the expirationDateTime option a valid date along with the anonymous scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: '2023-01-09T16:20:00Z', type: 'view', scope: 'anonymous' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, type: 'view' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, type: 'view' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, type: 'view', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

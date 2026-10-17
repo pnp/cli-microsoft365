@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './file-checkout-undo.js';
+import command, { options } from './file-checkout-undo.js';
 
 describe(commands.FILE_CHECKOUT_UNDO, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/projects';
@@ -23,6 +23,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -32,6 +33,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -86,7 +88,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, verbose: true }) });
     assert(postStub.called);
   });
 
@@ -99,7 +101,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, force: true, verbose: true }) });
     assert(postStub.called);
   });
 
@@ -113,7 +115,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: siteRelativeUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: siteRelativeUrl, force: true, verbose: true }) });
     assert(postStub.called);
   });
 
@@ -135,11 +137,17 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, force: true, verbose: true } }), new CommandError('The file "Shared Documents/4.docx" is not checked out.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, force: true, verbose: true }) }), new CommandError('The file "Shared Documents/4.docx" is not checked out.'));
   });
 
   it('prompts before undoing checkout when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId }) });
+
+    assert(promptIssued);
+  });
+
+  it('prompts before undoing checkout when confirmation argument not passed and fileUrl specified', async () => {
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl }) });
 
     assert(promptIssued);
   });
@@ -148,22 +156,28 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
     const postStub = sinon.stub(request, 'post').resolves();
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: webUrl, id: fileId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId }) });
     assert(postStub.notCalled);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', fileId: fileId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', fileId: fileId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and fileId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and fileId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

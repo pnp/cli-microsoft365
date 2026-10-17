@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -9,14 +10,21 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FileSharingPrincipalType } from './FileSharingPrincipalType.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  fileId: z.uuid().optional().alias('i'),
+  fileUrl: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  fileId?: string;
-  fileUrl?: string;
 }
 
 interface SharingPrincipal {
@@ -57,64 +65,19 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     return 'Generates a sharing information report for the specified file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileId: typeof args.options.fileId !== 'undefined',
-        fileUrl: typeof args.options.fileUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileId, opts.fileUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileId' or 'fileUrl', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileId', 'fileUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --fileId [fileId]'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.fileId) {
-          if (!validation.isValidGuid(args.options.fileId)) {
-            return `${args.options.fileId} is not a valid GUID`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'fileId', 'fileUrl');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
