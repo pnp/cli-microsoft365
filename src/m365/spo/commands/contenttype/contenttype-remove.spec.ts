@@ -285,6 +285,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'site.com' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if neither the content type ID nor content type Name parameters are specified', () => {

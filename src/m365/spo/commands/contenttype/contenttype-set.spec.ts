@@ -98,11 +98,13 @@ describe(commands.CONTENTTYPE_SET, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: id });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if id is specified and is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, listId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if listId and listTitle is specified', () => {

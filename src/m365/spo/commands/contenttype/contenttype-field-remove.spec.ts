@@ -674,16 +674,19 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   it('fails validation if webUrl is not correct', () => {
     const actual = commandOptionsSchema.safeParse({ id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'test' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not correct', () => {
     const actual = commandOptionsSchema.safeParse({ id: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid GUID');
   });
 
   it('fails validation if id is not valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'xxx is not a valid GUID');
   });
 
   it('fails validation with unknown options', () => {
