@@ -52,7 +52,7 @@ class SpoFileRoleAssignmentListCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: '--fileId [fileId]'
+        option: '-i, --fileId [fileId]'
       }
     );
   }

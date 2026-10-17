@@ -2863,6 +2863,44 @@ describe('utils/spo', () => {
 
     const roleAssignments = await spo.getFileRoleAssignments(webUrl, serverRelativeUrl, logger, true);
     assert.deepEqual(roleAssignments, roleAssignmentsResponse.value);
+    assert.deepStrictEqual(roleAssignments[0].RoleDefinitionBindings[0].BasePermissionsValue, [
+      'ViewListItems',
+      'AddListItems',
+      'EditListItems',
+      'DeleteListItems',
+      'ApproveItems',
+      'OpenItems',
+      'ViewVersions',
+      'DeleteVersions',
+      'CancelCheckout',
+      'ManagePersonalViews',
+      'ManageLists',
+      'ViewFormPages',
+      'AnonymousSearchAccessList',
+      'Open',
+      'ViewPages',
+      'AddAndCustomizePages',
+      'ApplyThemeAndBorder',
+      'ApplyStyleSheets',
+      'ViewUsageData',
+      'CreateSSCSite',
+      'ManageSubwebs',
+      'CreateGroups',
+      'ManagePermissions',
+      'BrowseDirectories',
+      'BrowseUserInfo',
+      'AddDelPrivateWebParts',
+      'UpdatePersonalWebParts',
+      'ManageWeb',
+      'AnonymousSearchAccessWebLists',
+      'UseClientIntegration',
+      'UseRemoteAPIs',
+      'ManageAlerts',
+      'CreateAlerts',
+      'EditMyUserInfo',
+      'EnumeratePermissions'
+    ]);
+    assert.strictEqual(roleAssignments[0].RoleDefinitionBindings[0].RoleTypeKindValue, 'Administrator');
   });
 
   it('correctly outputs result when calling createFileCopyJob', async () => {
