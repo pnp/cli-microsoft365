@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -11,12 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './contenttypehub-get.js';
+import command, { options } from './contenttypehub-get.js';
 
 describe(commands.CONTENTTYPEHUB_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,6 +35,8 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -89,11 +95,11 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       throw 'Invalid request';
     });
 
-    const options = {
+    const actionOptions = {
       verbose: true
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(actionOptions) });
     const bodyPayload = `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}">\n<Actions>\n  <ObjectPath Id="2" ObjectPathId="1" />\n  <ObjectIdentityQuery Id="3" ObjectPathId="1" />\n  <ObjectPath Id="5" ObjectPathId="4" />\n  <ObjectIdentityQuery Id="6" ObjectPathId="4" />\n  <Query Id="7" ObjectPathId="4">\n    <Query SelectAllProperties="false">\n      <Properties>\n        <Property Name="ContentTypePublishingHub" ScalarProperty="true" />\n      </Properties>\n    </Query>\n  </Query>\n</Actions>\n<ObjectPaths>\n  <StaticMethod Id="1" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />\n  <Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" />\n</ObjectPaths>\n</Request>`;
     assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
     assert(loggerLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
@@ -107,10 +113,10 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       throw 'Invalid request';
     });
 
-    const options = {
+    const actionOptions = {
       verbose: true
     };
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(actionOptions) }),
       new CommandError('request error'));
   });
 
@@ -123,10 +129,10 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       }
       throw 'Invalid request';
     });
-    const options = {
+    const actionOptions = {
       verbose: true
     };
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(actionOptions) }),
       new CommandError('ClientSvc error'));
   });
 
@@ -157,5 +163,17 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     assert(containsVerboseOption, "Verbose option not available");
     assert(containsDebugOption, "Debug option not available");
     assert(containsQueryOption, "Query option not available");
+  });
+
+  it('fails validation with unknown options', () => {
+    const result = commandOptionsSchema.safeParse({
+      unknownOption: true
+    });
+    assert.strictEqual(result.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const result = commandOptionsSchema.safeParse({});
+    assert.strictEqual(result.success, true);
   });
 });
