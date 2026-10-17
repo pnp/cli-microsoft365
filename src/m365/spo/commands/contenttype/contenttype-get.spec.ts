@@ -256,6 +256,7 @@ describe(commands.CONTENTTYPE_GET, () => {
   it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'site.com' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if both id and name are specified', () => {
@@ -274,6 +275,7 @@ describe(commands.CONTENTTYPE_GET, () => {
   it('fails validation if list id is not valid id', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', listId: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid GUID');
   });
 
   it('fails validation if none id or name are specified', () => {

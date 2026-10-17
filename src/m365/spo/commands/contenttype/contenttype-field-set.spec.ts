@@ -974,13 +974,15 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const { success } = commandOptionsSchema.safeParse({ webUrl: 'site.com', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' });
+    const { success, error } = commandOptionsSchema.safeParse({ webUrl: 'site.com', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' });
     assert.strictEqual(success, false);
+    assert.strictEqual(error?.issues[0].message, `'site.com' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the specified field ID is not a valid GUID', () => {
-    const { success } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: 'invalid' });
+    const { success, error } = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', contentTypeId: '0x0100FF0B2E33A3718B46A3909298D240FD93', id: 'invalid' });
     assert.strictEqual(success, false);
+    assert.strictEqual(error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('passes validation when all required parameters are valid', () => {
