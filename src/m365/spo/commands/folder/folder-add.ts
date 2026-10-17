@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -9,16 +10,27 @@ import commands from '../../commands.js';
 import { FolderColorValues } from './FolderColor.js';
 import { FolderProperties } from './FolderProperties.js';
 
+const folderColorValues = [...Object.keys(FolderColorValues), ...Object.values(FolderColorValues)] as [string, ...string[]];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  parentFolderUrl: z.string().alias('p'),
+  name: z.string().alias('n'),
+  color: z.enum(folderColorValues, {
+    error: e => `'${e.input}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`
+  }).optional(),
+  ensureParentFolders: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  parentFolderUrl: string;
-  name: string;
-  color?: string;
-  ensureParentFolders?: boolean
 }
 
 class SpoFolderAddCommand extends SpoCommand {
@@ -30,64 +42,8 @@ class SpoFolderAddCommand extends SpoCommand {
     return 'Creates a folder within a parent folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        color: typeof args.options.color !== 'undefined',
-        ensureParentFolders: !!args.options.ensureParentFolders
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-p, --parentFolderUrl <parentFolderUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--color [color]',
-        autocomplete: Object.keys(FolderColorValues)
-      },
-      {
-        option: '--ensureParentFolders'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.color && !Object.entries(FolderColorValues).flat().includes(args.options.color)) {
-          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`;
-        }
-
-        return true;
-      });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'parentFolderUrl', 'name', 'color');
-    this.types.boolean.push('ensureParentFolders');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
