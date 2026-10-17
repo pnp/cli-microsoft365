@@ -28,7 +28,7 @@ ID | Area | Change | Change type | Affected commands
 [SPO-1](#SPO-1) | SharePoint Online | Existing files are no longer overwritten by default | Default behavior | `spo file add`
 [SPO-2](#SPO-2) | SharePoint Online | Options that you don't specify are no longer reset to default values | Default behavior | `spo page header set`
 [SPO-3](#SPO-3) | SharePoint Online | SharePoint write permissions required, Microsoft Graph permissions no longer required | Permissions | `spo contenttype sync`
-[SPO-4](#SPO-4) | SharePoint Online | Output properties renamed, removed, and added | Output | `spo navigation node list`
+[SPO-4](#SPO-4) | SharePoint Online | Output properties renamed, removed, and added, `location` option required, `isExternal` option removed | Output, options | `spo navigation node add`, `spo navigation node get`, `spo navigation node list`, `spo navigation node set`
 [TEAMS-1](#TEAMS-1) | Teams | Teams specified by name are retrieved using the Microsoft Teams endpoint | Permissions | 15 `teams` commands
 [GEN-1](#GEN-1) | General | Removed items are moved to the recycle bin by default | Default behavior, options | 9 `remove` commands
 [GEN-2](#GEN-2) | General | `spo web alert` aliases removed | Removed alias | `spo web alert list`, `spo web alert remove`
@@ -42,7 +42,7 @@ Change | Action required when | Action
 [SPO-1](#SPO-1) | You use `spo file add` to replace files that already exist | Add `--overwrite`
 [SPO-2](#SPO-2) | You use `spo page header set` and rely on unspecified options being set to default values | Specify these options explicitly
 [SPO-3](#SPO-3) | You use `spo contenttype sync` | Consent SharePoint `AllSites.Manage` (delegated) or `Sites.Manage.All` (application)
-[SPO-4](#SPO-4) | You process the output of `spo navigation node list` | Use the new property names
+[SPO-4](#SPO-4) | You use an affected `spo navigation node` command | Use the new property names, add `--location` to `get` and `set`, remove `--isExternal`
 [TEAMS-1](#TEAMS-1) | You specify a team by name in an affected `teams` command | Consent Microsoft Graph `Team.ReadBasic.All` and update error message checks
 [GEN-1](#GEN-1) | You use an affected `remove` command | Remove `--recycle`, replace `--skipRecycleBin` with `--permanent`, add `--permanent` where items must be deleted permanently
 [GEN-2](#GEN-2) | You use `spo web alert list` or `spo web alert remove` | Use `spo web rule list` or `spo web rule remove`
@@ -160,20 +160,29 @@ Application | SharePoint | `Sites.Manage.All`
 1. Add the required SharePoint permission to your app registration and grant consent.
 2. Optionally, remove the Microsoft Graph permissions that you added for this command. Only do this if no other commands that you use need them.
 
-### SPO-4: `spo navigation node list` output changed {/* #SPO-4 */}
+### SPO-4: `spo navigation node` commands use a different API {/* #SPO-4 */}
 
-- **Affected commands**: [spo navigation node list](./cmd/spo/navigation/navigation-node-list.mdx)
-- **Change type**: Output
-- **Action required when**: your scripts read properties from the output of this command, for example in JSON output, `--query` expressions, or text output.
+- **Affected commands**: see the table below
+- **Change type**: Output, options
+- **Action required when**: you use any of the affected commands.
 
 #### What changed
 
-The command now uses a different API that allows you to retrieve more detailed information about navigation nodes. It exposes additional information, such as whether a link opens in a new tab (`OpenInNewWindow`).
+The `spo navigation node` commands now use a different API that allows you to retrieve more detailed information about navigation nodes. As a result, their output and options have changed.
+
+Command | Output changed | `--location` required | `--isExternal` removed
+------- | -------------- | ---------------------------------- | ----------------------
+[spo navigation node add](./cmd/spo/navigation/navigation-node-add.mdx) | Yes | No | Yes
+[spo navigation node get](./cmd/spo/navigation/navigation-node-get.mdx) | Yes | Yes | No
+[spo navigation node list](./cmd/spo/navigation/navigation-node-list.mdx) | Yes | Yes | No
+[spo navigation node set](./cmd/spo/navigation/navigation-node-set.mdx) | No | Yes | Yes
+
+**Output**: the output exposes additional information, such as whether a link opens in a new tab (`OpenInNewWindow`). The following properties have changed:
 
 | v11 property | v12 property | Change |
 | ------------ | ------------ | ------ |
 | `Id` (number) | `Key` (string) | Renamed, type changed from number to string |
-| `Url` | `SimpleUrl` | Renamed |
+| `Url` | `SimpleUrl` | Renamed. For linkless labels, the value is an empty string instead of `http://linkless.header/` |
 | `Children` | `Nodes` | Renamed |
 | `IsDocLib` | - | Removed |
 | `IsExternal` | - | Removed |
@@ -188,34 +197,57 @@ The command now uses a different API that allows you to retrieve more detailed i
 | - | `OpenInNewWindow` | Added |
 | - | `Translations` | Added |
 
+**`location` option**: `spo navigation node get` and `spo navigation node set` require the `location` option to specify the navigation in which the node is located. Valid values are `QuickLaunch` and `TopNavigationBar`. The error message returned when the navigation node doesn't exist has also changed:
+
+**`isExternal` option**: the new API doesn't support marking navigation nodes as external. The `isExternal` option has been removed from `spo navigation node add` and `spo navigation node set`, and specifying it returns an error. SharePoint doesn't allow changing the URL of a navigation node that points to a page in the current site into an external URL. When you try this using `spo navigation node set`, the URL isn't updated and no error is returned.
+
 #### Action required
 
-1. Replace `Id` with `Key`, `Url` with `SimpleUrl`, and `Children` with `Nodes`.
-2. Remove references to `IsDocLib`, `IsExternal`, `IsVisible`, and `ListTemplateType`.
-3. Treat `Key` as a string, for example in comparisons.
-4. Use `Key` when passing the ID of a navigation node to other commands, such as [spo navigation node remove](./cmd/spo/navigation/navigation-node-remove.mdx).
+1. In scripts that process the output of `spo navigation node add`, `get`, or `list`:
+   1. Replace `Id` with `Key`, `Url` with `SimpleUrl`, and `Children` with `Nodes`.
+   2. Remove references to `IsDocLib`, `IsExternal`, `IsVisible`, and `ListTemplateType`.
+   3. Treat `Key` as a string, for example in comparisons.
+   4. Use `Key` when passing the ID of a navigation node to other commands, such as [spo navigation node get](./cmd/spo/navigation/navigation-node-get.mdx), [spo navigation node set](./cmd/spo/navigation/navigation-node-set.mdx), or [spo navigation node remove](./cmd/spo/navigation/navigation-node-remove.mdx).
+2. Add `--location QuickLaunch` or `--location TopNavigationBar` to every `spo navigation node get` and `spo navigation node set` command, depending on where the node is located.
+3. Remove `--isExternal` from every `spo navigation node add` and `spo navigation node set` command.
 
 #### Example
 
 <Tabs>
   <TabItem value="v11">
 
-  ```sh
+  ```sh title="Retrieve the ID of a navigation node"
   m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --query "[?Title == 'Navigation Link'].Id"
+  ```
+
+  ```sh title="Retrieve a navigation node"
+  m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2209
+  ```
+
+  ```sh title="Update the URL of a navigation node"
+  m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/Marketing --id 2209 --url "https://www.microsoft.com" --isExternal true
   ```
 
   </TabItem>
   <TabItem value="v12">
 
-  ```sh
+  ```sh title="Retrieve the ID of a navigation node"
   m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --query "[?Title == 'Navigation Link'].Key"
+  ```
+
+  ```sh title="Retrieve a navigation node"
+  m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --id 2209
+  ```
+
+  ```sh title="Update the URL of a navigation node"
+  m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/Marketing --location TopNavigationBar --id 2209 --url "https://www.microsoft.com"
   ```
 
   </TabItem>
 </Tabs>
 
 <details>
-  <summary>Compare the full JSON output of v11 and v12</summary>
+  <summary>Compare the full JSON output of `spo navigation node list` in v11 and v12</summary>
 
 <Tabs>
   <TabItem value="v11 output">
