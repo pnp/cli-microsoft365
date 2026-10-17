@@ -14,8 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-record-undeclare.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './listitem-record-undeclare.js';
 
 describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -25,6 +24,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const postFakes = async (opts: any): Promise<string | undefined> => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // requestObjectIdentity mock
@@ -84,6 +84,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     }));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -126,145 +127,115 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
-      listTitle: 'Demo List',
-      listItemId: 147,
-      webUrl: 'https://returnerror.com/sites/project-y'
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        listTitle: 'Demo List',
+        listItemId: 147,
+        webUrl: 'https://returnerror.com/sites/project-y'
+      })
+    }), new CommandError('ClientSvc unknown error'));
   });
 
   it('correctly undeclares list item as a record when listTitle is passed', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.allowUnknownOptions();
-
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      listItemId: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listTitle: 'Demo List',
+        listItemId: 47,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+      })
+    });
   });
 
   it('correctly undeclares list item as a record when listUrl is passed', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.allowUnknownOptions();
-
-    const options: any = {
-      debug: true,
-      listUrl: listUrl,
-      id: 47,
-      webUrl: webUrl
-    };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listUrl: listUrl,
+        listItemId: 47,
+        webUrl: webUrl
+      })
+    });
   });
 
   it('correctly undeclares list item as a record when listId is passed', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.allowUnknownOptions();
-
-    const options: any = {
-      debug: true,
-      listId: '770fe148-1d72-480e-8cde-f9d3832798b6',
-      listItemId: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    };
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listId: '770fe148-1d72-480e-8cde-f9d3832798b6',
+        listItemId: 47,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+      })
+    });
   });
 
   it('fails to undeclare a list item as a record when \'reject me\' values are used', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
-      listTitle: 'Demo List',
-      listItemId: 47,
-      webUrl: 'https://rejectme.com/sites/project-y'
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Failed request'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        listTitle: 'Demo List',
+        listItemId: 47,
+        webUrl: 'https://rejectme.com/sites/project-y'
+      })
+    }), new CommandError('Failed request'));
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('fails validation if both id and title options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listItemId: 1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and title options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listItemId: 1, listTitle: 'Documents' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listItemId: 1, listTitle: 'Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 } }, commandInfo);
-    assert(actual);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', listItemId: 1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 in option listId is not a valid GUID');
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', listItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 } }, commandInfo);
-    assert(actual);
+  it('fails validation if both id and title options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listItemId: 1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and title options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listItemId: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 });

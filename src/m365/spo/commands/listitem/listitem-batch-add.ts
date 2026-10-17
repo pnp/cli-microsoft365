@@ -1,8 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -11,17 +12,26 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListItemFieldValueResult } from './ListItemFieldValueResult.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  filePath: z.string().refine(path => fs.existsSync(path), {
+    error: e => `File with path ${e.input} does not exist`
+  }).optional().alias('p'),
+  csvContent: z.string().optional().alias('c'),
+  listId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option listId is not a valid GUID`
+  }).optional().alias('l'),
+  listTitle: z.string().optional().alias('t'),
+  listUrl: z.string().optional()
+}).catchall(z.unknown());
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  filePath?: string;
-  csvContent?: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
 }
 
 interface FormValues {
@@ -46,85 +56,26 @@ class SpoListItemBatchAddCommand extends SpoCommand {
     return 'Creates list items in a batch';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        filePath: typeof args.options.filePath !== 'undefined',
-        csvContent: typeof args.options.csvContent !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
+      })
+      .refine(opts => [opts.filePath, opts.csvContent].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: filePath, csvContent.',
+        params: {
+          customCode: 'optionSet',
+          options: ['filePath', 'csvContent']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-p, --filePath [filePath]'
-      },
-      {
-        option: '-c, --csvContent [csvContent]'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId &&
-          !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
-        }
-
-        if (args.options.filePath && !fs.existsSync(args.options.filePath)) {
-          return `File with path ${args.options.filePath} does not exist`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push(
-      'webUrl',
-      'filePath',
-      'listId',
-      'listTitle',
-      'listUrl'
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] }, { options: ['filePath', 'csvContent'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
