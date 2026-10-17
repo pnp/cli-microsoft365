@@ -1,21 +1,32 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.uuid(),
+  fileId: z.uuid().optional(),
+  fileUrl: z.string().optional(),
+  expirationDateTime: z.string()
+    .refine(date => validation.isValidISODateTime(date) === true, {
+      error: e => `'${e.input}' is not a valid ISO date string.`
+    })
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id: string;
-  fileId?: string;
-  fileUrl?: string;
-  expirationDateTime: string;
 }
 
 class SpoFileSharingLinkSetCommand extends SpoCommand {
@@ -27,76 +38,19 @@ class SpoFileSharingLinkSetCommand extends SpoCommand {
     return 'Updates a sharing link of a file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileId: typeof args.options.fileId !== 'undefined',
-        fileUrl: typeof args.options.fileUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileId, opts.fileUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileId' or 'fileUrl', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileId', 'fileUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--fileId [fileId]'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--expirationDateTime <expirationDateTime>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
-          return `${args.options.fileId} is not a valid GUID`;
-        }
-
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (!validation.isValidISODateTime(args.options.expirationDateTime)) {
-          return `'${args.options.expirationDateTime}' is not a valid ISO date string`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'id', 'fileId', 'fileUrl', 'expirationDateTime');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
