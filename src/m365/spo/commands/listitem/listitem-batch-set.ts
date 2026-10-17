@@ -1,7 +1,8 @@
 import fs from 'fs';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -20,18 +21,34 @@ interface UserDetail {
   id: number;
 }
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  filePath: z.string()
+    .refine(filePath => fs.existsSync(filePath), {
+      error: e => `File with path ${e.input} does not exist`
+    })
+    .alias('p'),
+  webUrl: z.string()
+    .refine(webUrl => validation.isValidSharePointUrl(webUrl) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.string()
+    .refine(listId => validation.isValidGuid(listId), {
+      error: e => `${e.input} in option listId is not a valid GUID`
+    })
+    .optional()
+    .alias('l'),
+  listTitle: z.string().optional().alias('t'),
+  listUrl: z.string().optional(),
+  idColumn: z.string().optional(),
+  systemUpdate: z.boolean().optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  filePath: string;
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  idColumn?: string;
-  systemUpdate?: boolean;
 }
 
 class SpoListItemBatchSetCommand extends SpoCommand {
@@ -43,77 +60,19 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     return 'Updates list items in a batch';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        idColumn: typeof args.options.idColumn !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        systemUpdate: !!args.options.systemUpdate
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-p, --filePath <filePath>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--idColumn [idColumn]'
-      },
-      {
-        option: '-s, --systemUpdate'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId &&
-          !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
-        }
-
-        if (!fs.existsSync(args.options.filePath)) {
-          return `File with path ${args.options.filePath} does not exist`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

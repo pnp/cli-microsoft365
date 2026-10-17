@@ -13,7 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-batch-remove.js';
+import command, { options } from './listitem-batch-remove.js';
 
 describe(commands.LISTITEM_BATCH_REMOVE, () => {
   const filePath = 'C:\\Path\\To\\CSV\\CsvFile.csv';
@@ -32,6 +32,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
   //#endregion
 
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: any[];
   let logger: Logger;
   let promptIssued: boolean = false;
@@ -44,6 +45,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -91,7 +93,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
   });
 
   it('prompts before removing list items when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, ids: ids, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listId: listId, ids: ids, permanent: true }) });
 
     assert(promptIssued);
   });
@@ -101,7 +103,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, ids: ids } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listId: listId, ids: ids }) });
 
     assert(postSpy.notCalled);
   });
@@ -110,6 +112,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent);
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -118,7 +121,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -126,6 +129,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(`id\n1`);
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -134,7 +138,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -146,11 +150,12 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, ids: ids, listId: listId, permanent: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, ids: ids, listId: listId, permanent: true, force: true, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -159,10 +164,11 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listTitle: listTitle, force: true, verbose: true }) });
   });
 
   it('adds items in batch to a sharepoint list retrieved by title and removes empty items and final empty line if they exist', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n\n3\n`);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -171,7 +177,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listTitle: listTitle, force: true, verbose: true }) });
   });
 
   it('removes 150 items in batch from a sharepoint list retrieved by url and reading the content from a csv file and confirming the prompt', async () => {
@@ -183,6 +189,7 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       csvContent150Items += `\n${csvContentLine}`;
     }
     let amountOfRequestsInBody = 0;
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent150Items);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -192,12 +199,13 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true }) });
     assert.strictEqual(amountOfRequestsInBody, 150);
   });
 
   it('throws an error when batch api URL fails', async () => {
     const errorMessage = 'SharePoint REST Service Exception';
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -206,11 +214,12 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, force: true, verbose: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, force: true, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when batch api returns partly unsuccessful results', async () => {
     const errorMessage = `Creating some items failed with the following errors: ${os.EOL}- Item ID 1: Item does not exist. It may have been deleted by another user.`;
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -219,54 +228,74 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, force: true, verbose: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, force: true, verbose: true }) }), new CommandError(errorMessage));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if listId option is not a valid GUID', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if csv file does not exist', async () => {
-    sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if filePath exists and listId is a valid guid, but the csvContent does not contain the ID column', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n2\ninvalid`);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if filePath exists and listId is a valid guid, but the csvContent contains invalid ids', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns(`${csvContentHeaders}invalid\n${csvContentLine}`);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if filePath exists, csv content is valid and listId is a valid guid', async () => {
+  it('fails validation if listId option is not a valid GUID', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(csvContent);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option listId is not a valid GUID.');
   });
 
-  it('fails validation if ids are passed and ids contains invalid numbers', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, ids: `${ids},invalid` } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if csv file does not exist', () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if ids are passed and ids contains only valid numbers', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, ids: ids } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if filePath exists and listId is a valid guid, but the csvContent does not contain the ID column', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(`${csvContent}\n2\ninvalid`);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if filePath exists and listId is a valid guid, but the csvContent contains invalid ids', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(`${csvContentHeaders}invalid\n${csvContentLine}`);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if filePath exists, csv content is valid and listId is a valid guid', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(csvContent);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if ids are passed and ids contains invalid numbers', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, ids: `${ids},invalid` });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if ids are passed and ids contains only valid numbers', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, ids: ids });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if both filePath and ids are specified', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(csvContent);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId, ids: ids });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither filePath nor ids are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, ids: ids, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -13,7 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-batch-add.js';
+import command, { options } from './listitem-batch-add.js';
 
 describe(commands.LISTITEM_BATCH_ADD, () => {
   const filePath = 'C:\\Path\\To\\CSV\\CsvFile.csv';
@@ -32,6 +32,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
   //#endregion
 
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: any[];
   let logger: Logger;
 
@@ -42,6 +43,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -80,7 +82,13 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('allows unknown options', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
+  });
+
   it('adds items in batch to a sharepoint list retrieved by id', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -89,7 +97,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, verbose: true }) });
   });
 
   it('adds items in batch to a sharepoint list retrieved by id with csv content', async () => {
@@ -100,10 +108,11 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true }) });
   });
 
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -112,7 +121,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true }) });
   });
 
   it('adds 150 items in batch to a sharepoint list retrieved by url', async () => {
@@ -121,6 +130,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       csvContent150Items += `\n${csvContentLine}`;
     }
     let amountOfRequestsInBody = 0;
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent150Items);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -130,12 +140,13 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true }) });
     assert.strictEqual(amountOfRequestsInBody, 150);
   });
 
   it('throws an error when batch api URL fails', async () => {
     const errorMessage = 'SharePoint REST Service Exception';
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -144,11 +155,12 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when batch api returns partly unsuccessful results', async () => {
     const errorMessage = `Creating some items failed with the following errors: ${os.EOL}- Line 3: SomeDateTime - You must specify a valid date within the range of 1/1/1900 and 12/31/8900.${os.EOL}- Line 4: SomeDateTime - You must specify a valid date within the range of 1/1/1900 and 12/31/8900.`;
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -157,10 +169,11 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when the SharePoint list cannot be found by title', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
@@ -169,29 +182,43 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true } }), new CommandError(`List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listTitle: listTitle, verbose: true }) }), new CommandError(`List 'nonexistentlist' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'.`));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if listId option is not a valid GUID', async () => {
+  it('fails validation if listId option is not a valid GUID', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option listId is not a valid GUID');
   });
 
-  it('fails validation if csv file does not exist', async () => {
+  it('fails validation if csv file does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File with path ${filePath} does not exist`);
   });
 
-  it('passes validation if filePath exists and listId is a valid guid', async () => {
+  it('fails validation if both filePath and csvContent are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, csvContent: csvContent, listId: listId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither filePath nor csvContent are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if filePath exists and listId is a valid guid', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, true);
   });
 });
