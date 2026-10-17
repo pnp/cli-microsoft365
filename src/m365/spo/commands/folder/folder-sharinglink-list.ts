@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
 import { odata } from '../../../../utils/odata.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -10,20 +11,33 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands.js';
 
+const allowedScopes = ['anonymous', 'users', 'organization'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderUrl: z.string().optional(),
+  folderId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'folderId'.`
+    })
+    .optional(),
+  scope: z.enum(allowedScopes, {
+    error: e => `'${e.input}' is not a valid scope. Allowed values are: ${allowedScopes.join(', ')}`
+  }).optional().alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl?: string;
-  folderId?: string;
-  scope?: string;
-}
-
 class SpoFolderSharingLinkListCommand extends SpoCommand {
-  private readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
-
   public get name(): string {
     return commands.FOLDER_SHARINGLINK_LIST;
   }
@@ -36,67 +50,19 @@ class SpoFolderSharingLinkListCommand extends SpoCommand {
     return ['id', 'scope', 'roles', 'link'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
-        folderId: typeof args.options.folderId !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.folderUrl, opts.folderId].filter(o => o !== undefined).length === 1, {
+        error: `Specify one of the following options: folderUrl, folderId.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['folderUrl', 'folderId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '--folderUrl [folderUrl]' },
-      { option: '--folderId [folderId]' },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: this.allowedScopes
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['folderUrl', 'folderId'] }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.folderId && !validation.isValidGuid(args.options.folderId)) {
-          return `${args.options.folderId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && !this.allowedScopes.some(scope => scope === args.options.scope)) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(',')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folderUrl', 'folderId', 'scope');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
