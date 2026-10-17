@@ -1,20 +1,28 @@
 import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  appId: z.string().optional().alias('i'),
+  appDisplayName: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  appId?: string;
-  appDisplayName?: string;
 }
 
 class SpoSiteAppPermissionListCommand extends GraphCommand {
@@ -28,47 +36,15 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return 'Lists application permissions for a site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
-        appId: typeof args.options.appId !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => !(o.appId !== undefined && o.appDisplayName !== undefined), {
+        error: `Provide either appId or appDisplayName, not both.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '-n, --appDisplayName [appDisplayName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && args.options.appDisplayName) {
-          return `Provide either appId or appDisplayName, not both`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
   }
 
   private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {

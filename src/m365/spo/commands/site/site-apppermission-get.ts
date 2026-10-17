@@ -1,19 +1,27 @@
 import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.string().alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  id: string
 }
 
 class SpoSiteAppPermissionGetCommand extends GraphCommand {
@@ -25,28 +33,8 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
     return 'Gets a specific application permissions for the site';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --id <id>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   private getApplicationPermission(args: CommandArgs, siteId: string): Promise<Permission> {

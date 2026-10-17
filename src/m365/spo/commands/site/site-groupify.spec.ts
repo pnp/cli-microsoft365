@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-groupify.js';
+import command, { options } from './site-groupify.js';
 
 describe(commands.SITE_GROUPIFY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.SITE_GROUPIFY, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,7 +86,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A'  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -115,7 +117,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A'  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -146,7 +148,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -179,7 +181,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space'  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -212,7 +214,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI'  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -245,7 +247,7 @@ describe(commands.SITE_GROUPIFY, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true  }) });
     assert(loggerLogSpy.calledWith({
       "DocumentsUrl": null,
       "ErrorMessage": null,
@@ -270,7 +272,7 @@ describe(commands.SITE_GROUPIFY, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('The group alias already exists.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A'  }) }), new CommandError('The group alias already exists.'));
   });
 
   it('handles error when the specified site already is connected to a group', async () => {
@@ -288,22 +290,28 @@ describe(commands.SITE_GROUPIFY, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('This site already has an M365 Group attached.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A'  }) }), new CommandError('This site already has an M365 Group attached.'));
   });
 
   it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A'  }) }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if url is not a SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'http://contoso/sites/team-a' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if all required options are specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

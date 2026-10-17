@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-recyclebinitem-clear.js';
+import command, { options } from './site-recyclebinitem-clear.js';
 
 describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
 
@@ -19,6 +19,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,21 +72,27 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo', force: true });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', force: true } }, commandInfo);
-    assert(actual);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', force: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the items from the recycle bin when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -102,9 +110,9 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
 
     assert(postStub.notCalled);
@@ -122,11 +130,11 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
   });
 
@@ -145,9 +153,9 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com'
-      }
+      })
     });
 
     assert(postStub.called);
@@ -165,12 +173,12 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         secondary: true,
         force: true
-      }
+      })
     });
 
     assert(postStub.called);
@@ -192,7 +200,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', force: true } } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com', force: true }) }),
       new CommandError(error.error['odata.error'].message.value)
     );
   });
