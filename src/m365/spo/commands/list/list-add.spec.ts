@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-add.js';
+import command, { options } from './list-add.js';
 
 describe(commands.LIST_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.LIST_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -75,7 +77,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -91,7 +93,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -106,7 +108,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, 100);
   });
 
@@ -122,7 +124,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -138,7 +140,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -154,7 +156,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -170,7 +172,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -186,7 +188,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -202,7 +204,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -218,7 +220,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -234,7 +236,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -250,7 +252,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -266,7 +268,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -282,7 +284,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -298,7 +300,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', disableCommenting: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', disableCommenting: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -314,7 +316,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -330,7 +332,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: 'Author', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: 'Author', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -346,7 +348,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, enableAssignToEmail: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -362,7 +364,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -378,7 +380,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -394,7 +396,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -410,7 +412,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -426,7 +428,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -442,7 +444,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -458,7 +460,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -474,7 +476,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -490,7 +492,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -506,7 +508,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -522,7 +524,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -538,7 +540,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -554,7 +556,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -570,7 +572,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -586,7 +588,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -602,7 +604,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -618,7 +620,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -634,7 +636,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -650,7 +652,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -666,7 +668,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -682,7 +684,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -698,7 +700,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -714,7 +716,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -730,7 +732,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -746,7 +748,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: 'NewExperience', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: 'NewExperience', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -762,7 +764,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -778,7 +780,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -794,7 +796,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -810,7 +812,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -826,7 +828,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -842,7 +844,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -858,7 +860,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -874,7 +876,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -890,7 +892,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -906,7 +908,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -922,7 +924,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -938,7 +940,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -954,7 +956,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -970,7 +972,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -986,7 +988,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1002,7 +1004,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1018,7 +1020,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1034,7 +1036,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1050,7 +1052,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1066,7 +1068,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -1083,134 +1085,142 @@ describe(commands.LIST_ADD, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) }),
       new CommandError(error.error['odata.error'].message.value));
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', title: 'List 1', baseTemplate: 'GenericList' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', title: 'List 1', baseTemplate: 'GenericList' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('has correct baseTemplate specified', async () => {
+  it('has correct baseTemplate specified', () => {
     const baseTemplateValue = 'DocumentLibrary';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if non existing baseTemplate specified', async () => {
+  it('fails if non existing baseTemplate specified', () => {
     const baseTemplateValue = 'foo';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the templateFeatureId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the templateFeatureId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option templateFeatureId is not a valid GUID');
   });
 
-  it('passes validation if the templateFeatureId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the templateFeatureId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option defaultContentApprovalWorkflowId is not a valid GUID');
   });
 
-  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if non existing draftVersionVisibility specified', async () => {
+  it('fails if non existing draftVersionVisibility specified', () => {
     const draftVersionValue = 'NonExistingDraftVersionVisibility';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('has correct draftVersionVisibility specified', async () => {
+  it('has correct draftVersionVisibility specified', () => {
     const draftVersionValue = 'Approver';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if emailAlias specified, but enableAssignToEmail is not true', async () => {
+  it('fails if emailAlias specified, but enableAssignToEmail is not true', () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue } }, commandInfo);
-    assert.strictEqual(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
   });
 
-  it('has correct emailAlias and enableAssignToEmail values specified', async () => {
+  it('has correct emailAlias and enableAssignToEmail values specified', () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: true } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if non existing direction specified', async () => {
+  it('fails if non existing direction specified', () => {
     const directionValue = 'abc';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('has correct direction value specified', async () => {
+  it('has correct direction value specified', () => {
     const directionValue = 'LTR';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if majorVersionLimit specified, but enableVersioning is not true', async () => {
+  it('fails if majorVersionLimit specified, but enableVersioning is not true', () => {
     const majorVersionLimitValue = 20;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue } }, commandInfo);
-    assert.strictEqual(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `majorVersionLimit option is only valid in combination with enableVersioning.`);
   });
 
-  it('has correct majorVersionLimit and enableVersioning values specified', async () => {
+  it('has correct majorVersionLimit and enableVersioning values specified', () => {
     const majorVersionLimitValue = 20;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: true } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', async () => {
+  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
     const majorWithMinorVersionLimitValue = 20;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } }, commandInfo);
-    assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
-  it('fails if non existing readSecurity specified', async () => {
+  it('fails if non existing readSecurity specified', () => {
     const readSecurityValue = 5;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '5 is not a valid readSecurity value. Allowed values are 1|2');
   });
 
-  it('fails if non existing writeSecurity specified', async () => {
+  it('fails if non existing writeSecurity specified', () => {
     const writeSecurityValue = 5;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '5 is not a valid writeSecurity value. Allowed values are 1|2|4');
   });
 
-  it('has correct readSecurity specified', async () => {
+  it('has correct readSecurity specified', () => {
     const readSecurityValue = 2;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if non existing listExperienceOptions specified', async () => {
+  it('fails if non existing listExperienceOptions specified', () => {
     const listExperienceValue = 'NonExistingExperience';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('has correct listExperienceOptions specified', async () => {
+  it('has correct listExperienceOptions specified', () => {
     const listExperienceValue = 'NewExperience';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } }, commandInfo);
-    assert(actual === true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue });
+    assert.strictEqual(actual.success, true);
   });
 
   it('returns listInstance object when list is added with correct values', async () => {
@@ -1273,7 +1283,7 @@ describe(commands.LIST_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert(loggerLogSpy.calledWith({
       AllowContentTypes: true,
       BaseTemplate: 100,
@@ -1326,5 +1336,12 @@ describe(commands.LIST_ADD, () => {
       TemplateFeatureId: null,
       Title: 'List 1'
     }));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: 'NewExperience',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

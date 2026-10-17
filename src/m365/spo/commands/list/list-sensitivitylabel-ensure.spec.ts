@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-sensitivitylabel-ensure.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-sensitivitylabel-ensure.js';
 
 describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -39,6 +38,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -47,13 +47,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === 'prompt') {
-        return false;
-      }
-
-      return defaultValue;
-    });
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -74,8 +68,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch,
-      cli.getSettingWithDefaultValue
+      request.patch
     ]);
   });
 
@@ -92,60 +85,47 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: listId, name: name } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: listId, name: name });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, name: name } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, name: name });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: sensitivityLabelId } }, commandInfo);
-    assert(actual);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, id: sensitivityLabelId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: 'invalid', name: name } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: 'invalid', name: name });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, name: name } }, commandInfo);
-    assert(actual);
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, name: name });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if id and name options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id and name options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, name: name } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId, listUrl and listTitle options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, name: name });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should apply sensitivity label by id to document library using title', async () => {
@@ -157,7 +137,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, id: sensitivityLabelId, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle, id: sensitivityLabelId, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
@@ -180,7 +160,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, name: name, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle, name: name, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
@@ -203,7 +183,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl, name: name, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listUrl: listUrl, name: name, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
@@ -226,7 +206,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, name: name, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listId: listId, name: name, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
@@ -261,12 +241,12 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         name: name
-      }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+      })
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('should handle error if the specified sensitivity label does not exist', async () => {
@@ -279,12 +259,12 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         name: name
-      }
-    } as any), new CommandError('The specified sensitivity label does not exist'));
+      })
+    }), new CommandError('The specified sensitivity label does not exist'));
   });
 
   it('should handle error when trying to set label', async () => {
@@ -314,11 +294,18 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         name: name
-      }
-    } as any), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
+      })
+    }), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, name: name,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-sitescript-get.js';
+import command, { options } from './list-sitescript-get.js';
 
 describe(commands.LIST_SITESCRIPT_GET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -150,11 +152,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
-      }
+      })
     });
     const expected = {
       "actions": [
@@ -317,10 +319,10 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
-      }
+      })
     });
     const expected = {
       "actions": [
@@ -483,11 +485,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
-      }
+      })
     });
     const expected = {
       "actions": [
@@ -650,10 +652,10 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
-      }
+      })
     });
     const expected = {
       "actions": [
@@ -816,11 +818,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'sites/team1/MyLibrary'
-      }
+      })
     });
 
     const expected = {
@@ -916,11 +918,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
-      }
-    } as any), new CommandError("An error has occurred, the site script could not be extracted from list 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'"));
+      })
+    }), new CommandError("An error has occurred, the site script could not be extracted from list 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'"));
   });
 
   it('correctly handles error when trying to extract site script if the server did not return generated site script (using listTitle)', async () => {
@@ -943,11 +945,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
-      }
-    } as any), new CommandError("An error has occurred, the site script could not be extracted from list 'MyLibrary'"));
+      })
+    }), new CommandError("An error has occurred, the site script could not be extracted from list 'MyLibrary'"));
   });
 
   it('correctly handles error when trying to extract site script from a list that doesn\'t exist', async () => {
@@ -981,11 +983,11 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
-      }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+      })
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('uses correct API url when listId option is passed', async () => {
@@ -1006,31 +1008,39 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
-      }
+        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
+      })
     });
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the listid option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'XXXXX' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listid option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'XXXXX' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'XXXXX is not a valid GUID');
   });
 
-  it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the listid option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
