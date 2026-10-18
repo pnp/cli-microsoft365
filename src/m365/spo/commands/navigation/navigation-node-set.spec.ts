@@ -251,6 +251,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   it('fails validation if no options are set to be changed', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, location: 'QuickLaunch', id: id });
     assert.notStrictEqual(actual.success, true);
+    assert.deepStrictEqual((actual.error?.issues[0] as any).params, { customCode: 'optionSet', options: ['title', 'url', 'audienceIds', 'openInNewWindow'] });
   });
 
   it('fails validation if audienceIds contains more than 10 guids', async () => {

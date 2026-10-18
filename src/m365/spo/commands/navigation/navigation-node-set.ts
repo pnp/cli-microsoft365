@@ -49,7 +49,11 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.title, options.url, options.audienceIds, options.openInNewWindow].some(o => o !== undefined), {
-        error: 'Specify at least one property to update.'
+        error: 'Specify at least one property to update.',
+        params: {
+          customCode: 'optionSet',
+          options: ['title', 'url', 'audienceIds', 'openInNewWindow']
+        }
       });
   }
 
