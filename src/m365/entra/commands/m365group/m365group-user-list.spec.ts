@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-user-list.js';
+import command, { options } from './m365group-user-list.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.M365GROUP_USER_LIST, () => {
@@ -19,6 +19,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -66,52 +68,58 @@ describe(commands.M365GROUP_USER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the groupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid groupId and no role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid groupId and no role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid groupId and Owner role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Owner'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid groupId and Owner role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Owner'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid groupId and Member role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Member'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid groupId and Member role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Member'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when both groupId and groupDisplayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      groupDisplayName: 'CLI Test Group'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly lists all users in a Microsoft 365 group by group id', async () => {
@@ -134,7 +142,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupId: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: "00000000-0000-0000-0000-000000000000" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -179,7 +187,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupDisplayName: "CLI Test Group" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupDisplayName: "CLI Test Group" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -213,7 +221,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -247,7 +255,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: "00000000-0000-0000-0000-000000000000", role: "Member" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -290,7 +298,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, groupId: "00000000-0000-0000-0000-000000000000" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -334,7 +342,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: "2c1ba4c4-cd9b-4417-832f-92a34bc34b2a", properties: "displayName,mail,memberof/id,memberof/displayName" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: "2c1ba4c4-cd9b-4417-832f-92a34bc34b2a", properties: "displayName,mail,memberof/id,memberof/displayName" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"] },
@@ -361,7 +369,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: "2c1ba4c4-cd9b-4417-832f-92a34bc34b2a", filter: "userType eq 'Guest'" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: "2c1ba4c4-cd9b-4417-832f-92a34bc34b2a", filter: "userType eq 'Guest'" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -379,7 +387,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
   it('correctly handles error when listing users', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000" } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: "00000000-0000-0000-0000-000000000000" }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -389,7 +397,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, groupId: groupId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: groupId }) }),
       new CommandError(`Specified group '${groupId}' is not a Microsoft 365 group.`));
   });
 
@@ -399,7 +407,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupDisplayName: groupDisplayName }) }),
       new CommandError(`Specified group '${groupDisplayName}' is not a Microsoft 365 group.`));
   });
 });

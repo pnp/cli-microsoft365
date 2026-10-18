@@ -1,21 +1,24 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { cli } from '../../../../cli/cli.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('d'),
+  mailNickname: z.string().optional().alias('m')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  mailNickname?: string;
 }
 
 class EntraM365GroupRecycleBinItemRestoreCommand extends GraphCommand {
@@ -27,53 +30,19 @@ class EntraM365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     return 'Restores a deleted Microsoft 365 Group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-m, --mailNickname [mailNickname]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.displayName, opts.mailNickname].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: id, displayName or mailNickname.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName', 'mailNickname']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
