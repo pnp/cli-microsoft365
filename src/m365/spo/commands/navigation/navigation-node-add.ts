@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -7,19 +8,44 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { MenuState, MenuStateNode, NavigationNode } from './NavigationNode.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    message: 'The value of the option \'webUrl\' is not a valid SharePoint Online site URL.'
+  }).alias('u'),
+  location: z.enum(['QuickLaunch', 'TopNavigationBar']).optional().alias('l'),
+  title: z.string().alias('t'),
+  url: z.string().optional(),
+  parentNodeId: z.coerce.number().refine((val: number) => !isNaN(val), {
+    message: 'parentNodeId is not a number'
+  }).optional(),
+  isExternal: z.boolean().optional(),
+  audienceIds: z.string().refine((val: string) => {
+    if (val === '') {
+      return true;
+    }
+    const items = val.split(',').map((s: string) => s.trim());
+    if (items.length > 10) {
+      return false;
+    }
+    const invalid = items.filter((item: string) => !validation.isValidGuid(item));
+    return invalid.length === 0;
+  }, { error: (issue: any) => {
+    const val = issue.input as string;
+    const items = val.split(',').map((s: string) => s.trim());
+    if (items.length > 10) {
+      return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.';
+    }
+    const invalid = items.filter((item: string) => !validation.isValidGuid(item));
+    return `The following GUIDs are invalid for the option 'audienceIds': ${invalid.join(', ')}.`;
+  } }).optional(),
+  openInNewWindow: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  audienceIds?: string;
-  isExternal?: boolean;
-  location?: string;
-  parentNodeId?: number;
-  title: string;
-  url?: string;
-  webUrl: string;
-  openInNewWindow?: boolean
 }
 
 class SpoNavigationNodeAddCommand extends SpoCommand {
@@ -31,99 +57,19 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return 'Adds a navigation node to the specified site navigation';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        isExternal: args.options.isExternal,
-        location: typeof args.options.location !== 'undefined',
-        parentNodeId: typeof args.options.parentNodeId !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        openInNewWindow: !!args.options.openInNewWindow
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => [opts.location, opts.parentNodeId].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either location or parentNodeId, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['location', 'parentNodeId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --location [location]',
-        autocomplete: ['QuickLaunch', 'TopNavigationBar']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--parentNodeId [parentNodeId]'
-      },
-      {
-        option: '--isExternal'
-      },
-      {
-        option: '--audienceIds [audienceIds]'
-      },
-      {
-        option: '--openInNewWindow'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.parentNodeId) {
-          if (isNaN(args.options.parentNodeId)) {
-            return `${args.options.parentNodeId} is not a number`;
-          }
-        }
-        else {
-          if (args.options.location !== 'QuickLaunch' &&
-            args.options.location !== 'TopNavigationBar') {
-            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
-          }
-        }
-
-        if (args.options.audienceIds) {
-          const audienceIdsSplitted = args.options.audienceIds.split(',');
-          if (audienceIdsSplitted.length > 10) {
-            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds is 10.';
-          }
-
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.audienceIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'audienceIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['location', 'parentNodeId'] }
-    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

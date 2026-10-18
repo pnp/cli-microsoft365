@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -7,18 +8,43 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { MenuStateNode } from './NavigationNode.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    message: 'The value of the option \'webUrl\' is not a valid SharePoint Online site URL.'
+  }).alias('u'),
+  id: z.coerce.number().refine((val: number) => !isNaN(val), {
+    message: 'id is not a number'
+  }),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  audienceIds: z.string().refine((val: string) => {
+    if (val === '') {
+      return true;
+    }
+    const items = val.split(',').map((s: string) => s.trim());
+    if (items.length > 10) {
+      return false;
+    }
+    const invalid = items.filter((item: string) => !validation.isValidGuid(item));
+    return invalid.length === 0;
+  }, { error: (issue: any) => {
+    const val = issue.input as string;
+    const items = val.split(',').map((s: string) => s.trim());
+    if (items.length > 10) {
+      return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.';
+    }
+    const invalid = items.filter((item: string) => !validation.isValidGuid(item));
+    return `The following GUIDs are invalid for the option 'audienceIds': ${invalid.join(', ')}.`;
+  } }).optional(),
+  isExternal: z.boolean().optional(),
+  openInNewWindow: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  audienceIds?: string;
-  id: string;
-  isExternal?: boolean;
-  title?: string;
-  url?: string;
-  webUrl: string;
-  openInNewWindow?: boolean;
 }
 
 class SpoNavigationNodeSetCommand extends SpoCommand {
@@ -30,84 +56,18 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
     return 'Adds a navigation node to the specified site navigation';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        isExternal: typeof args.options.isExternal !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined',
-        openInNewWindow: typeof args.options.openInNewWindow !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => opts.audienceIds !== undefined || opts.url !== undefined || opts.isExternal !== undefined || opts.title !== undefined || opts.openInNewWindow !== undefined, {
+        message: 'Please specify at least one property to update.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('isExternal');
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--audienceIds [audienceIds]'
-      },
-      {
-        option: '--isExternal [isExternal]'
-      },
-      {
-        option: '--openInNewWindow [openInNewWindow]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.audienceIds === undefined && args.options.url === undefined && args.options.isExternal === undefined && !args.options.title && args.options.openInNewWindow === undefined) {
-          return `Please specify at least one property to update.`;
-        }
-
-        if (args.options.audienceIds) {
-          const audienceIdsSplitted = args.options.audienceIds.split(',');
-          if (audienceIdsSplitted.length > 10) {
-            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.';
-          }
-
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.audienceIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'audienceIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -151,11 +111,12 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
           await logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
         }
 
+        const idStr = args.options.id.toString();
         let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
-        let menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+        let menuStateItem = this.getMenuStateNode(menuState.Nodes, idStr);
         if (!menuStateItem) {
           menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
-          menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+          menuStateItem = this.getMenuStateNode(menuState.Nodes, idStr);
         }
         menuStateItem!.OpenInNewWindow = args.options.openInNewWindow;
         await spo.saveMenuState(args.options.webUrl, menuState);
