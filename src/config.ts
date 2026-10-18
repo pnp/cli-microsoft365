@@ -4,6 +4,7 @@ export default {
   allScopes: [
     'https://management.azure.com/user_impersonation',
     'https://admin.services.crm.dynamics.com/user_impersonation',
+    'https://graph.microsoft.com/AgentIdentityBlueprintPrincipal.Read.All',
     'https://graph.microsoft.com/AppCatalog.ReadWrite.All',
     'https://graph.microsoft.com/AuditLog.Read.All',
     'https://graph.microsoft.com/Bookings.Read.All',
