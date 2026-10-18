@@ -1,25 +1,29 @@
 import { Application, AppRole } from "@microsoft/microsoft-graph-types";
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from "../../../../utils/formatting.js";
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraApp } from "../../../../utils/entraApp.js";
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appName: z.string().optional(),
+  claim: z.string().optional().alias('c'),
+  name: z.string().optional().alias('n'),
+  id: z.uuid().optional().alias('i'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appObjectId?: string;
-  appName?: string;
-  claim?: string;
-  name?: string;
-  id?: string;
 }
 
 class EntraAppRoleRemoveCommand extends GraphCommand {
@@ -31,59 +35,26 @@ class EntraAppRoleRemoveCommand extends GraphCommand {
     return 'Removes role from the specified Entra app registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined',
-        claim: typeof args.options.claim !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        id: typeof args.options.id !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--appName [appName]' },
-      { option: '-n, --name [name]' },
-      { option: '-i, --id [id]' },
-      { option: '-c, --claim [claim]' },
-      { option: '-f, --force' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either appId, appObjectId, or appName',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appName']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['appId', 'appObjectId', 'appName'] },
-      { options: ['name', 'claim', 'id'] }
-    );
+      })
+      .refine(options => [options.name, options.claim, options.id].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either name, claim, or id',
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'claim', 'id']
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
