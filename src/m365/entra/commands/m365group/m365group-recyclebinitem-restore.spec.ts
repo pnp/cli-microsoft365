@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-recyclebinitem-restore.js';
+import command, { options } from './m365group-recyclebinitem-restore.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
@@ -60,6 +60,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -68,6 +69,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -115,14 +117,24 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when more than one of id, displayName and mailNickname is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', displayName: 'Dev Team' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('restores the specified group by id', async () => {
@@ -135,10 +147,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: validGroupId
-      }
+      })
     });
   });
 
@@ -159,10 +171,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         displayName: validGroupDisplayName
-      }
+      })
     });
   });
 
@@ -183,17 +195,17 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         mailNickname: validGroupMailNickname
-      }
+      })
     });
   });
 
   it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) }),
       new CommandError('Group Not Found.'));
   });
 
@@ -207,10 +219,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        mailNickname: validGroupMailNickname,
-        force: true
-      }
+      options: commandOptionsSchema.parse({
+        mailNickname: validGroupMailNickname
+      })
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
@@ -232,10 +243,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        mailNickname: validGroupMailNickname,
-        force: true
-      }
+      options: commandOptionsSchema.parse({
+        mailNickname: validGroupMailNickname
+      })
     }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -262,22 +272,11 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         displayName: validGroupDisplayName
-      }
+      })
     });
     assert(postRequestIssued);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

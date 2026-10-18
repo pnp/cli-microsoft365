@@ -1,30 +1,44 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { validation } from '../../../../utils/validation.js';
-import { formatting } from '../../../../utils/formatting.js';
-import GraphCommand from '../../../base/GraphCommand.js';
-import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+
+const RoleEnum = {
+  owner: 'owner',
+  member: 'member'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  ids: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'ids': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  userNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'userNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  groupId: z.uuid().optional().alias('i'),
+  groupName: z.string().optional(),
+  teamId: z.uuid().optional(),
+  teamName: z.string().optional(),
+  role: zod.coercedEnum(RoleEnum).alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  ids?: string;
-  userNames?: string;
-  groupId?: string;
-  groupName?: string;
-  teamId?: string;
-  teamName?: string;
-  role: string;
-}
-
 class EntraM365GroupUserSetCommand extends GraphCommand {
-  private readonly allowedRoles: string[] = ['owner', 'member'];
-
   public get name(): string {
     return commands.M365GROUP_USER_SET;
   }
@@ -33,97 +47,26 @@ class EntraM365GroupUserSetCommand extends GraphCommand {
     return 'Updates role of the specified user in the specified Microsoft 365 Group or Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.groupId, opts.groupName, opts.teamId, opts.teamName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: groupId, groupName, teamId or teamName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName', 'teamId', 'teamName']
+        }
+      })
+      .refine(opts => [opts.ids, opts.userNames].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: ids or userNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['ids', 'userNames']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--ids [ids]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-r, --role <role>',
-        autocomplete: this.allowedRoles
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `'${args.options.teamId}' is not a valid GUID for option 'teamId'.`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `'${args.options.groupId}' is not a valid GUID for option 'groupId'.`;
-        }
-
-        if (args.options.ids) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ids);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ids': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.userNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.role && !this.allowedRoles.some(role => role.toLowerCase() === args.options.role.toLowerCase())) {
-          return `'${args.options.role}' is not a valid role. Allowed values are: ${this.allowedRoles.join(',')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupName', 'teamId', 'teamName'] });
-    this.optionSets.push({ options: ['ids', 'userNames'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('ids', 'userNames', 'groupId', 'groupName', 'teamId', 'teamName', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

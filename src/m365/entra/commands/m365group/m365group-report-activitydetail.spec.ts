@@ -1,18 +1,23 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { dateAndPeriodBasedReportOptions } from '../../../base/DateAndPeriodBasedReport.js';
 import commands from '../../commands.js';
 import command from './m365group-report-activitydetail.js';
 
 describe(commands.M365GROUP_REPORT_ACTIVITYDETAIL, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof dateAndPeriodBasedReportOptions;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -20,6 +25,8 @@ describe(commands.M365GROUP_REPORT_ACTIVITYDETAIL, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof dateAndPeriodBasedReportOptions;
   });
 
   beforeEach(() => {
@@ -57,6 +64,31 @@ describe(commands.M365GROUP_REPORT_ACTIVITYDETAIL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation when neither period nor date is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when both period and date are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7', date: '2023-01-01' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation on valid period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation on valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ date: '2023-01-01' });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('gets details about Microsoft 365 Groups activity by group for the given period', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityDetail(period='D7')`) {
@@ -70,7 +102,7 @@ describe(commands.M365GROUP_REPORT_ACTIVITYDETAIL, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { period: 'D7' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityDetail(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });

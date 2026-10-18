@@ -2,35 +2,62 @@ import { Group, User } from '@microsoft/microsoft-graph-types';
 import { setTimeout } from 'timers/promises';
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const VisibilityEnum = {
+  Private: 'Private',
+  Public: 'Public',
+  HiddenMembership: 'HiddenMembership'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string().alias('n'),
+  mailNickname: z.string().alias('m'),
+  description: z.string().optional().alias('d'),
+  owners: z.string()
+    .refine(owners => owners.split(',').map(o => o.trim()).every(o => o.indexOf('@') > -1), {
+      error: e => `${(e.input as string).split(',').map(o => o.trim()).find(o => o.indexOf('@') < 0)} is not a valid userPrincipalName`
+    }).optional(),
+  members: z.string()
+    .refine(members => members.split(',').map(m => m.trim()).every(m => m.indexOf('@') > -1), {
+      error: e => `${(e.input as string).split(',').map(m => m.trim()).find(m => m.indexOf('@') < 0)} is not a valid userPrincipalName`
+    }).optional(),
+  visibility: zod.coercedEnum(VisibilityEnum).optional(),
+  logoPath: z.string()
+    .refine(logoPath => {
+      const fullPath = path.resolve(logoPath);
+      return fs.existsSync(fullPath) && !fs.lstatSync(fullPath).isDirectory();
+    }, {
+      error: e => {
+        const fullPath = path.resolve(e.input as string);
+        return fs.existsSync(fullPath) ? `Path '${fullPath}' points to a directory` : `File '${fullPath}' not found`;
+      }
+    })
+    .optional()
+    .alias('l'),
+  allowMembersToPost: z.boolean().optional(),
+  hideGroupInOutlook: z.boolean().optional(),
+  subscribeNewGroupMembers: z.boolean().optional(),
+  welcomeEmailDisabled: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  displayName: string;
-  mailNickname: string;
-  description?: string;
-  owners?: string;
-  members?: string;
-  visibility?: string;
-  logoPath?: string;
-  allowMembersToPost?: boolean;
-  hideGroupInOutlook?: boolean;
-  subscribeNewGroupMembers?: boolean;
-  welcomeEmailDisabled?: boolean;
-}
-
 class EntraM365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
   private pollingInterval: number = 500;
-  private allowedVisibilities: string[] = ['Private', 'Public', 'HiddenMembership'];
 
   public get name(): string {
     return commands.M365GROUP_ADD;
@@ -40,123 +67,16 @@ class EntraM365GroupAddCommand extends GraphCommand {
     return 'Creates a Microsoft 365 Group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        owners: typeof args.options.owners !== 'undefined',
-        members: typeof args.options.members !== 'undefined',
-        logoPath: typeof args.options.logoPath !== 'undefined',
-        visibility: typeof args.options.visibility !== 'undefined',
-        allowMembersToPost: !!args.options.allowMembersToPost,
-        hideGroupInOutlook: !!args.options.hideGroupInOutlook,
-        subscribeNewGroupMembers: !!args.options.subscribeNewGroupMembers,
-        welcomeEmailDisabled: !!args.options.welcomeEmailDisabled
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.mailNickname.indexOf(' ') === -1, {
+        error: 'The option mailNickname cannot contain spaces.',
+        path: ['mailNickname']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-m, --mailNickname <mailNickname>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--members [members]'
-      },
-      {
-        option: '--visibility [visibility]',
-        autocomplete: this.allowedVisibilities
-      },
-      {
-        option: '--allowMembersToPost [allowMembersToPost]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hideGroupInOutlook [hideGroupInOutlook]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--welcomeEmailDisabled [welcomeEmailDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-l, --logoPath [logoPath]'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('displayName', 'mailNickname', 'description', 'owners', 'members', 'visibility', 'logoPath');
-    this.types.boolean.push('allowMembersToPost', 'hideGroupInOutlook', 'subscribeNewGroupMembers', 'welcomeEmailDisabled');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.owners) {
-          const owners: string[] = args.options.owners.split(',').map(o => o.trim());
-          for (let i = 0; i < owners.length; i++) {
-            if (owners[i].indexOf('@') < 0) {
-              return `${owners[i]} is not a valid userPrincipalName`;
-            }
-          }
-        }
-
-        if (args.options.members) {
-          const members: string[] = args.options.members.split(',').map(m => m.trim());
-          for (let i = 0; i < members.length; i++) {
-            if (members[i].indexOf('@') < 0) {
-              return `${members[i]} is not a valid userPrincipalName`;
-            }
-          }
-        }
-
-        if (args.options.mailNickname.indexOf(' ') !== -1) {
-          return 'The option mailNickname cannot contain spaces.';
-        }
-
-        if (args.options.logoPath) {
-          const fullPath: string = path.resolve(args.options.logoPath);
-
-          if (!fs.existsSync(fullPath)) {
-            return `File '${fullPath}' not found`;
-          }
-
-          if (fs.lstatSync(fullPath).isDirectory()) {
-            return `Path '${fullPath}' points to a directory`;
-          }
-        }
-
-        if (args.options.visibility && this.allowedVisibilities.map(x => x.toLowerCase()).indexOf(args.options.visibility.toLowerCase()) === -1) {
-          return `${args.options.visibility} is not a valid visibility. Allowed values are ${this.allowedVisibilities.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
