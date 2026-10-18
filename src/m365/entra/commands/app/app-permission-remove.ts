@@ -1,5 +1,6 @@
 import { AppRole, AppRoleAssignment, Application, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from "@microsoft/microsoft-graph-types";
-import GlobalOptions from "../../../../GlobalOptions.js";
+import { z } from 'zod';
+import { globalOptionsZod } from "../../../../Command.js";
 import { odata } from "../../../../utils/odata.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
@@ -9,18 +10,27 @@ import { validation } from "../../../../utils/validation.js";
 import { cli } from "../../../../cli/cli.js";
 import { entraApp } from "../../../../utils/entraApp.js";
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional().alias('i'),
+  appObjectId: z.uuid().optional(),
+  appName: z.string().optional().alias('n'),
+  applicationPermissions: z.string()
+    .refine(permissions => validation.isValidPermission(permissions) === true, {
+      error: e => `Application permission(s) ${(validation.isValidPermission(e.input as string) as string[]).join(', ')} are not fully-qualified`
+    }).optional().alias('a'),
+  delegatedPermissions: z.string()
+    .refine(permissions => validation.isValidPermission(permissions) === true, {
+      error: e => `Delegated permission(s) ${(validation.isValidPermission(e.input as string) as string[]).join(', ')} are not fully-qualified`
+    }).optional().alias('d'),
+  revokeAdminConsent: z.boolean().optional(),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appObjectId?: string;
-  appName?: string;
-  applicationPermissions?: string;
-  delegatedPermissions?: string;
-  revokeAdminConsent?: boolean;
-  force?: boolean;
 }
 
 interface AppPermission {
@@ -43,101 +53,26 @@ class EntraAppPermissionRemoveCommand extends GraphCommand {
     return 'Removes the specified application and/or delegated permissions from a specified Microsoft Entra app';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined',
-        applicationPermissions: typeof args.options.applicationPermissions !== 'undefined',
-        delegatedPermissions: typeof args.options.delegatedPermissions !== 'undefined',
-        revokeAdminConsent: !!args.options.revokeAdminConsent,
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either appId, appObjectId, or appName',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appName']
+        }
+      })
+      .refine(options => options.applicationPermissions !== undefined || options.delegatedPermissions !== undefined, {
+        error: 'Specify either applicationPermissions or delegatedPermissions',
+        params: {
+          customCode: 'optionSet',
+          options: ['applicationPermissions', 'delegatedPermissions']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '--appObjectId [appObjectId]'
-      },
-      {
-        option: '-n, --appName [appName]'
-      },
-      {
-        option: '-a, --applicationPermissions [applicationPermissions]'
-      },
-      {
-        option: '-d, --delegatedPermissions [delegatedPermissions]'
-      },
-      {
-        option: '--revokeAdminConsent'
-      },
-      {
-        option: '--force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
-          return `${args.options.appObjectId} is not a valid GUID`;
-        }
-
-        if (args.options.delegatedPermissions) {
-          const invalidPermissions = validation.isValidPermission(args.options.delegatedPermissions);
-          if (Array.isArray(invalidPermissions)) {
-            return `Delegated permission(s) ${invalidPermissions.join(', ')} are not fully-qualified`;
-          }
-        }
-
-        if (args.options.applicationPermissions) {
-          const invalidPermissions = validation.isValidPermission(args.options.applicationPermissions);
-          if (Array.isArray(invalidPermissions)) {
-            return `Application permission(s) ${invalidPermissions.join(', ')} are not fully-qualified`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['appId', 'appObjectId', 'appName']
-      },
-      {
-        options: ['applicationPermissions', 'delegatedPermissions'],
-        runsWhen: (args) => args.options.delegatedPermissions === undefined && args.options.applicationPermissions === undefined
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('appId', 'appObjectId', 'appName', 'applicationPermissions', 'delegatedPermissions');
-    this.types.boolean.push('revokeAdminConsent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

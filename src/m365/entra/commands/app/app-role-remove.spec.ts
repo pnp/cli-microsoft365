@@ -9,16 +9,17 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-role-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-role-remove.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -28,6 +29,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -136,11 +138,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
         force: true
-      }
+      })
     });
   });
 
@@ -203,11 +205,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
   });
 
@@ -270,11 +272,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     });
   });
 
@@ -336,11 +338,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         claim: 'Product.Read',
         force: true
-      }
+      })
     });
   });
 
@@ -403,11 +405,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
   });
 
@@ -470,11 +472,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     });
   });
 
@@ -537,12 +539,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
         force: true
-      }
+      })
     });
   });
 
@@ -605,12 +607,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
   });
 
@@ -673,12 +675,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     });
   });
 
@@ -729,11 +731,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     });
   });
 
@@ -784,11 +786,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         claim: 'Product.Read',
         force: true
-      }
+      })
     });
   });
 
@@ -839,11 +841,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
   });
 
@@ -893,12 +895,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     });
   });
 
@@ -949,12 +951,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appName: 'App-Name',
         claim: 'Product.Read',
         force: true
-      }
+      })
     });
   });
 
@@ -1005,12 +1007,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appName: 'App-Name',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
   });
 
@@ -1019,11 +1021,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         claim: 'Product.Read',
         force: true
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -1066,6 +1068,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         }
       ]
     });
+
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -1075,11 +1078,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         name: 'ProductRead',
         force: true
-      }
+      })
     }), new CommandError(`Multiple roles with name 'ProductRead' found. Found: c4352a0a-494f-46f9-b843-479855c173a7, 9267ab18-8d09-408d-8c94-834662ed16d1.`));
   });
 
@@ -1132,12 +1135,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appName: 'App-Name',
         name: 'ProductRead',
         force: true
-      }
+      })
     });
     assert(removeRequestIssued);
   });
@@ -1149,11 +1152,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         name: 'ProductRead',
         force: true
-      }
+      })
     }), new CommandError(`No app role with name 'ProductRead' found.`));
   });
 
@@ -1164,11 +1167,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         claim: 'Product.Read',
         force: true
-      }
+      })
     }), new CommandError(`No app role with claim 'Product.Read' found.`));
   });
 
@@ -1179,22 +1182,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: true
-      }
+      })
     }), new CommandError(`No app role with id 'c4352a0a-494f-46f9-b843-479855c173a7' found.`));
   });
 
   it('prompts before removing the specified app role when force option not passed', async () => {
-    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: 'App-Name', claim: 'Product.Read' }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified app role when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appName: 'App-Name', claim: 'Product.Read' }) });
 
     assert(promptIssued);
   });
@@ -1259,12 +1262,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
         force: false
-      }
+      })
     });
   });
 
@@ -1329,11 +1332,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         force: false
-      }
+      })
     });
   });
 
@@ -1399,12 +1402,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         force: false
-      }
+      })
     });
   });
 
@@ -1414,7 +1417,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: 'App-Name', claim: 'Product.Read' }) });
     assert(patchStub.notCalled);
   });
 
@@ -1424,7 +1427,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appName: 'App-Name', claim: 'Product.Read' }) });
     assert(patchStub.notCalled);
   });
 
@@ -1442,11 +1445,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'App-Role',
         force: true
-      }
+      })
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -1455,11 +1458,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'App-Role',
         force: true
-      }
+      })
     }), new CommandError(`App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`));
   });
 
@@ -1468,165 +1471,106 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'My app',
         name: 'App-Role',
         force: true
-      }
+      })
     }), new CommandError(error));
   });
 
-  it('fails validation if appId and appObjectId specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and appObjectId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId and appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appObjectId and appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appObjectId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither appId, appObjectId nor appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, appObjectId nor appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if role name and id is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if role name and id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", id: "c4352a0a-494f-46f9-b843-479855c173a7" });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation role name and claim is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", claim: "Product.Read" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation role name and claim is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", claim: "Product.Read" });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if role id and claim is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: "Product.Read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if role id and claim is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: "Product.Read", id: "c4352a0a-494f-46f9-b843-479855c173a7" });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither role name, id or claim specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither role name, id or claim specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified role id is not a valid guid', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '77355bee' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified role id is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '77355bee' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified - appId,name', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appId,name', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appId,claim', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appId,claim', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appId,id', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appId,id', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appObjectId,name', async () => {
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appObjectId,name', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appObjectId,claim', async () => {
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appObjectId,claim', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appObjectId,id', async () => {
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appObjectId,id', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appName,name', async () => {
-    const actual = await command.validate({ options: { appName: 'My App', name: 'ProductRead' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appName,name', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'My App', name: 'ProductRead' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appName,claim', async () => {
-    const actual = await command.validate({ options: { appName: 'My App', claim: 'Product.Read' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appName,claim', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'My App', claim: 'Product.Read' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified - appName,id', async () => {
-    const actual = await command.validate({ options: { appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified - appName,id', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

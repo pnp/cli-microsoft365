@@ -1,19 +1,23 @@
 import { AppRole } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appObjectId?: string;
-  appName?: string;
 }
 
 class EntraAppRoleListCommand extends GraphCommand {
@@ -25,34 +29,19 @@ class EntraAppRoleListCommand extends GraphCommand {
     return 'Gets Entra app registration roles';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either appId, appObjectId, or appName',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appId [appId]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--appName [appName]' }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public defaultProperties(): string[] | undefined {

@@ -1,16 +1,20 @@
 import { Application } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from "../../../../utils/odata.js";
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  properties?: string;
 }
 
 class EntraAppListCommand extends GraphCommand {
@@ -22,29 +26,12 @@ class EntraAppListCommand extends GraphCommand {
     return 'Retrieves a list of Entra app registrations';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {
     return ['appId', 'id', 'displayName', "signInAudience"];
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        properties: typeof args.options.properties !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-p, --properties [properties]' }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
