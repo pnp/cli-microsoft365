@@ -237,6 +237,7 @@ export default {
   PAGE_TEMPLATE_LIST: `${prefix} page template list`,
   PAGE_TEMPLATE_REMOVE: `${prefix} page template remove`,
   PAGE_TEXT_ADD: `${prefix} page text add`,
+  PAGE_UNPUBLISH: `${prefix} page unpublish`,
   PROPERTYBAG_GET: `${prefix} propertybag get`,
   PROPERTYBAG_LIST: `${prefix} propertybag list`,
   PROPERTYBAG_REMOVE: `${prefix} propertybag remove`,
