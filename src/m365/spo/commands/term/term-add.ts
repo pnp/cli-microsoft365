@@ -1,7 +1,8 @@
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -10,22 +11,25 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { Term } from './Term.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  webUrl: z.string().optional().alias('u'),
+  termSetId: z.string().optional(),
+  termSetName: z.string().optional(),
+  termGroupId: z.string().optional(),
+  termGroupName: z.string().optional(),
+  id: z.string().optional().alias('i'),
+  description: z.string().optional().alias('d'),
+  parentTermId: z.string().optional(),
+  customProperties: z.string().optional(),
+  localCustomProperties: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl?: string;
-  customProperties?: string;
-  description?: string;
-  id?: string;
-  localCustomProperties?: string;
-  name: string;
-  parentTermId?: string;
-  termGroupId?: string;
-  termGroupName?: string;
-  termSetId?: string;
-  termSetName?: string;
 }
 
 class SpoTermAddCommand extends SpoCommand {
@@ -37,141 +41,86 @@ class SpoTermAddCommand extends SpoCommand {
     return 'Adds taxonomy term';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined',
-        customProperties: typeof args.options.customProperties !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        localCustomProperties: typeof args.options.localCustomProperties !== 'undefined',
-        parentTermId: typeof args.options.parentTermId !== 'undefined',
-        termGroupId: typeof args.options.termGroupId !== 'undefined',
-        termGroupName: typeof args.options.termGroupName !== 'undefined',
-        termSetId: typeof args.options.termSetId !== 'undefined',
-        termSetName: typeof args.options.termSetName !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl [webUrl]'
-      },
-      {
-        option: '--termSetId [termSetId]'
-      },
-      {
-        option: '--termSetName [termSetName]'
-      },
-      {
-        option: '--termGroupId [termGroupId]'
-      },
-      {
-        option: '--termGroupName [termGroupName]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--parentTermId [parentTermId]'
-      },
-      {
-        option: '--customProperties [customProperties]'
-      },
-      {
-        option: '--localCustomProperties [localCustomProperties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.webUrl) {
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.webUrl) {
+          return validation.isValidSharePointUrl(opts.webUrl) === true;
         }
-
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.parentTermId) {
-          if (!validation.isValidGuid(args.options.parentTermId)) {
-            return `${args.options.parentTermId} is not a valid GUID`;
-          }
-
-          if (args.options.termSetId || args.options.termSetName) {
-            return 'Specify either parentTermId, termSetId or termSetName but not both';
-          }
-        }
-
-        if (args.options.termGroupId) {
-          if (!validation.isValidGuid(args.options.termGroupId)) {
-            return `${args.options.termGroupId} is not a valid GUID`;
-          }
-        }
-
-        if (!args.options.termSetId && !args.options.termSetName && !args.options.parentTermId) {
-          return 'Specify termSetId, termSetName or parentTermId';
-        }
-
-        if (args.options.termSetId && args.options.termSetName) {
-          return 'Specify termSetId or termSetName but not both';
-        }
-
-        if (args.options.termSetId) {
-          if (!validation.isValidGuid(args.options.termSetId)) {
-            return `${args.options.termSetId} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.customProperties) {
-          try {
-            JSON.parse(args.options.customProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing customProperties: ${e}`;
-          }
-        }
-
-        if (args.options.localCustomProperties) {
-          try {
-            JSON.parse(args.options.localCustomProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing localCustomProperties: ${e}`;
-          }
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['termGroupId', 'termGroupName'] });
+      }, { message: 'Invalid SharePoint URL' })
+      .refine(opts => {
+        if (opts.id && !validation.isValidGuid(opts.id)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).id} is not a valid GUID` })
+      .refine(opts => {
+        if (opts.parentTermId && !validation.isValidGuid(opts.parentTermId)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).parentTermId} is not a valid GUID` })
+      .refine(opts => {
+        if (opts.parentTermId && (opts.termSetId || opts.termSetName)) {
+          return false;
+        }
+        return true;
+      }, { message: 'Specify either parentTermId, termSetId or termSetName but not both' })
+      .refine(opts => {
+        if (opts.termGroupId && !validation.isValidGuid(opts.termGroupId)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).termGroupId} is not a valid GUID` })
+      .refine(opts => {
+        if (!opts.termSetId && !opts.termSetName && !opts.parentTermId) {
+          return false;
+        }
+        return true;
+      }, { message: 'Specify termSetId, termSetName or parentTermId' })
+      .refine(opts => {
+        if (opts.termSetId && opts.termSetName) {
+          return false;
+        }
+        return true;
+      }, { message: 'Specify termSetId or termSetName but not both' })
+      .refine(opts => {
+        if (opts.termSetId && !validation.isValidGuid(opts.termSetId)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).termSetId} is not a valid GUID` })
+      .refine(opts => {
+        if (opts.customProperties) {
+          try {
+            JSON.parse(opts.customProperties);
+          }
+          catch {
+            return false;
+          }
+        }
+        return true;
+      }, { message: 'customProperties is not valid JSON' })
+      .refine(opts => {
+        if (opts.localCustomProperties) {
+          try {
+            JSON.parse(opts.localCustomProperties);
+          }
+          catch {
+            return false;
+          }
+        }
+        return true;
+      }, { message: 'localCustomProperties is not valid JSON' })
+      .refine(opts => [opts.termGroupId, opts.termGroupName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either termGroupId or termGroupName, but not both.',
+        params: { customCode: 'optionSet', options: ['termGroupId', 'termGroupName'] }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

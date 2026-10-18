@@ -13,8 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './term-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './term-add.js';
 
 describe(commands.TERM_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -112,6 +111,7 @@ describe(commands.TERM_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -127,6 +127,7 @@ describe(commands.TERM_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -177,7 +178,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, name: name, termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: name, termSetName: termSetName, termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -192,7 +193,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -207,7 +208,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -222,7 +223,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', parentTermId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', parentTermId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -245,7 +246,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, name: name, description: 'IT term', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: name, description: 'IT term', termSetName: termSetName, termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "IT term", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -268,7 +269,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1": "Value1" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1": "LocalValue1" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -289,7 +290,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: name, termSetName: termSetName, termGroupName: termGroupName } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when the term group specified by id doesn\'t exist', async () => {
@@ -309,14 +310,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
-        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
-        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
-      }
-    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' }) }), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the term group specified by name doesn\'t exist', async () => {
@@ -336,7 +330,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: name, termSetName: termSetName, termGroupName: termGroupName } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
 
   });
 
@@ -357,13 +351,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        termSetName: termSetName,
-        termGroupName: termGroupName
-      }
-    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the term set specified by id doesn\'t exist', async () => {
@@ -383,14 +371,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
-        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
-        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
-      }
-    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' }) } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the specified name already exists', async () => {
@@ -404,13 +385,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        termSetName: termSetName,
-        termGroupName: termGroupName
-      }
-    } as any), new CommandError('There is already a term with the same default label and parent term.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('There is already a term with the same default label and parent term.'));
   });
 
   it('correctly handles error when the specified id already exists', async () => {
@@ -424,14 +399,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
-        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
-        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
-      }
-    } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' }) }), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
   });
 
   it('correctly handles error when setting the description', async () => {
@@ -455,14 +423,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        description: 'IT term',
-        termSetName: termSetName,
-        termGroupName: termGroupName
-      }
-    } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, description: 'IT term', termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when setting custom properties', async () => {
@@ -486,15 +447,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        customProperties: '{"Prop1": "Value1"}',
-        localCustomProperties: '{"LocalProp1": "LocalValue1"}',
-        termSetName: termSetName,
-        termGroupName: termGroupName
-      }
-    } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when setting local custom properties', async () => {
@@ -518,15 +471,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: name,
-        customProperties: '{"Prop1": "Value1"}',
-        localCustomProperties: '{"LocalProp1": "LocalValue1"}',
-        termSetName: termSetName,
-        termGroupName: termGroupName
-      }
-    } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly escapes XML in term group name', async () => {
@@ -540,7 +485,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, termSetName: termSetName, termGroupName: 'People>' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: termSetName, termGroupName: 'People>'  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -555,7 +500,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, termSetName: 'Department>', termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, termSetName: 'Department>', termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith(termAddResponse));
   });
 
@@ -570,7 +515,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: 'IT>', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'IT>', termSetName: termSetName, termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -593,7 +538,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, description: 'IT term>', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, description: 'IT term>', termSetName: termSetName, termGroupName: termGroupName  }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "IT term>", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -616,7 +561,7 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, customProperties: '{"Prop1>": "Value1>"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, customProperties: '{"Prop1>": "Value1>"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: termSetName, termGroupName: termGroupName }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1>": "Value1>" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1": "LocalValue1" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -639,118 +584,111 @@ describe(commands.TERM_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1>": "LocalValue1>"}', termSetName: termSetName, termGroupName: termGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: name, customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1>": "LocalValue1>"}', termSetName: termSetName, termGroupName: termGroupName }) });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1": "Value1" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1>": "LocalValue1>" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { termGroupName: termGroupName, name: name, id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ termGroupName: termGroupName, name: name, id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('fails validation if neither termGroupId nor termGroupName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { name: name } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither termGroupId nor termGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both termGroupId and termGroupName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termGroupId: termGroupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both termGroupId and termGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupName: termGroupName, termGroupId: termGroupId, termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if termGroupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: 'invalid', termSetName: termSetName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if termGroupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: 'invalid', termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('fails validation if neither termSetId nor termSetName specified', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither termSetId, termSetName nor parentTermId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both termSetId and termSetName specified', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId, termSetId: termSetId, termSetName: termSetName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both termSetId and termSetName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, termSetId: termSetId, termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both parentTermId and termSetName specified', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId, parentTermId: parentTermId, termSetName: termSetName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both parentTermId and termSetName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, parentTermId: parentTermId, termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both parentTermId and termSetId specified', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId, parentTermId: parentTermId, termSetId: '9e54299e-208a-4000-8546-cc4139091b29' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both parentTermId and termSetId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, parentTermId: parentTermId, termSetId: '9e54299e-208a-4000-8546-cc4139091b29' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both parentTermId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId, parentTermId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both parentTermId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, parentTermId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('fails validation if termSetId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupId: termGroupId, termSetId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if termSetId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupId: termGroupId, termSetId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
-  it('fails validation if custom properties is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termSetName: termSetName, customProperties: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if custom properties is not a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupName: termGroupName, termSetName: termSetName, customProperties: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if local custom properties is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termSetName: termSetName, localCustomProperties: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if local custom properties is not a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupName: termGroupName, termSetName: termSetName, localCustomProperties: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when webUrl is not a valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', name: name, termGroupName: termGroupName, termSetName: termSetName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when webUrl is not a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', name: name, termGroupName: termGroupName, termSetName: termSetName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the webUrl is a valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, name: name, termGroupName: termGroupName, termSetName: termSetName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the webUrl is a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, name: name, termGroupName: termGroupName, termSetName: termSetName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when id, termSetId and termGroupId specified', async () => {
-    const actual = await command.validate({ options: { name: name, id: id, termGroupId: termGroupId, termSetId: termSetId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id, termSetId and termGroupId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, id: id, termGroupId: termGroupId, termSetId: termSetId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when id, termSetName and termGroupName specified', async () => {
-    const actual = await command.validate({ options: { name: name, id: id, termGroupName: termGroupName, termSetName: termSetName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id, termSetName and termGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, id: id, termGroupName: termGroupName, termSetName: termSetName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when id, parentTermId and termGroupName specified', async () => {
-    const actual = await command.validate({ options: { name: name, id: id, termGroupName: termGroupName, parentTermId: parentTermId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id, parentTermId and termGroupName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, id: id, termGroupName: termGroupName, parentTermId: parentTermId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when custom properties is a valid JSON string', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termSetName: termSetName, customProperties: '{}' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when custom properties is a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupName: termGroupName, termSetName: termSetName, customProperties: '{}' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when local custom properties is a valid JSON string', async () => {
-    const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termSetName: termSetName, localCustomProperties: '{}' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when local custom properties is a valid JSON string', () => {
+    const actual = commandOptionsSchema.safeParse({ name: name, termGroupName: termGroupName, termSetName: termSetName, localCustomProperties: '{}' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Test', unknown: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
