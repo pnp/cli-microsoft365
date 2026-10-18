@@ -24,17 +24,53 @@ Review pull requests against the project's PR checklist and coding standards. Pr
 3. Run the following to collect PR metadata and diff:
 
 ```bash
-gh pr view <number> --json number,title,body,author,files,additions,deletions,baseRefName,headRefName
+gh pr view <number> --json number,title,body,author,files,additions,deletions,baseRefName,headRefName,headRefOid,closingIssuesReferences
 gh pr diff <number>
 ```
 
-4. Identify the type of change (new command, bug fix, documentation, refactor, etc.) from the PR title, body, and changed files. This determines which checklist items apply.
+4. **Reviewing a specific commit**: `gh pr diff` always shows the latest PR state. When asked to review a specific commit (or an earlier state of the PR), fetch the PR head and diff from the merge base instead:
+
+```bash
+git fetch <remote> pull/<number>/head:pr-<number>   # <remote> = the remote pointing at the base repository
+git diff $(git merge-base <remote>/main <sha>)..<sha>
+```
+
+5. **Read the linked issue(s)** (`closingIssuesReferences`, or `Closes #<n>` in the body) with `gh issue view <n> --comments`. The issue is the specification: verify the PR implements what was agreed (option names, aliases, behavior, output).
+6. Identify the type of change (new command, bug fix, refactor/migration, breaking change/removal, documentation, SPFx rules, docs site, infrastructure, etc.) from the PR title, body, linked issue, and changed files. This determines which checklist items and area-specific checklists apply.
+7. **Read as widely as needed** to understand the change: callers, shared helpers the PR uses, related docs, release notes, and the linked issue. Wider reading informs findings but does not widen what can block (see [Scope policy](#scope-policy)).
+8. **Build, test, and lint** when feasible, without modifying the user's working tree. Use a separate worktree:
+
+```bash
+git worktree add ../pr-<number>-review <sha>
+cd ../pr-<number>-review && npm ci && npm run build
+npx mocha "dist/**/<changed-file>.spec.js"   # targeted tests for changed files
+npx eslint <changed files>
+```
+
+   Remove the worktree when done (`git worktree remove ../pr-<number>-review`). If you did not build, test, or lint, say so explicitly in the findings and the review summary (for example, "Not verified by running tests or lint").
+
+### Scope policy
+
+Read widely, but only issues the PR **introduces or exposes** may be blocking findings.
+
+In scope:
+
+- Problems in new or changed lines.
+- Unchanged code whose behavior changes because of the PR. For example: an unchanged `allowUnknownOptions()` that makes a removed option silently accepted; an unchanged helper (e.g. one that only matches `*.sharepoint.com`) that the PR newly relies on; a new `responseType` that interacts with error handling in `request.ts`; docs that still list options or aliases the PR dropped.
+- New code that copies an existing bad pattern.
+
+Out of scope:
+
+- Pre-existing issues in code the PR doesn't change never block. Omit them, or list them under a non-blocking **Noticed, out of scope** heading, ideally suggesting a follow-up issue.
+- For lines rewritten wholesale by a mechanical refactor or migration, flag only what the migration broke. Older problems on those lines follow the pre-existing rule.
+
+**Heuristic**: "Would this still be a problem if the PR were reverted?" If yes, it is pre-existing and must not block.
 
 ### Phase 2: Review
 
-Read `references/pr-checklist.md` for the full checklist.
+Read `references/pr-checklist.md` for the full checklist. When the PR touches SPFx upgrade/doctor rules, the docs site, or telemetry/infrastructure, also read `references/area-checklists.md`.
 
-Review the diff against **all three categories** below. Not every checklist item applies to every PR — evaluate applicability based on the change type identified in Phase 1.
+Review the diff against **all four categories** below. Not every checklist item applies to every PR — evaluate applicability based on the change type identified in Phase 1.
 
 #### A. Checklist Compliance
 
@@ -59,9 +95,25 @@ Walk through each applicable item in the checklist and verify it against the dif
 Review the implementation for:
 
 - Logic errors, off-by-one mistakes, unhandled edge cases.
-- Security issues (injection, unvalidated input, leaked credentials).
-- Performance concerns (unnecessary API calls, missing pagination).
+- Security issues (injection, unvalidated input, leaked or publicly exposed credentials and secrets).
+- Performance concerns (unnecessary API calls, missing pagination, unbounded concurrency).
 - TypeScript best practices (proper typing, no implicit any).
+
+**Breaking changes and removals** (removed or renamed commands, options, aliases, or behavior):
+
+- Release notes (`docs/docs/about/release-notes.mdx`) use accurate wording: *removed* vs *renamed* vs *deprecated*.
+- Upgrade guidance is added for the target major version (`docs/docs/v<N>-upgrade-guidance.mdx`), explaining what changed and what users should do.
+- No leftover references to the removed option or command in `src/` and `docs/` (e.g. `grep -rn -- '--<option>' src docs`), including examples, remarks, and tests.
+- Removed options are actually rejected (check `allowUnknownOptions()` and schema strictness), not silently accepted.
+
+**Refactors and migrations** (e.g. migrating a command to Zod) — verify behavior parity with the previous implementation:
+
+- Short aliases are preserved (e.g. `-t`, `-m`, `-n`).
+- Option sets keep the same semantics: exactly-one vs at-most-one; specifying none still fails when it did before.
+- Option-set options use `customCode: 'optionSet'` in refinements so interactive prompting still works; `customCode: 'required'` is used only where an option is truly required.
+- Enum and case handling is unchanged (e.g. use `zod.coercedEnum` for case-insensitive enums; check that transforms actually run).
+- Unknown-options behavior is unchanged.
+- Docs still match the options (names, aliases, required/optional, allowed values).
 
 #### C. Test Quality
 
@@ -72,6 +124,10 @@ Check test files (`.spec.ts`) for:
 - Tests that actually verify behavior (not just that code runs).
 - Tests for command name, description not being `null`, and schema validation.
 - Use `sinon.restore()` in `after()` to reset stubs/spies.
+- Test names describe the validated behavior (e.g. `'retrieves file contents as string when asString is specified'`), not the implementation or a vague label.
+- Assert exact URLs and request bodies (`opts.url === '<full url>'`, `assert.deepStrictEqual(postStub.lastCall.args[0].data, { ... })`), not `indexOf` or partial matches.
+- Use `settingsNames` constants (`src/settingsNames.ts`) instead of hardcoded setting name strings.
+- When the PR changes arguments passed to an API or helper (e.g. adds `permanent: true`), tests assert the changed argument is passed.
 
 #### D. Documentation Quality
 
@@ -81,6 +137,7 @@ Check documentation files (`.mdx`) for:
 - The `.mdx` file name matches the command file name.
 - Must include: title, description, usage, options table, examples, permissions, and response. A remarks section can be used for additional information, but is not mandatory.
 - When a command has a response, include sample output for all four output formats: JSON, Markdown, text, and CSV.
+- Each format's sample matches real output. Formats treat `defaultProperties` differently: only `text` output is trimmed to `defaultProperties`; JSON, CSV, and Markdown include all properties. A CSV or Markdown sample showing only the default properties is wrong.
 - Include at least 2 examples for the examples section, covering different option combinations.
 - Import and use `<Global />` for standard CLI options.
 - Examples should use `m365` prefix and long option names (not short aliases).
@@ -91,36 +148,46 @@ Check documentation files (`.mdx`) for:
 
 ### Phase 3: Present Findings
 
-Compile all findings into a **numbered list** and present it to the user in chat. Each finding must include:
+Compile all in-scope findings into a **numbered list** and present it to the user in chat. Each finding must include:
 
-1. **File and line reference** (linked).
-2. **Category**: Checklist | Code Quality | Test Quality.
+1. **File and line reference**, linked as a blob URL at the reviewed commit (PR `headRefOid` or the specific SHA) with line anchors: `[<path>:<line>](https://github.com/<owner>/<repo>/blob/<sha>/<path>#L<start>-L<end>)`. Use `#L<n>` for a single line.
+2. **Category**: Checklist | Code Quality | Test Quality | Documentation.
 3. **Severity**: Error (must fix) | Warning (should fix) | Suggestion (nice to have).
 4. **Description**: What the issue is and why it matters.
 5. **Suggestion**: What to change (be specific).
 
+**Severity calibration**:
+
+- **Error**: bugs, security issues (e.g. leaked or publicly exposed secrets, injection), and regressions in behavior users rely on (e.g. dropped aliases, broken interactive prompting, removed options silently accepted) are always Errors.
+- **Warning**: checklist violations and issues that should be fixed but don't break users.
+- **Suggestion**: style, readability, and optional improvements.
+
 If there are **zero findings**, state that the PR looks good.
 
-Sort findings: Errors first, then Warnings, then Suggestions.
+Sort findings: Errors first, then Warnings, then Suggestions. List out-of-scope observations separately under **Noticed, out of scope** (non-blocking). State whether build, tests, and lint were run and their results.
 
 ### Phase 4: Post Comments
 
 Always ask the user for confirmation before posting any comments on the PR. Present the planned comments and wait for explicit approval. Then:
 
 1. **Submit a review** with inline comments and the appropriate verdict:
+   - **Any Error** → `REQUEST_CHANGES`
+   - **Only Warnings and/or Suggestions** → `COMMENT`
    - **Zero findings** → `APPROVE`
-   - **Any findings** (error, warning, or suggestion) → `REQUEST_CHANGES`
+
+   Out-of-scope observations never affect the verdict.
 
 Post inline comments and the summary as a single review submission. Always target the actual line where the issue exists.
 
-**Line number accuracy**: When posting inline comments, verify line numbers against the actual diff hunk content. The line number refers to the **new file** line number (RIGHT side). Count lines in the diff hunk carefully — off-by-one errors cause comments to land on the wrong line and suggestion blocks to replace the wrong code.
+**Line number accuracy**: When posting inline comments, verify line numbers against the actual diff hunk content. The line number refers to the **new file** line number (RIGHT side). Count lines in the diff hunk carefully — off-by-one errors cause comments to land on the wrong line and suggestion blocks to replace the wrong code. Inline comments can only target lines in the diff; for issues in unchanged code exposed by the PR, include them in the summary.
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{number}/reviews \
   --method POST \
   --input - <<'EOF'
 {
-  "event": "APPROVE or REQUEST_CHANGES",
+  "commit_id": "<reviewed sha>",
+  "event": "APPROVE, COMMENT, or REQUEST_CHANGES",
   "body": "<summary>",
   "comments": [
     {
@@ -146,7 +213,7 @@ These comments appear on a public repository and represent the user responding t
 - **Brief**: One or two sentences per inline comment. Save detail for the summary.
 - **Professional**: No sarcasm, no passive-aggressive phrasing, no exclamation marks on criticism.
 
-For inline comments, use this format:
+For inline comments, use this format, where Category is one of Checklist, Code Quality, Test Quality, or Documentation:
 ```
 [Category | Severity] Description.
 
@@ -176,8 +243,11 @@ For the summary comment, use this format:
 ### Findings
 <numbered list of findings with severity>
 
+### Noticed, out of scope
+<optional: non-blocking pre-existing issues, ideally with a suggested follow-up issue; omit the section if empty>
+
 ### Checklist Coverage
-<brief note on which checklist categories were verified>
+<brief note on which checklist categories were verified, and whether build/tests/lint were run>
 
 ---
 *Reviewed against the [PR checklist](docs/docs/contribute/pr-checklist.mdx).*
@@ -190,6 +260,7 @@ If the PR has zero issues, the summary should simply acknowledge the quality of 
 ### Reference Files
 
 - **`references/pr-checklist.md`** — Full PR checklist with all items organized by category (General, Coding Standards, Documentation).
+- **`references/area-checklists.md`** — Short checklists for SPFx upgrade/doctor rules, docs site changes, and telemetry/infrastructure changes.
 
 ### Reference Commands
 
