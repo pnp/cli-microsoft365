@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-retentionlabel-ensure.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-retentionlabel-ensure.js';
 
 describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +26,7 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -46,8 +47,7 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -91,12 +91,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         name: 'abc',
         listTitle: 'MyLibrary'
-      }
-    } as any), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
+      })
+    }), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
   });
 
   it('should handle error if list does not exist', async () => {
@@ -110,13 +110,13 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         name: 'abc'
-      }
-    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
+      })
+    }), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
   it('should set label for list with deprecated label', async () => {
@@ -137,12 +137,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         name: 'abc'
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
@@ -168,12 +168,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         name: 'abc'
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
@@ -199,11 +199,11 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: '4d535433-2a7b-40b0-9dad-8f0f8f3b3841',
         name: 'abc'
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
@@ -221,12 +221,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
         name: 'abc',
         syncToItems: true
-      }
+      })
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
@@ -236,36 +236,37 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     assert.strictEqual(lastCall.data.syncToItems, true);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', name: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', name: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the listid option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'XXXXX' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listid option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'XXXXX' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'XXXXX is not a valid GUID');
   });
 
-  it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the listid option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if listId, listUrl and listTitle options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
+      unknownOption: 'value'
     });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 });
