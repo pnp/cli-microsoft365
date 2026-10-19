@@ -1,5 +1,6 @@
 import auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -9,17 +10,54 @@ import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { OnlineMeeting } from '@microsoft/microsoft-graph-types';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  startTime: z.string()
+    .refine(value => validation.isValidISODateTime(value), {
+      message: 'The startTime value must be a valid ISO date string.'
+    })
+    .refine(value => new Date(value) > new Date(), {
+      message: 'The startTime value must be in the future.'
+    }).optional().alias('s'),
+  endTime: z.string()
+    .refine(value => validation.isValidISODateTime(value), {
+      message: 'The endTime value must be a valid ISO date string.'
+    })
+    .refine(value => new Date(value) > new Date(), {
+      message: 'The endTime value must be in the future.'
+    }).optional().alias('e'),
+  subject: z.string().optional(),
+  participantUserNames: z.string()
+    .superRefine((value, ctx) => {
+      const invalidUserNames = validation.isValidUserPrincipalNameArray(value);
+      if (invalidUserNames !== true) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `The following user principal names are invalid for the option 'participantUserNames': ${invalidUserNames}.`
+        });
+      }
+    })
+    .transform(value => {
+      const userNames = value.trim().toLowerCase();
+      // Command.action resolves standalone runtime tokens while they are strings.
+      if (userNames === '@meusername') {
+        return userNames;
+      }
+
+      return userNames.split(',').map(userName => userName.trim());
+    })
+    .optional().alias('p'),
+  organizerEmail: z.string()
+    .refine(value => validation.isValidUserPrincipalName(value), {
+      message: 'The organizerEmail value must be a valid email.'
+    }).optional(),
+  recordAutomatically: z.boolean().optional().alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  startTime?: string;
-  endTime?: string;
-  subject?: string;
-  participantUserNames?: string;
-  organizerEmail?: string;
-  recordAutomatically?: boolean;
 }
 
 class TeamsMeetingAddCommand extends GraphCommand {
@@ -31,87 +69,15 @@ class TeamsMeetingAddCommand extends GraphCommand {
     return 'Creates a new online meeting';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        startTime: typeof args.options.startTime !== 'undefined',
-        endTime: typeof args.options.endTime !== 'undefined',
-        subject: typeof args.options.subject !== 'undefined',
-        participantUserNames: typeof args.options.participantUserNames !== 'undefined',
-        organizerEmail: typeof args.options.organizerEmail !== 'undefined',
-        recordAutomatically: !!args.options.recordAutomatically
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType {
+    return schema.refine(options => !options.startTime || !options.endTime || new Date(options.startTime) < new Date(options.endTime), {
+      message: 'The startTime value must be before endTime.',
+      path: ['startTime']
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --startTime [startTime]'
-      },
-      {
-        option: '-e, --endTime [endTime]'
-      },
-      {
-        option: '--subject [subject]'
-      },
-      {
-        option: '-p, --participantUserNames [participantUserNames]'
-      },
-      {
-        option: '--organizerEmail [organizerEmail]'
-      },
-      {
-        option: '-r, --recordAutomatically'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.startTime && !validation.isValidISODateTime(args.options.startTime)) {
-          return `'${args.options.startTime}' is not a valid ISO date string for startTime.`;
-        }
-
-        if (args.options.endTime && !validation.isValidISODateTime(args.options.endTime)) {
-          return `'${args.options.endTime}' is not a valid ISO date string for endTime.`;
-        }
-
-        if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'The startTime value must be before endTime.';
-        }
-
-        if (args.options.startTime && new Date() >= new Date(args.options.startTime)) {
-          return 'The startTime value must be in the future.';
-        }
-
-        if (args.options.endTime && new Date() >= new Date(args.options.endTime)) {
-          return 'The endTime value must be in the future.';
-        }
-
-        if (args.options.participantUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.participantUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'participantUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.organizerEmail && !validation.isValidUserPrincipalName(args.options.organizerEmail)) {
-          return `'${args.options.organizerEmail}' is not a valid email for organizerEmail.`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -159,8 +125,11 @@ class TeamsMeetingAddCommand extends GraphCommand {
     const requestData: any = {};
 
     if (options.participantUserNames) {
-      const attendees = options.participantUserNames.trim().toLowerCase().split(',').map(p => ({
-        upn: p.trim()
+      const userNames = typeof options.participantUserNames === 'string'
+        ? [options.participantUserNames.trim().toLowerCase()]
+        : options.participantUserNames;
+      const attendees = userNames.map(upn => ({
+        upn
       }));
       requestData.participants = { attendees };
     }

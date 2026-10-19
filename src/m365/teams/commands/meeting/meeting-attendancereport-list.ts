@@ -1,8 +1,8 @@
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
@@ -10,15 +10,21 @@ import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../.
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string()
+    .refine(value => validation.isValidGuid(value), {
+      message: 'The userId value must be a valid GUID.'
+    }).optional().alias('u'),
+  userName: z.string().optional().alias('n'),
+  email: z.string().optional(),
+  meetingId: z.string().alias('m')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  email?: string;
-  meetingId: string;
 }
 
 class TeamsMeetingAttendancereportListCommand extends GraphCommand {
@@ -34,51 +40,8 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
     return ['id', 'totalParticipantCount'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userId [userId]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '-m, --meetingId <meetingId>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid Guid`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,6 +1,7 @@
 import { Event } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -11,17 +12,35 @@ import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string()
+    .refine(value => validation.isValidGuid(value), {
+      message: 'The userId value must be a valid GUID.'
+    }).optional().alias('u'),
+  userName: z.string()
+    .refine(value => validation.isValidUserPrincipalName(value), {
+      message: 'The userName value must be a valid user principal name (UPN).'
+    }).optional().alias('n'),
+  email: z.string()
+    .refine(value => validation.isValidUserPrincipalName(value), {
+      message: 'The email value must be a valid email.'
+    }).optional(),
+  startDateTime: z.string()
+    .refine(value => validation.isValidISODateTime(value), {
+      error: issue => `'${issue.input}' is not a valid ISO date string for startDateTime.`
+    }),
+  endDateTime: z.string()
+    .refine(value => validation.isValidISODateTime(value), {
+      error: issue => `'${issue.input}' is not a valid ISO date string for endDateTime.`
+    }).optional(),
+  isOrganizer: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  email?: string;
-  startDateTime: string;
-  endDateTime?: string;
-  isOrganizer?: boolean;
 }
 
 class TeamsMeetingListCommand extends GraphCommand {
@@ -37,79 +56,15 @@ class TeamsMeetingListCommand extends GraphCommand {
     return ['subject', 'startDateTime', 'endDateTime'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined',
-        endDateTime: typeof args.options.endDateTime !== 'undefined',
-        isOrganizer: !!args.options.isOrganizer
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType {
+    return schema.refine(options => !options.endDateTime || options.startDateTime <= options.endDateTime, {
+      message: 'startDateTime value must be before endDateTime.',
+      path: ['startDateTime']
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userId [userId]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '--startDateTime <startDateTime>'
-      },
-      {
-        option: '--endDateTime [endDateTime]'
-      },
-      {
-        option: '--isOrganizer'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidISODateTime(args.options.startDateTime)) {
-          return `'${args.options.startDateTime}' is not a valid ISO date string for startDateTime.`;
-        }
-
-        if (args.options.endDateTime && !validation.isValidISODateTime(args.options.endDateTime)) {
-          return `'${args.options.startDateTime}' is not a valid ISO date string for endDateTime.`;
-        }
-
-        if (args.options.startDateTime && args.options.endDateTime && args.options.startDateTime > args.options.endDateTime) {
-          return 'startDateTime value must be before endDateTime.';
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID for userId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `'${args.options.userName}' is not a valid UPN for userName.`;
-        }
-
-        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
-          return `'${args.options.email}' is not a valid UPN for email.`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
