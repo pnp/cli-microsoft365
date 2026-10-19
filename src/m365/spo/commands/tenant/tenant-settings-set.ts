@@ -1,166 +1,110 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  MinCompatibilityLevel: z.string().refine(val => !isNaN(Number(val)), { message: 'MinCompatibilityLevel is not a number' }).optional(),
+  MaxCompatibilityLevel: z.string().refine(val => !isNaN(Number(val)), { message: 'MaxCompatibilityLevel is not a number' }).optional(),
+  ExternalServicesEnabled: z.boolean().optional(),
+  NoAccessRedirectUrl: z.string().optional(),
+  SharingCapability: z.enum(['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']).optional(),
+  DisplayStartASiteOption: z.boolean().optional(),
+  StartASiteFormUrl: z.string().optional(),
+  ShowEveryoneClaim: z.boolean().optional(),
+  ShowAllUsersClaim: z.boolean().optional(),
+  ShowEveryoneExceptExternalUsersClaim: z.boolean().optional(),
+  SearchResolveExactEmailOrUPN: z.boolean().optional(),
+  OfficeClientADALDisabled: z.boolean().optional(),
+  LegacyAuthProtocolsEnabled: z.boolean().optional(),
+  RequireAcceptingAccountMatchInvitedAccount: z.boolean().optional(),
+  ProvisionSharedWithEveryoneFolder: z.boolean().optional(),
+  SignInAccelerationDomain: z.string().optional(),
+  EnableGuestSignInAcceleration: z.boolean().optional(),
+  UsePersistentCookiesForExplorerView: z.boolean().optional(),
+  BccExternalSharingInvitations: z.boolean().optional(),
+  BccExternalSharingInvitationsList: z.string().optional(),
+  UserVoiceForFeedbackEnabled: z.boolean().optional(),
+  PublicCdnEnabled: z.boolean().optional(),
+  PublicCdnAllowedFileTypes: z.string().optional(),
+  RequireAnonymousLinksExpireInDays: z.string().refine(val => !isNaN(Number(val)), { message: 'RequireAnonymousLinksExpireInDays is not a number' }).optional(),
+  SharingAllowedDomainList: z.string().optional(),
+  SharingBlockedDomainList: z.string().optional(),
+  SharingDomainRestrictionMode: z.enum(['None', 'AllowList', 'BlockList']).optional(),
+  OneDriveStorageQuota: z.string().refine(val => !isNaN(Number(val)), { message: 'OneDriveStorageQuota is not a number' }).optional(),
+  OneDriveForGuestsEnabled: z.boolean().optional(),
+  IPAddressEnforcement: z.boolean().optional(),
+  IPAddressAllowList: z.string().optional(),
+  IPAddressWACTokenLifetime: z.string().refine(val => !isNaN(Number(val)), { message: 'IPAddressWACTokenLifetime is not a number' }).optional(),
+  UseFindPeopleInPeoplePicker: z.boolean().optional(),
+  DefaultSharingLinkType: z.enum(['None', 'Direct', 'Internal', 'AnonymousAccess']).optional(),
+  ODBMembersCanShare: z.enum(['Unspecified', 'On', 'Off']).optional(),
+  ODBAccessRequests: z.enum(['Unspecified', 'On', 'Off']).optional(),
+  PreventExternalUsersFromResharing: z.boolean().optional(),
+  ShowPeoplePickerSuggestionsForGuestUsers: z.boolean().optional(),
+  FileAnonymousLinkType: z.enum(['None', 'View', 'Edit']).optional(),
+  FolderAnonymousLinkType: z.enum(['None', 'View', 'Edit']).optional(),
+  NotifyOwnersWhenItemsReshared: z.boolean().optional(),
+  NotifyOwnersWhenInvitationsAccepted: z.boolean().optional(),
+  NotificationsInOneDriveForBusinessEnabled: z.boolean().optional(),
+  NotificationsInSharePointEnabled: z.boolean().optional(),
+  OwnerAnonymousNotification: z.boolean().optional(),
+  CommentsOnSitePagesDisabled: z.boolean().optional(),
+  SocialBarOnSitePagesDisabled: z.boolean().optional(),
+  OrphanedPersonalSitesRetentionPeriod: z.string().refine(val => !isNaN(Number(val)), { message: 'OrphanedPersonalSitesRetentionPeriod is not a number' }).optional(),
+  DisallowInfectedFileDownload: z.boolean().optional(),
+  DefaultLinkPermission: z.enum(['None', 'View', 'Edit']).optional(),
+  ConditionalAccessPolicy: z.enum(['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess']).optional(),
+  AllowDownloadingNonWebViewableFiles: z.boolean().optional(),
+  AllowEditing: z.boolean().optional(),
+  ApplyAppEnforcedRestrictionsToAdHocRecipients: z.boolean().optional(),
+  FilePickerExternalImageSearchEnabled: z.boolean().optional(),
+  EmailAttestationRequired: z.boolean().optional(),
+  EmailAttestationReAuthDays: z.string().refine(val => !isNaN(Number(val)), { message: 'EmailAttestationReAuthDays is not a number' }).optional(),
+  HideDefaultThemes: z.boolean().optional(),
+  BlockAccessOnUnmanagedDevices: z.boolean().optional(),
+  AllowLimitedAccessOnUnmanagedDevices: z.boolean().optional(),
+  BlockDownloadOfAllFilesForGuests: z.boolean().optional(),
+  BlockDownloadOfAllFilesOnUnmanagedDevices: z.boolean().optional(),
+  BlockDownloadOfViewableFilesForGuests: z.boolean().optional(),
+  BlockDownloadOfViewableFilesOnUnmanagedDevices: z.boolean().optional(),
+  BlockMacSync: z.boolean().optional(),
+  DisableReportProblemDialog: z.boolean().optional(),
+  DisplayNamesOfFileViewers: z.boolean().optional(),
+  EnableMinimumVersionRequirement: z.boolean().optional(),
+  HideSyncButtonOnODB: z.boolean().optional(),
+  IsUnmanagedSyncClientForTenantRestricted: z.boolean().optional(),
+  LimitedAccessFileType: z.enum(['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']).optional(),
+  OptOutOfGrooveBlock: z.boolean().optional(),
+  OptOutOfGrooveSoftBlock: z.boolean().optional(),
+  OrgNewsSiteUrl: z.string().optional(),
+  PermissiveBrowserFileHandlingOverride: z.boolean().optional(),
+  ShowNGSCDialogForSyncOnODB: z.boolean().optional(),
+  SpecialCharactersStateInFileFolderNames: z.enum(['NoPreference', 'Allowed', 'Disallowed']).optional(),
+  SyncPrivacyProfileProperties: z.boolean().optional(),
+  ExcludedFileExtensionsForSyncClient: z.string().optional(),
+  AllowedDomainListForSyncClient: z.string().optional(),
+  DisabledWebPartIds: z.string().optional(),
+  DisableCustomAppAuthentication: z.boolean().optional(),
+  CommentsOnListItemsDisabled: z.boolean().optional(),
+  EnableAzureADB2BIntegration: z.boolean().optional(),
+  SyncAadB2BManagementPolicy: z.boolean().optional(),
+  AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  MinCompatibilityLevel: number;
-  MaxCompatibilityLevel: number;
-  ExternalServicesEnabled?: boolean;
-  NoAccessRedirectUrl: string;
-  SharingCapability: string; // <SharingCapabilities>
-  DisplayStartASiteOption?: boolean;
-  StartASiteFormUrl: string;
-  ShowEveryoneClaim?: boolean;
-  ShowAllUsersClaim?: boolean;
-  ShowEveryoneExceptExternalUsersClaim?: boolean;
-  SearchResolveExactEmailOrUPN?: boolean;
-  OfficeClientADALDisabled?: boolean;
-  LegacyAuthProtocolsEnabled?: boolean;
-  RequireAcceptingAccountMatchInvitedAccount?: boolean;
-  ProvisionSharedWithEveryoneFolder?: boolean;
-  SignInAccelerationDomain: string;
-  EnableGuestSignInAcceleration?: boolean;
-  UsePersistentCookiesForExplorerView?: boolean;
-  BccExternalSharingInvitations?: boolean;
-  BccExternalSharingInvitationsList: string;
-  UserVoiceForFeedbackEnabled?: boolean;
-  PublicCdnEnabled?: boolean;
-  PublicCdnAllowedFileTypes: string;
-  RequireAnonymousLinksExpireInDays: number;
-  SharingAllowedDomainList: string;
-  SharingBlockedDomainList: string;
-  SharingDomainRestrictionMode: string; // <SharingDomainRestrictionModes>
-  OneDriveStorageQuota: number;
-  OneDriveForGuestsEnabled?: boolean;
-  IPAddressEnforcement?: boolean;
-  IPAddressAllowList: string;
-  IPAddressWACTokenLifetime: number;
-  UseFindPeopleInPeoplePicker?: boolean;
-  DefaultSharingLinkType: string; // <SharingLinkType>
-  ODBMembersCanShare: string; // <SharingState>
-  ODBAccessRequests: string; // <SharingState>
-  PreventExternalUsersFromResharing?: boolean;
-  ShowPeoplePickerSuggestionsForGuestUsers?: boolean;
-  FileAnonymousLinkType: string; // <AnonymousLinkType>
-  FolderAnonymousLinkType: string; // <AnonymousLinkType>
-  NotifyOwnersWhenItemsReshared?: boolean;
-  NotifyOwnersWhenInvitationsAccepted?: boolean;
-  NotificationsInOneDriveForBusinessEnabled?: boolean;
-  NotificationsInSharePointEnabled?: boolean;
-  OwnerAnonymousNotification?: boolean;
-  CommentsOnSitePagesDisabled?: boolean;
-  SocialBarOnSitePagesDisabled?: boolean;
-  OrphanedPersonalSitesRetentionPeriod?: number;
-  DisallowInfectedFileDownload?: boolean;
-  DefaultLinkPermission: string; // <SharingPermissionType>
-  ConditionalAccessPolicy: string; // <SPOConditionalAccessPolicyType>
-  AllowDownloadingNonWebViewableFiles?: boolean;
-  AllowEditing?: boolean;
-  ApplyAppEnforcedRestrictionsToAdHocRecipients?: boolean;
-  FilePickerExternalImageSearchEnabled?: boolean;
-  EmailAttestationRequired?: boolean;
-  EmailAttestationReAuthDays: number;
-  HideDefaultThemes?: boolean;
-  // not included in the PnP PowerShell, most of them are new and maybe the cmdlet is not updated recently.
-  BlockAccessOnUnmanagedDevices?: boolean;
-  AllowLimitedAccessOnUnmanagedDevices?: boolean;
-  BlockDownloadOfAllFilesForGuests?: boolean;
-  BlockDownloadOfAllFilesOnUnmanagedDevices?: boolean;
-  BlockDownloadOfViewableFilesForGuests?: boolean;
-  BlockDownloadOfViewableFilesOnUnmanagedDevices?: boolean;
-  BlockMacSync?: boolean;
-  DisableReportProblemDialog?: boolean;
-  DisplayNamesOfFileViewers?: boolean;
-  EnableMinimumVersionRequirement?: boolean;
-  HideSyncButtonOnODB?: boolean;
-  IsUnmanagedSyncClientForTenantRestricted?: boolean;
-  LimitedAccessFileType: string; // <LimitedAccessFileType>
-  OptOutOfGrooveBlock?: boolean;
-  OptOutOfGrooveSoftBlock?: boolean;
-  OrgNewsSiteUrl: string;
-  PermissiveBrowserFileHandlingOverride?: boolean;
-  ShowNGSCDialogForSyncOnODB?: boolean;
-  SpecialCharactersStateInFileFolderNames: string; // <SpecialCharactersState>
-  SyncPrivacyProfileProperties?: boolean;
-  ExcludedFileExtensionsForSyncClient: string[];
-  AllowedDomainListForSyncClient: string[];
-  DisabledWebPartIds: string[];
-  DisableCustomAppAuthentication?: boolean;
-  CommentsOnListItemsDisabled?: boolean;
-  EnableAzureADB2BIntegration?: boolean;
-  SyncAadB2BManagementPolicy?: boolean;
-  AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled?: boolean;
-}
-
 class SpoTenantSettingsSetCommand extends SpoCommand {
-  private static booleanOptions: string[] = [
-    'ExternalServicesEnabled',
-    'DisplayStartASiteOption',
-    'ShowEveryoneClaim',
-    'ShowAllUsersClaim',
-    'ShowEveryoneExceptExternalUsersClaim',
-    'SearchResolveExactEmailOrUPN',
-    'OfficeClientADALDisabled',
-    'LegacyAuthProtocolsEnabled',
-    'RequireAcceptingAccountMatchInvitedAccount',
-    'ProvisionSharedWithEveryoneFolder',
-    'EnableGuestSignInAcceleration',
-    'UsePersistentCookiesForExplorerView',
-    'BccExternalSharingInvitations',
-    'UserVoiceForFeedbackEnabled',
-    'PublicCdnEnabled',
-    'OneDriveForGuestsEnabled',
-    'IPAddressEnforcement',
-    'UseFindPeopleInPeoplePicker',
-    'PreventExternalUsersFromResharing',
-    'ShowPeoplePickerSuggestionsForGuestUsers',
-    'NotifyOwnersWhenItemsReshared',
-    'NotifyOwnersWhenInvitationsAccepted',
-    'NotificationsInOneDriveForBusinessEnabled',
-    'NotificationsInSharePointEnabled',
-    'OwnerAnonymousNotification',
-    'CommentsOnSitePagesDisabled',
-    'SocialBarOnSitePagesDisabled',
-    'DisallowInfectedFileDownload',
-    'AllowDownloadingNonWebViewableFiles',
-    'AllowEditing',
-    'ApplyAppEnforcedRestrictionsToAdHocRecipients',
-    'FilePickerExternalImageSearchEnabled',
-    'EmailAttestationRequired',
-    'HideDefaultThemes',
-    'BlockAccessOnUnmanagedDevices',
-    'AllowLimitedAccessOnUnmanagedDevices',
-    'BlockDownloadOfAllFilesForGuests',
-    'BlockDownloadOfAllFilesOnUnmanagedDevices',
-    'BlockDownloadOfViewableFilesForGuests',
-    'BlockDownloadOfViewableFilesOnUnmanagedDevices',
-    'BlockMacSync',
-    'DisableReportProblemDialog',
-    'DisplayNamesOfFileViewers',
-    'EnableMinimumVersionRequirement',
-    'HideSyncButtonOnODB',
-    'IsUnmanagedSyncClientForTenantRestricted',
-    'OptOutOfGrooveBlock',
-    'OptOutOfGrooveSoftBlock',
-    'PermissiveBrowserFileHandlingOverride',
-    'ShowNGSCDialogForSyncOnODB',
-    'SyncPrivacyProfileProperties',
-    'DisableCustomAppAuthentication',
-    'CommentsOnListItemsDisabled',
-    'EnableAzureADB2BIntegration',
-    'SyncAadB2BManagementPolicy',
-    'AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled'
-  ];
-
   public get name(): string {
     return commands.TENANT_SETTINGS_SET;
   }
@@ -169,427 +113,15 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     return 'Sets tenant global settings';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      const telemetryProps: any = {
-        MinCompatibilityLevel: (!(!args.options.MinCompatibilityLevel)).toString(),
-        MaxCompatibilityLevel: (!(!args.options.MaxCompatibilityLevel)).toString(),
-        NoAccessRedirectUrl: (!(!args.options.NoAccessRedirectUrl)).toString(),
-        SharingCapability: (!(!args.options.SharingCapability)).toString(),
-        StartASiteFormUrl: (!(!args.options.StartASiteFormUrl)).toString(),
-        SignInAccelerationDomain: (!(!args.options.SignInAccelerationDomain)).toString(),
-        BccExternalSharingInvitationsList: (!(!args.options.BccExternalSharingInvitationsList)).toString(),
-        PublicCdnAllowedFileTypes: (!(!args.options.PublicCdnAllowedFileTypes)).toString(),
-        RequireAnonymousLinksExpireInDays: (!(!args.options.RequireAnonymousLinksExpireInDays)).toString(),
-        SharingAllowedDomainList: (!(!args.options.SharingAllowedDomainList)).toString(),
-        SharingBlockedDomainList: (!(!args.options.SharingBlockedDomainList)).toString(),
-        SharingDomainRestrictionMode: (!(!args.options.SharingDomainRestrictionMode)).toString(),
-        OneDriveStorageQuota: (!(!args.options.OneDriveStorageQuota)).toString(),
-        IPAddressAllowList: (!(!args.options.IPAddressAllowList)).toString(),
-        IPAddressWACTokenLifetime: (!(!args.options.IPAddressWACTokenLifetime)).toString(),
-        DefaultSharingLinkType: (!(!args.options.DefaultSharingLinkType)).toString(),
-        ODBMembersCanShare: (!(!args.options.ODBMembersCanShare)).toString(),
-        ODBAccessRequests: (!(!args.options.ODBAccessRequests)).toString(),
-        FileAnonymousLinkType: (!(!args.options.FileAnonymousLinkType)).toString(),
-        FolderAnonymousLinkType: (!(!args.options.FolderAnonymousLinkType)).toString(),
-        OrphanedPersonalSitesRetentionPeriod: (!(!args.options.OrphanedPersonalSitesRetentionPeriod)).toString(),
-        DefaultLinkPermission: (!(!args.options.DefaultLinkPermission)).toString(),
-        ConditionalAccessPolicy: (!(!args.options.ConditionalAccessPolicy)).toString(),
-        EmailAttestationReAuthDays: (!(!args.options.EmailAttestationReAuthDays)).toString(),
-        LimitedAccessFileType: (!(!args.options.LimitedAccessFileType)).toString(),
-        OrgNewsSiteUrl: (!(!args.options.OrgNewsSiteUrl)).toString(),
-        SpecialCharactersStateInFileFolderNames: (!(!args.options.SpecialCharactersStateInFileFolderNames)).toString(),
-        ExcludedFileExtensionsForSyncClient: (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString(),
-        DisabledWebPartIds: (!(!args.options.DisabledWebPartIds)).toString(),
-        AllowedDomainListForSyncClient: (!(!args.options.AllowedDomainListForSyncClient)).toString()
-      };
-
-      // add boolean values
-      SpoTenantSettingsSetCommand.booleanOptions.forEach(o => {
-        const value: boolean = (args.options as any)[o];
-        if (value !== undefined) {
-          telemetryProps[o] = value;
-        }
-      });
-
-      Object.assign(this.telemetryProperties, telemetryProps);
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    const excluded = ['output', 'o', 'debug', 'verbose', '_', 'query'];
+    return schema.refine(opts => Object.keys(opts).some(key => !excluded.includes(key)), {
+      error: 'You must specify at least one option'
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--MinCompatibilityLevel [MinCompatibilityLevel]'
-      },
-      {
-        option: '--MaxCompatibilityLevel [MaxCompatibilityLevel]'
-      },
-      {
-        option: '--ExternalServicesEnabled [ExternalServicesEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--NoAccessRedirectUrl [NoAccessRedirectUrl]'
-      },
-      {
-        option: '--SharingCapability [SharingCapability]',
-        autocomplete: this.getSharingCapabilities()
-      },
-      {
-        option: '--DisplayStartASiteOption [DisplayStartASiteOption]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--StartASiteFormUrl [StartASiteFormUrl]'
-      },
-      {
-        option: '--ShowEveryoneClaim [ShowEveryoneClaim]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ShowAllUsersClaim [ShowAllUsersClaim]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ShowEveryoneExceptExternalUsersClaim [ShowEveryoneExceptExternalUsersClaim]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--SearchResolveExactEmailOrUPN [SearchResolveExactEmailOrUPN]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--OfficeClientADALDisabled [OfficeClientADALDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--LegacyAuthProtocolsEnabled [LegacyAuthProtocolsEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--RequireAcceptingAccountMatchInvitedAccount [RequireAcceptingAccountMatchInvitedAccount]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ProvisionSharedWithEveryoneFolder [ProvisionSharedWithEveryoneFolder]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--SignInAccelerationDomain [SignInAccelerationDomain]'
-      },
-      {
-        option: '--EnableGuestSignInAcceleration [EnableGuestSignInAcceleration]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--UsePersistentCookiesForExplorerView [UsePersistentCookiesForExplorerView]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BccExternalSharingInvitations [BccExternalSharingInvitations]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BccExternalSharingInvitationsList [BccExternalSharingInvitationsList]'
-      },
-      {
-        option: '--UserVoiceForFeedbackEnabled [UserVoiceForFeedbackEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--PublicCdnEnabled [PublicCdnEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--PublicCdnAllowedFileTypes [PublicCdnAllowedFileTypes]'
-      },
-      {
-        option: '--RequireAnonymousLinksExpireInDays [RequireAnonymousLinksExpireInDays]'
-      },
-      {
-        option: '--SharingAllowedDomainList [SharingAllowedDomainList]'
-      },
-      {
-        option: '--SharingBlockedDomainList [SharingBlockedDomainList]'
-      },
-      {
-        option: '--SharingDomainRestrictionMode [SharingDomainRestrictionMode]',
-        autocomplete: this.getSharingDomainRestrictionModes()
-      },
-      {
-        option: '--OneDriveStorageQuota [OneDriveStorageQuota]'
-      },
-      {
-        option: '--OneDriveForGuestsEnabled [OneDriveForGuestsEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--IPAddressEnforcement [IPAddressEnforcement]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--IPAddressAllowList [IPAddressAllowList]'
-      },
-      {
-        option: '--IPAddressWACTokenLifetime [IPAddressWACTokenLifetime]'
-      },
-      {
-        option: '--UseFindPeopleInPeoplePicker [UseFindPeopleInPeoplePicker]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--DefaultSharingLinkType [DefaultSharingLinkType]',
-        autocomplete: this.getSharingLinkType()
-      },
-      {
-        option: '--ODBMembersCanShare [ODBMembersCanShare]',
-        autocomplete: this.getSharingState()
-      },
-      {
-        option: '--ODBAccessRequests [ODBAccessRequests]',
-        autocomplete: this.getSharingState()
-      },
-      {
-        option: '--PreventExternalUsersFromResharing [PreventExternalUsersFromResharing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ShowPeoplePickerSuggestionsForGuestUsers [ShowPeoplePickerSuggestionsForGuestUsers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--FileAnonymousLinkType [FileAnonymousLinkType]',
-        autocomplete: this.getAnonymousLinkType()
-      },
-      {
-        option: '--FolderAnonymousLinkType [FolderAnonymousLinkType]',
-        autocomplete: this.getAnonymousLinkType()
-      },
-      {
-        option: '--NotifyOwnersWhenItemsReshared [NotifyOwnersWhenItemsReshared]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--NotifyOwnersWhenInvitationsAccepted [NotifyOwnersWhenInvitationsAccepted]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--NotificationsInOneDriveForBusinessEnabled [NotificationsInOneDriveForBusinessEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--NotificationsInSharePointEnabled [NotificationsInSharePointEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--OwnerAnonymousNotification [OwnerAnonymousNotification]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--CommentsOnSitePagesDisabled [CommentsOnSitePagesDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--SocialBarOnSitePagesDisabled [SocialBarOnSitePagesDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--OrphanedPersonalSitesRetentionPeriod [OrphanedPersonalSitesRetentionPeriod]'
-      },
-      {
-        option: '--DisallowInfectedFileDownload [DisallowInfectedFileDownload]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--DefaultLinkPermission [DefaultLinkPermission]',
-        autocomplete: this.getSharingPermissionType()
-      },
-      {
-        option: '--ConditionalAccessPolicy [ConditionalAccessPolicy]',
-        autocomplete: this.getSPOConditionalAccessPolicyType()
-      },
-      {
-        option: '--AllowDownloadingNonWebViewableFiles [AllowDownloadingNonWebViewableFiles]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--AllowEditing [AllowEditing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ApplyAppEnforcedRestrictionsToAdHocRecipients [ApplyAppEnforcedRestrictionsToAdHocRecipients]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--FilePickerExternalImageSearchEnabled [FilePickerExternalImageSearchEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--EmailAttestationRequired [EmailAttestationRequired]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--EmailAttestationReAuthDays [EmailAttestationReAuthDays]'
-      },
-      {
-        option: '--HideDefaultThemes [HideDefaultThemes]',
-        autocomplete: ['true', 'false']
-      },
-      // not included in the PnP PowerShell, most of them are new and maybe the cmdlet is not updated recently.
-      {
-        option: '--BlockAccessOnUnmanagedDevices [BlockAccessOnUnmanagedDevices]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--AllowLimitedAccessOnUnmanagedDevices [AllowLimitedAccessOnUnmanagedDevices]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BlockDownloadOfAllFilesForGuests [BlockDownloadOfAllFilesForGuests]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BlockDownloadOfAllFilesOnUnmanagedDevices [BlockDownloadOfAllFilesOnUnmanagedDevices]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BlockDownloadOfViewableFilesForGuests [BlockDownloadOfViewableFilesForGuests]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BlockDownloadOfViewableFilesOnUnmanagedDevices [BlockDownloadOfViewableFilesOnUnmanagedDevices]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--BlockMacSync [BlockMacSync]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--DisableReportProblemDialog [DisableReportProblemDialog]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--DisplayNamesOfFileViewers [DisplayNamesOfFileViewers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--EnableMinimumVersionRequirement [EnableMinimumVersionRequirement]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--HideSyncButtonOnODB [HideSyncButtonOnODB]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--IsUnmanagedSyncClientForTenantRestricted [IsUnmanagedSyncClientForTenantRestricted]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--LimitedAccessFileType [LimitedAccessFileType]',
-        autocomplete: this.getSPOLimitedAccessFileType()
-      },
-      {
-        option: '--OptOutOfGrooveBlock [OptOutOfGrooveBlock]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--OptOutOfGrooveSoftBlock [OptOutOfGrooveSoftBlock]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--OrgNewsSiteUrl [OrgNewsSiteUrl]'
-      },
-      {
-        option: '--PermissiveBrowserFileHandlingOverride [PermissiveBrowserFileHandlingOverride]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ShowNGSCDialogForSyncOnODB [ShowNGSCDialogForSyncOnODB]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--SpecialCharactersStateInFileFolderNames [SpecialCharactersStateInFileFolderNames]',
-        autocomplete: this.getSpecialCharactersState()
-      },
-      {
-        option: '--SyncPrivacyProfileProperties [SyncPrivacyProfileProperties]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--ExcludedFileExtensionsForSyncClient [ExcludedFileExtensionsForSyncClient]'
-      },
-      {
-        option: '--AllowedDomainListForSyncClient [AllowedDomainListForSyncClient]'
-      },
-      {
-        option: '--DisabledWebPartIds [DisabledWebPartIds]'
-      },
-      {
-        option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--CommentsOnListItemsDisabled [CommentsOnListItemsDisabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled [AllowWebPropertyBagUpdateWhenDenyAddAndCustomizePagesIsEnabled]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const opts: any = args.options;
-        let hasAtLeastOneOption: boolean = false;
-
-        for (const propertyKey of Object.keys(opts)) {
-          if (this.isExcludedOption(propertyKey)) {
-            continue;
-          }
-
-          hasAtLeastOneOption = true;
-          const propertyValue = opts[propertyKey];
-
-          for (const item of this.options) {
-            if (item.option.indexOf(propertyKey) > -1 &&
-              item.autocomplete &&
-              item.autocomplete.indexOf(propertyValue.toString()) === -1) {
-              return `${propertyKey} option has invalid value of ${propertyValue}. Allowed values are ${JSON.stringify(item.autocomplete)}`;
-            }
-          }
-        }
-
-        if (!hasAtLeastOneOption) {
-          return `You must specify at least one option`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push(...SpoTenantSettingsSetCommand.booleanOptions);
   }
 
   public getAllEnumOptions(): string[] {
@@ -616,15 +148,16 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       // map the args.options to XML Properties
       let propsXml: string = '';
       let id: number = 42; // geek's humor
-      for (const optionKey of Object.keys(args.options)) {
+      const optionsRecord = args.options as Record<string, any>;
+      for (const optionKey of Object.keys(optionsRecord)) {
         if (this.isExcludedOption(optionKey)) {
           continue;
         }
 
-        let optionValue = args.options[optionKey];
+        let optionValue = optionsRecord[optionKey];
         if (this.getAllEnumOptions().indexOf(optionKey) > -1) {
           // map enum values to int
-          optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
+          optionValue = this.mapEnumToInt(optionKey, optionsRecord[optionKey]);
         }
 
         if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {

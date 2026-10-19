@@ -11,12 +11,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-applicationcustomizer-get.js';
+import command, { options } from './tenant-applicationcustomizer-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
-  const id = 4;
+  const id = '4';
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -52,6 +52,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -61,6 +62,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -101,118 +103,73 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when all options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when all options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: String(id),
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when no options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when no options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and id options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when title and id options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: String(id)
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when title and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when title and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when id and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when id and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: String(id),
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: String(id) });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passed validation when title specified', async () => {
-    const actual = await command.validate({ options: { title: title } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation when title specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if clientSideComponentId is valid', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if clientSideComponentId is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: clientSideComponentId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws error when tenant app catalog doesn\'t exist', async () => {
@@ -227,9 +184,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -245,9 +202,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -265,9 +222,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
@@ -300,9 +257,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     }), new CommandError("Multiple application customizers with Some customizer were found. Found: undefined."));
   });
 
@@ -328,9 +285,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
@@ -349,9 +306,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
@@ -370,9 +327,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly(applicationCustomizerResponse.value[0]));
   });
@@ -391,10 +348,10 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         tenantWideExtensionComponentProperties: true
-      }
+      })
     });
     assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(applicationCustomizerResponse.value[0].TenantWideExtensionComponentProperties)));
   });
@@ -427,9 +384,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId
-      }
+      })
     }), new CommandError("Multiple application customizers with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: undefined."));
   });
 
@@ -448,9 +405,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -469,9 +426,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -491,9 +448,9 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         clientSideComponentId: clientSideComponentId
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });
