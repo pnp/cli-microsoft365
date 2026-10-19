@@ -14,7 +14,7 @@ import { spo } from '../../../../utils/spo.js';
 import { drive } from '../../../../utils/drive.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands.js';
-import command from './folder-sharinglink-add.js';
+import command, { options } from './folder-sharinglink-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FOLDER_SHARINGLINK_ADD, () => {
@@ -22,6 +22,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const folderId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
@@ -66,6 +67,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -107,44 +109,60 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderId: folderId, type: "view" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderId: folderId, type: "view" });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the folderId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderId: 'invalid', type: "view" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the folderId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: 'invalid', type: "view" });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option 'folderId'.`);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: 'invalid date', type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the expirationDateTime option is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: 'invalid date', type: 'view' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date' is not a valid ISO date string.`);
   });
 
-  it('fails validation if invalid scope specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, scope: 'invalid scope', type: 'view' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid scope specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, scope: 'invalid scope', type: 'view' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid scope' is not a valid scope. Allowed values are: anonymous, organization, users.`);
   });
 
-  it('fails validation if invalid type specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'invalid type' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid type specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'invalid type' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid type' is not a valid type. Allowed values are: view,edit`);
   });
 
-  it('fails validation if scope is users but recipients are not specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', scope: 'users' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scope is users but recipients are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', scope: 'users' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if recipients option is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', scope: 'users', recipients: "invalid upn" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if recipients option is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', scope: 'users', recipients: "invalid upn" });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for the option 'recipients': invalid upn.`);
   });
 
-  it('passes validation if options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if both folderId and folderUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, folderUrl: folderUrl, type: 'view' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('creates a sharing link to a folder specified by the id', async () => {
@@ -158,7 +176,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, type: 'view', scope: 'organization', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderId: folderId, type: 'view', scope: 'organization', verbose: true }) });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
 
@@ -173,7 +191,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, type: 'view', scope: 'users', recipients: 'john@contoso.com', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, type: 'view', scope: 'users', recipients: 'john@contoso.com', verbose: true }) });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
 
@@ -190,7 +208,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, type: 'view' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, type: 'view' }) }),
       new CommandError(`Drive 'https://contoso.sharepoint.com/sites/project-x/shared%20documents/folder1' not found`));
   });
 });
