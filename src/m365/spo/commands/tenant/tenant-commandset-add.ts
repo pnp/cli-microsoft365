@@ -204,6 +204,15 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
       await logger.logToStderr('Pre-checks finished. Adding tenant wide extension to the TenantWideExtensions list');
     }
 
+    const output: spoListItemAddCommandOptions['output'] =
+      options.output === 'text' ||
+        options.output === 'csv' ||
+        options.output === 'json' ||
+        options.output === 'md' ||
+        options.output === 'none'
+        ? options.output
+        : undefined;
+
     const commandOptions: spoListItemAddCommandOptions = {
       webUrl: appCatalogUrl,
       listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`,
@@ -217,7 +226,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
       TenantWideExtensionDisabled: false,
       verbose: this.verbose,
       debug: this.debug,
-      output: options.output
+      output: output
     };
 
     await cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });

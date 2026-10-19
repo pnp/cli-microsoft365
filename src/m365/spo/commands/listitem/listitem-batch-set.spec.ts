@@ -15,7 +15,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-batch-set.js';
+import command, { options } from './listitem-batch-set.js';
 
 describe(commands.LISTITEM_BATCH_SET, () => {
   const filePath = 'C:\\Path\\To\\CSV\\CsvFile.csv';
@@ -40,6 +40,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   const listResponse = { Id: listId };
 
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let log: any[];
   let logger: Logger;
 
@@ -49,6 +50,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,6 +76,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       'objectIdentity': '04e9249b-1edd-40da-9ec9-c3f19b2db1bd|25a633e6-3138-49c0-8be8-8bd3260a0431:site:339fb67e-4573-4eee-91b8-7e4fdb1a38d7:web:2c82aec1-21d2-4a1a-ad95-15bb7a4b66aa',
       'serverRelativeUrl': '/sites/project-x'
     }));
+    sinon.stub(fs, 'existsSync').returns(true);
   });
 
   afterEach(() => {
@@ -134,7 +137,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: idColumn, systemUpdate: true, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: idColumn, systemUpdate: true, verbose: true }) });
     assert(postStub.called);
     assert(postStub.args[0][0].data.includes('Title A &lt;&gt;&amp;&quot;'));
   });
@@ -156,7 +159,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, systemUpdate: true, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, systemUpdate: true, verbose: true }) });
     assert(postStub.called);
   });
 
@@ -197,7 +200,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true }) });
     assert.strictEqual(amountOfExecutions, 3);
   });
 
@@ -227,7 +230,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true } } as any), new CommandError(`${batchCsomResponseError[0].ErrorInfo.ErrorMessage} - ${batchCsomResponseError[0].ErrorInfo.ErrorValue}`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true }) }), new CommandError(`${batchCsomResponseError[0].ErrorInfo.ErrorMessage} - ${batchCsomResponseError[0].ErrorInfo.ErrorValue}`));
   });
 
   it('throws an error when field specified in the csv does not exist on the list', async () => {
@@ -257,7 +260,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when list by url is not found', async () => {
@@ -271,7 +274,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: idColumn, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: idColumn, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when list by title is not found', async () => {
@@ -284,7 +287,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listTitle: listTitle, idColumn: idColumn, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listTitle: listTitle, idColumn: idColumn, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when specified idColumn does not exist in csv', async () => {
@@ -292,36 +295,54 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     const errorMessage = `The specified value for idColumn does not exist in the array. Specified idColumn is '${tempIdColumn || 'ID'}'. Please specify the correct value.`;
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: tempIdColumn, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, idColumn: tempIdColumn, verbose: true }) }), new CommandError(errorMessage));
   });
 
   it('throws an error when idColumn is not specified and ID does not exist in csv', async () => {
     const errorMessage = `The specified value for idColumn does not exist in the array. Specified idColumn is 'ID'. Please specify the correct value.`;
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true }) }), new CommandError(errorMessage));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if listId option is not a valid GUID', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option listId is not a valid GUID');
   });
 
-  it('fails validation if csv file does not exist', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if csv file does not exist', () => {
+    sinonUtil.restore(fs.existsSync);
+    sinon.stub(fs, 'existsSync').returns(false);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File with path ${filePath} does not exist`);
   });
 
-  it('passes validation if filePath exists, listId is a valid guid and idColumn is a valid idColumn', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    const actual = await command.validate({ options: { webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if listId, listTitle and listUrl are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listId and listTitle are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId, listTitle: listTitle });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if filePath exists, listId is a valid guid and idColumn is a valid idColumn', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, filePath: filePath, listId: listId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 });

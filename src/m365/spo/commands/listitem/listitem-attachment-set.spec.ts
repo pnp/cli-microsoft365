@@ -14,11 +14,11 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import fs from 'fs';
 import request from '../../../../request.js';
-import command from './listitem-attachment-set.js';
+import command, { options } from './listitem-attachment-set.js';
 
 describe(commands.LISTITEM_ATTACHMENT_SET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const listId = '236a0f92482d475bba8fd0e4f78555e4';
+  const listId = '236a0f92-482d-475b-ba8f-d0e4f78555e4';
   const listTitle = 'Test list';
   const listUrl = 'sites/project-x/lists/testlist';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
@@ -29,6 +29,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,6 +38,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,41 +79,44 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: 'invalid', listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
-
-  it('passes validation if the webUrl option is a valid SharePoint site URL and filePath exists', async () => {
+  it('passes validation if the webUrl option is a valid SharePoint site URL and filePath exists', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);
-    assert(actual);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, true);
   });
-
-  it('fails validation if the listItemId option is not a valid number', async () => {
+  it('fails validation if the listItemId option is not a valid number', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: 'invalid', filePath: filePath, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: 'invalid', filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, false);
   });
-
-
-  it('fails validation if the listId option is not a valid GUID', async () => {
+  it('fails validation if the listId option is not a valid GUID', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: 'invalid', listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: 'invalid', listItemId: listItemId, filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option listId is not a valid GUID.');
   });
-
-  it('passes validation if the listId option is a valid GUID', async () => {
+  it('passes validation if the listId option is a valid GUID', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);
-    assert(actual);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, true);
   });
-
-  it('fails validation if filePath does not exist', async () => {
+  it('fails validation if filePath does not exist', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File with path '${filePath}' was not found.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('updates attachment to listitem in list retrieved by id while specifying fileName', async () => {
@@ -125,7 +130,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName }) });
     assert(putStub.called);
   });
 
@@ -140,7 +145,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, listUrl: listUrl, listItemId: listItemId, filePath: filePath, fileName: fileName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, listUrl: listUrl, listItemId: listItemId, filePath: filePath, fileName: fileName }) });
     assert(putStub.called);
   });
 
@@ -157,7 +162,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileNameWithoutExtension } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileNameWithoutExtension }) });
     assert(putStub.called);
   });
 
@@ -183,7 +188,7 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName }) }),
       new CommandError(error.error['odata.error'].message.value));
   });
 });

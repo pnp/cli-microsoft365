@@ -103,7 +103,7 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'List', title: customizerTitle, verbose: true } });
+    await command.action(logger, { options: { clientSideComponentId: clientSideComponentId, listType: 'List', title: customizerTitle, verbose: true, output: 'none' } });
     assert.strictEqual(executeCommandCalled, true);
   });
 

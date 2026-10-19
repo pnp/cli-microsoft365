@@ -15,13 +15,13 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './listitem-add.js';
 
 describe(commands.LISTITEM_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let ensureFolderStub: sinon.SinonStub;
   const listUrl = 'sites/project-x/documents';
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -107,6 +107,7 @@ describe(commands.LISTITEM_ADD, () => {
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -145,66 +146,43 @@ describe(commands.LISTITEM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('allows unknown options', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  it('fails validation if listTitle and listId option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Use one of the following options: listId, listTitle, listUrl.');
   });
 
-  it('fails validation if listTitle and listId option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listTitle and listId are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Use one of the following options: listId, listTitle, listUrl.');
   });
 
-  it('fails validation if listTitle and listId are specified together', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listTitle: 'Demo List' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' } }, commandInfo);
-    assert(actual);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option listId is not a valid GUID');
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails to create a list item when \'fail me\' values are used', async () => {
@@ -213,13 +191,13 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
+    const options = {
       listTitle: 'Demo List',
       webUrl: webUrl,
       Title: "fail adding me"
     };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`Creating the item failed with the following errors: ${os.EOL}- Title - failed updating`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }), new CommandError(`Creating the item failed with the following errors: ${os.EOL}- Title - failed updating`));
     assert.strictEqual(actualId, 0);
   });
 
@@ -227,16 +205,14 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.allowUnknownOptions();
-
-    const options: any = {
+    const options = {
       debug: true,
       listTitle: 'Demo List',
       webUrl: webUrl,
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.strictEqual(actualId, expectedId);
   });
 
@@ -244,13 +220,13 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
+    const options = {
       listId: 'cf8c72a1-0207-40ee-aebd-fca67d20bc8a',
       webUrl: webUrl,
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.strictEqual(actualId, expectedId);
   });
 
@@ -258,14 +234,14 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
+    const options = {
       verbose: true,
       listUrl: listUrl,
       webUrl: webUrl,
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert.strictEqual(actualId, expectedId);
   });
 
@@ -274,7 +250,7 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
+    const options = {
       debug: true,
       listTitle: 'Demo List',
       webUrl: webUrl,
@@ -282,7 +258,7 @@ describe(commands.LISTITEM_ADD, () => {
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(expectedContentType === actualContentType);
   });
 
@@ -290,14 +266,14 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    const options: any = {
+    const options = {
       listTitle: 'Demo List',
       webUrl: webUrl,
       contentType: "Unexpected content type",
       Title: expectedTitle
     };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse(options) }), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
 
   it('should call ensure folder when folder arg specified', async () => {
@@ -305,13 +281,13 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2"
-      }
+      })
     });
     assert.strictEqual(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
     assert.strictEqual(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2');
@@ -322,14 +298,14 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3"
-      }
+      })
     });
     assert.strictEqual(ensureFolderStub.lastCall.args[0], 'https://contoso.sharepoint.com/sites/project-x');
     assert.strictEqual(ensureFolderStub.lastCall.args[1], '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
@@ -340,14 +316,14 @@ describe(commands.LISTITEM_ADD, () => {
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3/"
-      }
+      })
     });
     const addValidateUpdateItemUsingPathRequest = postStubs.getCall(postStubs.callCount - 1).args[0];
     const info = addValidateUpdateItemUsingPathRequest.data.listItemCreateInfo;
@@ -359,7 +335,7 @@ describe(commands.LISTITEM_ADD, () => {
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         output: "text",
@@ -368,7 +344,7 @@ describe(commands.LISTITEM_ADD, () => {
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3/"
-      }
+      })
     });
     assert.deepEqual(postStubs.firstCall.args[0].data, {
       formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }, { FieldName: 'ContentType', FieldValue: 'Item' }],
