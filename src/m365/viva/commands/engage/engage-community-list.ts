@@ -1,8 +1,12 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Community } from './Community.js';
+
+export const options = globalOptionsZod.strict();
 
 class VivaEngageCommunityListCommand extends GraphCommand {
   public get name(): string {
@@ -15,6 +19,10 @@ class VivaEngageCommunityListCommand extends GraphCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'privacy'];
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

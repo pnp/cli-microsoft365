@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-network-list.js';
+import command, { options } from './engage-network-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_NETWORK_LIST, () => {
@@ -19,15 +19,17 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
-    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -70,6 +72,21 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'email', 'community', 'permalink', 'web_url']);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with withSuspended', () => {
+    const actual = commandOptionsSchema.safeParse({ withSuspended: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('calls the networking endpoint without parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
@@ -95,7 +112,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
@@ -108,7 +125,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred.'));
   });
 
   it('calls the networking endpoint without parameter and json', async () => {
@@ -135,7 +152,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, output: "json" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, output: "json" }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
@@ -164,17 +181,7 @@ describe(commands.ENGAGE_NETWORK_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, withSuspended: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, withSuspended: true }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
-  });
-
-  it('passes validation without parameters', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { withSuspended: true } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });

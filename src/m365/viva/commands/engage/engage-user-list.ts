@@ -1,23 +1,27 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import VivaEngageCommand from '../../../base/VivaEngageCommand.js';
 import commands from '../../commands.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  groupId: z.coerce.number().optional(),
+  letter: z.string().optional(),
+  reverse: z.boolean().optional(),
+  limit: z.coerce.number().optional(),
+  sortBy: z.enum(['messages', 'followers']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  letter?: string;
-  sortBy?: string;
-  reverse?: boolean;
-  limit?: number;
-  groupId?: number;
-}
-
 class VivaEngageUserListCommand extends VivaEngageCommand {
-  protected items: any[];
+  protected items!: any[];
 
   public get name(): string {
     return commands.ENGAGE_USER_LIST;
@@ -31,74 +35,20 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
     return ['id', 'full_name', 'email'];
   }
 
-  constructor() {
-    super();
-    this.items = [];
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        letter: args.options.letter !== undefined,
-        sortBy: args.options.sortBy !== undefined,
-        reverse: args.options.reverse !== undefined,
-        limit: args.options.limit !== undefined,
-        groupId: args.options.groupId !== undefined
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.letter || /^(?!\d)[a-zA-Z]+$/i.test(opts.letter), {
+        message: "Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.",
+        params: { customCode: 'required' }
+      })
+      .refine(opts => !opts.letter || opts.letter.length === 1, {
+        message: "Only one char as value of 'letter' accepted.",
+        params: { customCode: 'required' }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-g, --groupId [groupId]'
-      },
-      {
-        option: '-l, --letter [letter]'
-      },
-      {
-        option: '--reverse'
-      },
-      {
-        option: '--limit [limit]'
-      },
-      {
-        option: '--sortBy [sortBy]',
-        autocomplete: ['messages', 'followers']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && typeof args.options.groupId !== 'number') {
-          return `${args.options.groupId} is not a number`;
-        }
-
-        if (args.options.limit && typeof args.options.limit !== 'number') {
-          return `${args.options.limit} is not a number`;
-        }
-
-        if (args.options.sortBy && args.options.sortBy !== 'messages' && args.options.sortBy !== 'followers') {
-          return `sortBy accepts only the values "messages" or "followers"`;
-        }
-
-        if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
-          return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
-        }
-
-        if (args.options.letter && args.options.letter.length !== 1) {
-          return `Only one char as value of 'letter' accepted.`;
-        }
-
-        return true;
-      }
-    );
   }
 
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {

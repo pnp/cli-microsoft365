@@ -1,21 +1,25 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { cli } from '../../../../cli/cli.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().optional(),
+  displayName: z.string().optional(),
+  entraGroupId: z.string().optional(),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  entraGroupId?: string;
-  force?: boolean
 }
 
 class VivaEngageCommunityRemoveCommand extends GraphCommand {
@@ -26,66 +30,23 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
     return 'Removes a Viva Engage community';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: args.options.id !== 'undefined',
-        displayName: args.options.displayName !== 'undefined',
-        entraGroupId: args.options.entraGroupId !== 'undefined',
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `${args.options.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either id, displayName, or entraGroupId, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName', 'entraGroupId']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['id', 'displayName', 'entraGroupId']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName', 'entraGroupId');
+      })
+      .refine(opts => !opts.entraGroupId || validation.isValidGuid(opts.entraGroupId), {
+        error: opts => `${opts.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`,
+        params: { customCode: 'required' }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -123,7 +84,7 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
       await removeCommunity();
     }
     else {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove Viva Engage community '${args.options.id || args.options.displayName || args.options.entraGroupId }'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove Viva Engage community '${args.options.id || args.options.displayName || args.options.entraGroupId}'?` });
 
       if (result) {
         await removeCommunity();
