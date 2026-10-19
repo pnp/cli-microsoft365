@@ -9,12 +9,16 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-recyclebinitem-list.js';
+import command, { options } from './m365group-recyclebinitem-list.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -126,7 +132,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -243,7 +249,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -360,7 +366,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Deleted' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Deleted' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -477,7 +483,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupMailNickname: 'd_team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -594,7 +600,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Deleted', groupMailNickname: 'd_team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Deleted', groupMailNickname: 'd_team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -653,28 +659,16 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupMailNickname: 'd_team' }) }), new CommandError(errorMessage));
   });
 
-  it('supports specifying groupName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--groupName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ groupName: 'Deleted', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying groupMailNickname', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--groupMailNickname') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

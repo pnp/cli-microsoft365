@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-conversation-list.js';
+import command, { options } from './m365group-conversation-list.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { cli } from '../../../../cli/cli.js';
 
@@ -19,6 +19,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = {
     "value": [
@@ -53,6 +54,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     sinon.stub(entraGroup, 'getGroupIdByDisplayName').resolves('00000000-0000-0000-0000-000000000000');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,13 +96,21 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['topic', 'lastDeliveredDateTime', 'id']);
   });
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: 'not-c49b-4fd4-8223-28f0ac3a6402' });
+    assert.strictEqual(actual.success, false);
   });
-  it('passes validation if the groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the groupId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' });
+    assert.strictEqual(actual.success, true);
+  });
+  it('fails validation when both groupId and groupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupName: 'Finance' });
+    assert.strictEqual(actual.success, false);
+  });
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('Retrieve conversations for the group specified by groupId in the tenant (verbose)', async () => {
@@ -112,9 +122,9 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, groupId: "00000000-0000-0000-0000-000000000000"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
@@ -130,9 +140,9 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true, groupName: "Finance"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       jsonOutput.value
@@ -142,7 +152,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
   it('correctly handles error when listing conversations', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000" } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: "00000000-0000-0000-0000-000000000000" }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -152,7 +162,7 @@ describe(commands.M365GROUP_CONVERSATION_LIST, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 
