@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-version-clear.js';
+import command, { options } from './file-version-clear.js';
 
 describe(commands.FILE_VERSION_CLEAR, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const validWebUrl = "https://contoso.sharepoint.com";
   const validFileUrl = "/Shared Documents/Document.docx";
@@ -31,6 +32,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -75,37 +77,41 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if fileId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        fileId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if fileId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      fileId: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileUrl: validFileUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if required options specified (fileUrl)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, fileUrl: validFileUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileUrl)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (fileId)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, fileId: validFileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileId)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: validFileId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: validFileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing all file history when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         fileId: validFileId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -117,10 +123,10 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         fileId: validFileId
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -134,12 +140,12 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileUrl: validFileUrl,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -153,12 +159,12 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileId: validFileId,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -175,11 +181,11 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileUrl: validFileUrl
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -196,11 +202,11 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileId: validFileId
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -227,11 +233,12 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
+        fileId: validFileId,
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 });

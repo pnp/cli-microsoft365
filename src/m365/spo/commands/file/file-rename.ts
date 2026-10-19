@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -11,15 +11,22 @@ import commands from '../../commands.js';
 import removeCommand, { Options as SpoFileRemoveOptions } from './file-remove.js';
 import { FileProperties } from './FileProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  sourceUrl: z.string().alias('s'),
+  targetFileName: z.string().alias('t'),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  sourceUrl: string;
-  targetFileName: string;
-  force?: boolean;
 }
 
 interface RenameResponse {
@@ -44,49 +51,8 @@ class SpoFileRenameCommand extends SpoCommand {
     return 'Renames a file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --sourceUrl <sourceUrl>'
-      },
-      {
-        option: '-t, --targetFileName <targetFileName>'
-      },
-      {
-        option: '--force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'sourceUrl', 'targetFileName');
-    this.types.boolean.push('force');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -142,7 +108,6 @@ class SpoFileRenameCommand extends SpoCommand {
     const removeOptions: SpoFileRemoveOptions = {
       webUrl: webUrl,
       url: targetFileServerRelativeUrl,
-      recycle: true,
       force: true,
       debug: this.debug,
       verbose: this.verbose

@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-rename.js';
+import command, { options } from './file-rename.js';
 
 describe(commands.FILE_RENAME, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const renameResponseJson = [
     {
@@ -41,6 +42,7 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -81,14 +83,20 @@ describe(commands.FILE_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetFileName: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', sourceUrl: 'abc', targetFileName: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetFileName: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetFileName: 'abc' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetFileName: 'abc', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('forcefully renames file from a non-root site in the root folder of a document library when a file with the same name exists (or it doesn\'t?)', async () => {
@@ -109,13 +117,12 @@ describe(commands.FILE_RENAME, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: '/Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(renameResponseJson));
   });
@@ -136,12 +143,11 @@ describe(commands.FILE_RENAME, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: 'Shared Documents/abc.pdf',
         targetFileName: 'def.pdf'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(renameResponseJson));
   });
@@ -169,13 +175,12 @@ describe(commands.FILE_RENAME, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: 'Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(renameResponseJson));
   });
@@ -198,13 +203,12 @@ describe(commands.FILE_RENAME, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: 'Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      }
+      })
     }), new CommandError(fileDeleteError.error.message));
   });
 });
