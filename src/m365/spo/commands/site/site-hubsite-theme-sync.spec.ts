@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-hubsite-theme-sync.js';
+import command, { options } from './site-hubsite-theme-sync.js';
 
 describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,7 +76,7 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/Project-X' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -89,7 +91,7 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -106,28 +108,26 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/Project-X' }) }),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
-  it('supports specifying webUrl', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--webUrl') > -1) {
-        containsOption = true;
-      }
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      unknownOption: 'value'
     });
-    assert(containsOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webUrl: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passed validation if webUrl is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation if webUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 });

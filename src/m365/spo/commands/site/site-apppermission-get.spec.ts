@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-apppermission-get.js';
+import command, { options } from './site-apppermission-get.js';
 
 describe(commands.SITE_APPPERMISSION_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,34 +66,29 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation with an incorrect URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with an incorrect URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'https;//contoso,sharepoint:com/sites/sitecollection-name' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation with a correct URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with a correct URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation with a correct URL and a filter value', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0',
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with a correct URL and a filter value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0',
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('returns a specific application permissions for the site', async () => {
@@ -137,11 +134,11 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
       });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         id: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
         output: 'json'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{
       appDisplayName: 'Selected',
@@ -170,6 +167,11 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
       throw siteError;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing' } } as any), new CommandError('Requested site could not be found'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        id: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing'
+      })
+    }), new CommandError('Requested site could not be found'));
   });
 });

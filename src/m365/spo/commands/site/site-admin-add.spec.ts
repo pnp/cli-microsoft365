@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-admin-add.js';
+import command, { options } from './site-admin-add.js';
 import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -21,6 +21,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const listOfAdminsFromAdminSource = [
     {
@@ -60,6 +61,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -95,34 +97,53 @@ describe(commands.SITE_ADMIN_ADD, () => {
     auth.connection.spoUrl = undefined;
   });
 
-  it('fails validation if siteUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', userId: adminToAddId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo', userId: adminToAddId } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual((actual.error?.issues[0].message), `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual((actual.error?.issues[0].message), `'invalid' is not a valid GUID for option 'userId'`);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userName: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual((actual.error?.issues[0].message), `'invalid' is not a valid UPN for option 'userName'`);
   });
 
-  it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, groupId: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual((actual.error?.issues[0].message), `'invalid' is not a valid GUID for option 'groupId'`);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userId: adminToAddId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the siteUrl is a valid SharePoint URL and userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToAddId } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userName: adminToAddUPN } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the siteUrl is a valid SharePoint URL and userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userName: adminToAddUPN } );
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when no user or group option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when multiple user or group options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToAddId, groupId: groupId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToAddId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds a user to site collection admins by userId as admin', async () => {
@@ -149,7 +170,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToAddId, asAdmin: true, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -194,7 +215,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToAddUPN, asAdmin: true, primary: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToAddUPN, asAdmin: true, primary: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -235,7 +256,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -272,7 +293,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -287,8 +308,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       {
         mail: undefined,
         id: groupId
-      }
-    );
+      });
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -311,7 +331,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupName: groupName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupName: groupName, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -326,8 +346,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       {
         mail: undefined,
         id: groupId
-      }
-    );
+      });
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/root?$select=webUrl`) {
@@ -359,7 +378,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupName: groupName, asAdmin: true, primary: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupName: groupName, asAdmin: true, primary: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId, secondaryAdministratorLoginNames:
@@ -387,7 +406,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToAddId, verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { IsSiteAdmin: true });
   });
 
@@ -412,7 +431,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToAddUPN } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToAddUPN }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { IsSiteAdmin: true });
   });
 
@@ -434,7 +453,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { IsSiteAdmin: true });
   });
 
@@ -443,8 +462,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       {
         mail: undefined,
         id: groupId
-      }
-    );
+      });
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `${siteUrl}/_api/web/siteusers('c%3A0t.c%7Ctenant%7C00000000-1000-0000-0000-000000000000')`) {
@@ -458,7 +476,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupName: groupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupName: groupName }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { IsSiteAdmin: true });
   });
 
@@ -499,7 +517,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, primary: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToAddId, primary: true }) });
     assert.deepStrictEqual(postStub.getCall(postStub.callCount - 1).args[0].data, { IsSiteAdmin: true });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { IsSiteAdmin: true });
   });
@@ -508,7 +526,7 @@ describe(commands.SITE_ADMIN_ADD, () => {
     sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToAddUPN);
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, asAdmin: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToAddId, asAdmin: true }) }),
       new CommandError(`Cannot get site ${siteUrl}`));
   });
 
@@ -522,6 +540,6 @@ describe(commands.SITE_ADMIN_ADD, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToAddId, asAdmin: true } }), new CommandError(`User not found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToAddId, asAdmin: true }) }), new CommandError(`User not found.`));
   });
 });
