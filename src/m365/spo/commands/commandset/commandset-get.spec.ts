@@ -13,7 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './commandset-get.js';
+import command, { options } from './commandset-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_GET, () => {
@@ -28,6 +28,7 @@ describe(commands.COMMANDSET_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.COMMANDSET_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -92,7 +94,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, scope: scope, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, scope: scope, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
@@ -105,7 +107,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
@@ -120,7 +122,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, clientSideComponentId: clientSideComponentId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, clientSideComponentId: clientSideComponentId, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
@@ -137,7 +139,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: commandSetId, verbose: true } })
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, verbose: true }) })
       , new CommandError(`Command set with id ${commandSetId} can't be found.`));
   });
 
@@ -156,7 +158,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: commandSetId, verbose: true } })
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, verbose: true }) })
       , new CommandError(`Custom action with id ${commandSetId} is not a command set.`));
   });
 
@@ -170,7 +172,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, clientSideComponentId: clientSideComponentId, scope: scope, verbose: true } })
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, clientSideComponentId: clientSideComponentId, scope: scope, verbose: true }) })
       , new CommandError(`No command set with clientSideComponentId '${clientSideComponentId}' found.`));
   });
 
@@ -184,7 +186,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true }) })
       , new CommandError(`No command set with title '${commandSetTitle}' found.`));
   });
 
@@ -212,7 +214,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true }) })
       , new CommandError(`Multiple command sets with title 'Alerts' found. Found: 0a8e82b5-651f-400b-b537-9a739f92d6b4, ${commandSetCloneId}.`));
   });
 
@@ -232,7 +234,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(commandSetObject));
   });
 
@@ -244,7 +246,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(JSON.parse(commandSetObject.ClientSideComponentProperties)));
   });
 
@@ -257,7 +259,7 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(requestResult.ClientSideComponentProperties));
   });
 
@@ -269,42 +271,47 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, id: commandSetId, clientSideComponentProperties: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(undefined));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', id: commandSetId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: commandSetId });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the clientSideComponentId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, clientSideComponentId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, clientSideComponentId: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if the scope option is not a valid scope option', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: clientSideComponentId, scope: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: clientSideComponentId, scope: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation if options are specified properly with id', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: clientSideComponentId, scope: 'All' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: clientSideComponentId, scope: 'All' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if options are specified properly with title', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: commandSetTitle, scope: 'Web' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: commandSetTitle, scope: 'Web' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation if options are specified properly with clientSideComponentId', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, clientSideComponentId: clientSideComponentId, scope: 'Site' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, clientSideComponentId: clientSideComponentId, scope: 'Site' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', async () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: commandSetId, invalidOption: 'invalid' });
+    assert.notStrictEqual(actual.success, true);
   });
 });
