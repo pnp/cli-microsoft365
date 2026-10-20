@@ -135,6 +135,20 @@ export default {
       style: {
         color: '#569CD6'
       }
+    },
+    {
+      types: ['atrule'],
+      languages: ['yaml', 'yml'],
+      style: {
+        color: '#569CD6'
+      }
+    },
+    {
+      types: ['boolean', 'null', 'important'],
+      languages: ['yaml', 'yml'],
+      style: {
+        color: '#569CD6'
+      }
     }
   ]
 } satisfies PrismTheme;

@@ -1684,11 +1684,24 @@ describe('Auth', () => {
     auth.connection.appId = appId;
     auth.connection.tenant = tenant;
 
-    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, true);
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, false);
     assert.strictEqual(ensuredAccessToken, accessToken);
     assert(requestPostStub.calledOnce);
     assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_id=${appId}`) > -1, true);
     assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_assertion=${gitlabOidcToken}`) > -1, true);
+  });
+
+  it('fails when using federated identity from GitLab CI/CD, but GITLAB_OIDC_TOKEN not available', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: ''
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The `GITLAB_OIDC_TOKEN` environment variable is not available. Please add an id_tokens entry named GITLAB_OIDC_TOKEN with audience `api://AzureADTokenExchange` to the job.'));
   });
 
   it('fails when using federated identity from GitLab CI/CD with empty appId and tenant option', async () => {
@@ -1701,7 +1714,7 @@ describe('Auth', () => {
     auth.connection.appId = undefined;
     auth.connection.tenant = 'common';
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using Federated Identity in GitLab CI/CD.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.'));
   });
 
   it('fails when using federated identity from GitLab CI/CD with empty tenant option', async () => {
@@ -1714,7 +1727,7 @@ describe('Auth', () => {
     auth.connection.appId = appId;
     auth.connection.tenant = 'common';
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using Federated Identity in GitLab CI/CD.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.'));
   });
 
   it('returns access token if persisting connection fails', async () => {

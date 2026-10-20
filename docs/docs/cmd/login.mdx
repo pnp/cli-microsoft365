@@ -86,7 +86,9 @@ To use Federated Identity in GitLab CI/CD, the job must request an ID token name
 job:
   id_tokens:
     GITLAB_OIDC_TOKEN:
-      aud: api://AzureADTokenExchange
+      aud: "api://AzureADTokenExchange"
+  script:
+    - m365 login --authType federatedIdentity --appId eb96cfd0-abfa-4477-8d1d-c6dfde3efb19 --tenant 9a1a1bbd-e158-4cf5-967d-a53b8e85c628
 ```
 
 The corresponding federated credential on the Microsoft Entra app registration must have issuer `https://gitlab.com` (or your self-managed GitLab instance URL) and a subject matching the GitLab OIDC claim for the job, for example `project_path:<group>/<project>:ref_type:branch:ref:<branch>`.

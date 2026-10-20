@@ -123,6 +123,27 @@ export default {
       style: {
         color: '#0000FF'
       }
+    },
+    {
+      types: ['atrule'],
+      languages: ['yaml', 'yml'],
+      style: {
+        color: '#800000'
+      }
+    },
+    {
+      types: ['punctuation'],
+      languages: ['yaml', 'yml'],
+      style: {
+        color: '#000000'
+      }
+    },
+    {
+      types: ['boolean', 'null', 'important'],
+      languages: ['yaml', 'yml'],
+      style: {
+        color: '#0000FF'
+      }
     }
   ]
 } satisfies PrismTheme;
