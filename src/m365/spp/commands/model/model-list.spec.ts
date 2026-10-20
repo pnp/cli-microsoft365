@@ -106,7 +106,7 @@ describe(commands.MODEL_LIST, () => {
   it('fails validation when siteUrl is not valid', () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl' });
     assert.strictEqual(actual.success, false);
-        assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation with unknown options', () => {

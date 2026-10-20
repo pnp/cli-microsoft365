@@ -239,7 +239,7 @@ describe(commands.MODEL_GET, () => {
   it('fails validation when siteUrl is not valid', () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
     assert.strictEqual(actual.success, false);
-        assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when id is not valid', () => {
