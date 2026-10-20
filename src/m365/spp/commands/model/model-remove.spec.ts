@@ -91,6 +91,26 @@ describe(commands.MODEL_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when neither id nor title is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' });
+    assert(!actual.success);
+    const issue = actual.error.issues[0];
+    assert(issue.code === 'custom');
+    assert.deepStrictEqual(issue.params, { customCode: 'optionSet', options: ['id', 'title'] });
+  });
+
+  it('fails validation when both id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sales',
+      id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+      title: 'ModelName'
+    });
+    assert(!actual.success);
+    const issue = actual.error.issues[0];
+    assert(issue.code === 'custom');
+    assert.deepStrictEqual(issue.params, { customCode: 'optionSet', options: ['id', 'title'] });
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       siteUrl: 'https://contoso.sharepoint.com/sites/sales',
