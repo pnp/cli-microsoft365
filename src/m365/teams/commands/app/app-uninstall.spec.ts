@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-uninstall.js';
+import command, { options } from './app-uninstall.js';
 
 describe(commands.APP_UNINSTALL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.APP_UNINSTALL, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -65,14 +67,12 @@ describe(commands.APP_UNINSTALL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '123456789',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '123456789',
+      id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('uninstalls an app from a Microsoft Teams team with confirmation', async () => {
@@ -85,12 +85,12 @@ describe(commands.APP_UNINSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         force: true,
         verbose: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -106,10 +106,10 @@ describe(commands.APP_UNINSTALL, () => {
 
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -117,10 +117,10 @@ describe(commands.APP_UNINSTALL, () => {
   it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -140,22 +140,29 @@ describe(commands.APP_UNINSTALL, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        force: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+      force: true
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
