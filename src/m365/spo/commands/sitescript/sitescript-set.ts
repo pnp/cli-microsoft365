@@ -14,7 +14,7 @@ export const options = z.strictObject({
   description: z.string().optional().alias('d'),
   version: z.string()
     .refine(val => validation.isValidPositiveInteger(val), {
-      message: 'Version must be a number.'
+      error: 'Version must be a number.'
     })
     .optional().alias('v'),
   content: z.string()
@@ -27,7 +27,7 @@ export const options = z.strictObject({
         return false;
       }
     }, {
-      message: 'Specified content value is not a valid JSON string.'
+      error: 'Specified content value is not a valid JSON string.'
     })
     .optional().alias('c')
 });

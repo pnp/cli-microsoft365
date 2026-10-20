@@ -20,7 +20,7 @@ export const options = z.strictObject({
         return false;
       }
     }, {
-      message: 'Specified content value is not a valid JSON string.'
+      error: 'Specified content value is not a valid JSON string.'
     })
     .alias('c'),
   description: z.string().optional().alias('d')
