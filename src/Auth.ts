@@ -775,7 +775,7 @@ export class Auth {
       return this.getAccessTokenWithFederatedToken(resource, process.env.GITLAB_OIDC_TOKEN, logger, debug);
     }
     else {
-      throw new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab CI/CD.');
+      throw new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab.');
     }
   }
 

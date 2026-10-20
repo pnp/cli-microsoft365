@@ -1591,7 +1591,7 @@ describe('Auth', () => {
     assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
   });
 
-  it('fails when not using federated identity from GitHub Action, Azure DevOps Pipeline or GitLab CI/CD', async () => {
+  it('fails when not using federated identity from GitHub Action, Azure DevOps Pipeline or GitLab', async () => {
     process.env = {
       ACTIONS_ID_TOKEN_REQUEST_URL: '',
       ACTIONS_ID_TOKEN_REQUEST_TOKEN: '',
@@ -1605,7 +1605,7 @@ describe('Auth', () => {
     auth.connection.appId = appId;
     auth.connection.tenant = tenant;
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab CI/CD.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab.'));
   });
 
   it('fails when using federated identity from Azure DevOps Pipeline, but SYSTEM_ACCESSTOKEN not available', async () => {
@@ -1712,7 +1712,7 @@ describe('Auth', () => {
 
     auth.connection.authType = AuthType.FederatedIdentity;
     auth.connection.appId = undefined;
-    auth.connection.tenant = 'common';
+    auth.connection.tenant = tenant;
 
     await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.'));
   });

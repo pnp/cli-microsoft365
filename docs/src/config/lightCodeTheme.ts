@@ -126,21 +126,21 @@ export default {
     },
     {
       types: ['atrule'],
-      languages: ['yaml', 'yml'],
+      languages: ['yaml'],
       style: {
         color: '#800000'
       }
     },
     {
       types: ['punctuation'],
-      languages: ['yaml', 'yml'],
+      languages: ['yaml'],
       style: {
         color: '#000000'
       }
     },
     {
       types: ['boolean', 'null', 'important'],
-      languages: ['yaml', 'yml'],
+      languages: ['yaml'],
       style: {
         color: '#0000FF'
       }
