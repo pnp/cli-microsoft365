@@ -3,15 +3,12 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
-import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
-  }).alias('i'),
+  id: z.uuid().alias('i'),
   content: z.boolean().optional().alias('c')
 });
 declare type Options = z.infer<typeof options>;

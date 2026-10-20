@@ -3,19 +3,17 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
-import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().refine(val => validation.isValidGuid(val), {
-    message: 'The value must be a valid GUID.'
-  }).alias('i'),
+  id: z.uuid().alias('i'),
   title: z.string().optional().alias('t'),
   description: z.string().optional().alias('d'),
   version: z.string().optional()
-    .refine(val => val === undefined || !isNaN(parseInt(val)), {
+    .refine(val => val === undefined || validation.isValidPositiveInteger(val), {
       message: 'Version must be a number.'
     })
     .alias('v'),
