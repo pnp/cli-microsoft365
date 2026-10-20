@@ -9,19 +9,16 @@ import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().alias('i'),
+  id: z.guid().alias('i'),
   title: z.string().optional().alias('t'),
   description: z.string().optional().alias('d'),
-  version: z.string().optional()
-    .refine(val => val === undefined || validation.isValidPositiveInteger(val), {
+  version: z.string()
+    .refine(val => validation.isValidPositiveInteger(val), {
       message: 'Version must be a number.'
     })
-    .alias('v'),
-  content: z.string().optional()
+    .optional().alias('v'),
+  content: z.string()
     .refine(val => {
-      if (val === undefined) {
-        return true;
-      }
       try {
         JSON.parse(val);
         return true;
@@ -32,7 +29,7 @@ export const options = z.strictObject({
     }, {
       message: 'Specified content value is not a valid JSON string.'
     })
-    .alias('c')
+    .optional().alias('c')
 });
 declare type Options = z.infer<typeof options>;
 
