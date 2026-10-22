@@ -154,6 +154,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       userId: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
@@ -164,6 +165,7 @@ describe(commands.MAILBOX_SETTINGS_SET, () => {
       userName: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if no option except user id provided in app-only mode', () => {

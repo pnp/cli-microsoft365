@@ -1,18 +1,21 @@
 import fs from 'fs';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
 import ContextCommand from '../../../base/ContextCommand.js';
 import { M365RcJson } from '../../../base/M365RcJson.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  value: z.string().alias('v')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  value: string;
 }
 
 class ContextOptionSetCommand extends ContextCommand {
@@ -24,21 +27,8 @@ class ContextOptionSetCommand extends ContextCommand {
     return 'Allows to add a new name for the option and value to the local context file.';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-v, --value <value>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

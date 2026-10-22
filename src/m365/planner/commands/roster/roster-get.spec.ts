@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,18 +11,20 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roster-get.js';
+import command, { options } from './roster-get.js';
 
 describe(commands.ROSTER_GET, () => {
   const id = '8bc07d47-c06f-41e1-8f00-1c113c8f6067';
   const rosterGetResponse = {
-    "id": id,
-    "assignedSensitivityLabel": null
+    id: id,
+    assignedSensitivityLabel: null
   };
 
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +32,8 @@ describe(commands.ROSTER_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -65,6 +71,21 @@ describe(commands.ROSTER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with valid id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('retrieves Microsoft Planner Roster by specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${id}`) {
@@ -74,7 +95,7 @@ describe(commands.ROSTER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: id, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id, verbose: true }) });
     assert(loggerLogSpy.calledWith(rosterGetResponse));
   });
 
@@ -89,10 +110,10 @@ describe(commands.ROSTER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
-        id: id
-      }
+        id
+      })
     }), new CommandError(errorMessage));
   });
 });

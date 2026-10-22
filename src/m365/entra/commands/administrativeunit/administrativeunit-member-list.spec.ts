@@ -9,8 +9,7 @@ import { session } from '../../../../utils/session.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import command from './administrativeunit-member-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './administrativeunit-member-list.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { cli } from '../../../../cli/cli.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
@@ -278,6 +277,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -286,6 +286,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -307,8 +308,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      entraAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      cli.getSettingWithDefaultValue
+      entraAdministrativeUnit.getAdministrativeUnitByDisplayName
     ]);
   });
 
@@ -325,65 +325,49 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when administrativeUnitId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when administrativeUnitId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if administrativeUnitId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if administrativeUnitId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if wrong type is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'application' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if wrong type is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, type: 'application' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if user type is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'user' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if user type is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, type: 'user' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if group type is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'group' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if group type is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, type: 'group' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if device type is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'device' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if device type is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, type: 'device' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if filter is specified but type is missing', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, filter: "userType eq 'Memmber'" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if filter is specified but type is missing', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, filter: "userType eq 'Memmber'" });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should get all members of an administrative unit specified by its id when type not specified', async () => {

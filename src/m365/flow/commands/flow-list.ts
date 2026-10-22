@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import { formatting } from '../../../utils/formatting.js';
 import { odata } from '../../../utils/odata.js';
 import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 import commands from '../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  sharingStatus: z.enum(['all', 'personal', 'ownedByMe', 'sharedWithMe']).optional(),
+  withSolutions: z.boolean().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  sharingStatus?: string;
-  withSolutions?: boolean;
-  asAdmin?: boolean;
 }
 
 interface PowerAutomateFlow {
@@ -26,8 +30,6 @@ interface PowerAutomateFlow {
 }
 
 class FlowListCommand extends PowerAutomateCommand {
-  private allowedSharingStatuses = ['all', 'personal', 'ownedByMe', 'sharedWithMe'];
-
   public get name(): string {
     return commands.LIST;
   }
@@ -36,66 +38,18 @@ class FlowListCommand extends PowerAutomateCommand {
     return 'Lists Power Automate flows in the given environment';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'displayName'];
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        sharingStatus: typeof args.options.sharingStatus !== 'undefined',
-        withSolutions: !!args.options.withSolutions,
-        asAdmin: !!args.options.asAdmin
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(options => !(options.asAdmin && options.sharingStatus), {
+      error: 'The options asAdmin and sharingStatus cannot be specified together.'
     });
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--sharingStatus [sharingStatus]',
-        autocomplete: this.allowedSharingStatuses
-      },
-      {
-        option: '--withSolutions'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.asAdmin && args.options.sharingStatus) {
-          return `The options asAdmin and sharingStatus cannot be specified together.`;
-        }
-
-        if (args.options.sharingStatus && !this.allowedSharingStatuses.some(status => status === args.options.sharingStatus)) {
-          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatuses.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('environmentName', 'sharingStatus');
-    this.types.boolean.push('withSolutions', 'asAdmin');
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'displayName'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

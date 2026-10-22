@@ -14,12 +14,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-permission-remove.js';
+import command, { options } from './app-permission-remove.js';
 
 describe(commands.APP_PERMISSION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
@@ -68,6 +69,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     };
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -120,69 +122,74 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if appName is not a GUID', async () => {
-    const actual = await command.validate({ options: { appName: 'invalid', userId: validUserId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appName is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'invalid', userId: validUserId, force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if appName is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, userId: validUserId, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if appName is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userId: validUserId, force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a GUID', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, userId: 'invalid', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userId: 'invalid', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, userId: validUserId, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userId: validUserId, force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, userName: 'John Doe', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userName: 'John Doe', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, userName: validUserName, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userName: validUserName, force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if groupId is not a GUID', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, groupId: 'invalid', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, groupId: 'invalid', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, groupId: validGroupId, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if groupId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, groupId: validGroupId, force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if asAdmin is used without environmentName', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, asAdmin: true, userId: validUserId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if asAdmin is used without environmentName', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, asAdmin: true, userId: validUserId, force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if environmentName is used without asAdmin', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if environmentName is used without asAdmin', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if environmentName is used with asAdmin', async () => {
-    const actual = await command.validate({ options: { appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, asAdmin: true, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if environmentName is used with asAdmin', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, asAdmin: true, force: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: validAppName, userId: validUserId, force: true, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified Microsoft Power App permission when force option not passed', async () => {
     sinon.stub(request, 'post').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: validAppName,
         userId: validUserId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -201,7 +208,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: validUserId }]
     };
 
-    await command.action(logger, { options: { verbose: true, appName: validAppName, userId: validUserId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: validAppName, userId: validUserId, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -221,7 +228,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: `tenant-${tenantId}` }]
     };
 
-    await command.action(logger, { options: { appName: validAppName, tenant: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: validAppName, tenant: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -238,7 +245,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: validGroupId }]
     };
 
-    await command.action(logger, { options: { verbose: true, appName: validAppName, groupId: validGroupId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: validAppName, groupId: validGroupId, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -255,7 +262,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: `tenant-${tenantId}` }]
     };
 
-    await command.action(logger, { options: { verbose: true, appName: validAppName, tenant: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: validAppName, tenant: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -274,7 +281,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: validUserId }]
     };
 
-    await command.action(logger, { options: { verbose: true, appName: validAppName, userName: validUserName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: validAppName, userName: validUserName, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -293,7 +300,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: validGroupId }]
     };
 
-    await command.action(logger, { options: { verbose: true, appName: validAppName, groupName: validGroupName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, appName: validAppName, groupName: validGroupName, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -310,7 +317,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       delete: [{ id: validUserId }]
     };
 
-    await command.action(logger, { options: { appName: validAppName, userId: validUserId, environmentName: validEnvironmentName, asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: validAppName, userId: validUserId, environmentName: validEnvironmentName, asAdmin: true, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -324,7 +331,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: validAppName, userId: validUserId, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appName: validAppName, userId: validUserId, force: true }) }),
       new CommandError(errorMessage));
   });
 });

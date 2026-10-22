@@ -108,11 +108,13 @@ describe(commands.CALENDARGROUP_REMOVE, () => {
   it('fails validation when userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ id: calendarGroupId, userId: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation when userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ id: calendarGroupId, userName: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation with unknown options', () => {

@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,14 +11,16 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roster-remove.js';
+import command, { options } from './roster-remove.js';
 
-describe(commands.PLAN_REMOVE, () => {
+describe(commands.ROSTER_REMOVE, () => {
   const validRosterId = 'CRp0hFSovEedkXtcX3WnS5gAGgch';
 
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean = false;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +32,8 @@ describe(commands.PLAN_REMOVE, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,13 +78,27 @@ describe(commands.PLAN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with valid id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validRosterId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validRosterId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the specified Roster when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validRosterId
-      }
+      })
     });
-
 
     assert(promptIssued);
   });
@@ -87,9 +106,9 @@ describe(commands.PLAN_REMOVE, () => {
   it('aborts removing the specified Roster when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validRosterId
-      }
+      })
     });
     assert(deleteSpy.notCalled);
   });
@@ -104,11 +123,11 @@ describe(commands.PLAN_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: validRosterId,
         force: true
-      }
+      })
     });
   });
 
@@ -125,9 +144,9 @@ describe(commands.PLAN_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validRosterId
-      }
+      })
     });
   });
 
@@ -139,10 +158,10 @@ describe(commands.PLAN_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validRosterId,
         force: true
-      }
+      })
     }), new CommandError('The requested item is not found.'));
   });
 });

@@ -1,22 +1,37 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 import { teams } from '../../../../utils/teams.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional()
+    .alias('i'),
+  teamName: z.string()
+    .optional(),
+  name: z.string()
+    .alias('n'),
+  description: z.string()
+    .optional()
+    .alias('d'),
+  type: z.enum(['standard', 'private', 'shared'])
+    .optional(),
+  owner: z.string()
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  name: string;
-  description?: string;
-  type: string;
-  owner: string;
 }
 
 class TeamsChannelAddCommand extends GraphCommand {
@@ -28,77 +43,31 @@ class TeamsChannelAddCommand extends GraphCommand {
     return 'Adds a channel to the specified Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        type: args.options.type || 'standard',
-        owner: typeof args.options.owner !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
+      })
+      .refine(opts => !((opts.type === 'private' || opts.type === 'shared') && !opts.owner), {
+        message: 'Specify owner when creating a private or shared channel.',
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !((opts.type !== 'private' && opts.type !== 'shared') && opts.owner), {
+        message: 'Specify owner only when creating a private or shared channel.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--type [type]',
-        autocomplete: ['standard', 'private', 'shared']
-      },
-      {
-        option: '--owner [owner]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.type && ['standard', 'private', 'shared'].indexOf(args.options.type) === -1) {
-          return `${args.options.type} is not a valid type value. Allowed values standard|private|shared.`;
-        }
-
-        if ((args.options.type === 'private' || args.options.type === 'shared') && !args.options.owner) {
-          return `Specify owner when creating a ${args.options.type} channel.`;
-        }
-
-        if ((args.options.type !== 'private' && args.options.type !== 'shared') && args.options.owner) {
-          return `Specify owner only when creating a private or shared channel.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['teamId', 'teamName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

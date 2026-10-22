@@ -29,7 +29,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get a ListView Command Set that is installed tenant wide';
+    return 'Gets a ListView Command Set that is installed tenant wide';
   }
 
   constructor() {

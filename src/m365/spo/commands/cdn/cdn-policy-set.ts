@@ -1,20 +1,24 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  cdnType: z.enum(['Public', 'Private']).optional().alias('t'),
+  policy: z.enum(['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']).alias('p'),
+  value: z.string().alias('v')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  cdnType: string;
-  policy: string;
-  value: string;
 }
 
 class SpoCdnPolicySetCommand extends SpoCommand {
@@ -26,58 +30,8 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     return 'Sets CDN policy value for the current SharePoint Online tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        cdnType: args.options.cdnType || 'Public',
-        policy: args.options.policy
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --cdnType [cdnType]',
-        autocomplete: ['Public', 'Private']
-      },
-      {
-        option: '-p, --policy <policy>',
-        autocomplete: ['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']
-      },
-      {
-        option: '-v, --value <value>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.cdnType) {
-          if (args.options.cdnType !== 'Public' &&
-            args.options.cdnType !== 'Private') {
-            return `${args.options.cdnType} is not a valid CDN type. Allowed values are Public|Private`;
-          }
-        }
-
-        if (!args.options.policy ||
-          (args.options.policy !== 'IncludeFileExtensions' &&
-            args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
-          return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

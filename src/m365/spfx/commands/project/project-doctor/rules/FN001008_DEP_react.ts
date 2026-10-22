@@ -3,8 +3,8 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from './DependencyRule.js';
 
 export class FN001008_DEP_react extends DependencyRule {
-  constructor(supportedRange: string) {
-    super('react', supportedRange, false);
+  constructor(options: { supportedRange: string }) {
+    super({ ...options, packageName: 'react' });
   }
 
   get id(): string {

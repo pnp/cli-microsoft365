@@ -24,7 +24,7 @@ class TeamsUserAppListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'List the apps installed in the personal scope of the specified user';
+    return 'Lists the apps installed in the personal scope of the specified user';
   }
 
   constructor() {

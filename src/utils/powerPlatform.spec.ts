@@ -375,6 +375,33 @@ describe('utils/powerPlatform', () => {
 
     await assert.rejects(powerPlatform.getWebsiteByUrl(environment, 'https://site-0uaq9.powerappsportals.com'), Error(`The specified Power Page website with url 'https://site-0uaq9.powerappsportals.com' does not exist.`));
   });
+
+  it('returns correct website record id by unique name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `${envUrl}/api/data/v9.2/powerpagesites?$filter=name eq 'Site 1'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return { value: [{ powerpagesiteid: '5eb107a6-5ac2-4e1c-a3b9-d5c21bbc10ce' }] };
+        }
+      }
+
+      throw `Invalid request with opts ${JSON.stringify(opts)}`;
+    });
+
+    const actual = await powerPlatform.getWebsiteIdByUniqueName(envUrl, 'Site 1');
+    assert.strictEqual(actual, '5eb107a6-5ac2-4e1c-a3b9-d5c21bbc10ce');
+  });
+
+  it('handles no website found when using unique name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `${envUrl}/api/data/v9.2/powerpagesites?$filter=name eq 'Site 1'`)) {
+        return { value: [] };
+      }
+
+      return 'Invalid request';
+    });
+
+    await assert.rejects(powerPlatform.getWebsiteIdByUniqueName(envUrl, 'Site 1'), Error(`The specified website 'Site 1' does not exist.`));
+  });
   //#endregion
 
   //#region Cards

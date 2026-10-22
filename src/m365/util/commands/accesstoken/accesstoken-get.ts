@@ -1,18 +1,21 @@
+import { z } from 'zod';
 import auth, { Auth } from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  resource: z.string().alias('r'),
+  new: z.boolean().optional(),
+  decoded: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  new?: boolean;
-  resource: string;
-  decoded?: boolean;
 }
 
 class UtilAccessTokenGetCommand extends Command {
@@ -24,34 +27,8 @@ class UtilAccessTokenGetCommand extends Command {
     return 'Gets access token for the specified resource';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        new: args.options.new,
-        decoded: args.options.decoded
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-r, --resource <resource>'
-      },
-      {
-        option: '--new'
-      },
-      {
-        option: '--decoded'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

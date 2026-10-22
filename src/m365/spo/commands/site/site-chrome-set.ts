@@ -52,7 +52,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Set the chrome header and footer for the specified site';
+    return 'Sets the chrome header and footer for the specified site';
   }
 
   constructor() {

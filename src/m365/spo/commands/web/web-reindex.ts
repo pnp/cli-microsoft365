@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { ContextInfo, IdentityResponse, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -7,12 +8,17 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
 }
 
 class SpoWebReindexCommand extends SpoCommand {
@@ -24,25 +30,8 @@ class SpoWebReindexCommand extends SpoCommand {
     return 'Requests reindexing the specified subsite';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

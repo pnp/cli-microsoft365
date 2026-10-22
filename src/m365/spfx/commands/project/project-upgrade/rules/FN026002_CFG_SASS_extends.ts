@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN026002_CFG_SASS_extends extends JsonRule {
-  constructor(private _extends: string) {
+  private _extends: string;
+
+  constructor(options: { _extends: string }) {
     super();
+    this._extends = options._extends;
   }
 
   get id(): string {

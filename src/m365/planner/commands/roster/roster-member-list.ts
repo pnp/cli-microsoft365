@@ -1,15 +1,19 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  rosterId: z.string()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  rosterId: string;
 }
 
 class PlannerRosterMemberListCommand extends GraphCommand {
@@ -21,24 +25,8 @@ class PlannerRosterMemberListCommand extends GraphCommand {
     return 'Lists members of the specified Microsoft Planner Roster';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTypes();
-  }
-
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--rosterId <rosterId>'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('rosterId');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

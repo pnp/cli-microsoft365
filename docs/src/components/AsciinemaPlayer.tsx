@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
+import type { Options } from 'asciinema-player';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 type AsciinemaPlayerProps = {
   src: string;
   // START asciinemaOptions
-  cols: string;
-  rows: string;
+  cols: number;
+  rows: number;
   autoPlay: boolean;
   preload: boolean;
   loop: boolean | number;
@@ -15,7 +16,7 @@ type AsciinemaPlayerProps = {
   idleTimeLimit: number;
   theme: string;
   poster: string;
-  fit: string;
+  fit: Options['fit'];
   fontSize: string;
   // END asciinemaOptions
 };

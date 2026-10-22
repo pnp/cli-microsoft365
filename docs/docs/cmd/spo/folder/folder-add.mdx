@@ -27,7 +27,7 @@ m365 spo folder add [options]
 `--color [color]`
 : Visual color of the folder. Valid values are a color name or a number. Check remarks for more info.
 
-`--ensureParentFolders [ensureParentFolders]`
+`--ensureParentFolders`
 : Ensure that the parent folder path is available. Any missing folders will be created recursively.
 ```
 
@@ -55,6 +55,25 @@ When you specify a value for `color`, consider the following:
 | Light blue   | 13           | lightBlue    |
 | Light purple | 14           | lightPurple  |
 | Light pink   | 15           | lightPink    |
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

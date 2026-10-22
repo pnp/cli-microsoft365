@@ -1,17 +1,21 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().optional().alias('e'),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName?: string;
-  asAdmin: boolean;
 }
 
 class PaAppListCommand extends PowerAppsCommand {
@@ -27,48 +31,18 @@ class PaAppListCommand extends PowerAppsCommand {
     return ['name', 'displayName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: args.options.asAdmin === true,
-        environmentName: typeof args.options.environmentName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.asAdmin || opts.environmentName, {
+        message: 'When specifying the asAdmin option the environment option is required as well.'
+      })
+      .refine(opts => !opts.environmentName || opts.asAdmin, {
+        message: 'When specifying the environment option the asAdmin option is required as well.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName [environmentName]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option the environment option is required as well';
-        }
-
-        if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environment option the asAdmin option is required as well';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

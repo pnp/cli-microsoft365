@@ -1,20 +1,28 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { validation } from '../../../utils/validation.js';
 import GraphCommand from '../../base/GraphCommand.js';
 import commands from '../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  folderUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online folder URL.`
+    })
+    .alias('u'),
+  filePath: z.string().alias('p'),
+  siteUrl: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  folderUrl: string;
-  filePath: string;
-  siteUrl?: string;
 }
 
 class FileAddCommand extends GraphCommand {
@@ -26,47 +34,24 @@ class FileAddCommand extends GraphCommand {
     return 'Uploads file to the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        siteUrl: typeof args.options.siteUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => fs.existsSync(options.filePath), {
+        error: e => `Specified source file ${(e.input as Options).filePath} doesn't exist`
+      })
+      .refine(options => {
+        if (options.siteUrl) {
+          return validation.isValidSharePointUrl(options.siteUrl) === true;
+        }
+
+        return true;
+      }, {
+        error: e => `'${(e.input as Options).siteUrl}' is not a valid SharePoint Online site URL.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --folderUrl <folderUrl>' },
-      { option: '-p, --filePath <filePath>' },
-      { option: '--siteUrl [siteUrl]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!fs.existsSync(args.options.filePath)) {
-          return `Specified source file ${args.options.sourceFile} doesn't exist`;
-        }
-
-        if (args.options.siteUrl) {
-          const isValidSiteUrl = validation.isValidSharePointUrl(args.options.siteUrl);
-          if (isValidSiteUrl !== true) {
-            return isValidSiteUrl;
-          }
-        }
-
-        return validation.isValidSharePointUrl(args.options.folderUrl);
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

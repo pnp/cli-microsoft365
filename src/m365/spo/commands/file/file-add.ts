@@ -5,7 +5,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { fsUtil } from '../../../../utils/fsUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
@@ -135,8 +134,7 @@ class SpoFileAddCommand extends SpoCommand {
         option: '--publishComment [publishComment]'
       },
       {
-        option: '--overwrite [overwrite]',
-        autocomplete: ['true', 'false']
+        option: '--overwrite'
       },
       {
         option: '--fileName [fileName]'
@@ -177,7 +175,7 @@ class SpoFileAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const folderPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
-    const fileName: string = fsUtil.getSafeFileName(args.options.fileName ?? path.basename(fullPath));
+    const fileName: string = args.options.fileName ?? path.basename(fullPath);
 
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
@@ -187,12 +185,8 @@ class SpoFileAddCommand extends SpoCommand {
       await logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
-    if (args.options.overwrite === undefined) {
-      await this.warn(logger, 'In the next major version, the --overwrite option will default to false. To avoid this warning, please set the --overwrite option explicitly to true or false.');
-    }
-
     try {
-      if (args.options.overwrite === false) {
+      if (!args.options.overwrite) {
         try {
           const requestOptions: CliRequestOptions = {
             url: `${args.options.webUrl}/_api/Web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderPath + '/' + fileName)}')?$select=Exists`,

@@ -8,15 +8,17 @@ import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import commands from '../../commands.js';
-import command from './config-reset.js';
+import command, { options } from './config-reset.js';
 
 describe(commands.CONFIG_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -100,25 +102,13 @@ describe(commands.CONFIG_RESET, () => {
     assert.strictEqual(showHelpOnFailureValue, undefined, 'Invalid value');
   });
 
-  it('fails validation if specified key is invalid', async () => {
-    const actual = await command.validate({ options: { key: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified key is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if key is not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying key', () => {
-    const options = command.options;
-    let containsOptionKey = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--key') > -1) {
-        containsOptionKey = true;
-      }
-    });
-
-    assert(containsOptionKey);
+  it('passes validation if key is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

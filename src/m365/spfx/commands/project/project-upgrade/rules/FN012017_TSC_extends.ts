@@ -5,8 +5,11 @@ import { Finding } from '../../report-model/index.js';
 export class FN012017_TSC_extends extends JsonRule {
 
   // extends is a reserved word so _extends is used instead
-  constructor(private _extends: string) {
+  private _extends: string;
+
+  constructor(options: { _extends: string }) {
     super();
+    this._extends = options._extends;
   }
 
   get id(): string {

@@ -1,8 +1,8 @@
 import { DependencyRule } from './DependencyRule.js';
 
 export class FN002007_DEVDEP_ajv extends DependencyRule {
-  constructor(supportedRange: string) {
-    super('ajv', supportedRange, true);
+  constructor(options: { supportedRange: string }) {
+    super({ ...options, packageName: 'ajv', isDevDep: true });
   }
 
   get id(): string {

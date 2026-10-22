@@ -52,6 +52,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 - `replace` will replace the destination file if it already exists.
 - `rename` will add a suffix (e.g. Document1.pdf) when the destination file already exists.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Copy a file by server-relative URL to a document library in another site collection with server relative URL.
@@ -66,13 +85,13 @@ Copy a file by site-relative URL to a document library in another site collectio
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --ignoreVersionHistory
 ```
 
-Copy file by sourceId (UniqueId) to a document library in another site collection and rename the file (without specifying the file extension).
+Copy file by sourceId (unique ID) to a document library in another site collection and rename the file (without specifying the file extension).
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf"
 ```
 
-Copy file by sourceId (UniqueId) to a document library in another site collection with a new name, rename the file if it already exists.
+Copy file by sourceId (unique ID) to a document library in another site collection with a new name, rename the file if it already exists.
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf" --nameConflictBehavior rename

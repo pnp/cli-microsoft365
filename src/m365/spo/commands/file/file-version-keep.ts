@@ -33,7 +33,7 @@ class SpoFileVersionKeepCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Ensure that a specific file version will never expire';
+    return 'Ensures that a specific file version will never expire';
   }
 
   public get schema(): z.ZodType | undefined {
@@ -43,7 +43,11 @@ class SpoFileVersionKeepCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.fileUrl, options.fileId].filter(o => o !== undefined).length === 1, {
-        error: `Specify 'fileUrl' or 'fileId', but not both.`
+        error: `Specify 'fileUrl' or 'fileId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileUrl', 'fileId']
+        }
       });
   }
 

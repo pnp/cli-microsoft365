@@ -1,5 +1,7 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import DateAndPeriodBasedReport, { dateAndPeriodBasedReportOptions } from '../../../base/DateAndPeriodBasedReport.js';
 import commands from '../../commands.js';
+
+export const options = dateAndPeriodBasedReportOptions;
 
 class OutlookReportMailActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {

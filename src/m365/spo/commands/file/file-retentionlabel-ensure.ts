@@ -27,7 +27,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Apply a retention label to a file';
+    return 'Applies a retention label to a file';
   }
 
   constructor() {

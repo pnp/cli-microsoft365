@@ -12,29 +12,29 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-checklistitem-remove.js';
+import command, { options } from './task-checklistitem-remove.js';
 
 describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validId = '71175';
 
   const responseChecklistWithId = {
-    "71175": {
-      "isChecked": false,
-      "title": "test 2"
+    '71175': {
+      isChecked: false,
+      title: 'test 2'
     }
   };
   const responseChecklistWithNoId = {
-    "71176": {
-      "isChecked": false,
-      "title": "test 2"
+    '71176': {
+      isChecked: false,
+      title: 'test 2'
     }
   };
-
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -48,6 +48,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     };
     sinon.stub(cli.getConfig(), 'all').value({});
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,6 +94,15 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removal when force option not passed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
@@ -101,30 +111,28 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         id: validId
-      }
+      })
     });
 
     assert(promptIssued);
   });
 
-  it('passes validation when valid options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        taskId: validTaskId,
-        id: validId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      id: validId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly deletes checklist item', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           checklist: responseChecklistWithId
         };
       }
@@ -138,11 +146,11 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         id: validId,
         force: true
-      }
+      })
     });
   });
 
@@ -150,7 +158,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           checklist: responseChecklistWithId
         };
       }
@@ -164,10 +172,10 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         id: validId
-      }
+      })
     });
   });
 
@@ -175,7 +183,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return {
-          "@odata.etag": "TestEtag",
+          '@odata.etag': 'TestEtag',
           checklist: responseChecklistWithNoId
         };
       }
@@ -184,10 +192,10 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         taskId: validTaskId,
         id: validId
-      }
+      })
     }), new CommandError(`The specified checklist item with id ${validId} does not exist`));
   });
 
@@ -195,6 +203,12 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId,
+        id: validId,
+        force: true
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

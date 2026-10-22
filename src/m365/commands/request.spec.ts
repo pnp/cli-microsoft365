@@ -13,7 +13,7 @@ import { pid } from '../../utils/pid.js';
 import { session } from '../../utils/session.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import commands from './commands.js';
-import command from './request.js';
+import command, { options } from './request.js';
 
 describe(commands.REQUEST, () => {
   let log: any[];
@@ -21,6 +21,7 @@ describe(commands.REQUEST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   //#region 
   const mockSPOWebJSONResponse = { "AllowRssFeeds": true, "AlternateCssUrl": "", "AppInstanceId": "00000000-0000-0000-0000-000000000000", "ClassicWelcomePage": null, "Configuration": 0, "Created": "2020-10-08T07:03:47.907", "CurrentChangeToken": { "StringValue": "1;2;d5f1681e-9480-4636-ac33-094bb75c44ff;637960770683600000;495812642" }, "CustomMasterUrl": "/_catalogs/masterpage/seattle.master", "Description": "", "DesignPackageId": "00000000-0000-0000-0000-000000000000", "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false, "EnableMinimalDownload": false, "FooterEmphasis": 0, "FooterEnabled": true, "FooterLayout": 0, "HeaderEmphasis": 0, "HeaderLayout": 0, "HideTitleInHeader": false, "HorizontalQuickLaunch": false, "Id": "d5f1681e-9480-4636-ac33-094bb75c44ff", "IsEduClass": false, "IsEduClassProvisionChecked": false, "IsEduClassProvisionPending": false, "IsHomepageModernized": false, "IsMultilingual": true, "IsRevertHomepageLinkHidden": false, "Language": 1033, "LastItemModifiedDate": "2022-08-14T11:31:56Z", "LastItemUserModifiedDate": "2022-08-14T11:31:56Z", "LogoAlignment": 0, "MasterUrl": "/_catalogs/masterpage/seattle.master", "MegaMenuEnabled": true, "NavAudienceTargetingEnabled": false, "NoCrawl": false, "ObjectCacheEnabled": false, "OverwriteTranslationsOnChange": false, "ResourcePath": { "DecodedUrl": "https://contoso.sharepoint.com" }, "QuickLaunchEnabled": true, "RecycleBinEnabled": true, "SearchScope": 0, "ServerRelativeUrl": "/", "SiteLogoUrl": "/SiteAssets/__sitelogo__logo_240x240.png", "SyndicationEnabled": true, "TenantAdminMembersCanShare": 0, "Title": "Contoso Intranet", "TreeViewEnabled": false, "UIVersion": 15, "UIVersionConfigurationEnabled": false, "Url": "https://contoso.sharepoint.com", "WebTemplate": "SITEPAGEPUBLISHING", "WelcomePage": "SitePages/Home.aspx" };
@@ -51,6 +52,7 @@ describe(commands.REQUEST, () => {
     auth.connection.active = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,80 +95,66 @@ describe(commands.REQUEST, () => {
   });
 
   it('fails validation if wrong method is set', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web',
-        method: 'gett'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web',
+      method: 'gett'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if body is set when content-type is not specified', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web',
-        body: '{ "key": "value" }',
-        method: 'post'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web',
+      body: '{ "key": "value" }',
+      method: 'post'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if body is set on GET requests', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web',
-        body: '{ "key": "value" }',
-        'content-type': 'application/json',
-        method: 'get'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web',
+      body: '{ "key": "value" }',
+      'content-type': 'application/json',
+      method: 'get'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation if filePath doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({
-      options: {
-        url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
-        method: 'get',
-        filePath: 'abc'
-      }
-    }, commandInfo);
+    const actual = commandOptionsSchema.safeParse({
+      url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
+      method: 'get',
+      filePath: 'abc'
+    });
     sinonUtil.restore(fs.existsSync);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation with body and content-type on POST request', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web',
-        body: '{ "key": "value" }',
-        'content-type': 'application/json',
-        method: 'post'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web',
+      body: '{ "key": "value" }',
+      'content-type': 'application/json',
+      method: 'post'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with correct method set', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web',
-        method: 'get'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web',
+      method: 'get'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with no method set', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/_api/web'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly defaults to a GET request accepting a json response', async () => {
@@ -179,9 +167,9 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web'
-      }
+      })
     });
   });
 
@@ -195,10 +183,10 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
@@ -213,10 +201,10 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web?$select=Title',
         accept: 'application/xml'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebXMLResponse));
   });
@@ -231,11 +219,11 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         debug: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
@@ -250,13 +238,13 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json',
         'x-http-method': 'PATCH',
         method: 'post'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
@@ -271,11 +259,11 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         resource: 'https://contoso.sharepoint.com'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
@@ -290,12 +278,12 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         resource: 'https://contoso.sharepoint.com',
         debug: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
@@ -311,10 +299,10 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: '@graph/me',
         accept: 'application/json;odata.metadata=none'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
@@ -330,10 +318,10 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: '@graphbeta/me',
         accept: 'application/json;odata.metadata=none'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
@@ -349,10 +337,10 @@ describe(commands.REQUEST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: '@spo/_api/web',
         accept: 'application/json;odata=nometadata'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
@@ -360,10 +348,10 @@ describe(commands.REQUEST, () => {
   it('throws error when using the @spo token when there is nog spoUrl in the auth service', async () => {
     auth.connection.spoUrl = undefined;
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: '@spo/_api/web',
         accept: 'application/json;odata=nometadata'
-      }
+      })
     }), new CommandError(`SharePoint root site URL is unknown. Please set your SharePoint URL using command 'spo set'.`));
   });
 
@@ -373,10 +361,10 @@ describe(commands.REQUEST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: 'https://contoso.sharepoint.com/_api/web'
-      }
-    } as any), new CommandError('Invalid request'));
+      })
+    }), new CommandError('Invalid request'));
   });
 
 
@@ -403,14 +391,14 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options = {
+    const options = commandOptionsSchema.parse({
       verbose: true,
       url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
       body: '{ "key": "value" }',
       'content-type': 'application/json',
-      method: 'get',
+      method: 'post',
       filePath: 'test1.docx'
-    };
+    });
 
     await command.action(logger, { options: options } as any);
     assert(fsStub.calledOnce);
@@ -442,13 +430,13 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options = {
+    const options = commandOptionsSchema.parse({
       url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
       body: '{ "key": "value" }',
       'content-type': 'application/json',
-      method: 'get',
+      method: 'post',
       filePath: 'test1.docx'
-    };
+    });
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Writestream throws error'));
     assert(fsStub.calledOnce);

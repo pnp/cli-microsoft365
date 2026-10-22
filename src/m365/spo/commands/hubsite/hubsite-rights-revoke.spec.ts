@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-rights-revoke.js';
+import command, { options } from './hubsite-rights-revoke.js';
 
 describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   let log: string[];
@@ -22,6 +22,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptIssued: boolean = false;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -37,6 +38,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,7 +101,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -119,12 +121,12 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before revoking the rights when force option not passed', async () => {
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' }) });
 
     assert(promptIssued);
   });
@@ -133,7 +135,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' }) });
     assert(postSpy.notCalled);
   });
 
@@ -147,7 +149,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     ])));
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' }) });
     assert(postStub.called);
   });
 
@@ -167,7 +169,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -187,7 +189,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -207,7 +209,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -227,7 +229,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -246,32 +248,38 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true }) }),
       new CommandError('An error has occurred.'));
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'abc', principals: 'admin' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'abc', principals: 'admin' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when all parameters are valid', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals)', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all parameters are valid (multiple principals)', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals separated with an extra space)', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all parameters are valid (multiple principals separated with an extra space)', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals with email address)', async () => {
-    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all parameters are valid (multiple principals with email address)', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

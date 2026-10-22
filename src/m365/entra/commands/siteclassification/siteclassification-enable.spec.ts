@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,11 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './siteclassification-enable.js';
+import command, { options } from './siteclassification-enable.js';
 
 describe(commands.SITECLASSIFICATION_ENABLE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -21,6 +25,8 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -129,7 +135,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" }) }),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
@@ -217,7 +223,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" }) });
     assert(enableRequestIssued);
   });
 
@@ -305,7 +311,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" }) });
     assert(enableRequestIssued);
   });
 
@@ -393,7 +399,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" }) });
     assert(enableRequestIssued);
   });
 
@@ -481,7 +487,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" }) });
     assert(enableRequestIssued);
   });
 
@@ -569,7 +575,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" }) });
     assert(enableRequestIssued);
   });
 
@@ -663,7 +669,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" }) }),
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 });

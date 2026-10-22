@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
-  recycle?: boolean;
+  permanent?: boolean;
   force?: boolean;
 }
 
@@ -44,7 +44,7 @@ class SpoListRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
         force: !!args.options.force,
-        recycle: !!args.options.recycle
+        permanent: !!args.options.permanent
       });
     });
   }
@@ -61,7 +61,7 @@ class SpoListRemoveCommand extends SpoCommand {
         option: '-t, --title [title]'
       },
       {
-        option: '--recycle'
+        option: '--permanent'
       },
       {
         option: '-f, --force'
@@ -93,7 +93,7 @@ class SpoListRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'title', 'webUrl');
-    this.types.boolean.push('force', 'recycle');
+    this.types.boolean.push('force', 'permanent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -111,7 +111,7 @@ class SpoListRemoveCommand extends SpoCommand {
         requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
       }
 
-      if (args.options.recycle) {
+      if (!args.options.permanent) {
         requestUrl += `/recycle`;
       }
 

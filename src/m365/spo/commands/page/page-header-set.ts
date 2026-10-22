@@ -292,20 +292,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         pageData = await Page.checkout(pageFullName, args.options.webUrl, logger, this.verbose);
       }
 
-      let header: PageHeader | CustomPageHeader;
-      switch (args.options.type) {
-        case 'None':
-          header = noPageHeader;
-          break;
-        case 'Custom':
-          header = customPageHeader;
-          break;
-        case 'Default':
-        default:
-          header = defaultPageHeader;
-          break;
-      }
-
       if (pageData) {
         canvasContent = pageData.CanvasContent1;
         authorByline = authorByline.length > 0 ? authorByline : pageData.AuthorByline;
@@ -319,69 +305,144 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       //In the new design page header is is a configurable Banner webpart in the first full-width section
       const headerControl: PageControl | undefined = pageControls.find(control => control?.position?.zoneIndex === 1 && control?.position?.sectionFactor === 0 && control?.webPartId === BannerWebPartId);
       const isStandardPageHeader: boolean = pageData.LayoutWebpartsContent !== '[]';
+      const existingHeader: PageHeader | CustomPageHeader | undefined = isStandardPageHeader && typeof pageData.LayoutWebpartsContent === 'string'
+        ? JSON.parse(pageData.LayoutWebpartsContent)[0] as PageHeader | CustomPageHeader
+        : headerControl?.webPartData as any;
 
-      //LayoutWebpartsContent represents standard page header
-      if (!isStandardPageHeader) {
-        header = headerControl?.webPartData as any || header;
+      let header: PageHeader | CustomPageHeader;
+      switch (args.options.type) {
+        case 'None':
+          header = noPageHeader;
+          break;
+        case 'Custom':
+          header = customPageHeader;
+          break;
+        case 'Default':
+          header = defaultPageHeader;
+          break;
+        default:
+          header = existingHeader || defaultPageHeader;
+          break;
+      }
+
+      if (existingHeader && args.options.type !== 'None') {
+        if (typeof args.options.textAlignment === 'undefined') {
+          header.properties.textAlignment = existingHeader.properties.textAlignment;
+        }
+        if (typeof args.options.showTopicHeader === 'undefined') {
+          header.properties.showTopicHeader = existingHeader.properties.showTopicHeader;
+        }
+        if (typeof args.options.topicHeader === 'undefined') {
+          header.properties.topicHeader = existingHeader.properties.topicHeader;
+        }
+        if (typeof args.options.showPublishDate === 'undefined') {
+          header.properties.showPublishDate = existingHeader.properties.showPublishDate;
+        }
+        if (typeof args.options.showTimeToRead === 'undefined') {
+          header.properties.showTimeToRead = existingHeader.properties.showTimeToRead;
+        }
+        if (typeof args.options.layout === 'undefined') {
+          header.properties.layoutType = existingHeader.properties.layoutType;
+        }
+
+        if (header.properties.imageSourceType === 2 && existingHeader.properties.imageSourceType === 2) {
+          const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
+          const existingProperties: CustomPageHeaderProperties = existingHeader.properties as CustomPageHeaderProperties;
+          if (typeof args.options.altText === 'undefined') {
+            properties.altText = existingProperties.altText;
+          }
+          if (typeof args.options.translateX === 'undefined') {
+            properties.translateX = existingProperties.translateX;
+          }
+          if (typeof args.options.translateY === 'undefined') {
+            properties.translateY = existingProperties.translateY;
+          }
+          if (typeof args.options.imageUrl === 'undefined') {
+            properties.listId = existingProperties.listId;
+            properties.siteId = existingProperties.siteId;
+            properties.uniqueId = existingProperties.uniqueId;
+            properties.webId = existingProperties.webId;
+            header.serverProcessedContent = existingHeader.serverProcessedContent;
+          }
+        }
       }
 
       header.properties.title = title;
-      header.properties.textAlignment = args.options.textAlignment as any || 'Left';
-      header.properties.showTopicHeader = args.options.showTopicHeader || false;
-      header.properties.topicHeader = args.options.topicHeader || '';
-      header.properties.showPublishDate = args.options.showPublishDate || false;
-      header.properties.showTimeToRead = args.options.showTimeToRead || false;
-
-      if (args.options.type !== 'None') {
-        header.properties.layoutType = args.options.layout as any || 'FullWidthImage';
+      if (typeof args.options.textAlignment !== 'undefined') {
+        header.properties.textAlignment = args.options.textAlignment as any;
+      }
+      if (typeof args.options.showTopicHeader !== 'undefined') {
+        header.properties.showTopicHeader = args.options.showTopicHeader;
+      }
+      if (typeof args.options.topicHeader !== 'undefined') {
+        header.properties.topicHeader = args.options.topicHeader;
+      }
+      if (typeof args.options.showPublishDate !== 'undefined') {
+        header.properties.showPublishDate = args.options.showPublishDate;
+      }
+      if (typeof args.options.showTimeToRead !== 'undefined') {
+        header.properties.showTimeToRead = args.options.showTimeToRead;
       }
 
-      if (args.options.type === 'Custom') {
-        header.serverProcessedContent.imageSources = {
-          imageSource: args.options.imageUrl || ''
-        };
+      if (args.options.type !== 'None' && typeof args.options.layout !== 'undefined') {
+        header.properties.layoutType = args.options.layout as any;
+      }
+
+      if (header.properties.imageSourceType === 2) {
         const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
-        properties.altText = args.options.altText || '';
-        properties.translateX = args.options.translateX || 0;
-        properties.translateY = args.options.translateY || 0;
+        if (typeof args.options.altText !== 'undefined') {
+          properties.altText = args.options.altText;
+        }
+        if (typeof args.options.translateX !== 'undefined') {
+          properties.translateX = args.options.translateX;
+        }
+        if (typeof args.options.translateY !== 'undefined') {
+          properties.translateY = args.options.translateY;
+        }
         header.properties = properties;
 
-        if (!args.options.imageUrl) {
-          (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
-            imageSource: {
-              siteId: '',
-              webId: '',
-              listId: '',
-              uniqueId: ''
-            }
+        if (typeof args.options.imageUrl !== 'undefined') {
+          header.serverProcessedContent.imageSources = {
+            imageSource: args.options.imageUrl
           };
-          properties.listId = '';
-          properties.siteId = '';
-          properties.uniqueId = '';
-          properties.webId = '';
-          header.properties = properties;
-        }
-        else {
-          const res = await Promise.all([
-            spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose),
-            spo.getWebId(args.options.webUrl, logger, this.verbose),
-            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
-          ]);
 
-          (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
-            imageSource: {
-              siteId: res[0],
-              webId: res[1],
-              listId: res[2].ListId,
-              uniqueId: res[2].UniqueId
-            }
-          };
-          const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
-          properties.listId = res[2].ListId;
-          properties.siteId = res[0];
-          properties.uniqueId = res[2].UniqueId;
-          properties.webId = res[1];
-          header.properties = properties;
+          if (!args.options.imageUrl) {
+            (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
+              imageSource: {
+                siteId: '',
+                webId: '',
+                listId: '',
+                uniqueId: ''
+              }
+            };
+            properties.listId = '';
+            properties.siteId = '';
+            properties.uniqueId = '';
+            properties.webId = '';
+            header.properties = properties;
+          }
+          else {
+            const res = await Promise.all([
+              spo.getSiteIdBySPApi(args.options.webUrl, logger, this.verbose),
+              spo.getWebId(args.options.webUrl, logger, this.verbose),
+              this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
+            ]);
+
+            (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
+              imageSource: {
+                siteId: res[0],
+                webId: res[1],
+                listId: res[2].ListId,
+                uniqueId: res[2].UniqueId
+              }
+            };
+            const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
+            properties.listId = res[2].ListId;
+            properties.siteId = res[0];
+            properties.uniqueId = res[2].UniqueId;
+            properties.webId = res[1];
+            header.properties = properties;
+          }
         }
       }
 

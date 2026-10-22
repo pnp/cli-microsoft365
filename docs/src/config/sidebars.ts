@@ -250,6 +250,15 @@ const sidebars: SidebarsConfig = {
           ]
         },
         {
+          agent: [
+            {
+              type: 'doc',
+              label: 'agent list',
+              id: 'cmd/entra/agent/agent-list'
+            }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
@@ -1316,6 +1325,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'calendar list',
+              id: 'cmd/outlook/calendar/calendar-list'
+            },
+            {
+              type: 'doc',
               label: 'calendar remove',
               id: 'cmd/outlook/calendar/calendar-remove'
             },
@@ -1351,6 +1365,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'event cancel',
               id: 'cmd/outlook/event/event-cancel'
+            },
+            {
+              type: 'doc',
+              label: 'event get',
+              id: 'cmd/outlook/event/event-get'
             },
             {
               type: 'doc',
@@ -2049,6 +2068,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'website get',
               id: 'cmd/pp/website/website-get'
+            },
+            {
+              type: 'doc',
+              label: 'website remove',
+              id: 'cmd/pp/website/website-remove'
+            },
+            {
+              type: 'doc',
+              label: 'website webrole list',
+              id: 'cmd/pp/website/website-webrole-list'
             }
           ]
         }
@@ -2215,6 +2244,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'container remove',
               id: 'cmd/spe/container/container-remove'
+            },
+            {
+              type: 'doc',
+              label: 'container set',
+              id: 'cmd/spe/container/container-set'
             },
             {
               type: 'doc',
@@ -2758,6 +2792,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'file unarchive',
+              id: 'cmd/spo/file/file-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'file retentionlabel ensure',
               id: 'cmd/spo/file/file-retentionlabel-ensure'
             },
@@ -2867,6 +2906,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder archive',
+              id: 'cmd/spo/folder/folder-archive'
+            },
+            {
+              type: 'doc',
               label: 'folder copy',
               id: 'cmd/spo/folder/folder-copy'
             },
@@ -2894,6 +2938,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'folder set',
               id: 'cmd/spo/folder/folder-set'
+            },
+            {
+              type: 'doc',
+              label: 'folder unarchive',
+              id: 'cmd/spo/folder/folder-unarchive'
             },
             {
               type: 'doc',
@@ -3231,6 +3280,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'list sensitivitylabel remove',
+              id: 'cmd/spo/list/list-sensitivitylabel-remove'
+            },
+            {
+              type: 'doc',
               label: 'list sitescript get',
               id: 'cmd/spo/list/list-sitescript-get'
             },
@@ -3528,6 +3582,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'page set',
               id: 'cmd/spo/page/page-set'
+            },
+            {
+              type: 'doc',
+              label: 'page unpublish',
+              id: 'cmd/spo/page/page-unpublish'
             },
             {
               type: 'doc',
@@ -4297,16 +4356,6 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'web alert list',
-              id: 'cmd/spo/web/web-alert-list'
-            },
-            {
-              type: 'doc',
-              label: 'web alert remove',
-              id: 'cmd/spo/web/web-alert-remove'
-            },
-            {
-              type: 'doc',
               label: 'web clientsidewebpart list',
               id: 'cmd/spo/web/web-clientsidewebpart-list'
             },
@@ -4339,6 +4388,21 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web roleinheritance reset',
               id: 'cmd/spo/web/web-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'web rule get',
+              id: 'cmd/spo/web/web-rule-get'
+            },
+            {
+              type: 'doc',
+              label: 'web rule list',
+              id: 'cmd/spo/web/web-rule-list'
+            },
+            {
+              type: 'doc',
+              label: 'web rule remove',
+              id: 'cmd/spo/web/web-rule-remove'
             }
           ]
         }
@@ -5028,6 +5092,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'engage role list',
               id: 'cmd/viva/engage/engage-role-list'
+            },
+            {
+              type: 'doc',
+              label: 'engage role member add',
+              id: 'cmd/viva/engage/engage-role-member-add'
             },
             {
               type: 'doc',

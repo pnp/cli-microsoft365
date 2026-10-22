@@ -222,7 +222,7 @@ describe('autocomplete', () => {
     const readFileSyncStub = sinon.stub(fs, 'readFileSync').returns(JSON.stringify({}));
     (autocomplete as any).init();
     try {
-      assert(readFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), 'utf-8'));
+      assert(readFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), sinon.match.same('utf-8')));
     }
     catch (e: any) {
       fail(e);

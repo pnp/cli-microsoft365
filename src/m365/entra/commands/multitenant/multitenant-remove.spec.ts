@@ -6,7 +6,7 @@ import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import command from './multitenant-remove.js';
+import command, { options } from './multitenant-remove.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -28,6 +28,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +36,8 @@ describe(commands.MULTITENANT_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    const commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -121,7 +124,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ force: true, verbose: true }) });
     assert(deleteRequestStub.calledTwice);
   });
 
@@ -167,12 +170,12 @@ describe(commands.MULTITENANT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(deleteRequestStub.calledTwice);
   });
 
   it('prompts before removing the multitenant organization when prompt option not passed', async () => {
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
 
     assert(promptIssued);
   });
@@ -180,7 +183,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
   it('aborts removing the multitenant organization when prompt not confirmed', async () => {
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(deleteSpy.notCalled);
   });
 
@@ -223,7 +226,7 @@ describe(commands.MULTITENANT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true }) }),
       new CommandError(error.error.message));
   });
 });

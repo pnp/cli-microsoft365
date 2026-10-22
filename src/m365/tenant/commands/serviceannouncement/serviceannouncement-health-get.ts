@@ -20,7 +20,7 @@ class TenantServiceAnnouncementHealthGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'This operation provides the health information of a specified service for a tenant';
+    return 'Gets the health report of a specified service for a tenant';
   }
 
   constructor() {

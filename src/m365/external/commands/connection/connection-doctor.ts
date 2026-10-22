@@ -1,6 +1,7 @@
 import { ExternalConnectors, SearchResponse } from '@microsoft/microsoft-graph-types';
 import os from 'os';
-import Command from '../../../../Command.js';
+import { z } from 'zod';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -9,13 +10,18 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { CheckStatus, formatting } from '../../../../utils/formatting.js';
 
+const supportedUx = ['copilot', 'search', 'all'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  ux: z.enum(supportedUx).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  ux?: string;
 }
 
 /**
@@ -49,7 +55,6 @@ interface CheckResult {
 
 class ExternalConnectionDoctorCommand extends GraphCommand {
   private checksStatus: CheckResult[] = [];
-  private static readonly supportedUx: string[] = ['copilot', 'search', 'all'];
 
   public get name(): string {
     return commands.CONNECTION_DOCTOR;
@@ -59,37 +64,8 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
     return 'Checks if the external connection is correctly configured for use with the specified Microsoft 365 experience';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--ux [ux]',
-        autocomplete: ExternalConnectionDoctorCommand.supportedUx
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ux) {
-          if (!ExternalConnectionDoctorCommand.supportedUx.find(u => u === args.options.ux)) {
-            return `${args.options.ux} is not a valid UX. Allowed values are ${ExternalConnectionDoctorCommand.supportedUx.join(', ')}`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

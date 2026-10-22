@@ -1,7 +1,7 @@
 ---
 tags:
   - reports
-  - alerts
+  - rules
   - retirement
   - tenant
 ---
@@ -9,11 +9,11 @@ tags:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# List SharePoint alerts usage across the tenant
+# List SharePoint rules usage across the tenant
 
 Author: [Saurabh Tripathi](https://github.com/saurabh7019)
 
-SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives.
+SharePoint Online list rules are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing rules. This information helps administrators identify and plan the migration of critical rules to modern alternatives.
 
 **Prerequisites:**
 This script assumes you have permissions to all sites in the tenant. We recommend running this script with application-only permissions using Sites.FullControl.All permissions.
@@ -22,52 +22,52 @@ This script assumes you have permissions to all sites in the tenant. We recommen
   <TabItem value="PowerShell">
 
   ```powershell
-  $fileExportPath = "Alerts.csv"
+  $fileExportPath = "Rules.csv"
 
-  function Convert-AlertsToResults {
+  function Convert-RulesToResults {
     param(
-      [array]$Alerts,
+      [array]$Rules,
       [string]$SiteTitle,
       [string]$SiteUrl
     )
 
-    $alertResults = @()
+    $ruleResults = @()
 
-    foreach ($alert in $Alerts) {
-      $targetPath = $alert.List.RootFolder.ServerRelativeUrl
+    foreach ($rule in $Rules) {
+      $targetPath = $rule.List.RootFolder.ServerRelativeUrl
 
-      $filterPath = ($alert.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
+      $filterPath = ($rule.Properties | Where-Object { $_.Key -eq "filterpath" }).Value
       if ($filterPath) {
         $targetPath = $filterPath
       }
-      elseif ($alert.Item) {
-        $targetPath = $alert.Item.FileRef
+      elseif ($rule.Item) {
+        $targetPath = $rule.Item.FileRef
       }
 
-      $frequency = switch ($alert.AlertFrequency) {
+      $frequency = switch ($rule.AlertFrequency) {
         0 { "Immediate" }
         1 { "Daily" }
         2 { "Weekly" }
         default { "Unknown" }
       }
 
-      $alertResults += [PSCustomObject][ordered]@{
+      $ruleResults += [PSCustomObject][ordered]@{
         SiteTitle  = $SiteTitle
         SiteUrl    = $SiteUrl
-        AlertTitle = $alert.Title
-        AlertId    = $alert.ID
+        RuleTitle  = $rule.Title
+        RuleId     = $rule.ID
         TargetPath = $targetPath
         Frequency  = $frequency
-        AlertType  = $alert.AlertTemplateName
-        UserName   = $alert.User.Title
-        UserEmail  = $alert.User.Email
+        RuleType   = $rule.AlertTemplateName
+        UserName   = $rule.User.Title
+        UserEmail  = $rule.User.Email
       }
     }
 
-    return $alertResults
+    return $ruleResults
   }
 
-  function Get-DeprecatedAlertsRecursively {
+  function Get-DeprecatedRulesRecursively {
     param(
       [string]$SiteUrl,
       [string]$SiteTitle
@@ -76,21 +76,21 @@ This script assumes you have permissions to all sites in the tenant. We recommen
     $results = @()
 
     try {
-      # Get deprecated alerts from specific site
-      $alerts = m365 spo web alert list --webUrl $SiteUrl --output json --query "[?!(Properties[].Key && contains(Properties[].Key, 'ruletitle'))]" | ConvertFrom-Json
+      # Get deprecated rules from specific site
+      $rules = m365 spo web rule list --webUrl $SiteUrl --output json --query "[?!(Properties[].Key && contains(Properties[].Key, 'ruletitle'))]" | ConvertFrom-Json
 
-      if ($alerts.Count -gt 0) {
-        Write-Host "`tFound $($alerts.Count) alert(s)" -ForegroundColor Yellow
-        $results += Convert-AlertsToResults -Alerts $alerts -SiteTitle $SiteTitle -SiteUrl $SiteUrl
+      if ($rules.Count -gt 0) {
+        Write-Host "`tFound $($rules.Count) rule(s)" -ForegroundColor Yellow
+        $results += Convert-RulesToResults -Rules $rules -SiteTitle $SiteTitle -SiteUrl $SiteUrl
       }
       else {
-        Write-Host "`tNo alerts found" -ForegroundColor Green
+        Write-Host "`tNo rules found" -ForegroundColor Green
       }
 
       $webs = m365 spo web list --url $SiteUrl --output json | ConvertFrom-Json
       foreach ($web in $webs) {
         Write-Host "`tScanning subsite '$($web.Url)'..." -ForegroundColor Gray
-        $results += Get-DeprecatedAlertsRecursively -SiteUrl $web.Url -SiteTitle $web.Title
+        $results += Get-DeprecatedRulesRecursively -SiteUrl $web.Url -SiteTitle $web.Title
       }
     }
     catch {
@@ -114,17 +114,17 @@ This script assumes you have permissions to all sites in the tenant. We recommen
     foreach ($site in $sites) {
       $iCnt++
       Write-Host "($iCnt/$count) Scanning '$($site.Url)'..."
-      $results += Get-DeprecatedAlertsRecursively -SiteUrl $site.Url -SiteTitle $site.Title
+      $results += Get-DeprecatedRulesRecursively -SiteUrl $site.Url -SiteTitle $site.Title
     }
 
     if ($results.Count -gt 0) {
       $location = Get-Location
-      Write-Host ("`nExporting {0} alerts to '{1}\{2}'..." -f $results.Count, $location.Path, $fileExportPath)
+      Write-Host ("`nExporting {0} rules to '{1}\{2}'..." -f $results.Count, $location.Path, $fileExportPath)
       $results | Export-Csv -Path $fileExportPath -NoTypeInformation -Encoding UTF8
       Write-Host "Report saved successfully!"
     }
     else {
-      Write-Host "`nNo legacy alerts found across the tenant."
+      Write-Host "`nNo legacy rules found across the tenant."
     }
   }
   catch {
@@ -136,4 +136,3 @@ This script assumes you have permissions to all sites in the tenant. We recommen
 
   </TabItem>
 </Tabs>
-

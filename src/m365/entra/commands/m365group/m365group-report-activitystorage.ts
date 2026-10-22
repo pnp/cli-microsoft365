@@ -7,7 +7,7 @@ class M365GroupReportActivityStorageCommand extends PeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Get the total storage used across all group mailboxes and group sites';
+    return 'Gets the total storage used across all group mailboxes and group sites';
   }
 
   public get usageEndpoint(): string {

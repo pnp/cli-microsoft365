@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { Logger } from '../../cli/Logger.js';
+import { globalOptionsZod } from '../../Command.js';
 import { app } from '../../utils/app.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
+
+export const options = z.strictObject({ ...globalOptionsZod.shape });
 
 class VersionCommand extends AnonymousCommand {
   public get name(): string {
@@ -10,6 +14,10 @@ class VersionCommand extends AnonymousCommand {
 
   public get description(): string {
     return 'Shows CLI for Microsoft 365 version';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

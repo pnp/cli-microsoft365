@@ -6,9 +6,8 @@ import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
-import command from './connection-remove.js';
+import command, { options } from './connection-remove.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { settingsNames } from '../../../settingsNames.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import { CommandError } from '../../../Command.js';
 import { cli } from '../../../cli/cli.js';
@@ -17,6 +16,7 @@ describe(commands.REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'clearConnectionInfo').resolves();
@@ -25,7 +25,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     commandInfo = cli.getCommandInfo(command);
-
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     auth.connection.active = true;
     auth.connection.authType = AuthType.DeviceCode;
@@ -97,7 +97,6 @@ describe(commands.REMOVE, () => {
     sinonUtil.restore([
       auth.ensureAccessToken,
       auth.removeConnectionInfo,
-      cli.getSettingWithDefaultValue,
       cli.promptForConfirmation,
       cli.handleMultipleResultsFound
     ]);
@@ -116,22 +115,19 @@ describe(commands.REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if name is not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: "value" });
+    assert.strictEqual(actual.success, false);
   });
 
   it(`fails with error if the connection cannot be found`, async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await assert.rejects(command.action(logger, { options: { name: 'Non-existent connection' } }), new CommandError(`The connection 'Non-existent connection' cannot be found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'Non-existent connection' }) }), new CommandError(`The connection 'Non-existent connection' cannot be found.`));
   });
 
   it('fails with error when restoring auth information leads to error', async () => {
@@ -139,7 +135,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
     try {
-      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+      await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'test' }) }), new CommandError('An error has occurred'));
     }
     finally {
       sinonUtil.restore(auth.restoreAuth);
@@ -149,25 +145,24 @@ describe(commands.REMOVE, () => {
   it(`removes the 'Contoso Application' connection when prompt is confirmed`, async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
-    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'acd6df42-10a9-4315-8928-53334f1c9d01' }) });
     assert(removeStub.calledOnce);
   });
 
   it(`removes the 'Contoso Application' connection and not prompting for confirmation`, async () => {
     const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
-    await command.action(logger, { options: { name: 'acd6df42-10a9-4315-8928-53334f1c9d01', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'acd6df42-10a9-4315-8928-53334f1c9d01', force: true }) });
     assert(removeStub.calledOnce);
   });
-
 
   it('aborts removing the connection when prompt not confirmed', async () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'acd6df42-10a9-4315-8928-53334f1c9d01'
-      }
+      })
     });
     assert(removeStub.notCalled);
   });
@@ -176,7 +171,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     const removeStub = sinon.stub(auth, 'removeConnectionInfo').resolves();
 
-    await command.action(logger, { options: { name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true }) });
     assert(removeStub.calledOnce);
   });
 });

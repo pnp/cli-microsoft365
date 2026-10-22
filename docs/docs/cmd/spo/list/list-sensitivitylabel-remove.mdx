@@ -1,0 +1,77 @@
+import Global from '../../_global.mdx';
+import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
+
+# spo list sensitivitylabel remove
+
+Clears a default sensitivity label from a document library
+
+## Usage
+
+```sh
+m365 spo list sensitivitylabel remove [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the site where the list is located.
+
+`-t, --listTitle [listTitle]`
+: The title of the library on which to remove the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`-l, --listId [listId]`
+: The ID of the library on which to remove the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`--listUrl [listUrl]`
+: Server- or web-relative URL of the library on which to remove the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|  
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Removes a sensitivity label from a document library based on the list title.
+
+```sh
+m365 spo list sensitivitylabel remove --webUrl 'https://contoso.sharepoint.com' --listTitle 'Shared Documents'
+```
+
+Removes a sensitivity label from a document library based on the list url.
+
+```sh
+m365 spo list sensitivitylabel remove --webUrl 'https://contoso.sharepoint.com' --listUrl '/Shared Documents'
+```
+
+Removes a sensitivity label from a document library based on the list id without prompting for confirmation.
+
+```sh
+m365 spo list sensitivitylabel remove --webUrl 'https://contoso.sharepoint.com' --listId 'b4cfa0d9-b3d7-49ae-a0f0-f14ffdd005f7' --force
+```
+
+## Response
+
+The command won't return a response on success.

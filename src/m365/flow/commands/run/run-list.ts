@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -7,18 +8,25 @@ import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  flowName: z.uuid(),
+  environmentName: z.string().alias('e'),
+  status: z.enum(['Succeeded', 'Running', 'Failed', 'Cancelled']).optional(),
+  triggerStartTime: z.string().refine(date => validation.isValidISODateTime(date), {
+    error: e => `'${e.input}' is not a valid datetime.`
+  }).optional(),
+  triggerEndTime: z.string().refine(date => validation.isValidISODateTime(date), {
+    error: e => `'${e.input}' is not a valid datetime.`
+  }).optional(),
+  withTrigger: z.boolean().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  flowName: string;
-  status?: string;
-  triggerStartTime?: string;
-  triggerEndTime?: string;
-  withTrigger?: boolean
-  asAdmin?: boolean;
 }
 
 interface PowerAutomateFlowRun {
@@ -38,8 +46,6 @@ interface PowerAutomateFlowRun {
 }
 
 class FlowRunListCommand extends PowerAutomateCommand {
-  public readonly allowedStatusses: string[] = ['Succeeded', 'Running', 'Failed', 'Cancelled'];
-
   public get name(): string {
     return commands.RUN_LIST;
   }
@@ -48,83 +54,23 @@ class FlowRunListCommand extends PowerAutomateCommand {
     return 'Lists runs of the specified Microsoft Flow';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'startTime', 'status'];
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        status: typeof args.options.status !== 'undefined',
-        triggerStartTime: typeof args.options.triggerStartTime !== 'undefined',
-        triggerEndTime: typeof args.options.triggerEndTime !== 'undefined',
-        withTrigger: !!args.options.withTrigger,
-        asAdmin: !!args.options.asAdmin
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(options => {
+      if (options.output !== 'json' && options.withTrigger) {
+        return false;
+      }
+      return true;
+    }, {
+      error: 'The --withTrigger option is only available when output is set to json'
     });
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--flowName <flowName>'
-      },
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--status [status]',
-        autocomplete: this.allowedStatusses
-      },
-      {
-        option: '--triggerStartTime [triggerStartTime]'
-      },
-      {
-        option: '--triggerEndTime [triggerEndTime]'
-      },
-      {
-        option: '--withTrigger'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.flowName)) {
-          return `${args.options.flowName} is not a valid GUID`;
-        }
-
-        if (args.options.status && this.allowedStatusses.indexOf(args.options.status) === -1) {
-          return `'${args.options.status}' is not a valid status. Allowed values are: ${this.allowedStatusses.join(',')}`;
-        }
-
-        if (args.options.triggerStartTime && !validation.isValidISODateTime(args.options.triggerStartTime)) {
-          return `'${args.options.triggerStartTime}' is not a valid datetime.`;
-        }
-
-        if (args.options.triggerEndTime && !validation.isValidISODateTime(args.options.triggerEndTime)) {
-          return `'${args.options.triggerEndTime}' is not a valid datetime.`;
-        }
-
-        if (args.options.output !== 'json' && args.options.withTrigger) {
-          return 'The --withTrigger option is only available when output is set to json';
-        }
-
-        return true;
-      }
-    );
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'startTime', 'status'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

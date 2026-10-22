@@ -1,8 +1,8 @@
 import { DependencyRule } from './DependencyRule.js';
 
 export class FN002013_DEVDEP_types_webpack_env extends DependencyRule {
-  constructor(supportedRange: string) {
-    super('@types/webpack-env', supportedRange, true);
+  constructor(options: { supportedRange: string }) {
+    super({ ...options, packageName: '@types/webpack-env', isDevDep: true });
   }
 
   get id(): string {

@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './auditlog-list.js';
+import command, { options } from './auditlog-list.js';
 
 describe(commands.AUDITLOG_LIST, () => {
 
@@ -110,6 +110,7 @@ describe(commands.AUDITLOG_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -118,6 +119,7 @@ describe(commands.AUDITLOG_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: 'abc',
@@ -165,52 +167,57 @@ describe(commands.AUDITLOG_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if contentType has an invalid value', async () => {
-    const actual = await command.validate({ options: { contentType: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if contentType has an invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if startTime is not a valid date', async () => {
-    const actual = await command.validate({ options: { contentType: contentType, startTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if startTime is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, startTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if endTime is not a valid date', async () => {
-    const actual = await command.validate({ options: { contentType: contentType, endTime: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if endTime is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, endTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if startTime is more than 7 days in the past', async () => {
+  it('fails validation if startTime is more than 7 days in the past', () => {
     const startTime = new Date();
     startTime.setDate(startTime.getDate() - 7);
     startTime.setHours(startTime.getHours() - 2);
-    const actual = await command.validate({ options: { contentType: contentType, startTime: startTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, startTime: startTime.toISOString() });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if endTime is in the future', async () => {
+  it('fails validation if endTime is in the future', () => {
     const endTime = new Date();
     endTime.setHours(endTime.getHours() + 1);
-    const actual = await command.validate({ options: { contentType: contentType, endTime: endTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, endTime: endTime.toISOString() });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if endTime is before startTime', async () => {
+  it('fails validation if endTime is before startTime', () => {
     const startTime = new Date();
     const endTime = new Date(startTime);
     endTime.setTime(endTime.getTime() - 1);
-    const actual = await command.validate({ options: { contentType: contentType, startTime: startTime.toISOString(), endTime: endTime.toISOString() } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, startTime: startTime.toISOString(), endTime: endTime.toISOString() });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if only contentType is provided', async () => {
-    const actual = await command.validate({ options: { contentType: contentType } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only contentType is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if startTime and endTime are provided', async () => {
-    const actual = await command.validate({ options: { contentType: contentType, startTime: startTime, endTime: endTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if startTime and endTime are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, startTime: startTime, endTime: endTime });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ contentType: contentType, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles error when unable to start new subscription', async () => {
@@ -234,9 +241,9 @@ describe(commands.AUDITLOG_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         contentType: 'DLP'
-      }
+      })
     }), new CommandError(`Unable to start subscription 'DLP.All'`));
   });
 
@@ -262,11 +269,11 @@ describe(commands.AUDITLOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         contentType: contentType,
         startTime: startTime,
         endTime: endTime
-      }
+      })
     });
 
     assert(postStub.called);
@@ -338,12 +345,12 @@ describe(commands.AUDITLOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         contentType: contentType,
         startTime: startTime,
         endTime: endTime,
         verbose: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(auditLogs.sort((a, b) => a.CreationTime < b.CreationTime ? -1 : a.CreationTime > b.CreationTime ? 1 : 0)));

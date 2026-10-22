@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './siteclassification-get.js';
+import command, { options } from './siteclassification-get.js';
 
 describe(commands.SITECLASSIFICATION_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,7 +77,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('Site classification is not enabled.'));
   });
 
@@ -146,7 +152,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
@@ -222,7 +228,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith({
       "Classifications": ["TopSecret"],
       "DefaultClassification": "TopSecret",
@@ -302,7 +308,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith({
       "Classifications": ["TopSecret", "HBI"],
       "DefaultClassification": "TopSecret",
@@ -382,7 +388,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith({
       "Classifications": [],
       "DefaultClassification": "",
@@ -394,6 +400,6 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('An error has occurred'));
   });
 });

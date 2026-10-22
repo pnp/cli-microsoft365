@@ -1,24 +1,29 @@
+import { z } from 'zod';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(['oneOnOne', 'group', 'meeting']).alias('t').optional(),
+  userId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value of the option userId must be a valid GUID.'
+  }).optional(),
+  userName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  type?: string;
-  userId?: string;
-  userName?: string;
-}
-
 class TeamsChatListCommand extends GraphCommand {
-  public supportedTypes = ['oneOnOne', 'group', 'meeting'];
   public get name(): string {
     return commands.CHAT_LIST;
   }
@@ -31,56 +36,19 @@ class TeamsChatListCommand extends GraphCommand {
     return ['id', 'topic', 'chatType'];
   }
 
-  constructor() {
-    super();
-
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: args.options.type
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !(opts.userId && opts.userName), {
+        message: 'You can only specify either userId or userName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type [type]',
-        autocomplete: this.supportedTypes
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.type !== undefined && this.supportedTypes.indexOf(args.options.type) === -1) {
-          return `${args.options.type} is not a valid chatType. Accepted values are ${this.supportedTypes.join(', ')}`;
-        }
-
-        if (args.options.userId && args.options.userName) {
-          return `You can only specify either 'userId' or 'userName'`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

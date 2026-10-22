@@ -13,7 +13,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command, { options } from './chat-message-list.js';
 import { settingsNames } from '../../../../settingsNames.js';
-import { z } from 'zod';
 
 describe(commands.CHAT_MESSAGE_LIST, () => {
 
@@ -138,7 +137,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
-  let refinedSchema: z.ZodTypeAny;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -149,7 +147,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
-    refinedSchema = commandInfo.command.getRefinedSchema!(commandOptionsSchema as any)!;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => settingName === settingsNames.prompt ? false : defaultValue);
   });
 
@@ -199,6 +196,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       chatId: "2da4c29f6d7041"
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'2da4c29f6d7041' is not a valid value for option chatId.`);
   });
 
 
@@ -222,6 +220,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       endDateTime: 'invalid date time'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date time' is not a valid ISO date-time string for option endDateTime.`);
   });
 
   it('fails validation if the createdEndDateTime is not valid', async () => {
@@ -230,6 +229,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       createdEndDateTime: 'invalid date time'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date time' is not a valid ISO date-time string for option createdEndDateTime.`);
   });
 
   it('fails validation if the modifiedStartDateTime is not valid', async () => {
@@ -238,6 +238,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       modifiedStartDateTime: 'not a date'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'not a date' is not a valid ISO date-time string for option modifiedStartDateTime.`);
   });
 
   it('fails validation if the modifiedEndDateTime is not valid', async () => {
@@ -246,10 +247,11 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       modifiedEndDateTime: 'not a date'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'not a date' is not a valid ISO date-time string for option modifiedEndDateTime.`);
   });
 
   it('fails validation if both endDateTime and createdEndDateTime are specified', async () => {
-    const actual = refinedSchema.safeParse({
+    const actual = commandOptionsSchema.safeParse({
       chatId: '19:2da4c29f6d7041eca70b638b43d45437@thread.v2',
       endDateTime: '2025-11-01T00:00:00Z',
       createdEndDateTime: '2025-11-01T00:00:00Z'
@@ -258,7 +260,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('fails validation if createdEndDateTime is combined with modifiedStartDateTime', async () => {
-    const actual = refinedSchema.safeParse({
+    const actual = commandOptionsSchema.safeParse({
       chatId: '19:2da4c29f6d7041eca70b638b43d45437@thread.v2',
       createdEndDateTime: '2025-11-01T00:00:00Z',
       modifiedStartDateTime: '2025-10-01T00:00:00Z'
@@ -267,7 +269,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('fails validation if createdEndDateTime is combined with modifiedEndDateTime', async () => {
-    const actual = refinedSchema.safeParse({
+    const actual = commandOptionsSchema.safeParse({
       chatId: '19:2da4c29f6d7041eca70b638b43d45437@thread.v2',
       createdEndDateTime: '2025-11-01T00:00:00Z',
       modifiedEndDateTime: '2025-12-01T00:00:00Z'
@@ -276,7 +278,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('fails validation if endDateTime is combined with modifiedStartDateTime', async () => {
-    const actual = refinedSchema.safeParse({
+    const actual = commandOptionsSchema.safeParse({
       chatId: '19:2da4c29f6d7041eca70b638b43d45437@thread.v2',
       endDateTime: '2025-11-01T00:00:00Z',
       modifiedStartDateTime: '2025-10-01T00:00:00Z'

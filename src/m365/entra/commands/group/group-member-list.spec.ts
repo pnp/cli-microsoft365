@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
-import command from './group-member-list.js';
+import command, { options } from './group-member-list.js';
 
 describe(commands.GROUP_MEMBER_LIST, () => {
   const groupId = '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a';
@@ -24,6 +24,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -78,31 +80,25 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('fails validation if the groupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails validation when invalid role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('passes validation when valid groupId and no role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: groupId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      groupId: groupId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly lists all users in a Microsoft Entra group by id', async () => {
@@ -125,7 +121,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupId: groupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: groupId }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -169,7 +165,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, groupName: groupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupName: groupName }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -201,7 +197,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, role: "Owner" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -237,9 +233,9 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         groupName: groupName
-      }
+      })
     }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
@@ -265,7 +261,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
 
-    await command.action(logger, { options: { groupName: groupName, role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: groupName, role: "Owner" }) });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -292,7 +288,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, role: "Member" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, role: "Member" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -335,7 +331,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, properties: "displayName,mail,memberof/id,memberof/displayName" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, properties: "displayName,mail,memberof/id,memberof/displayName" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"] },
@@ -362,7 +358,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, filter: "userType eq 'Guest'" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, filter: "userType eq 'Guest'" }) });
 
     assert(loggerLogSpy.calledOnceWithExactly([
       {
@@ -397,7 +393,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, groupId: groupId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, groupId: groupId }) }),
       new CommandError(error.error.message));
   });
 });

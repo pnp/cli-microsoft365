@@ -3,6 +3,7 @@ const prefix: string = 'outlook';
 export default {
   CALENDAR_ADD: `${prefix} calendar add`,
   CALENDAR_GET: `${prefix} calendar get`,
+  CALENDAR_LIST: `${prefix} calendar list`,
   CALENDAR_REMOVE: `${prefix} calendar remove`,
   CALENDAR_SET: `${prefix} calendar set`,
   CALENDARGROUP_GET: `${prefix} calendargroup get`,
@@ -10,6 +11,7 @@ export default {
   CALENDARGROUP_REMOVE: `${prefix} calendargroup remove`,
   CALENDARGROUP_SET: `${prefix} calendargroup set`,
   EVENT_CANCEL: `${prefix} event cancel`,
+  EVENT_GET: `${prefix} event get`,
   EVENT_LIST: `${prefix} event list`,
   EVENT_REMOVE: `${prefix} event remove`,
   MAIL_SEARCHFOLDER_ADD: `${prefix} mail searchfolder add`,

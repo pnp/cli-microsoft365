@@ -23,11 +23,13 @@ describe(commands.CONTENTTYPE_SYNC, () => {
   const listId = 'd4552f22-5fb0-4df3-b216-309264237d2b';
   const listTitle = 'Documents';
   const listUrl = '/sites/project-x/Shared Documents';
-  const graphBaseUrl = 'https://graph.microsoft.com/v1.0/sites/';
-  const siteId = 'contoso.sharepoint.com,777794dc-43c9-4f36-88bd-a42721c75304,95c1171f-7b40-46bb-8679-3b5263dc019a';
+  const siteId = '777794dc-43c9-4f36-88bd-a42721c75304';
+  const webId = '95c1171f-7b40-46bb-8679-3b5263dc019a';
+  const siteResource = `contoso.sharepoint.com,${siteId},${webId}`;
+  const spApiBaseUrl = 'https://contoso.sharepoint.com/_api/v2.0/sites/';
 
   const syncResponse = {
-    '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#contentType',
+    '@odata.context': 'https://contoso.sharepoint.com/_api/v2.0/$metadata#contentType',
     '@odata.type': '#microsoft.graph.contentType',
     '@odata.etag': '\'2\'',
     id: '0x010100B01336624A574D47BE29121892EA4D98',
@@ -60,7 +62,9 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getSiteIdByMSGraph').resolves(siteId);
+    sinon.stub(spo, 'getSiteIdBySPApi').resolves(siteId);
+    sinon.stub(spo, 'getWebId').resolves(webId);
+    sinon.stub(spo, 'getListId').resolves(listId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
   });
@@ -103,7 +107,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('succesfully sync a content type to the site by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return syncResponse;
       }
       throw 'Invalid request';
@@ -115,7 +119,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('succesfully sync a content type to the site by name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return syncResponse;
       }
 
@@ -123,8 +127,8 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `${graphBaseUrl}${siteId}/contenttypes?$filter=name eq '${contentTypeName}'&$select=id,name`) {
-        return [{ id: contentTypeId }];
+      if (url === `${webUrl}/_api/web/AvailableContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(contentTypeName)}'&$select=StringId,Name`) {
+        return [{ StringId: contentTypeId }];
       }
 
       throw 'Invalid request';
@@ -136,7 +140,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('succesfully sync a content type to the site by name after the initial sync', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return '';
       }
 
@@ -144,8 +148,8 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `${graphBaseUrl}${siteId}/contenttypes?$filter=name eq '${contentTypeName}'&$select=id,name`) {
-        return [{ id: contentTypeId }];
+      if (url === `${webUrl}/_api/web/AvailableContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(contentTypeName)}'&$select=StringId,Name`) {
+        return [{ StringId: contentTypeId }];
       }
 
       throw 'Invalid request';
@@ -158,7 +162,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
   it('succesfully sync a content type to a list by listId', async () => {
     const url = webUrl.split('/sites/')[0];
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${new URL(url).host}/lists/${listId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/lists/${listId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return syncResponse;
       }
 
@@ -166,8 +170,8 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     });
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `${graphBaseUrl}${siteId}/contenttypes?$filter=name eq '${contentTypeName}'&$select=id,name`) {
-        return [{ id: contentTypeId }];
+      if (url === `${new URL(webUrl).origin}/_api/web/AvailableContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(contentTypeName)}'&$select=StringId,Name`) {
+        return [{ StringId: contentTypeId }];
       }
 
       throw 'Invalid request';
@@ -179,7 +183,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('succesfully sync a content type to a list by listTitle', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/lists/${listTitle}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/lists/${listId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return syncResponse;
       }
 
@@ -192,16 +196,8 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('succesfully sync a content type to a list by listUrl', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/lists/${listId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/lists/${listId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         return syncResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=id`) {
-        return { Id: listId };
       }
 
       throw 'Invalid request';
@@ -213,7 +209,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
 
   it('correctly handles contentType not found in the hub', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
-      if (url === `${graphBaseUrl}${siteId}/contenttypes?$filter=name eq '${contentTypeName}'&$select=id,name`) {
+      if (url === `${webUrl}/_api/web/AvailableContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(contentTypeName)}'&$select=StringId,Name`) {
         return [];
       }
 
@@ -238,7 +234,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     };
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         throw error;
       }
 
@@ -263,7 +259,7 @@ describe(commands.CONTENTTYPE_SYNC, () => {
     };
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${graphBaseUrl}${siteId}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
+      if (opts.url === `${spApiBaseUrl}${siteResource}/contenttypes/addCopyFromContentTypeHub` && opts.data.contentTypeId === contentTypeId) {
         throw error;
       }
 

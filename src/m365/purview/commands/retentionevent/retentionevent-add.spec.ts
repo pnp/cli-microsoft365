@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentionevent-add.js';
+import command, { options } from './retentionevent-add.js';
 
 describe(commands.RETENTIONEVENT_ADD, () => {
   const validDisplayName = "Event display name";
@@ -86,6 +86,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -98,6 +99,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -138,19 +140,24 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if date is not a valid ISO date string', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: "Not a valid date", assetIds: validAssetIds } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if date is not a valid ISO date string', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: "Not a valid date", assetIds: validAssetIds });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if assetId or keywords is not provided', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if assetId or keywords is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if a correct ISO date string is entered', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if a correct ISO date string is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds retention event with minimal required parameters and assetIds', async () => {
@@ -162,7 +169,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds }) });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -175,7 +182,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: validDisplayName, eventTypeId: validTypeId, keywords: validKeyswords } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: validDisplayName, eventTypeId: validTypeId, keywords: validKeyswords }) });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -188,7 +195,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds, keywords: validKeyswords } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds, keywords: validKeyswords }) });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -209,7 +216,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds }) });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -223,7 +230,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: { displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds }
+      options: commandOptionsSchema.parse({ displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds })
     }), new CommandError(`The specified event type '${validTypeName}' does not exist.`));
   });
 
@@ -236,9 +243,9 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });

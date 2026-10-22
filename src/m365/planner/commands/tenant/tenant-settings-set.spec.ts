@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-settings-set.js';
+import command, { options } from './tenant-settings-set.js';
 
 describe(commands.TENANT_SETTINGS_SET, () => {
   const successResponse = {
@@ -28,6 +28,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,23 +75,26 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation no options are specified', async () => {
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      isPlannerAllowed: true,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when no options specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-  it('passes validation when valid options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        isPlannerAllowed: 'true',
-        allowCalendarSharing: 'false',
-        allowPlannerMobilePushNotifications: 'false'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      isPlannerAllowed: true,
+      allowCalendarSharing: false,
+      allowPlannerMobilePushNotifications: false
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('successfully updates tenant planner settings', async () => {
@@ -102,9 +107,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
-        isPlannerAllowed: 'true'
-      }
+      options: commandOptionsSchema.parse({
+        isPlannerAllowed: true
+      })
     });
     assert(loggerLogSpy.calledWith(successResponse));
   });
@@ -119,9 +124,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        isPlannerAllowed: 'true'
-      }
+      options: commandOptionsSchema.parse({
+        isPlannerAllowed: true
+      })
     }), new CommandError('An error has occurred'));
   });
 });

@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo folder retentionlabel remove
 
@@ -20,13 +22,32 @@ m365 spo folder retentionlabel remove [options]
 : The server- or site-relative decoded URL of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
 
 `-i, --folderId [folderId]`
-: The UniqueId (GUID) of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
+: The unique ID (GUID) of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
 
 `-f, --force`
 : Don't prompt for confirming to remove the label.
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 

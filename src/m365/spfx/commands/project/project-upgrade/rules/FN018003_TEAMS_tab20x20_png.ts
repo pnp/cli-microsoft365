@@ -8,12 +8,15 @@ import { Rule } from '../../Rule.js';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export class FN018003_TEAMS_tab20x20_png extends Rule {
+  private fixedFileName?: string;
+
   /**
    * Creates instance of this rule
-   * @param fixedFileName Name to use for the copied file. If not specified, will generate the name based on web part's ID
+   * @param options.fixedFileName Name to use for the copied file. If not specified, will generate the name based on web part's ID
    */
-  constructor(private fixedFileName?: string) {
+  constructor(options?: { fixedFileName?: string }) {
     super();
+    this.fixedFileName = options?.fixedFileName;
   }
 
   get id(): string {

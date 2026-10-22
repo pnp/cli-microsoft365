@@ -52,6 +52,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 - `replace` will replace the destination file if it already exists.
 - `rename` will add a suffix (e.g. Document1.pdf) when the destination file already exists.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Move a file to a document library in another site collection by server relative URL.

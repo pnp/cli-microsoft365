@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   name: string;
-  recycle?: boolean;
+  permanent?: boolean;
   bypassSharedLock?: boolean;
   force?: boolean;
 }
@@ -42,7 +42,7 @@ class SpoPageRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         force: !!args.options.force,
-        recycle: !!args.options.recycle,
+        permanent: !!args.options.permanent,
         bypassSharedLock: !!args.options.bypassSharedLock
       });
     });
@@ -57,7 +57,7 @@ class SpoPageRemoveCommand extends SpoCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '--recycle'
+        option: '--permanent'
       },
       {
         option: '--bypassSharedLock'
@@ -76,7 +76,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('name', 'webUrl');
-    this.types.boolean.push('force', 'bypassSharedLock', 'recycle');
+    this.types.boolean.push('force', 'bypassSharedLock', 'permanent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -116,13 +116,12 @@ class SpoPageRemoveCommand extends SpoCommand {
       if (args.options.bypassSharedLock) {
         requestOptions.headers!.Prefer = 'bypass-shared-lock';
       }
-      if (args.options.recycle) {
-        requestOptions.url += '/Recycle';
-
-        await request.post(requestOptions);
+      if (args.options.permanent) {
+        await request.delete(requestOptions);
       }
       else {
-        await request.delete(requestOptions);
+        requestOptions.url += '/Recycle';
+        await request.post(requestOptions);
       }
     }
     catch (err: any) {

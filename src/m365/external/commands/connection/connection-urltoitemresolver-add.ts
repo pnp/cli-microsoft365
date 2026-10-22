@@ -1,20 +1,24 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types/microsoft-graph';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  externalConnectionId: z.string().alias('c'),
+  baseUrls: z.string(),
+  urlPattern: z.string(),
+  itemId: z.string().alias('i'),
+  priority: z.number().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  externalConnectionId: string;
-  baseUrls: string;
-  urlPattern: string;
-  itemId: string;
-  priority: number;
 }
 
 class ExternalConnectionUrlToItemResolverAddCommand extends GraphCommand {
@@ -26,30 +30,8 @@ class ExternalConnectionUrlToItemResolverAddCommand extends GraphCommand {
     return 'Adds a URL to item resolver to an external connection';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-c, --externalConnectionId <externalConnectionId>'
-      },
-      {
-        option: '--baseUrls <baseUrls>'
-      },
-      {
-        option: '--urlPattern <urlPattern>'
-      },
-      {
-        option: '-i, --itemId <itemId>'
-      },
-      {
-        option: '-p, --priority <priority>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

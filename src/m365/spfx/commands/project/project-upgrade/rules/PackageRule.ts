@@ -3,8 +3,15 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export abstract class PackageRule extends JsonRule {
-  constructor(protected propertyName: string, protected add: boolean, protected propertyValue?: string) {
+  protected propertyName: string;
+  protected add: boolean;
+  protected propertyValue?: string;
+
+  constructor(options: { propertyName: string; add: boolean; propertyValue?: string }) {
     super();
+    this.propertyName = options.propertyName;
+    this.add = options.add;
+    this.propertyValue = options.propertyValue;
   }
 
   get title(): string {

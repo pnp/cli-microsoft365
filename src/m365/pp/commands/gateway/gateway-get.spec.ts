@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './gateway-get.js';
+import command, { options } from './gateway-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.GATEWAY_GET, () => {
@@ -20,6 +20,7 @@ describe(commands.GATEWAY_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const gateway: any = {
     id: "1f69e798-5852-4fdd-ab01-33bb14b6e934",
@@ -39,6 +40,7 @@ describe(commands.GATEWAY_GET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,30 +76,19 @@ describe(commands.GATEWAY_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it("fails validation if the id is not valid", async () => {
-    const actual = await command.validate(
-      {
-        options: {
-          id: "3eb1a01b"
-        }
-      },
-      commandInfo
-    );
-
-    assert.notStrictEqual(actual, true);
+  it("fails validation if the id is not valid", () => {
+    const actual = commandOptionsSchema.safeParse({ id: "3eb1a01b" });
+    assert.strictEqual(actual.success, false);
   });
 
-  it("passes validation if the id is valid", async () => {
-    const actual = await command.validate(
-      {
-        options: {
-          id: "1f69e798-5852-4fdd-ab01-33bb14b6e934"
-        }
-      },
-      commandInfo
-    );
+  it("passes validation if the id is valid", () => {
+    const actual = commandOptionsSchema.safeParse({ id: "1f69e798-5852-4fdd-ab01-33bb14b6e934" });
+    assert.strictEqual(actual.success, true);
+  });
 
-    assert.strictEqual(actual, true);
+  it("fails validation with unknown options", () => {
+    const actual = commandOptionsSchema.safeParse({ id: "1f69e798-5852-4fdd-ab01-33bb14b6e934", unknownOption: "value" });
+    assert.strictEqual(actual.success, false);
   });
 
   it("correctly handles error", async () => {
@@ -107,9 +98,9 @@ describe(commands.GATEWAY_GET, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: {
-          id: 'testid'
-        }
+        options: commandOptionsSchema.parse({
+          id: '1f69e798-5852-4fdd-ab01-33bb14b6e934'
+        })
       }),
       new CommandError("An error has occurred")
     );
@@ -128,9 +119,9 @@ describe(commands.GATEWAY_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: "1f69e798-5852-4fdd-ab01-33bb14b6e934"
-      }
+      })
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
 

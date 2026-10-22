@@ -411,29 +411,47 @@ describe(commands.FILE_ADD, () => {
         folder: folderServerRelativePath,
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
-        overwrite: false,
         verbose: true
       }
     }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
   });
 
-  it('should resolve safe filename when path (bash) contains apostrophes in folders and filename', async () => {
-    stubPostResponses();
+  it('escapes apostrophes in the folder and in the file name resolved from the path', async () => {
+    stubFs();
+    const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
-    const unsafePath: string = '/Users/user/Projects/TEST\'FOLDER/TEST\'FILE.txt';
-
-    await assert.rejects(command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared%20Documents/t1',
-        path: unsafePath,
-        contentType: 'abc',
+        folder: 'Shared\'Documents/t1',
+        path: localFolderPath + 'TEST\'FILE.txt',
+        overwrite: true,
         verbose: true
       }
-    }));
-    assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
+    });
+
+    assert.strictEqual(postRequests.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared''Documents%2Ft1')/Files/Add(url='TEST''FILE.txt', overwrite=true)`);
+  });
+
+  it('escapes apostrophes in the folder and in the file name specified using the fileName option', async () => {
+    stubFs();
+    const postRequests: sinon.SinonStub = stubPostResponses();
+    stubGetResponses();
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: 'Shared\'Documents/t1',
+        path: localFolderPath + 'MS365.jpg',
+        fileName: 'TEST\'FILE.txt',
+        overwrite: true,
+        verbose: true
+      }
+    });
+
+    assert.strictEqual(postRequests.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared''Documents%2Ft1')/Files/Add(url='TEST''FILE.txt', overwrite=true)`);
   });
 
   it('should handle non existing content type', async () => {
@@ -624,7 +642,7 @@ describe(commands.FILE_ADD, () => {
     assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
 
-  it('throws error when not overwriting and file exists', async () => {
+  it('throws error by default when file exists', async () => {
     stubFs();
     stubPostResponses();
 
@@ -644,7 +662,6 @@ describe(commands.FILE_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
-        overwrite: false,
         verbose: true
       }
     }), new CommandError("File 'MS365.jpg' already exists in folder '/sites/project-x/Shared%20Documents/t1'. To overwrite the file, use the --overwrite option."));
@@ -840,8 +857,7 @@ describe(commands.FILE_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
-        checkOut: true,
-        overwrite: false
+        checkOut: true
       }
     });
 

@@ -343,7 +343,7 @@ export class Auth {
     return {
       auth: authConfig,
       cache: {
-        cachePlugin: msalCachePlugin
+        cachePlugin: await msalCachePlugin.getCachePlugin()
       },
       system: {
         loggerOptions: {
@@ -462,7 +462,7 @@ export class Auth {
       await logger.logToStderr(`🌶️  ${response.message}`);
     }
 
-    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) && response.verificationUri !== undefined) {
       await browserUtil.open(response.verificationUri);
     }
 
@@ -475,7 +475,9 @@ export class Auth {
         this._clipboardy = (await import('clipboardy')).default;
       }
 
-      this._clipboardy.writeSync(response.userCode);
+      if (response.userCode !== undefined) {
+        this._clipboardy.writeSync(response.userCode);
+      }
     }
   }
 
@@ -755,8 +757,25 @@ export class Auth {
 
       return this.getAccessTokenWithFederatedToken(resource, federationToken, logger, debug);
     }
+    else if (process.env.GITLAB_CI) {
+      if (debug) {
+        await logger.logToStderr('GITLAB_CI env variable found. The context is GitLab CI/CD...');
+      }
+
+      if (!process.env.GITLAB_OIDC_TOKEN) {
+        throw new CommandError('The `GITLAB_OIDC_TOKEN` environment variable is not available. Please add an id_tokens entry named GITLAB_OIDC_TOKEN with audience `api://AzureADTokenExchange` to the job.');
+      }
+
+      if (!this.connection.appId || this.connection.tenant === 'common') {
+        throw new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.');
+      }
+
+      // GitLab's id_tokens feature mints the OIDC JWT directly into the configured job variable, so no
+      // separate request to GitLab is needed to obtain the federation token before exchanging it with Entra ID.
+      return this.getAccessTokenWithFederatedToken(resource, process.env.GITLAB_OIDC_TOKEN, logger, debug);
+    }
     else {
-      throw new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.');
+      throw new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab.');
     }
   }
 
@@ -916,8 +935,7 @@ export class Auth {
 
     // we need to manually clear MSAL cache, because MSAL doesn't have support
     // for logging out when using cert-based auth
-    const msalCache = this.getMsalCacheStorage();
-    await msalCache.remove();
+    await msalCachePlugin.clearMsalCache();
   }
 
   public async removeConnectionInfo(connection: Connection, logger: Logger, debug: boolean): Promise<void> {
@@ -960,9 +978,6 @@ export class Auth {
     return new FileTokenStorage(FileTokenStorage.connectionInfoFilePath());
   }
 
-  private getMsalCacheStorage(): TokenStorage {
-    return new FileTokenStorage(FileTokenStorage.msalCacheFilePath());
-  }
 
   public getAllConnectionsStorage(): TokenStorage {
     return new FileTokenStorage(FileTokenStorage.allConnectionsFilePath());

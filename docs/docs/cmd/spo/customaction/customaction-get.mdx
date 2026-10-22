@@ -37,6 +37,25 @@ m365 spo customaction get [options]
 
 If the command finds multiple user custom actions with the specified `title` or `clientSideComponentId`, it will prompt you to disambiguate which user custom action it should get, listing the discovered IDs.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions   |
+  |------------|---------------|
+  | SharePoint | AllSites.Read |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | Sites.Read.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Return details about the user custom action based on the id and a given url.

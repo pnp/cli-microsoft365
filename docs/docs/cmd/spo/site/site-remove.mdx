@@ -16,8 +16,8 @@ m365 spo site remove [options]
 `-u, --url <url>`
 : URL of the site.
 
-`--skipRecycleBin`
-: Set to directly remove the site without moving it to the recycle bin.
+`--permanent`
+: Permanently remove the site without leaving it in the recycle bin.
 
 `--fromRecycleBin`
 : Set to remove the site from the recycle bin.
@@ -49,7 +49,7 @@ m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite
 Remove the site without moving it to the recycle bin.
 
 ```sh
-m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite --permanent
 ```
 
 Remove the previously deleted site from the recycle bin.

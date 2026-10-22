@@ -1,20 +1,24 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import PlannerCommand from '../../../base/PlannerCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  isPlannerAllowed: z.boolean().optional(),
+  allowCalendarSharing: z.boolean().optional(),
+  allowTenantMoveWithDataLoss: z.boolean().optional(),
+  allowTenantMoveWithDataMigration: z.boolean().optional(),
+  allowRosterCreation: z.boolean().optional(),
+  allowPlannerMobilePushNotifications: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  isPlannerAllowed?: boolean;
-  allowCalendarSharing?: boolean;
-  allowTenantMoveWithDataLoss?: boolean;
-  allowTenantMoveWithDataMigration?: boolean;
-  allowRosterCreation?: boolean;
-  allowPlannerMobilePushNotifications?: boolean;
 }
 
 class PlannerTenantSettingsSetCommand extends PlannerCommand {
@@ -26,83 +30,18 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
     return 'Sets Microsoft Planner configuration of the tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        isPlannerAllowed: typeof args.options.isPlannerAllowed !== 'undefined',
-        allowCalendarSharing: typeof args.options.allowCalendarSharing !== 'undefined',
-        allowTenantMoveWithDataLoss: typeof args.options.allowTenantMoveWithDataLoss !== 'undefined',
-        allowTenantMoveWithDataMigration: typeof args.options.allowTenantMoveWithDataMigration !== 'undefined',
-        allowRosterCreation: typeof args.options.allowRosterCreation !== 'undefined',
-        allowPlannerMobilePushNotifications: typeof args.options.allowPlannerMobilePushNotifications !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--isPlannerAllowed [isPlannerAllowed]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowCalendarSharing [allowCalendarSharing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowTenantMoveWithDataLoss [allowTenantMoveWithDataLoss]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowTenantMoveWithDataMigration [allowTenantMoveWithDataMigration]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowRosterCreation [allowRosterCreation]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowPlannerMobilePushNotifications [allowPlannerMobilePushNotifications]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push(
-      'isPlannerAllowed',
-      'allowCalendarSharing',
-      'allowTenantMoveWithDataLoss',
-      'allowTenantMoveWithDataMigration',
-      'allowRosterCreation',
-      'allowPlannerMobilePushNotifications'
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const optionsArray = [
-          args.options.isPlannerAllowed, args.options.allowCalendarSharing, args.options.allowTenantMoveWithDataLoss,
-          args.options.allowTenantMoveWithDataMigration, args.options.allowRosterCreation, args.options.allowPlannerMobilePushNotifications
-        ];
-
-        if (optionsArray.every(o => typeof o === 'undefined')) {
-          return 'You must specify at least one option';
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => opts.isPlannerAllowed !== undefined || opts.allowCalendarSharing !== undefined || opts.allowTenantMoveWithDataLoss !== undefined || opts.allowTenantMoveWithDataMigration !== undefined || opts.allowRosterCreation !== undefined || opts.allowPlannerMobilePushNotifications !== undefined, {
+        message: 'You must specify at least one option',
+        params: {
+          customCode: 'required'
         }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

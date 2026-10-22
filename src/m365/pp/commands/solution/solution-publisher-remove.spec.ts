@@ -13,11 +13,12 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppSolutionPublisherGetCommand from './solution-publisher-get.js';
-import command from './solution-publisher-remove.js';
+import command, { options } from './solution-publisher-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '00000001-0000-0000-0001-00000000009b';
@@ -38,6 +39,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -85,34 +87,37 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified publisher owned by the currently signed-in user when force option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         id: validId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -152,11 +157,11 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -173,12 +178,12 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -191,12 +196,12 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async () => { throw errorMessage; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

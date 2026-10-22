@@ -5,7 +5,6 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 
@@ -112,12 +111,17 @@ class SpoContentTypeSyncCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { listId, listTitle, listUrl, webUrl } = args.options;
     const url: URL = new URL(webUrl);
-    const baseUrl = 'https://graph.microsoft.com/v1.0/sites/';
+    const baseUrl = `${url.origin}/_api/v2.0/sites/`;
 
     try {
-      const siteUrl = url.pathname === '/' ? url.host : await spo.getSiteIdByMSGraph(webUrl, logger, this.verbose);
-      const listPath = listId || listTitle || listUrl ? `/lists/${listId || listTitle || await this.getListIdByUrl(webUrl, listUrl!, logger)}` : '';
-      const contentTypeId = await this.getContentTypeId(baseUrl, url, args.options, logger);
+      const [siteId, webId] = await Promise.all([
+        spo.getSiteIdBySPApi(webUrl, logger, this.verbose),
+        spo.getWebId(webUrl, logger, this.verbose)
+      ]);
+      const siteUrl = `${url.host},${siteId},${webId}`;
+      const targetListId = listId || (listTitle || listUrl ? await spo.getListId(webUrl, listTitle, listUrl, logger, this.verbose) : undefined);
+      const listPath = targetListId ? `/lists/${targetListId}` : '';
+      const contentTypeId = await this.getContentTypeId(webUrl, args.options, logger);
 
       if (this.verbose) {
         await logger.logToStderr(`Adding or syncing the content type...`);
@@ -147,44 +151,22 @@ class SpoContentTypeSyncCommand extends SpoCommand {
     }
   }
 
-  private async getContentTypeId(baseUrl: string, url: URL, options: Options, logger: Logger): Promise<string> {
+  private async getContentTypeId(webUrl: string, options: Options, logger: Logger): Promise<string> {
     if (options.id) {
       return options.id;
     }
-
-    const siteId = await spo.getSiteIdByMSGraph(`${url.origin}/sites/contenttypehub`, logger, this.verbose);
 
     if (this.verbose) {
       await logger.logToStderr(`Retrieving content type Id by name...`);
     }
 
-    const contentTypes: { id: string }[] = await odata.getAllItems(`${baseUrl}${siteId}/contenttypes?$filter=name eq '${options.name}'&$select=id,name`);
+    const contentTypes: { StringId: string }[] = await odata.getAllItems(`${webUrl}/_api/web/AvailableContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(options.name!)}'&$select=StringId,Name`);
 
     if (contentTypes.length === 0) {
       throw `Content type with name ${options.name} not found.`;
     }
 
-    return contentTypes[0].id;
-  }
-
-  private async getListIdByUrl(webUrl: string, listUrl: string, logger: Logger): Promise<string> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving list id to sync the content type to...`);
-    }
-
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-
-    const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=id`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ Id: string }>(requestOptions);
-
-    return response.Id;
+    return contentTypes[0].StringId;
   }
 }
 

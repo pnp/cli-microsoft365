@@ -1,19 +1,25 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import commands from '../../commands.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import { cli } from '../../../../cli/cli.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional(),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid user principal name (UPN).`
+  }).optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  userName?: string;
-  force?: boolean;
 }
 
 class EntraUserRemoveCommand extends GraphCommand {
@@ -26,62 +32,22 @@ class EntraUserRemoveCommand extends GraphCommand {
     return 'Removes a specific user';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.userName].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'id' or 'userName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'userName']
+        }
       });
-    });
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'userName'] }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name (UPN)`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Removing user '${args.options.id || args.options.userName}'...`);
     }

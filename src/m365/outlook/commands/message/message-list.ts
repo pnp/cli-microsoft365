@@ -1,6 +1,6 @@
 import { Message } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
@@ -11,18 +11,42 @@ import { cli } from '../../../../cli/cli.js';
 import { validation } from '../../../../utils/validation.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  folderId: z.string().optional(),
+  folderName: z.string().optional(),
+  startTime: z.string()
+    .refine(startTime => validation.isValidISODateTime(startTime), {
+      error: e => `'${e.input}' is not a valid ISO date string for option startTime.`
+    })
+    .refine(startTime => new Date(startTime) <= new Date(), {
+      error: 'startTime value cannot be in the future.'
+    })
+    .optional(),
+  endTime: z.string()
+    .refine(endTime => validation.isValidISODateTime(endTime), {
+      error: e => `'${e.input}' is not a valid ISO date string for option endTime.`
+    })
+    .refine(endTime => new Date(endTime) <= new Date(), {
+      error: 'endTime value cannot be in the future.'
+    })
+    .optional(),
+  userId: z.string()
+    .refine(userId => validation.isValidGuid(userId), {
+      error: e => `${e.input} is not a valid GUID for option userId.`
+    }).optional(),
+  userName: z.string()
+    .refine(userName => validation.isValidUserPrincipalName(userName), {
+      error: e => `${e.input} is not a valid UPN for option userName.`
+    }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  folderId?: string;
-  folderName?: string;
-  startTime?: string;
-  endTime?: string;
-  userId?: string;
-  userName?: string;
 }
 
 class OutlookMessageListCommand extends GraphCommand {
@@ -34,106 +58,29 @@ class OutlookMessageListCommand extends GraphCommand {
     return 'Gets all mail messages from the specified folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderId: typeof args.options.folderId !== 'undefined',
-        folderName: typeof args.options.folderName !== 'undefined',
-        startTime: typeof args.options.startTime !== 'undefined',
-        endTime: typeof args.options.endTime !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => !(options.folderId && options.folderName), {
+        error: 'Specify either folderId or folderName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['folderId', 'folderName']
+        }
+      })
+      .refine(options => !(options.userId && options.userName), {
+        error: 'Specify either userId or userName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
+      })
+      .refine(options => !(options.startTime && options.endTime && new Date(options.startTime) >= new Date(options.endTime)), {
+        error: 'startTime must be before endTime.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--folderName [folderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--folderId [folderId]'
-      },
-      {
-        option: '--startTime [startTime]'
-      },
-      {
-        option: '--endTime [endTime]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.startTime) {
-          if (!validation.isValidISODateTime(args.options.startTime)) {
-            return `'${args.options.startTime}' is not a valid ISO date string for option startTime.`;
-          }
-          if (new Date(args.options.startTime) > new Date()) {
-            return 'startTime value cannot be in the future.';
-          }
-        }
-
-        if (args.options.endTime) {
-          if (!validation.isValidISODateTime(args.options.endTime)) {
-            return `'${args.options.endTime}' is not a valid ISO date string for option endTime.`;
-          }
-          if (new Date(args.options.endTime) > new Date()) {
-            return 'endTime value cannot be in the future.';
-          }
-        }
-
-        if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'startTime must be before endTime.';
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID for option userId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid UPN for option userName.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('folderName', 'folderId', 'startTime', 'endTime', 'userId', 'userName');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['folderId', 'folderName'],
-        runsWhen: (args) => args.options.folderId || args.options.folderName
-      },
-      {
-        options: ['userId', 'userName'],
-        runsWhen: (args) => args.options.userId || args.options.userName
-      }
-    );
   }
 
   public defaultProperties(): string[] | undefined {

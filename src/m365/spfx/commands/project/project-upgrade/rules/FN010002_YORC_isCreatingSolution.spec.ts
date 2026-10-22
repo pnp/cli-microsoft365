@@ -9,7 +9,7 @@ describe('FN010002_YORC_isCreatingSolution', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010002_YORC_isCreatingSolution(true);
+    rule = new FN010002_YORC_isCreatingSolution({ value: true });
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {

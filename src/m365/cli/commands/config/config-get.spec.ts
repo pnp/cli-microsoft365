@@ -9,16 +9,18 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './config-get.js';
+import command, { options } from './config-get.js';
 
 describe(commands.CONFIG_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -70,24 +72,13 @@ describe(commands.CONFIG_GET, () => {
     assert(loggerSpy.calledWith(undefined));
   });
 
-  it('supports specifying key', () => {
-    const options = command.options;
-    let containsOptionKey = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--key') > -1) {
-        containsOptionKey = true;
-      }
-    });
-    assert(containsOptionKey);
+  it('fails validation if specified key is invalid ', () => {
+    const actual = commandOptionsSchema.safeParse({ key: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified key is invalid ', async () => {
-    const actual = await command.validate({ options: { key: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure}`, async () => {
-    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure}`, () => {
+    const actual = commandOptionsSchema.safeParse({ key: settingsNames.showHelpOnFailure });
+    assert.strictEqual(actual.success, true);
   });
 });

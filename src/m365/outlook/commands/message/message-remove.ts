@@ -1,6 +1,6 @@
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -8,16 +8,26 @@ import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  userId: z.string()
+    .refine(userId => validation.isValidGuid(userId), {
+      error: e => `Value '${e.input}' is not a valid GUID for option 'userId'.`
+    }).optional(),
+  userName: z.string()
+    .refine(userName => validation.isValidUserPrincipalName(userName), {
+      error: e => `Value '${e.input}' is not a valid user principal name for option 'userName'.`
+    }).optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  userId?: string;
-  userName?: string;
-  force?: boolean
 }
 
 class OutlookMessageRemoveCommand extends GraphCommand {
@@ -29,61 +39,8 @@ class OutlookMessageRemoveCommand extends GraphCommand {
     return 'Permanently removes a specific message from a mailbox';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `Value '${args.options.userId}' is not a valid GUID for option 'userId'.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `Value '${args.options.userName}' is not a valid user principal name for option 'userName'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'userId', 'userName');
-    this.types.boolean.push('force');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

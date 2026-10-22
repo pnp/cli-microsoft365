@@ -44,6 +44,25 @@ To use this command you must be a Global or SharePoint administrator.
 
 :::
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Sets the home site to the provided site collection url and sets the Viva Connections landing experience to the SharePoint home site
@@ -70,13 +89,13 @@ Set the audience to groups using groups Ids
 m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceIds "978b5280-4f80-47ea-a1db-b0d1d2fb1ba4,21af775d-17b3-4637-94a4-2ba8625277cb"
 ```
 
-Set the audience to using their display name
+Set the audience using their display name
 
 ```sh
 m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceNames "Marketing, IT department"
 ```
 
-Clear the audience and set to draft 
+Clear the audience and set to draft
 
 ```sh
 m365 spo homesite set --url https://contoso.sharepoint.com/sites/contosoportal --audienceNames '' --draftMode true

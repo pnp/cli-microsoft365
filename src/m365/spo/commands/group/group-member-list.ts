@@ -22,7 +22,7 @@ class SpoGroupMemberListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return `List the members of a SharePoint Group`;
+    return 'Lists the members of a SharePoint Group';
   }
 
   public defaultProperties(): string[] | undefined {

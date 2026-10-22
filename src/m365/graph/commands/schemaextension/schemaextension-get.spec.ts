@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './schemaextension-get.js';
+import command, { options } from './schemaextension-get.js';
 
 describe(commands.SCHEMAEXTENSION_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandOptionsSchema: typeof options;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -60,6 +66,12 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
+
+  it('fails validation if id is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('gets schema extension', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
@@ -88,9 +100,9 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'adatumisv_exo2'
-      }
+      })
     });
     try {
       assert(loggerLogSpy.calledWith({
@@ -146,10 +158,10 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
       throw 'Invalid request';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'adatumisv_exo2'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
@@ -181,10 +193,10 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
       throw 'Invalid request';
     });
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: 'adatumisv_exo2'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

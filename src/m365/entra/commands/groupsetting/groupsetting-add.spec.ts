@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './groupsetting-add.js';
+import command, { options } from './groupsetting-add.js';
 
 describe(commands.GROUPSETTING_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -145,7 +147,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' }) });
     assert(loggerLogSpy.calledWith({
       displayName: null,
       id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
@@ -234,7 +236,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' }) });
     assert(loggerLogSpy.calledWith({
       displayName: null,
       id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
@@ -323,7 +325,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' }) });
     assert(loggerLogSpy.calledWith({
       displayName: null,
       id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
@@ -412,7 +414,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' }) });
     assert.deepEqual(postStub.firstCall.args[0].data, {
       templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
       values: [
@@ -450,7 +452,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ templateId: '62375ab9-6b52-47ed-826b-58e47e0e304c' }) } as any),
       new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -477,18 +479,18 @@ describe(commands.GROUPSETTING_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' }) } as any),
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 
-  it('fails validation if the templateId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { templateId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the templateId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ templateId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the templateId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the templateId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('allows unknown properties', () => {

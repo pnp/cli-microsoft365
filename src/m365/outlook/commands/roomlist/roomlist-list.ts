@@ -14,7 +14,7 @@ class OutlookRoomListListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a collection of available roomlists';
+    return 'Gets a collection of available roomlists';
   }
 
   public get schema(): z.ZodType | undefined {

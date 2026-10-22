@@ -1,8 +1,19 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { MultitenantOrganization } from './MultitenantOrganization.js';
+
+export const options = globalOptionsZod
+  .extend({})
+  .strict();
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
+}
 
 class EntraMultitenantGetCommand extends GraphCommand {
   public get name(): string {
@@ -13,7 +24,11 @@ class EntraMultitenantGetCommand extends GraphCommand {
     return 'Gets properties of the multitenant organization';
   }
 
-  public async commandAction(logger: Logger): Promise<void> {
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
+  }
+
+  public async commandAction(logger: Logger, _args: CommandArgs): Promise<void> {
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/tenantRelationships/multiTenantOrganization`,

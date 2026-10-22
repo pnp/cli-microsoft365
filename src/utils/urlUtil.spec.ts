@@ -502,6 +502,16 @@ describe('urlUtil/urlUtil', () => {
     assert.strictEqual(actual, 'https://example.com');
   });
 
+  it('should return the correct target site absolute URL for a site with a dot in its name', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', 'https://contoso.sharepoint.com/sites/sales.team/_api/web/lists');
+    assert.strictEqual(actual, 'https://contoso.sharepoint.com/sites/sales.team');
+  });
+
+  it('should return the correct target site absolute URL for a site with the /teams/ managed path when the URL contains an _api segment', () => {
+    const actual = urlUtil.getTargetSiteAbsoluteUrl('https://contoso.sharepoint.com', `https://contoso.sharepoint.com/teams/sales/Shared Documents/Temp`);
+    assert.strictEqual(actual, 'https://contoso.sharepoint.com/teams/sales');
+  });
+
   it('correctly removes leading slashes from the URL', () => {
     const actual = urlUtil.removeLeadingSlashes('/Shared Documents/MyFolder');
     assert.strictEqual(actual, 'Shared Documents/MyFolder');

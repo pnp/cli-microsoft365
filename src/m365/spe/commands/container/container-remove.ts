@@ -13,7 +13,7 @@ export const options = z.strictObject({
   name: z.string().optional().alias('n'),
   containerTypeId: z.uuid().optional(),
   containerTypeName: z.string().optional(),
-  recycle: z.boolean().optional(),
+  permanent: z.boolean().optional(),
   force: z.boolean().optional().alias('f')
 });
 
@@ -39,10 +39,18 @@ class SpeContainerRemoveCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: id or name.'
+        error: 'Use one of the following options: id or name.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       })
       .refine((options: Options) => !options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['containerTypeId', 'containerTypeName']
+        }
       })
       .refine((options: Options) => options.name || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
         error: 'Options containerTypeId and containerTypeName are only required when deleting a container by name.'
@@ -51,7 +59,7 @@ class SpeContainerRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.force) {
-      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove container '${args.options.id || args.options.name}'${!args.options.recycle ? ' permanently' : ''}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.permanent ? 'permanently remove' : 'recycle'} container '${args.options.id || args.options.name}'?` });
 
       if (!result) {
         return;
@@ -73,14 +81,13 @@ class SpeContainerRemoveCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      if (args.options.recycle) {
-        await request.delete(requestOptions);
+      if (args.options.permanent) {
+        requestOptions.url += '/permanentDelete';
+        await request.post(requestOptions);
         return;
       }
 
-      // Container should be permanently deleted
-      requestOptions.url += '/permanentDelete';
-      await request.post(requestOptions);
+      await request.delete(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
