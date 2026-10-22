@@ -1,6 +1,7 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -8,16 +9,21 @@ import commands from '../../commands.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid userName.`
+  }).optional().alias('n'),
+  email: z.string().optional(),
+  properties: z.string().optional().alias('p'),
+  withManager: z.boolean().optional()
+});
+
+export declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  id?: string;
-  userName?: string;
-  email?: string;
-  properties?: string;
-  withManager?: boolean;
 }
 
 class EntraUserGetCommand extends GraphCommand {
@@ -29,66 +35,19 @@ class EntraUserGetCommand extends GraphCommand {
     return 'Gets information about the specified user';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined',
-        properties: args.options.properties,
-        withManager: typeof args.options.withManager !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.id, options.userName, options.email].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'id', 'userName', or 'email'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'userName', 'email']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      },
-      {
-        option: '--withManager'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id &&
-          !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'userName', 'email'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -3,8 +3,8 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002015_DEVDEP_types_react extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('@types/react', packageVersion, true, true);
+  constructor(options: { packageVersion: string }) {
+    super({ ...options, packageName: '@types/react', isDevDep: true, isOptional: true });
   }
 
   get id(): string {

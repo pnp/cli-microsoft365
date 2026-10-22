@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -10,16 +11,32 @@ import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appItemId: z.number().optional(),
+  appItemUniqueId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional(),
+  appName: z.string().optional(),
+  fileName: z.string()
+    .refine(fileName => !fs.existsSync(fileName), {
+      error: e => `File ${e.input} already exists`
+    })
+    .optional(),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appCatalogUrl?: string;
-  appItemUniqueId?: string;
-  appItemId?: number;
-  appName?: string;
-  fileName?: string;
 }
 
 interface AppInfo {
@@ -40,73 +57,19 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
     return 'Downloads Teams app package for an SPFx solution deployed to tenant app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appCatalogUrl: typeof args.options.appCatalogUrl !== 'undefined',
-        appItemUniqueId: typeof args.options.appItemUniqueId !== 'undefined',
-        appItemId: typeof args.options.appItemId !== 'undefined',
-        appName: typeof args.options.appName !== 'undefined',
-        fileName: typeof args.options.fileName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.appItemUniqueId, opts.appItemId, opts.appName].filter(x => x !== undefined).length === 1, {
+        error: 'Specify appItemUniqueId, appItemId or appName but not multiple',
+        params: {
+          customCode: 'optionSet',
+          options: ['appItemUniqueId', 'appItemId', 'appName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--appItemId [appItemId]' },
-      { option: '--appItemUniqueId [appItemUniqueId]' },
-      { option: '--appName [appName]' },
-      { option: '--fileName [fileName]' },
-      { option: '-u, --appCatalogUrl [appCatalogUrl]' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.appItemUniqueId &&
-          !args.options.appItemId &&
-          !args.options.appName) {
-          return `Specify appItemUniqueId, appItemId or appName`;
-        }
-
-        if ((args.options.appItemUniqueId && args.options.appItemId) ||
-          (args.options.appItemUniqueId && args.options.appName) ||
-          (args.options.appItemId && args.options.appName)) {
-          return `Specify appItemUniqueId, appItemId or appName but not multiple`;
-        }
-
-        if (args.options.appItemUniqueId &&
-          !validation.isValidGuid(args.options.appItemUniqueId)) {
-          return `${args.options.appItemUniqueId} is not a valid GUID`;
-        }
-
-        if (args.options.appItemId &&
-          isNaN(args.options.appItemId)) {
-          return `${args.options.appItemId} is not a number`;
-        }
-
-        if (args.options.fileName &&
-          fs.existsSync(args.options.fileName)) {
-          return `File ${args.options.fileName} already exists`;
-        }
-
-        if (args.options.appCatalogUrl) {
-          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

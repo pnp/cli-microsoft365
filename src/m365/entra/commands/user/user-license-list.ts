@@ -1,18 +1,24 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional(),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid user principal name (UPN).`
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
 }
 
 class EntraUserLicenseListCommand extends GraphDelegatedCommand {
@@ -28,56 +34,19 @@ class EntraUserLicenseListCommand extends GraphDelegatedCommand {
     return ['id', 'skuId', 'skuPartNumber'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => !options.userId || !options.userName, {
+        error: `Specify either 'userId' or 'userName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name (UPN)`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['userId', 'userName'],
-      runsWhen: (args) => args.options.userId || args.options.userName
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -8,7 +8,7 @@ describe('FN002022_DEVDEP_typescript', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN002022_DEVDEP_typescript('~5.3.3');
+    rule = new FN002022_DEVDEP_typescript({ supportedRange: '~5.3.3' });
   });
 
   it('has the correct id', () => {

@@ -9,7 +9,7 @@ describe('FN001005_DEP_types_react', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN001005_DEP_types_react('15.6.6');
+    rule = new FN001005_DEP_types_react({ packageVersion: '15.6.6' });
   });
 
   it('returns notification if version is not up-to-date', () => {

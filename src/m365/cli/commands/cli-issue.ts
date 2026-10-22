@@ -1,15 +1,18 @@
-import GlobalOptions from '../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../Command.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
 import AnonymousCommand from '../../base/AnonymousCommand.js';
 import commands from '../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(['bug', 'command', 'sample']).alias('t')
+});
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  type: string;
 }
 
 class CliIssueCommand extends AnonymousCommand {
@@ -21,41 +24,8 @@ class CliIssueCommand extends AnonymousCommand {
     return 'Returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        type: args.options.type
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --type <type>',
-        autocomplete: CliIssueCommand.issueType
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (CliIssueCommand.issueType.indexOf(args.options.type) < 0) {
-          return `${args.options.type} is not a valid Issue type. Allowed values are ${CliIssueCommand.issueType.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -76,12 +46,6 @@ class CliIssueCommand extends AnonymousCommand {
     await browserUtil.open(issueLink);
     await logger.log(issueLink);
   }
-
-  private static issueType: string[] = [
-    'bug',
-    'command',
-    'sample'
-  ];
 }
 
 export default new CliIssueCommand();

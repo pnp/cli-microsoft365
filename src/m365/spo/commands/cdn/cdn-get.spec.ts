@@ -12,12 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './cdn-get.js';
+import command, { options } from './cdn-get.js';
 
 describe(commands.CDN_GET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
@@ -31,6 +32,7 @@ describe(commands.CDN_GET, () => {
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     auth.connection.spoTenantId = 'abc';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -93,7 +95,7 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request ' + opts.url;
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'Public' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, type: 'Public' }) });
     assert(loggerLogToStderrSpy.calledWithExactly(`Public CDN at ${spoAdminUrl} is enabled`));
   });
 
@@ -119,7 +121,7 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { type: 'Private' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'Private' }) });
     assert(loggerLogSpy.calledOnceWithExactly(false));
   });
 
@@ -145,7 +147,7 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(false));
   });
 
@@ -171,7 +173,7 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, type: 'Private' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, type: 'Private' }) });
     assert(loggerLogToStderrSpy.calledWithExactly(`Private CDN at ${spoAdminUrl} is disabled`));
   });
 
@@ -197,7 +199,7 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogToStderrSpy.calledWithExactly(`Public CDN at ${spoAdminUrl} is enabled`));
   });
 
@@ -231,33 +233,38 @@ describe(commands.CDN_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 
-  it('accepts Public SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Public' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts Private SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Private' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts Public SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'Public' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('accepts Private SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'Private' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('doesn\'t fail validation if the optional type option not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('rejects invalid SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -51,20 +51,36 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.roleDefinitionId !== !options.roleDefinitionName, {
-        error: 'Specify either roleDefinitionId or roleDefinitionName, but not both'
+        error: 'Specify either roleDefinitionId or roleDefinitionName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
       })
       .refine(options => options.roleDefinitionId || options.roleDefinitionName, {
-        error: 'Specify either roleDefinitionId or roleDefinitionName'
+        error: 'Specify either roleDefinitionId or roleDefinitionName',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
       })
       .refine(options => (!options.roleDefinitionId && !options.roleDefinitionName) || options.roleDefinitionName || (options.roleDefinitionId && validation.isValidGuid(options.roleDefinitionId)), {
         error: e => `The '${e.input}' must be a valid GUID`,
         path: ['roleDefinitionId']
       })
       .refine(options => !options.principalId !== !options.principalName, {
-        error: 'Specify either principalId or principalName, but not both'
+        error: 'Specify either principalId or principalName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['principalId', 'principalName']
+        }
       })
       .refine(options => options.principalId || options.principalName, {
-        error: 'Specify either principalId or principalName'
+        error: 'Specify either principalId or principalName',
+        params: {
+          customCode: 'optionSet',
+          options: ['principalId', 'principalName']
+        }
       })
       .refine(options => (!options.principalId && !options.principalName) || options.principalName || (options.principalId && validation.isValidGuid(options.principalId)), {
         error: e => `The '${e.input}' must be a valid GUID`,
@@ -80,11 +96,19 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
       })
       .refine(options => options.scope !== 'user' || (!options.userId !== !options.userName), {
         message: "When the scope is set to 'user' specify either userId or userName, but not both",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       })
       .refine(options => options.scope !== 'user' || (options.userId || options.userName), {
         message: "When the scope is set to 'user' specify either userId or userName",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       })
       .refine(options => options.scope !== 'user' || (!options.userId && !options.userName) || options.userName || (options.userId && validation.isValidGuid(options.userId)), {
         error: e => `The '${e.input}' must be a valid GUID`,
@@ -100,11 +124,19 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
       })
       .refine(options => options.scope !== 'group' || (!options.groupId !== !options.groupName), {
         message: "When the scope is set to 'group' specify either groupId or groupName, but not both",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
       })
       .refine(options => options.scope !== 'group' || (options.groupId || options.groupName), {
         message: "When the scope is set to 'group' specify either groupId or groupName",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
       })
       .refine(options => options.scope !== 'group' || (!options.groupId && !options.groupName) || options.groupName || (options.groupId && validation.isValidGuid(options.groupId)), {
         error: e => `The '${e.input}' must be a valid GUID`,
@@ -116,11 +148,19 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
       })
       .refine(options => options.scope !== 'administrativeUnit' || (!options.administrativeUnitId !== !options.administrativeUnitName), {
         message: "When the scope is set to 'administrativeUnit' specify either administrativeUnitId or administrativeUnitName, but not both",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'administrativeUnitName']
+        }
       })
       .refine(options => options.scope !== 'administrativeUnit' || (options.administrativeUnitId || options.administrativeUnitName), {
         message: "When the scope is set to 'administrativeUnit' specify either administrativeUnitId or administrativeUnitName",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['administrativeUnitId', 'administrativeUnitName']
+        }
       })
       .refine(options => options.scope !== 'administrativeUnit' || (!options.administrativeUnitId && !options.administrativeUnitName) || options.administrativeUnitName || (options.administrativeUnitId && validation.isValidGuid(options.administrativeUnitId)), {
         error: e => `The '${e.input}' must be a valid GUID`,
@@ -132,11 +172,19 @@ class ExoAppRoleAssignmentAddCommand extends GraphCommand {
       })
       .refine(options => options.scope !== 'custom' || (!options.customAppScopeId !== !options.customAppScopeName), {
         message: "When the scope is set to 'custom' specify either customAppScopeId or customAppScopeName, but not both",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['customAppScopeId', 'customAppScopeName']
+        }
       })
       .refine(options => options.scope !== 'custom' || (options.customAppScopeId || options.customAppScopeName), {
         message: "When the scope is set to 'custom' specify either customAppScopeId or customAppScopeName",
-        path: ['scope']
+        path: ['scope'],
+        params: {
+          customCode: 'optionSet',
+          options: ['customAppScopeId', 'customAppScopeName']
+        }
       })
       .refine(options => options.scope !== 'custom' || (!options.customAppScopeId && !options.customAppScopeName) || options.customAppScopeName || (options.customAppScopeId && validation.isValidGuid(options.customAppScopeId)), {
         error: e => `The '${e.input}' must be a valid GUID`,

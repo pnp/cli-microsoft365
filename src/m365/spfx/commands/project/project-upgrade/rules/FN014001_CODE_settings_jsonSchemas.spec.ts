@@ -9,7 +9,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN014001_CODE_settings_jsonSchemas(false);
+    rule = new FN014001_CODE_settings_jsonSchemas({ add: false });
   });
 
   it('doesn\'t return notification if json.schemas should be removed and is not present', () => {
@@ -24,7 +24,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
   });
 
   it('doesn\'t return notification if json.schemas should be added and is already present', () => {
-    rule = new FN014001_CODE_settings_jsonSchemas(true);
+    rule = new FN014001_CODE_settings_jsonSchemas({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       vsCode: {
@@ -38,7 +38,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
   });
 
   it('returns notification if json.schemas should be added but is not present', () => {
-    rule = new FN014001_CODE_settings_jsonSchemas(true);
+    rule = new FN014001_CODE_settings_jsonSchemas({ add: true });
     const project: Project = {
       path: '/usr/tmp',
       vsCode: {

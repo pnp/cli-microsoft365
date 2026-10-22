@@ -1,28 +1,31 @@
 import { AxiosRequestConfig, AxiosResponse, RawAxiosRequestHeaders } from 'axios';
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import auth from '../../Auth.js';
-import Command from '../../Command.js';
-import GlobalOptions from '../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../Command.js';
 import { Logger } from '../../cli/Logger.js';
 import request from '../../request.js';
 import commands from './commands.js';
+
+const allowedMethods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] as const;
+
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  url: z.string().alias('u'),
+  method: z.enum(allowedMethods).default('get').alias('m'),
+  resource: z.string().optional().alias('r'),
+  body: z.string().optional().alias('b'),
+  filePath: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  url: string;
-  method?: string;
-  resource?: string;
-  body?: string;
-  filePath?: string;
-}
-
 class RequestCommand extends Command {
-  private allowedMethods: string[] = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
-
   public get name(): string {
     return commands.REQUEST;
   }
@@ -31,75 +34,21 @@ class RequestCommand extends Command {
     return 'Executes the specified web request using CLI for Microsoft 365';
   }
 
-  public allowUnknownOptions(): boolean | undefined {
-    return true;
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        method: args.options.method || 'get',
-        resource: typeof args.options.resource !== 'undefined',
-        accept: args.options.accept || 'application/json',
-        body: typeof args.options.body !== 'undefined',
-        filePath: typeof args.options.filePath !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.body || (opts.method !== 'get'), {
+        error: 'Specify a different method when using body'
+      })
+      .refine(opts => !opts.body || opts['content-type'], {
+        error: 'Specify the content-type when using body'
+      })
+      .refine(opts => !opts.filePath || fs.existsSync(path.dirname(opts.filePath)), {
+        error: 'The location specified in the filePath does not exist'
       });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-m, --method [method]',
-        autocomplete: this.allowedMethods
-      },
-      {
-        option: '-r, --resource [resource]'
-      },
-      {
-        option: '-b, --body [body]'
-      },
-      {
-        option: '-p, --filePath [filePath]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const currentMethod = args.options.method || 'get';
-        if (this.allowedMethods.indexOf(currentMethod) === -1) {
-          return `${currentMethod} is not a valid value for method. Allowed values: ${this.allowedMethods.join(', ')}`;
-        }
-
-        if (args.options.body && (!args.options.method || args.options.method === 'get')) {
-          return 'Specify a different method when using body';
-        }
-
-        if (args.options.body && !args.options['content-type']) {
-          return 'Specify the content-type when using body';
-        }
-
-        if (args.options.filePath && !fs.existsSync(path.dirname(args.options.filePath))) {
-          return 'The location specified in the filePath does not exist';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -109,10 +58,10 @@ class RequestCommand extends Command {
 
     try {
       const url = this.resolveUrlTokens(args.options.url);
-      const method = (args.options.method || 'get').toUpperCase();
+      const method = args.options.method.toUpperCase();
       const headers: RawAxiosRequestHeaders = {};
 
-      this.addUnknownOptionsToPayload(headers, args.options);
+      this.addUnknownOptionsToPayloadZod(headers, args.options);
 
       if (!headers.accept) {
         headers.accept = 'application/json';

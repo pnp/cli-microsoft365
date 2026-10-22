@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './enterpriseapp-add.js';
+import command, { options } from './enterpriseapp-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.ENTERPRISEAPP_ADD, () => {
@@ -19,6 +19,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -73,114 +75,49 @@ describe(commands.ENTERPRISEAPP_ADD, () => {
     assert.deepStrictEqual(alias, [commands.SP_ADD]);
   });
 
-  it('fails validation if neither the id, displayName, nor objectId option specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the id, displayName, nor objectId option specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the objectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '123' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and displayName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000', displayName: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '00000000-0000-0000-0000-000000000000', displayName: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both displayName and objectId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { displayName: 'abc', objectId: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both displayName and objectId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'abc', objectId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both id and objectId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and objectId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id option specified', async () => {
-    const actual = await command.validate({ options: { id: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the displayName option specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the displayName option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: 'abc' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the objectId option specified', async () => {
-    const actual = await command.validate({ options: { objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying displayName', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying objectId', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--objectId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when the objectId option specified', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly handles API OData error', async () => {

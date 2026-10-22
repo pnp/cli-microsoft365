@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { Auth, AuthType, CertificateType, CloudType, Connection, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse } from './Auth.js';
 import authServer from './AuthServer.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
+import { msalCachePlugin } from './auth/msalCachePlugin.js';
 import { TokenStorage } from './auth/TokenStorage.js';
 import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
@@ -96,6 +97,8 @@ describe('Auth', () => {
   beforeEach(() => {
     log = [];
     auth = new Auth();
+    sinon.stub(msalCachePlugin, 'getCachePlugin').resolves(mockTokenCachePlugin);
+    sinon.stub(msalCachePlugin, 'clearMsalCache').resolves();
     response = {
       deviceCode: "",
       expiresIn: 0,
@@ -142,7 +145,9 @@ describe('Auth', () => {
       publicApplication.acquireTokenByDeviceCode,
       publicApplication.acquireTokenByUsernamePassword,
       publicApplication.acquireTokenByCode,
-      tokenCache.getAllAccounts
+      tokenCache.getAllAccounts,
+      msalCachePlugin.getCachePlugin,
+      msalCachePlugin.clearMsalCache
     ]);
     openStub.restore();
     clipboardStub.restore();
@@ -1591,19 +1596,21 @@ describe('Auth', () => {
     assert.strictEqual(requestPostStub.secondCall.args[0].data.indexOf(`client_assertion=${federatedIdentityClientAssertion}`) > -1, true);
   });
 
-  it('fails when not using federated identity from GitHub Action or Azure DevOps Pipeline', async () => {
+  it('fails when not using federated identity from GitHub Action, Azure DevOps Pipeline or GitLab', async () => {
     process.env = {
       ACTIONS_ID_TOKEN_REQUEST_URL: '',
       ACTIONS_ID_TOKEN_REQUEST_TOKEN: '',
       SYSTEM_OIDCREQUESTURI: '',
-      SYSTEM_ACCESSTOKEN: ''
+      SYSTEM_ACCESSTOKEN: '',
+      GITLAB_CI: '',
+      GITLAB_OIDC_TOKEN: ''
     };
 
     auth.connection.authType = AuthType.FederatedIdentity;
     auth.connection.appId = appId;
     auth.connection.tenant = tenant;
 
-    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions and Azure DevOps.'));
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('Federated identity is currently only supported in GitHub Actions, Azure DevOps and GitLab.'));
   });
 
   it('fails when using federated identity from Azure DevOps Pipeline, but SYSTEM_ACCESSTOKEN not available', async () => {
@@ -1657,6 +1664,77 @@ describe('Auth', () => {
     await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError(`The appId and tenant parameters are required when not using a service connection.`));
   });
 
+  it('calls api with correct params using federated identity flow from GitLab CI/CD', async () => {
+    const gitlabOidcToken = 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...';
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: gitlabOidcToken
+    };
+    const accessToken = 'eyJ0eXAiOiJKV1QiLCJ-EntraIDAccessToken...';
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`) {
+        return {
+          "access_token": accessToken,
+          "expires_in": "3599",
+          "ext_expires_in": "3599",
+          "token_type": "Bearer"
+        };
+      }
+
+      throw { error: { "error": "Invalid POST Request" } };
+    });
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    const ensuredAccessToken = await auth.ensureAccessToken(resource, logger, false);
+    assert.strictEqual(ensuredAccessToken, accessToken);
+    assert(requestPostStub.calledOnce);
+    assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_id=${appId}`) > -1, true);
+    assert.strictEqual(requestPostStub.firstCall.args[0].data.indexOf(`client_assertion=${gitlabOidcToken}`) > -1, true);
+  });
+
+  it('fails when using federated identity from GitLab CI/CD, but GITLAB_OIDC_TOKEN not available', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: ''
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = tenant;
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The `GITLAB_OIDC_TOKEN` environment variable is not available. Please add an id_tokens entry named GITLAB_OIDC_TOKEN with audience `api://AzureADTokenExchange` to the job.'));
+  });
+
+  it('fails when using federated identity from GitLab CI/CD with empty appId and tenant option', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = undefined;
+    auth.connection.tenant = tenant;
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.'));
+  });
+
+  it('fails when using federated identity from GitLab CI/CD with empty tenant option', async () => {
+    process.env = {
+      GITLAB_CI: 'true',
+      GITLAB_OIDC_TOKEN: 'eyJ0eXAiOiJKV1QiLCJ-GitLabFederationClientAssertion-...'
+    };
+
+    auth.connection.authType = AuthType.FederatedIdentity;
+    auth.connection.appId = appId;
+    auth.connection.tenant = 'common';
+
+    await assert.rejects(auth.ensureAccessToken(resource, logger, true), new CommandError('The appId and tenant parameters are required when using federated identity in GitLab CI/CD.'));
+  });
+
   it('returns access token if persisting connection fails', async () => {
     sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth as any, 'getPublicClient').returns(publicApplication);
@@ -1694,12 +1772,6 @@ describe('Auth', () => {
   it('configures FileTokenStorage as connections storage', async () => {
     const actual = auth.getAllConnectionsStorage();
     assert(actual instanceof FileTokenStorage);
-  });
-
-  it('configures MSAL cache storage as token storage', async () => {
-    const actual = (auth as any).getMsalCacheStorage();
-    assert(actual instanceof FileTokenStorage);
-    assert.strictEqual((actual as any).filePath, FileTokenStorage.msalCacheFilePath());
   });
 
   it('restores authentication', async () => {
@@ -1766,18 +1838,15 @@ describe('Auth', () => {
   it('clears connection information in the configured token storage', async () => {
     const mockStorage1 = new MockTokenStorage();
     const mockStorage2 = new MockTokenStorage();
-    const mockStorage3 = new MockTokenStorage();
     const mockStorageRemoveStub1 = sinon.stub(mockStorage1, 'remove').resolves();
     const mockStorageRemoveStub2 = sinon.stub(mockStorage2, 'remove').resolves();
-    const mockStorageRemoveStub3 = sinon.stub(mockStorage3, 'remove').resolves();
     sinon.stub(auth, 'getConnectionStorage').returns(mockStorage1);
     sinon.stub(auth, 'getAllConnectionsStorage').returns(mockStorage2);
-    sinon.stub(auth as any, 'getMsalCacheStorage').callsFake(() => mockStorage3);
 
     await auth.clearConnectionInfo();
     assert(mockStorageRemoveStub1.called, 'Active connection Storage not cleared');
     assert(mockStorageRemoveStub2.called, 'All connections Storage not cleared');
-    assert(mockStorageRemoveStub3.called, 'token storage or MSAL cache not cleared');
+    assert((msalCachePlugin.clearMsalCache as sinon.SinonStub).called, 'MSAL cache not cleared');
   });
 
   it('removes a connection from the configured token storage', async () => {

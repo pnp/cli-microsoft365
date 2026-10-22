@@ -34,5 +34,6 @@ export interface AzureDevOpsPipelineStep {
     arguments?: string;
     verbose?: boolean;
     customCommand?: string;
+    script?: string;
   }
 }

@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,31 +12,31 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-reference-list.js';
+import command, { options } from './task-reference-list.js';
 
 describe(commands.TASK_REFERENCE_LIST, () => {
   const referenceListResponse = {
-    "https%3A//contoso%2Esharepoint%2Ecom/sites/HRPlan/Shared Documents/Sample.pdf": {
-      "alias": "Sample.pdf",
-      "type": "Pdf",
-      "previewPriority": "[>",
-      "lastModifiedDateTime": "2022-05-15T16:20:31.8649232Z",
-      "lastModifiedBy": {
-        "user": {
-          "displayName": null,
-          "id": "fe36f75f-c103-410b-a18a-2bf6df06ac3a"
+    'https%3A//contoso%2Esharepoint%2Ecom/sites/HRPlan/Shared Documents/Sample.pdf': {
+      alias: 'Sample.pdf',
+      type: 'Pdf',
+      previewPriority: '[>',
+      lastModifiedDateTime: '2022-05-15T16:20:31.8649232Z',
+      lastModifiedBy: {
+        user: {
+          displayName: null,
+          id: 'fe36f75f-c103-410b-a18a-2bf6df06ac3a'
         }
       }
     },
-    "https%3A//contoso%2Esharepoint%2Ecom/sites/HRPlan/Shared Documents/Sample.png": {
-      "alias": "Sample.png",
-      "type": "Other",
-      "previewPriority": "8585492445655664725P(",
-      "lastModifiedDateTime": "2022-05-12T13:32:59.9267487Z",
-      "lastModifiedBy": {
-        "user": {
-          "displayName": null,
-          "id": "fe36f75f-c103-410b-a18a-2bf6df06ac3a"
+    'https%3A//contoso%2Esharepoint%2Ecom/sites/HRPlan/Shared Documents/Sample.png': {
+      alias: 'Sample.png',
+      type: 'Other',
+      previewPriority: '8585492445655664725P(',
+      lastModifiedDateTime: '2022-05-12T13:32:59.9267487Z',
+      lastModifiedBy: {
+        user: {
+          displayName: null,
+          id: 'fe36f75f-c103-410b-a18a-2bf6df06ac3a'
         }
       }
     }
@@ -49,6 +51,9 @@ describe(commands.TASK_REFERENCE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
+  const validTaskId = 'uBk5fK_MHkeyuPYlCo4OFpcAMowf';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -60,6 +65,8 @@ describe(commands.TASK_REFERENCE_LIST, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,9 +106,17 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      taskId: validTaskId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('successfully handles item found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=references`) {
         return references;
       }
 
@@ -109,9 +124,9 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
-        taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf'
-      }
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId
+      })
     });
     assert(loggerLogSpy.calledWith(references.references));
   });
@@ -119,6 +134,10 @@ describe(commands.TASK_REFERENCE_LIST, () => {
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        taskId: validTaskId
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

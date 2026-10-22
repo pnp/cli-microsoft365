@@ -29,7 +29,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get an application customizer that is added to a site.';
+    return 'Gets an application customizer that is added to a site.';
   }
 
   constructor() {

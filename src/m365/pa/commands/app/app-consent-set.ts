@@ -1,20 +1,28 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  name: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .alias('n'),
+  bypass: z.boolean().alias('b'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string,
-  name: string;
-  bypass: boolean;
-  force?: boolean;
 }
 
 class PaAppConsentSetCommand extends PowerAppsCommand {
@@ -26,46 +34,8 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
     return 'Configures if users can bypass the API Consent window for the selected canvas app';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-b, --bypass <bypass>',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('bypass');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

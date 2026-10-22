@@ -130,6 +130,7 @@ describe(commands.WEBSITE_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environment, url: 'https://site-0uaq9.contoso.com' });
     assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'https://site-0uaq9.contoso.com' is not a valid Power Pages URL.`);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {

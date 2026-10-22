@@ -12,11 +12,12 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './solution-publish.js';
+import command, { options } from './solution-publish.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.SOLUTION_PUBLISH, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '00000001-0000-0000-0001-00000000009b';
@@ -64,6 +65,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -106,29 +108,32 @@ describe(commands.SOLUTION_PUBLISH, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
+  it('fails validation when both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, name: validName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
   });
 
   it('publishes the components of a specified solution owned by the currently signed-in user', async () => {
@@ -155,11 +160,11 @@ describe(commands.SOLUTION_PUBLISH, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     }));
   });
 
@@ -187,12 +192,12 @@ describe(commands.SOLUTION_PUBLISH, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         name: validName,
         wait: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -205,11 +210,11 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(request, 'get').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

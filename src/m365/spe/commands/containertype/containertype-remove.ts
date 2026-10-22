@@ -34,7 +34,7 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove a specific container type';
+    return 'Removes a specific container type';
   }
 
   public get schema(): z.ZodType {
@@ -44,7 +44,11 @@ class SpeContainerTypeRemoveCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.id, options.name].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: id, name.'
+        error: 'Use one of the following options: id, name.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       });
   }
 

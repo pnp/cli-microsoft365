@@ -1,21 +1,24 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  flowName: z.uuid(),
+  environmentName: z.string().alias('e'),
+  withTrigger: z.boolean().optional(),
+  withActions: z.union([z.string(), z.boolean()]).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  flowName: string;
-  name: string;
-  withTrigger?: boolean;
-  withActions?: string | boolean;
 }
 
 interface FlowLink {
@@ -79,57 +82,8 @@ class FlowRunGetCommand extends PowerAutomateCommand {
     return 'Gets information about a specific run of the specified Microsoft Flow';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--flowName <flowName>'
-      },
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--withTrigger'
-      },
-      {
-        option: '--withActions [withActions]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.flowName)) {
-          return `${args.options.flowName} is not a valid GUID`;
-        }
-
-        if (args.options.withActions && (typeof args.options.withActions !== 'string' && typeof args.options.withActions !== 'boolean')) {
-          return 'the withActions parameter must be a string or boolean';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        withTrigger: !!args.options.withTrigger,
-        withActions: typeof args.options.withActions !== 'undefined'
-      });
-    });
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

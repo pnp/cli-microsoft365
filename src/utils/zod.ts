@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { JSONSchema } from 'zod/v4/core';
-import { EnumLike } from 'zod/v4/core/util.cjs';
+import { JSONSchema, util } from 'zod/v4/core';
 import { CommandOptionInfo } from '../cli/CommandOptionInfo';
 import { CommandOption } from '../Command';
 
@@ -63,7 +62,7 @@ function parseBoolean(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo
   return;
 }
 
-function getParseFn(typeName?: "object" | "array" | "string" | "number" | "boolean" | "null" | "integer"): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
+function getParseFn(typeName?: JSONSchema.JSONSchema['type']): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
   switch (typeName) {
     case 'object':
       return parseObject;
@@ -147,7 +146,7 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends EnumLike>(e: T): z.ZodPipe<z.ZodTransform<string | number | null, unknown>, z.ZodEnum<T>> =>
+  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
     z.preprocess(val => {
       const target = String(val)?.toLowerCase();
       for (const k of Object.values(e)) {

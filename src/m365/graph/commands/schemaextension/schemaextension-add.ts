@@ -1,20 +1,24 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  description: z.string().optional().alias('d'),
+  owner: z.string(),
+  targetTypes: z.string().alias('t'),
+  properties: z.string().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  description: string;
-  id: string;
-  owner: string;
-  properties: string;
-  targetTypes: string;
 }
 
 class GraphSchemaExtensionAddCommand extends GraphCommand {
@@ -26,43 +30,22 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
     return 'Creates a Microsoft Graph schema extension';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-t, --targetTypes <targetTypes>'
-      },
-      {
-        option: '-p, --properties <properties>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
-          return `The specified owner '${args.options.owner}' is not a valid App Id`;
-        }
-
-        return this.validateProperties(args.options.properties);
-      }
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => validation.isValidGuid(options.owner), {
+        error: e => `The specified owner '${(e.input as Options).owner}' is not a valid App Id`,
+        path: ['owner']
+      })
+      .refine(options => {
+        return this.validateProperties(options.properties) === true;
+      }, {
+        error: e => `${this.validateProperties((e.input as Options).properties)}`,
+        path: ['properties']
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

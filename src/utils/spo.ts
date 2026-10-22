@@ -8,7 +8,7 @@ import { BasePermissions } from '../m365/spo/base-permissions.js';
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from './formatting.js';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction.js';
-import { MenuState } from '../m365/spo/commands/navigation/NavigationNode.js';
+import { MenuState, MenuStateNode } from '../m365/spo/commands/navigation/NavigationNode.js';
 import { odata } from './odata.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
@@ -924,6 +924,52 @@ export const spo = {
   },
 
   /**
+  * Retrieves the navigation node with the specified key.
+  * Returns the node along with the menu state that contains it.
+  * @param webUrl Web url
+  * @param key Key (ID) of the navigation node
+  * @param location Navigation to search. When not specified, searches the quick launch first and then the top navigation
+  */
+  async getMenuStateNodeByKey(webUrl: string, key: string, location?: 'QuickLaunch' | 'TopNavigationBar'): Promise<{ menuState: MenuState, node: MenuStateNode }> {
+    const locations: string[] = location ? [location] : ['QuickLaunch', 'TopNavigationBar'];
+
+    for (const navigationLocation of locations) {
+      const menuState: MenuState = navigationLocation === 'TopNavigationBar'
+        ? await this.getTopNavigationMenuState(webUrl)
+        : await this.getQuickLaunchMenuState(webUrl);
+      const node: MenuStateNode | undefined = this.findMenuStateNode(menuState.Nodes, key);
+
+      if (node) {
+        return { menuState, node };
+      }
+    }
+
+    throw location
+      ? `Navigation node with id '${key}' not found in ${location}.`
+      : `Navigation node with id '${key}' not found.`;
+  },
+
+  /**
+  * Recursively searches the specified menu state nodes for the node with the specified key.
+  * @param nodes Menu state nodes to search
+  * @param key Key (ID) of the navigation node
+  */
+  findMenuStateNode(nodes: MenuStateNode[], key: string): MenuStateNode | undefined {
+    for (const node of nodes) {
+      if (node.Key === key) {
+        return node;
+      }
+
+      const childNode: MenuStateNode | undefined = this.findMenuStateNode(node.Nodes, key);
+      if (childNode) {
+        return childNode;
+      }
+    }
+
+    return undefined;
+  },
+
+  /**
   * Retrieves the spo group by name.
   * Returns a group object
   * @param webUrl Web url
@@ -1717,9 +1763,7 @@ export const spo = {
       throw 'Either properties or contentTypeName must be provided for systemUpdateListItem.';
     }
 
-    const parsedUrl = new URL(absoluteListUrl);
-    const serverRelativeSiteMatch = absoluteListUrl.match(new RegExp('/sites/[^/]+'));
-    const webUrl = `${parsedUrl.protocol}//${parsedUrl.host}${serverRelativeSiteMatch ?? ''}`;
+    const webUrl = absoluteListUrl.substring(0, absoluteListUrl.indexOf('/_api/'));
 
     if (verbose && logger) {
       await logger.logToStderr(`Getting list id...`);

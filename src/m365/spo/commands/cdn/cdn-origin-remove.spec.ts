@@ -13,12 +13,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './cdn-origin-remove.js';
+import command, { options } from './cdn-origin-remove.js';
 
 describe(commands.CDN_ORIGIN_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
 
@@ -52,6 +53,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       throw 'Invalid request';
     });
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -96,7 +98,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when Public type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { origin: '*/cdn', force: true, type: 'Public' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ origin: '*/cdn', force: true, type: 'Public' }) });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -110,7 +112,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument', async () => {
-    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', force: true, type: 'Private' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ origin: '*/cdn', force: true, type: 'Private' }) }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -124,7 +126,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument (debug)', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', force: true, type: 'Private' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, origin: '*/cdn', force: true, type: 'Private' }) }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -138,7 +140,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when no type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { origin: '*/cdn', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ origin: '*/cdn', force: true }) });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -152,7 +154,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('prompts before removing CDN origin when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, origin: '*/cdn' }) });
 
     assert(promptIssued);
   });
@@ -161,7 +163,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, origin: '*/cdn' }) });
     assert(requests.length === 0);
   });
 
@@ -169,7 +171,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, origin: '*/cdn' }) });
   });
 
   it('correctly handles an error when removing CDN origin', async () => {
@@ -202,57 +204,39 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, origin: '*/cdn', force: true }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles a random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ origin: '*/cdn', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('supports suppressing confirmation prompt', () => {
-    const options = command.options;
-    let containsConfirmOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--force') > -1) {
-        containsConfirmOption = true;
-      }
-    });
-    assert(containsConfirmOption);
+  it('accepts Public SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'Public', origin: '*/CDN' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('requires CDN origin name', () => {
-    const options = command.options;
-    let requiresCdnOriginName = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<origin>') > -1) {
-        requiresCdnOriginName = true;
-      }
-    });
-    assert(requiresCdnOriginName);
+  it('accepts Private SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'Private', origin: '*/CDN' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts Public SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Public', origin: '*/CDN' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('rejects invalid SharePoint Online CDN type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'foo', origin: '*/CDN' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('accepts Private SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Private', origin: '*/CDN' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('doesn\'t fail validation if the optional type option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ origin: '*/CDN' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid SharePoint Online CDN type', async () => {
-    const type = 'foo';
-    const actual = await command.validate({ options: { type: type, origin: '*/CDN' } }, commandInfo);
-    assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
-  });
-
-  it('doesn\'t fail validation if the optional type option not specified', async () => {
-    const actual = await command.validate({ options: { origin: '*/CDN' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ origin: '*/CDN', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-password-validate.js';
+import command, { options } from './user-password-validate.js';
 
 describe(commands.USER_PASSWORD_VALIDATE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -80,7 +86,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { password: 'cli365' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ password: 'cli365' }) });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -114,7 +120,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { password: 'cli365password' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ password: 'cli365password' }) });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -148,7 +154,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { password: 'MyP@ssW0rd' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ password: 'MyP@ssW0rd' }) });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -182,7 +188,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    await command.action(logger, { options: { password: 'cli365P@ssW0rd' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ password: 'cli365P@ssW0rd' }) });
     assert(loggerLogSpy.calledWith({
       "isValid": true,
       "validationResults": [
@@ -207,7 +213,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { password: 'cli365P@ssW0rd079654' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ password: 'cli365P@ssW0rd079654' }) }),
       new CommandError(`An error has occurred`));
   });
 });

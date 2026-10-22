@@ -62,6 +62,46 @@ paths:
       responses:
         200:
           description: OK
+  /_api/SPHSite/AddHomeSite:
+    post:
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/SPO.Tenant/GetSitePropertiesByUrl:
+    post:
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/SPO.Tenant/GetTargetedSitesDetails:
+    get:
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/SPO.Tenant/RemoveTargetedSite:
+    post:
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
   /_api/SPO.Tenant/sites('{id}'):
     get:
       parameters:
@@ -77,6 +117,16 @@ paths:
           schema:
             type: string
           description: e.g. "$select=Url" to retrieve only the site URL
+      security:
+        - delegated:
+          - AllSites.FullControl
+        - application:
+          - Sites.FullControl.All
+      responses:
+        200:
+          description: OK
+  /_api/SPO.Tenant/UpdateTargetedSite:
+    post:
       security:
         - delegated:
           - AllSites.FullControl

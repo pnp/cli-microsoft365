@@ -1,5 +1,6 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
@@ -7,12 +8,15 @@ import flowCommands from '../../../flow/commands.js';
 import commands from '../../commands.js';
 import { Connector } from './Connector.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
 }
 
 class PaConnectorListCommand extends PowerAppsCommand {
@@ -32,18 +36,8 @@ class PaConnectorListCommand extends PowerAppsCommand {
     return ['name', 'displayName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

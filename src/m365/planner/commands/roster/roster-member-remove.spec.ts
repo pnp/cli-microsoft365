@@ -12,11 +12,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roster-member-remove.js';
+import command, { options } from './roster-member-remove.js';
 import { ConfirmationConfig } from '../../../../utils/prompt.js';
 
 describe(commands.ROSTER_MEMBER_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validRosterId = 'iryDKm9VLku2HIoC2G-TX5gABJw0';
   const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
@@ -53,6 +54,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,42 +99,63 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        rosterId: validRosterId,
-        userId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId,
+      userId: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName is not a valid upn', async () => {
-    const actual = await command.validate({
-      options: {
-        rosterId: validRosterId,
-        userName: 'John Doe'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid upn', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId,
+      userName: 'John Doe'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { rosterId: validRosterId, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when neither userId nor userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { rosterId: validRosterId, userName: validUserName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId,
+      userId: validUserId,
+      userName: validUserName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ rosterId: validRosterId, userId: validUserId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ rosterId: validRosterId, userName: validUserName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rosterId: validRosterId,
+      userId: validUserId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified roster member when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         rosterId: validRosterId,
         userId: validUserId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -160,10 +183,10 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         rosterId: validRosterId,
         userId: validUserId
-      }
+      })
     });
 
     let promptIssued = false;
@@ -179,10 +202,10 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     const deleteSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         rosterId: validRosterId,
         userId: validUserId
-      }
+      })
     });
 
     assert(deleteSpy.notCalled);
@@ -213,11 +236,11 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         rosterId: validRosterId,
         userName: validUserName
-      }
+      })
     });
 
     assert(deleteSpy.called);
@@ -248,11 +271,11 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         rosterId: validRosterId,
         userName: validUserName
-      }
+      })
     });
 
     assert(deleteSpy.called);
@@ -268,12 +291,12 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         rosterId: validRosterId,
         userId: validUserId,
         force: true
-      }
+      })
     });
 
     assert(deleteSpy.called);
@@ -288,11 +311,11 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         rosterId: validRosterId,
         userId: validUserId,
         force: true
-      }
+      })
     }), new CommandError('The roster member cannot be found.'));
   });
 });

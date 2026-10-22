@@ -41,7 +41,11 @@ class GraphDirectoryExtensionAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => Object.values([options.appId, options.appObjectId, options.appName]).filter(v => typeof v !== 'undefined').length === 1, {
-        error: 'Specify either appId, appObjectId or appName, but not multiple'
+        error: 'Specify either appId, appObjectId or appName, but not multiple',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appName']
+        }
       })
       .refine(options => (!options.appId && !options.appObjectId && !options.appName) || options.appObjectId || options.appName ||
         (options.appId && validation.isValidGuid(options.appId)), {

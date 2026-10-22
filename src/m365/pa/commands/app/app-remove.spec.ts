@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-remove.js';
+import command, { options } from './app-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_REMOVE, () => {
@@ -19,6 +19,7 @@ describe(commands.APP_REMOVE, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -29,6 +30,7 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,29 +75,33 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the name is not valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the name is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the name specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the name specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified Microsoft Power App when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -107,9 +113,9 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -127,10 +133,10 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -148,12 +154,12 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         environmentName: '4ce50206-9576-4237-8b17-38d8aadfaa35',
         asAdmin: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -168,11 +174,11 @@ describe(commands.APP_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -187,11 +193,11 @@ describe(commands.APP_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -229,23 +235,21 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
-    } as any);
+      })
+    });
   });
 
   it('correctly handles Microsoft Power App found when confirm specified', async () => {
     sinon.stub(request, 'delete').resolves({ statusCode: 200 });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         force: true
-      }
-    } as any);
+      })
+    });
   });
 
   it('correctly handles random api error', async () => {
@@ -262,18 +266,18 @@ describe(commands.APP_REMOVE, () => {
     } as any), new CommandError("Something went wrong"));
   });
 
-  it('fails validation if asAdmin specified without environment', async () => {
-    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if asAdmin specified without environment', () => {
+    const actual = commandOptionsSchema.safeParse({ name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if environment specified without admin', async () => {
-    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if environment specified without admin', () => {
+    const actual = commandOptionsSchema.safeParse({ name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if asAdmin specified with environment', async () => {
-    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if asAdmin specified with environment', () => {
+    const actual = commandOptionsSchema.safeParse({ name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' });
+    assert.strictEqual(actual.success, true);
   });
 });

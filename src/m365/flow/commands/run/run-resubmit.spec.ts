@@ -9,15 +9,17 @@ import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './run-resubmit.js';
+import command, { options } from './run-resubmit.js';
 
 describe(commands.RUN_RESUBMIT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -25,8 +27,10 @@ describe(commands.RUN_RESUBMIT, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,35 +76,31 @@ describe(commands.RUN_RESUBMIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the flowName is not valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flowName: 'invalid',
-        name: '08585981115186985105550762687CU161'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the flowName is not valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+      flowName: 'invalid',
+      name: '08585981115186985105550762687CU161'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the name, environmentName and flowName specified', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the name, environmentName and flowName specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+      flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+      name: '08585981115186985105550762687CU161'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before resubmitting the specified Microsoft Flow when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
-      }
+      })
     });
 
 
@@ -114,11 +114,11 @@ describe(commands.RUN_RESUBMIT, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
-      }
+      })
     });
     assert(postSpy.notCalled);
     assert(getSpy.notCalled);
@@ -137,11 +137,11 @@ describe(commands.RUN_RESUBMIT, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
-      }
+      })
     } as any), new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`));
   });
 
@@ -158,11 +158,11 @@ describe(commands.RUN_RESUBMIT, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
-      }
+      })
     } as any), new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`));
   });
 
@@ -204,11 +204,11 @@ describe(commands.RUN_RESUBMIT, () => {
 
     await assert.rejects(command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
-      }
+      })
     } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
   });
 
@@ -250,12 +250,12 @@ describe(commands.RUN_RESUBMIT, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
-      }
+      })
     });
     assert.notStrictEqual(loggerLogToStderrSpy.getCall(1).args[0].indexOf('Retrieved trigger: manual'), -1);
     assert(getStub.called);
@@ -297,48 +297,16 @@ describe(commands.RUN_RESUBMIT, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         debug: true,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161',
         force: true
-      }
+      })
     });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01');
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01');
   });
 
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying flow', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--flow') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

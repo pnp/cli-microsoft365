@@ -2,23 +2,25 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import url from 'url';
+import { z } from 'zod';
 import { autocomplete } from '../../../../autocomplete.js';
 import { Logger } from '../../../../cli/Logger.js';
 import {
-  CommandError
+  CommandError, globalOptionsZod
 } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
 import commands from '../../commands.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  profile: z.string().alias('p')
+});
+type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  profile: string;
 }
 
 class CliCompletionPwshSetupCommand extends AnonymousCommand {
@@ -30,18 +32,8 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     return 'Sets up command completion for PowerShell';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-p, --profile <profile>'
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

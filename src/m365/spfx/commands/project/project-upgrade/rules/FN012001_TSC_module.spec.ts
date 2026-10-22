@@ -9,7 +9,7 @@ describe('FN012001_TSC_module', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012001_TSC_module('esnext');
+    rule = new FN012001_TSC_module({ module: 'esnext' });
   });
 
   it('doesn\'t return notification if module type is already up-to-date', () => {

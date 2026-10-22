@@ -172,6 +172,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   it('fails validation if url is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'abc' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation when url is a valid SharePoint URL', async () => {

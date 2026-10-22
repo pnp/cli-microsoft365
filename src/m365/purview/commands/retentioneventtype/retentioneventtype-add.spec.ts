@@ -2,6 +2,8 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -9,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './retentioneventtype-add.js';
+import command, { options } from './retentioneventtype-add.js';
 
 describe(commands.RETENTIONEVENTTYPE_ADD, () => {
   const displayName = 'Contract Expiry';
@@ -40,6 +42,8 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,6 +55,8 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,8 +105,13 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
       return 'Invalid Request';
     });
 
-    await command.action(logger, { options: { displayName: displayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName }) });
     assert(loggerLogSpy.calledWith(requestResponse));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ displayName: displayName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('handles random API error', async () => {
@@ -108,7 +119,7 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
       throw 'An error has occurred.';
     });
 
-    await assert.rejects(command.action(logger, { options: { displayName: displayName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName }) }),
       new CommandError('An error has occurred.'));
   });
 });

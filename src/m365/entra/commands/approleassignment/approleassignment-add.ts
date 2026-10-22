@@ -1,6 +1,7 @@
 import os from 'os';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -15,16 +16,19 @@ interface AppRole {
   resourceId: string;
 }
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appId: z.uuid().optional(),
+  appObjectId: z.uuid().optional(),
+  appDisplayName: z.string().optional(),
+  resource: z.string().alias('r'),
+  scopes: z.string().transform((value) => value.split(',').map(String)).alias('s')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appId?: string;
-  appObjectId?: string;
-  appDisplayName?: string;
-  resource: string;
-  scopes: string;
 }
 
 class EntraAppRoleAssignmentAddCommand extends GraphCommand {
@@ -36,64 +40,19 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
     return 'Adds service principal permissions also known as scopes and app role assignments for specified Microsoft Entra application registration';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appObjectId: typeof args.options.appObjectId !== 'undefined',
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.appId, options.appObjectId, options.appDisplayName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either appId, appObjectId, or appDisplayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appObjectId', 'appDisplayName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '--appObjectId [appObjectId]'
-      },
-      {
-        option: '--appDisplayName [appDisplayName]'
-      },
-      {
-        option: '-r, --resource <resource>',
-        autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
-      },
-      {
-        option: '-s, --scopes <scopes>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
-          return `${args.options.appObjectId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appObjectId', 'appDisplayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -185,7 +144,7 @@ class EntraAppRoleAssignmentAddCommand extends GraphCommand {
       }
 
       // search for match between the found app roles and the specified scopes option value
-      for (const scope of args.options.scopes.split(',')) {
+      for (const scope of args.options.scopes) {
         const existingRoles = appRolesFound.filter((role: AppRole) => {
           return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
         });

@@ -1,63 +1,37 @@
+import { z } from 'zod';
 import { Logger } from '../../cli/Logger.js';
-import GlobalOptions from '../../GlobalOptions.js';
+import { globalOptionsZod } from '../../Command.js';
 import { formatting } from '../../utils/formatting.js';
 import PeriodBasedReport from './PeriodBasedReport.js';
 
-export interface CommandArgs {
-  options: DateAndPeriodBasedOptions;
-}
+export const dateAndPeriodBasedReportOptions = z.strictObject({
+  ...globalOptionsZod.shape,
+  output: z.enum(['json', 'csv']).optional().alias('o'),
+  period: z.enum(['D7', 'D30', 'D90', 'D180']).optional().alias('p'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'The supported date format is YYYY-MM-DD').optional().alias('d')
+}).refine(opts => opts.period || opts.date, {
+  message: `Specify either 'period' or 'date'.`,
+  params: {
+    customCode: 'optionSet',
+    options: ['period', 'date']
+  }
+}).refine(opts => !(opts.period && opts.date), {
+  message: `Specify either 'period' or 'date', but not both.`,
+  params: {
+    customCode: 'optionSet',
+    options: ['period', 'date']
+  }
+});
 
-interface DateAndPeriodBasedOptions extends GlobalOptions {
-  period?: string;
-  date?: string;
+declare type Options = z.infer<typeof dateAndPeriodBasedReportOptions>;
+
+export interface CommandArgs {
+  options: Options;
 }
 
 export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport {
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        period: args.options.period,
-        date: typeof args.options.date !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-d, --date [date]' }
-    );
-
-    this.options.forEach(option => {
-      option.option = option.option.replace('-p, --period <period>', '-p, --period [period]');
-    });
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.period && !args.options.date) {
-          return 'Specify period or date, one is required.';
-        }
-
-        if (args.options.period && args.options.date) {
-          return 'Specify period or date but not both.';
-        }
-
-        if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
-          return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return dateAndPeriodBasedReportOptions;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

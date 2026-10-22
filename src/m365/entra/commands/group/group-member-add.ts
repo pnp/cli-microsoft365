@@ -1,29 +1,46 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const RoleEnum = {
+  Owner: 'Owner',
+  Member: 'Member'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  groupId: z.uuid().optional().alias('i'),
+  groupName: z.string().optional().alias('n'),
+  userIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'userIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  userNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'userNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  subgroupIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'subgroupIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  subgroupNames: z.string().optional(),
+  role: zod.coercedEnum(RoleEnum).alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  groupId?: string;
-  groupName?: string;
-  userIds?: string;
-  userNames?: string;
-  subgroupIds?: string;
-  subgroupNames?: string;
-  role: string;
-}
-
 class EntraGroupMemberAddCommand extends GraphCommand {
-  private readonly roleValues = ['Owner', 'Member'];
-
   public get name(): string {
     return commands.GROUP_MEMBER_ADD;
   }
@@ -32,106 +49,29 @@ class EntraGroupMemberAddCommand extends GraphCommand {
     return 'Adds members to a Microsoft Entra group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        userIds: typeof args.options.userIds !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined',
-        subgroupIds: typeof args.options.subgroupIds !== 'undefined',
-        subgroupNames: typeof args.options.subgroupNames !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.groupId, options.groupName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: groupId or groupName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
+      })
+      .refine(options => [options.userIds, options.userNames, options.subgroupIds, options.subgroupNames].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: userIds, userNames, subgroupIds, or subgroupNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userIds', 'userNames', 'subgroupIds', 'subgroupNames']
+        }
+      })
+      .refine(options => !(options.subgroupIds || options.subgroupNames) || options.role !== 'Owner', {
+        error: `Subgroups cannot be set as owners.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '-n, --groupName [groupName]'
-      },
-      {
-        option: '--userIds [userIds]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '--subgroupIds [subgroupIds]'
-      },
-      {
-        option: '--subgroupNames [subgroupNames]'
-      },
-      {
-        option: '-r, --role <role>',
-        autocomplete: this.roleValues
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID for option groupId.`;
-        }
-
-        if (args.options.userIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.userIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'userIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.userNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'userNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.subgroupIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.subgroupIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'subgroupIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if ((args.options.subgroupIds || args.options.subgroupNames) && args.options.role === 'Owner') {
-          return `Subgroups cannot be set as owners.`;
-        }
-
-        if (this.roleValues.indexOf(args.options.role) === -1) {
-          return `Option 'role' must be one of the following values: ${this.roleValues.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['groupId', 'groupName'] },
-      { options: ['userIds', 'userNames', 'subgroupIds', 'subgroupNames'] }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('groupId', 'groupName', 'ids', 'userIds', 'userNames', 'subgroupIds', 'subgroupNames', 'role');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

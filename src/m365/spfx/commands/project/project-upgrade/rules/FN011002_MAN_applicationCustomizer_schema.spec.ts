@@ -9,7 +9,7 @@ describe('FN011002_MAN_applicationCustomizer_schema', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN011002_MAN_applicationCustomizer_schema('test-schema');
+    rule = new FN011002_MAN_applicationCustomizer_schema({ schema: 'test-schema' });
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {

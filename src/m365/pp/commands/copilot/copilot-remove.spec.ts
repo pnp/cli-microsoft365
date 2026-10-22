@@ -13,11 +13,12 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import ppCopilotGetCommand from './copilot-get.js';
-import command from './copilot-remove.js';
+import command, { options } from './copilot-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.COPILOT_REMOVE, () => {
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
@@ -38,6 +39,7 @@ describe(commands.COPILOT_REMOVE, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,32 +86,49 @@ describe(commands.COPILOT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        environmentName: validEnvironment,
-        id: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (id)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, name: validName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      environmentName: validEnvironment,
+      id: validId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment, id: validId, name: validName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither id nor name is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironment });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified copilot owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         id: validId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -119,10 +138,10 @@ describe(commands.COPILOT_REMOVE, () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         environmentName: validEnvironment,
         id: validId
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -151,11 +170,11 @@ describe(commands.COPILOT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         environmentName: validEnvironment,
         name: validName
-      }
+      })
     });
     assert(postStub.called);
   });
@@ -172,12 +191,12 @@ describe(commands.COPILOT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         environmentName: validEnvironment,
         id: validId,
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.called);
   });
@@ -190,12 +209,12 @@ describe(commands.COPILOT_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         environmentName: validEnvironment,
         id: validId,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

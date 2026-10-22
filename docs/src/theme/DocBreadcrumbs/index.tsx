@@ -16,7 +16,7 @@ function BreadcrumbsItemLink({
   isLast
 }: {
   children: ReactNode;
-  href: string | undefined;
+  href?: string;
   isLast: boolean;
 }): JSX.Element {
   const className = 'breadcrumbs__link';
@@ -98,7 +98,8 @@ export default function DocBreadcrumbs(): JSX.Element | null {
   }
   
   //! Custom const
-  const headFolderId = breadcrumbs[breadcrumbs.length-1]?.docId?.split('/')[0];
+  const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+  const headFolderId = (lastBreadcrumb && 'docId' in lastBreadcrumb ? lastBreadcrumb.docId : undefined)?.split('/')[0];
 
   return (
     <nav

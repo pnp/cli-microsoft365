@@ -108,6 +108,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
   it('fails validation if itemMajorVersionLimit is a negative number', async () => {
     const actual = commandOptionsSchema.safeParse({ name: containerName, itemMajorVersionLimit: -1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a valid positive integer.`);
   });
 
   it('fails validation if itemMajorVersionLimit is float number', async () => {
@@ -123,6 +124,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
   it('fails validation if maxStoragePerContainerInBytes is a negative number', async () => {
     const actual = commandOptionsSchema.safeParse({ name: containerName, maxStoragePerContainerInBytes: -1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a valid positive integer.`);
   });
 
   it('fails validation if maxStoragePerContainerInBytes is float number', async () => {
@@ -143,6 +145,7 @@ describe(commands.CONTAINERTYPE_ADD, () => {
   it('fails validation if consumingTenantOverridables contains an invalid value', async () => {
     const actual = commandOptionsSchema.safeParse({ name: containerName, consumingTenantOverridables: 'isDiscoverabilityEnabled, invalid, isItemVersioningEnabled' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'isDiscoverabilityEnabled, invalid, isItemVersioningEnabled' is not a valid value. Valid options are: urlTemplate, isDiscoverabilityEnabled, isSearchEnabled, isItemVersioningEnabled, itemMajorVersionLimit, maxStoragePerContainerInBytes.`);
   });
 
   it('passes validation if all options are passed', async () => {

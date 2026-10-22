@@ -78,7 +78,8 @@ describe(commands.CALENDAR_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      calendarGroup.getUserCalendarGroupByName
     ]);
   });
 
@@ -111,12 +112,20 @@ describe(commands.CALENDAR_GET, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation if neither userId nor userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: calendarId
+    });
+    assert.notStrictEqual(actual.success, true);
+  });
+
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       id: calendarId,
       userId: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid user principal name', () => {
@@ -125,6 +134,7 @@ describe(commands.CALENDAR_GET, () => {
       userName: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName is specified', () => {

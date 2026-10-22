@@ -12,7 +12,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {
-    rule = new FN010006_YORC_framework('react', true);
+    rule = new FN010006_YORC_framework({ framework: 'react', add: true });
     const project: Project = {
       path: '/usr/tmp'
     };
@@ -21,7 +21,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('doesn\'t return notification if framework is already up-to-date', () => {
-    rule = new FN010006_YORC_framework('react', true);
+    rule = new FN010006_YORC_framework({ framework: 'react', add: true });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {
@@ -35,7 +35,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('doesn\'t return notification if framework not found and should be removed', () => {
-    rule = new FN010006_YORC_framework('', false);
+    rule = new FN010006_YORC_framework({ framework: '', add: false });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {
@@ -48,7 +48,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('doesn\'t return notification if framework not found and should be removed, and @microsoft/generator-sharepoint not set', () => {
-    rule = new FN010006_YORC_framework('', false);
+    rule = new FN010006_YORC_framework({ framework: '', add: false });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {}
@@ -58,7 +58,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('returns notification if framework not found while it should be added', () => {
-    rule = new FN010006_YORC_framework('react', true);
+    rule = new FN010006_YORC_framework({ framework: 'react', add: true });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {
@@ -76,7 +76,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('returns notification if framework not found while it should be added and @microsoft/generator-sharepoint not set', () => {
-    rule = new FN010006_YORC_framework('react', true);
+    rule = new FN010006_YORC_framework({ framework: 'react', add: true });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {}
@@ -86,7 +86,7 @@ describe('FN010006_YORC_framework', () => {
   });
 
   it('returns notification if framework found while it should be removed', () => {
-    rule = new FN010006_YORC_framework('react', false);
+    rule = new FN010006_YORC_framework({ framework: 'react', add: false });
     const project: Project = {
       path: '/usr/tmp',
       yoRcJson: {

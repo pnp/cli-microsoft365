@@ -1,10 +1,11 @@
 import chalk from 'chalk';
 import os from 'os';
+import { z } from 'zod';
 import auth, { AuthType } from '../../Auth.js';
 import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
+import { globalOptionsZod } from '../../Command.js';
 import config from '../../config.js';
-import GlobalOptions from '../../GlobalOptions.js';
 import { settingsNames } from '../../settingsNames.js';
 import { accessToken } from '../../utils/accessToken.js';
 import { AppCreationOptions, AppInfo, entraApp } from '../../utils/entraApp.js';
@@ -15,6 +16,15 @@ import { validation } from '../../utils/validation.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  interactive: z.boolean().optional(),
+  scripting: z.boolean().optional(),
+  skipApp: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 export interface Preferences {
   clientId?: string;
@@ -33,12 +43,6 @@ export interface Preferences {
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  interactive?: boolean;
-  scripting?: boolean;
-  skipApp?: boolean;
 }
 
 export enum CliUsageMode {
@@ -80,44 +84,15 @@ class SetupCommand extends AnonymousCommand {
     return 'Sets up CLI for Microsoft 365 based on your preferences';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      const properties: any = {
-        interactive: !!args.options.interactive,
-        scripting: !!args.options.scripting,
-        skipApp: !!args.options.skipApp
-      };
-
-      Object.assign(this.telemetryProperties, properties);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '--interactive' },
-      { option: '--scripting' },
-      { option: '--skipApp' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.interactive && args.options.scripting) {
-          return 'Specify either interactive or scripting but not both';
-        }
-
-        return true;
-      }
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.interactive || !opts.scripting, {
+        error: 'Specify either interactive or scripting but not both'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

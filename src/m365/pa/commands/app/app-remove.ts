@@ -1,22 +1,29 @@
+import { z } from 'zod';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID.'
+    })
+    .alias('n'),
+  force: z.boolean().optional().alias('f'),
+  asAdmin: z.boolean().optional(),
+  environmentName: z.string().optional().alias('e')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
-  force?: boolean;
-  environmentName?: string;
-  asAdmin?: boolean;
 }
 
 class PaAppRemoveCommand extends PowerAppsCommand {
@@ -28,59 +35,18 @@ class PaAppRemoveCommand extends PowerAppsCommand {
     return 'Removes the specified Microsoft Power App';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: typeof args.options.force !== 'undefined',
-        asAdmin: !!args.options.asAdmin,
-        environmentName: typeof args.options.environmentName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.asAdmin || opts.environmentName, {
+        message: 'When specifying the asAdmin option, the environment option is required as well.'
+      })
+      .refine(opts => !opts.environmentName || opts.asAdmin, {
+        message: 'When specifying the environment option, the asAdmin option is required as well.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --force'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-e, --environmentName [environmentName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID`;
-        }
-
-        if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option, the environment option is required as well.';
-        }
-
-        if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environment option, the asAdmin option is required as well.';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

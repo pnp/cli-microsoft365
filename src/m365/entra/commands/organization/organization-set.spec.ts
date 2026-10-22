@@ -97,6 +97,7 @@ describe(commands.ORGANIZATION_SET, () => {
       contactEmail: 'contactcontosocom'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'contactcontosocom' is not a valid email.`);
   });
 
   it('fails validation if marketingNotificationEmails contains invalid email', () => {
@@ -105,6 +106,7 @@ describe(commands.ORGANIZATION_SET, () => {
       marketingNotificationEmails: 'marketing@contoso.com,foocontoso.com'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following marketing notification emails are invalid: marketing@contoso.com,foocontoso.com.`);
   });
 
   it('fails validation if securityComplianceNotificationMails contains invalid email', () => {
@@ -113,6 +115,7 @@ describe(commands.ORGANIZATION_SET, () => {
       securityComplianceNotificationMails: 'security@contoso.com,foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following security compliance notification emails are invalid: security@contoso.com,foo.`);
   });
 
   it('fails validation if technicalNotificationMails contains invalid email', () => {
@@ -121,6 +124,7 @@ describe(commands.ORGANIZATION_SET, () => {
       technicalNotificationMails: 'support@contoso.com,@contoso.com'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The following technical notification emails are invalid: support@contoso.com,@contoso.com.`);
   });
 
   it('fails validation if neither contactEmail, marketingNotificationEmails, securityComplianceNotificationMails, securityComplianceNotificationPhones, statementUrl, nor technicalNotificationMails is provided', () => {

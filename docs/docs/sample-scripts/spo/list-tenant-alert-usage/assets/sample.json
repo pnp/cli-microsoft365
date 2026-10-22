@@ -2,13 +2,13 @@
   {
     "name": "pnp-list-tenant-alert-usage",
     "source": "pnp",
-    "title": "List SharePoint alerts usage across the tenant",
+    "title": "List SharePoint rules usage across the tenant",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-tenant-alert-usage",
     "creationDateTime": "2025-10-13",
     "updateDateTime": "2025-10-13",
-    "shortDescription": "Generate a tenant-wide report of legacy SharePoint Online list alerts before their retirement.",
+    "shortDescription": "Generate a tenant-wide report of legacy SharePoint Online list rules before their retirement.",
     "longDescription": [
-      "SharePoint Online list alerts are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing alerts. This information helps administrators identify and plan the migration of critical alerts to modern alternatives."
+      "SharePoint Online list rules are being gradually retired. This script scans all sites across the tenant and generates a comprehensive CSV report of existing rules. This information helps administrators identify and plan the migration of critical rules to modern alternatives."
     ],
     "products": [
       "SharePoint"
@@ -16,7 +16,7 @@
     "categories": [],
     "tags": [
       "reports",
-      "alerts",
+      "rules",
       "retirement",
       "tenant"
     ],

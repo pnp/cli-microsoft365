@@ -248,8 +248,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object by id when list item is requested', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
@@ -263,8 +261,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('returns listItemInstance object by uniqueId when list item is requested', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-
-    command.allowUnknownOptions();
 
     const options: any = {
       debug: true,
@@ -289,8 +285,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested and with permissions', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
@@ -306,14 +300,12 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
       output: "json",
-      properties: "ID,Modified"
+      fields: "ID,Modified"
     };
 
     await command.action(logger, { options: options } as any);
@@ -335,14 +327,12 @@ describe(commands.LISTITEM_GET, () => {
       throw 'Invalid request';
     });
 
-    command.allowUnknownOptions();
-
     const options: any = {
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
       output: "json",
-      properties: "Title,Modified,Company/Title"
+      fields: "Title,Modified,Company/Title"
     };
 
     await command.action(logger, { options: options } as any);
@@ -355,8 +345,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
-
-    command.allowUnknownOptions();
 
     const options: any = {
       listTitle: 'Demo List',
@@ -372,8 +360,6 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
@@ -388,15 +374,13 @@ describe(commands.LISTITEM_GET, () => {
   it('returns listItemInstance object when list item is requested with an output type of text from a list specified by url, and a list of fields are being specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.allowUnknownOptions();
-
     const options: any = {
       verbose: true,
       webUrl: webUrl,
       id: expectedId,
       listUrl: listUrl,
       output: 'json',
-      properties: 'Title,Modified'
+      fields: 'Title,Modified'
     };
 
     await command.action(logger, { options: options } as any);

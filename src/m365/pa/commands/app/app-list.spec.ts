@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-list.js';
+import command, { options } from './app-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.APP_LIST, () => {
@@ -19,6 +19,7 @@ describe(commands.APP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.APP_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -550,7 +552,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -1504,7 +1506,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -2458,7 +2460,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { asAdmin: true, environmentName: '4ce50206-9576-4237-8b17-38d8aadfaa35' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ asAdmin: true, environmentName: '4ce50206-9576-4237-8b17-38d8aadfaa35' }) });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -3425,14 +3427,14 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(loggerLogSpy.calledWith(apps));
   });
 
   it('correctly handles no apps found', async () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -3448,23 +3450,33 @@ describe(commands.APP_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if asAdmin specified without environment', async () => {
-    const actual = await command.validate({ options: { asAdmin: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if environment specified without admin', async () => {
-    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if asAdmin specified with environment', async () => {
-    const actual = await command.validate({ options: { asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if asAdmin specified without environment', () => {
+    const actual = commandOptionsSchema.safeParse({ asAdmin: true });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if environment specified without admin', () => {
+    const actual = commandOptionsSchema.safeParse({ environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if asAdmin specified with environment', () => {
+    const actual = commandOptionsSchema.safeParse({ asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' });
+    assert.strictEqual(actual.success, true);
   });
 
 });

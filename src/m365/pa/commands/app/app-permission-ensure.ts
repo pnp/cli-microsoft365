@@ -1,5 +1,6 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import Auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
@@ -9,26 +10,42 @@ import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appName: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for appName.'
+    }),
+  roleName: z.enum(['CanEdit', 'CanView']),
+  userId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for userId.'
+    })
+    .optional(),
+  userName: z.string()
+    .refine(val => validation.isValidUserPrincipalName(val), {
+      message: 'The value is not a valid user principal name (UPN) for userName.'
+    })
+    .optional(),
+  groupId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value is not a valid GUID for groupId.'
+    })
+    .optional(),
+  groupName: z.string().optional(),
+  tenant: z.boolean().optional(),
+  environmentName: z.string().optional().alias('e'),
+  sendInvitationMail: z.boolean().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  appName: string;
-  roleName: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  tenant?: boolean;
-  sendInvitationMail?: boolean;
-  environmentName?: string;
-  asAdmin?: boolean;
-}
-
 class PaAppPermissionEnsureCommand extends PowerAppsCommand {
-  private static readonly roleNames = ['CanEdit', 'CanView'];
-
   public get name(): string {
     return commands.APP_PERMISSION_ENSURE;
   }
@@ -37,113 +54,28 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
     return 'Assigns/updates permissions to a Power Apps app';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        tenant: !!args.options.tenant,
-        sendInvitationMail: !!args.options.sendInvitationMail,
-        environmentName: typeof args.options.environmentName !== 'undefined',
-        asAdmin: !!args.options.asAdmin
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.userId, opts.userName, opts.groupId, opts.groupName, opts.tenant].filter(x => x !== undefined).length === 1, {
+        error: `Specify exactly one of the following options: 'userId', 'userName', 'groupId', 'groupName' or 'tenant'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName', 'tenant']
+        }
+      })
+      .refine(opts => !opts.environmentName || opts.asAdmin, {
+        message: 'Specifying environmentName is only allowed when using asAdmin.'
+      })
+      .refine(opts => !opts.asAdmin || opts.environmentName, {
+        message: 'Specifying asAdmin is only allowed when using environmentName.'
+      })
+      .refine(opts => !opts.tenant || opts.roleName === 'CanView', {
+        message: 'Sharing with the entire tenant is only supported with CanView role.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--appName <appName>'
-      },
-      {
-        option: '--roleName <roleName>',
-        autocomplete: PaAppPermissionEnsureCommand.roleNames
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--tenant'
-      },
-      {
-        option: '-e, --environmentName [environmentName]'
-      },
-      {
-        option: '--sendInvitationMail'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.appName)) {
-          return `${args.options.appName} is not a valid GUID for appName.`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID for userId.`;
-        }
-
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID for groupId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name (UPN) for userName.`;
-        }
-
-        if (PaAppPermissionEnsureCommand.roleNames.indexOf(args.options.roleName) < 0) {
-          return `${args.options.roleName} is not a valid roleName. Allowed values are: ${PaAppPermissionEnsureCommand.roleNames.join(', ')}.`;
-        }
-
-        if (args.options.environmentName && !args.options.asAdmin) {
-          return 'Specifying environmentName is only allowed when using asAdmin.';
-        }
-
-        if (args.options.asAdmin && !args.options.environmentName) {
-          return 'Specifying asAdmin is only allowed when using environmentName.';
-        }
-
-        if (args.options.tenant && args.options.roleName !== 'CanView') {
-          return 'Sharing with the entire tenant is only supported with CanView role.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName', 'tenant'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('appName', 'roleName', 'userId', 'userName', 'groupId', 'groupName', 'environmentName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

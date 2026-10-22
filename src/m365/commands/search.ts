@@ -1,32 +1,49 @@
 import { SearchHit, SearchResponse } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../cli/Logger.js';
+import { globalOptionsZod } from '../../Command.js';
 import request, { CliRequestOptions } from '../../request.js';
-import GraphCommand from '../base/GraphCommand.js';
-import GlobalOptions from '../../GlobalOptions.js';
 import { ODataResponse } from '../../utils/odata.js';
+import GraphCommand from '../base/GraphCommand.js';
 import commands from './commands.js';
+
+const allowedScopes = ['chatMessage', 'message', 'event', 'drive', 'driveItem', 'list', 'listItem', 'site', 'bookmark', 'acronym', 'person'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  queryText: z.string().optional().alias('q'),
+  scopes: z.string()
+    .refine(value => value.split(',').map(x => x.trim()).every(scope => (allowedScopes as readonly string[]).includes(scope)), {
+      error: e => {
+        const scopes = (e.input as string).split(',').map(x => x.trim());
+        const invalidScope = scopes.find(scope => !(allowedScopes as readonly string[]).includes(scope));
+        return `'${invalidScope}' is not a valid scope. Allowed scopes are ${allowedScopes.join(', ')}.`;
+      }
+    }).alias('s'),
+  startIndex: z.number()
+    .refine(n => n >= 0, {
+      error: e => `'${e.input}' is not a valid value for option 'startIndex'. Start index must be greater or equal to 0.`
+    }).optional(),
+  pageSize: z.number()
+    .refine(n => n >= 1 && n <= 500, {
+      error: e => `'${e.input}' is not a valid value for option 'pageSize'. Page size must be between 1 and 500.`
+    }).optional(),
+  allResults: z.boolean().optional(),
+  resultsOnly: z.boolean().optional(),
+  enableTopResults: z.boolean().optional(),
+  select: z.string().optional(),
+  sortBy: z.string().optional(),
+  enableSpellingSuggestion: z.boolean().optional(),
+  enableSpellingModification: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  queryText?: string;
-  scopes: string;
-  startIndex?: number;
-  pageSize?: number;
-  allResults?: boolean;
-  resultsOnly?: boolean;
-  enableTopResults?: boolean;
-  select?: string;
-  sortBy?: string;
-  enableSpellingSuggestion?: boolean;
-  enableSpellingModification?: boolean;
-}
-
 class SearchCommand extends GraphCommand {
-  private allowedScopes: string[] = ['chatMessage', 'message', 'event', 'drive', 'driveItem', 'list', 'listItem', 'site', 'bookmark', 'acronym', 'person'];
-
   public get name(): string {
     return commands.SEARCH;
   }
@@ -35,101 +52,36 @@ class SearchCommand extends GraphCommand {
     return 'Uses the Microsoft Search to query Microsoft 365 data';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        queryText: typeof args.options.queryText !== 'undefined',
-        startIndex: typeof args.options.startIndex !== 'undefined',
-        pageSize: typeof args.options.pageSize !== 'undefined',
-        allResults: !!args.options.allResults,
-        resultsOnly: !!args.options.resultsOnly,
-        enableTopResults: !!args.options.enableTopResults,
-        select: typeof args.options.select !== 'undefined',
-        sortBy: typeof args.options.sortBy !== 'undefined',
-        enableSpellingSuggestion: !!args.options.enableSpellingSuggestion,
-        enableSpellingModification: !!args.options.enableSpellingModification
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-q, --queryText [queryText]'
-      },
-      {
-        option: '-s, --scopes <scopes>',
-        autocomplete: this.allowedScopes
-      },
-      {
-        option: '--startIndex [startIndex]'
-      },
-      {
-        option: '--pageSize [pageSize]'
-      },
-      {
-        option: '--allResults'
-      },
-      {
-        option: '--resultsOnly'
-      },
-      {
-        option: '--enableTopResults'
-      },
-      {
-        option: '--select [select]'
-      },
-      {
-        option: '--sortBy [sortBy]'
-      },
-      {
-        option: '--enableSpellingSuggestion'
-      },
-      {
-        option: '--enableSpellingModification'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const scopes = args.options.scopes.split(',').map(x => x.trim());
-
-        if (!scopes.every(scope => this.allowedScopes.indexOf(scope) > -1)) {
-          const invalidScope = scopes.find(scope => this.allowedScopes.indexOf(scope) === -1);
-          return `'${invalidScope}'' is not a valid scope. Allowed scopes are ${this.allowedScopes.join(', ')}.`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.sortBy) {
+          const scopes = opts.scopes.split(',').map(x => x.trim());
+          return !scopes.some(scope => scope === 'message' || scope === 'event');
         }
-
-        if (args.options.startIndex !== undefined && args.options.startIndex < 0) {
-          return `'${args.options.startIndex}' is not a valid value for option 'startIndex'. Start index must be greater or equal to 0.`;
-        }
-
-        if (args.options.pageSize !== undefined && (args.options.pageSize < 1 || args.options.pageSize > 500)) {
-          return `'${args.options.pageSize}' is not a valid value for option 'pageSize'. Page size must be between 1 and 500.`;
-        }
-
-        if (args.options.sortBy && scopes.some(scope => scope === 'message' || scope === 'event')) {
-          return 'Sorting the results is not supported for messages and events.';
-        }
-
-        if (args.options.enableTopResults &&
-          ((scopes.length === 1 && scopes.indexOf('message') === -1 && scopes.indexOf('chatMessage') === -1) ||
-            (scopes.length === 2) && !(scopes.indexOf('message') > -1 && scopes.indexOf('chatMessage') > -1))) {
-          return 'Top results are only supported for messages and chat messages.';
-        }
-
         return true;
-      }
-    );
+      }, {
+        error: 'Sorting the results is not supported for messages and events.'
+      })
+      .refine(opts => {
+        if (opts.enableTopResults) {
+          const scopes = opts.scopes.split(',').map(x => x.trim());
+          if (scopes.length === 1) {
+            return scopes[0] === 'message' || scopes[0] === 'chatMessage';
+          }
+          if (scopes.length === 2) {
+            return scopes.includes('message') && scopes.includes('chatMessage');
+          }
+          return false;
+        }
+        return true;
+      }, {
+        error: 'Top results are only supported for messages and chat messages.'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

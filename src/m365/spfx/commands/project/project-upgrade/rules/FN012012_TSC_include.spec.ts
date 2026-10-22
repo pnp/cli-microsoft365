@@ -9,7 +9,7 @@ describe('FN012012_TSC_include', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN012012_TSC_include(['src/**/*.ts']);
+    rule = new FN012012_TSC_include({ include: ['src/**/*.ts'] });
   });
 
   it('doesn\'t return notification if include has the exact same elements', () => {

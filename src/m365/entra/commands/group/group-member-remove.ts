@@ -1,33 +1,50 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
-import GraphCommand from '../../../base/GraphCommand.js';
-import commands from '../../commands.js';
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { GraphBatchRequest, GraphBatchRequestResponse } from '../../../../utils/types.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { cli } from '../../../../cli/cli.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+
+const RoleEnum = {
+  Owner: 'Owner',
+  Member: 'Member'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  groupId: z.uuid().optional().alias('i'),
+  groupName: z.string().optional().alias('n'),
+  userIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `Invalid GUIDs found for option 'userIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  userNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `Invalid UPNs found for option 'userNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  subgroupIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `Invalid GUIDs found for option 'subgroupIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  subgroupNames: z.string().optional(),
+  role: zod.coercedEnum(RoleEnum).optional().alias('r'),
+  suppressNotFound: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  groupId?: string;
-  groupName?: string;
-  userIds?: string;
-  userNames?: string;
-  subgroupIds?: string;
-  subgroupNames?: string;
-  role?: string;
-  suppressNotFound?: boolean;
-  force?: boolean;
-}
-
 class EntraGroupMemberRemoveCommand extends GraphCommand {
-  private readonly roleValues = ['Owner', 'Member'];
-
   public get name(): string {
     return commands.GROUP_MEMBER_REMOVE;
   }
@@ -36,116 +53,29 @@ class EntraGroupMemberRemoveCommand extends GraphCommand {
     return 'Removes members from a Microsoft Entra group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        userIds: typeof args.options.userIds !== 'undefined',
-        userNames: typeof args.options.userNames !== 'undefined',
-        subgroupIds: typeof args.options.subgroupIds !== 'undefined',
-        subgroupNames: typeof args.options.subgroupNames !== 'undefined',
-        role: typeof args.options.role !== 'undefined',
-        suppressNotFound: !!args.options.suppressNotFound,
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.groupId, options.groupName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: groupId or groupName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
+        }
+      })
+      .refine(options => [options.userIds, options.userNames, options.subgroupIds, options.subgroupNames].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: userIds, userNames, subgroupIds, or subgroupNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userIds', 'userNames', 'subgroupIds', 'subgroupNames']
+        }
+      })
+      .refine(options => !(options.subgroupIds !== undefined || options.subgroupNames !== undefined) || options.role?.toLowerCase() === 'member', {
+        error: `When removing subgroups, the 'role' option must be set to 'Member'.`
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '-n, --groupName [groupName]'
-      },
-      {
-        option: '--userIds [userIds]'
-      },
-      {
-        option: '--userNames [userNames]'
-      },
-      {
-        option: '--subgroupIds [subgroupIds]'
-      },
-      {
-        option: '--subgroupNames [subgroupNames]'
-      },
-      {
-        option: '-r, --role [role]',
-        autocomplete: this.roleValues
-      },
-      {
-        option: '--suppressNotFound'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId !== undefined && !validation.isValidGuid(args.options.groupId)) {
-          return `'${args.options.groupId}' is not a valid GUID for option 'groupId'.`;
-        }
-
-        if (args.options.userIds !== undefined) {
-          const invalidGuids = validation.isValidGuidArray(args.options.userIds);
-          if (invalidGuids !== true) {
-            return `Invalid GUIDs found for option 'ids': ${invalidGuids}.`;
-          }
-        }
-
-        if (args.options.userNames !== undefined) {
-          const invalidUpns = validation.isValidUserPrincipalNameArray(args.options.userNames);
-          if (invalidUpns !== true) {
-            return `Invalid UPNs found for option 'userNames': ${invalidUpns}.`;
-          }
-        }
-
-        if (args.options.subgroupIds !== undefined) {
-          const invalidGuids = validation.isValidGuidArray(args.options.subgroupIds);
-          if (invalidGuids !== true) {
-            return `Invalid GUIDs found for option 'subgroupIds': ${invalidGuids}.`;
-          }
-        }
-
-        if (args.options.role !== undefined && this.roleValues.indexOf(args.options.role) === -1) {
-          return `Option 'role' must be one of the following values: ${this.roleValues.join(', ')}.`;
-        }
-
-        if ((args.options.subgroupIds !== undefined || args.options.subgroupNames !== undefined) && args.options.role?.toLowerCase() !== 'member') {
-          return `When removing subgroups, the 'role' option must be set to 'Member'.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['groupId', 'groupName'] },
-      { options: ['userIds', 'userNames', 'subgroupIds', 'subgroupNames'] }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('groupId', 'groupName', 'ids', 'userNames', 'subgroupIds', 'subgroupNames', 'role');
-    this.types.boolean.push('force', 'suppressNotFound');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

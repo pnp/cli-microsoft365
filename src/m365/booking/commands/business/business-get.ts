@@ -26,7 +26,7 @@ class BookingBusinessGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the specified Microsoft Bookings business.';
+    return 'Retrieves the specified Microsoft Bookings business.';
   }
 
   public get schema(): z.ZodType | undefined {
@@ -36,7 +36,11 @@ class BookingBusinessGetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => options.id || options.name, {
-        error: 'Specify either id or name'
+        error: 'Specify either id or name',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       });
   }
 

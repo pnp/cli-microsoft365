@@ -23,7 +23,7 @@ class SpoPageSectionGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get information about the specified modern page section';
+    return 'Gets information about the specified modern page section';
   }
 
   constructor() {

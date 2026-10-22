@@ -14,7 +14,7 @@ class ContextOptionListCommand extends ContextCommand {
   }
 
   public get description(): string {
-    return 'List all options added to the context';
+    return 'Lists all options added to the context';
   }
 
   public get schema(): z.ZodType | undefined {

@@ -41,17 +41,28 @@ class EntraRoleDefinitionSetCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => !options.id !== !options.displayName, {
-        error: 'Specify either id or displayName, but not both'
+        error: 'Specify either id or displayName, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => options.id || options.displayName, {
-        error: 'Specify either id or displayName'
+        error: 'Specify either id or displayName',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
       })
       .refine(options => (!options.id && !options.displayName) || options.displayName || (options.id && validation.isValidGuid(options.id)), {
         error: e => `The '${e.input}' must be a valid GUID`,
         path: ['id']
       })
       .refine(options => Object.values([options.newDisplayName, options.description, options.allowedResourceActions, options.enabled, options.version]).filter(v => typeof v !== 'undefined').length > 0, {
-        error: 'Provide value for at least one of the following parameters: newDisplayName, description, allowedResourceActions, enabled or version'
+        error: 'Provide value for at least one of the following parameters: newDisplayName, description, allowedResourceActions, enabled or version',
+        params: {
+          customCode: 'required'
+        }
       });
   }
 

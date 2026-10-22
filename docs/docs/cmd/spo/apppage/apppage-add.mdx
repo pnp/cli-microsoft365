@@ -34,6 +34,25 @@ m365 spo apppage add [options]
 
 If you want to add the single-part app page to quick launch, use the addToQuickLaunch flag.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create a single-part app page in the specified site, webpart data is stored in the `$webPartData` variable
@@ -41,7 +60,6 @@ Create a single-part app page in the specified site, webpart data is stored in t
 ```sh
 m365 spo apppage add --title "Contoso" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData --addToQuickLaunch
 ```
-
 
 ## Response
 

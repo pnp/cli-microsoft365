@@ -40,6 +40,25 @@ m365 spo field add [options]
 
 If the specified field already exists, you will get a _A duplicate field name "your-field" was found._ error.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions    |
+  |------------|----------------|
+  | SharePoint | AllSites.Write |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions         |
+  |------------|---------------------|
+  | SharePoint | Sites.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create a date time site column.

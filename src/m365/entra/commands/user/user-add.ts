@@ -1,6 +1,7 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -10,28 +11,35 @@ interface ExtendedUser extends User {
   password: string;
 }
 
+export const options = z.looseObject({
+  ...globalOptionsZod.shape,
+  displayName: z.string(),
+  userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid userName.`
+  }),
+  accountEnabled: z.boolean().optional(),
+  mailNickname: z.string().optional(),
+  password: z.string().optional(),
+  firstName: z.string().max(64, { error: `The maximum amount of characters for 'firstName' is 64.` }).optional(),
+  lastName: z.string().max(64, { error: `The maximum amount of characters for 'lastName' is 64.` }).optional(),
+  forceChangePasswordNextSignIn: z.boolean().optional(),
+  forceChangePasswordNextSignInWithMfa: z.boolean().optional(),
+  usageLocation: z.string().regex(/^[a-zA-Z]{2}$/, { error: e => `'${e.input}' is not a valid usageLocation.` }).optional(),
+  officeLocation: z.string().optional(),
+  jobTitle: z.string().max(128, { error: `The maximum amount of characters for 'jobTitle' is 128.` }).optional(),
+  companyName: z.string().max(64, { error: `The maximum amount of characters for 'companyName' is 64.` }).optional(),
+  department: z.string().max(64, { error: `The maximum amount of characters for 'department' is 64.` }).optional(),
+  preferredLanguage: z.string().min(2, { error: e => `'${e.input}' is not a valid preferredLanguage.` }).optional(),
+  managerUserId: z.uuid().optional(),
+  managerUserName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
+    error: e => `'${e.input}' is not a valid user principal name.`
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  displayName: string;
-  userName: string;
-  accountEnabled?: boolean;
-  mailNickname?: string;
-  password?: string;
-  firstName?: string;
-  lastName?: string;
-  forceChangePasswordNextSignIn?: boolean;
-  forceChangePasswordNextSignInWithMfa?: boolean;
-  usageLocation?: string;
-  officeLocation?: string;
-  jobTitle?: string;
-  companyName?: string;
-  department?: string;
-  preferredLanguage?: string;
-  managerUserId?: string;
-  managerUserName?: string;
 }
 
 class EntraUserAddCommand extends GraphCommand {
@@ -47,158 +55,19 @@ class EntraUserAddCommand extends GraphCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        accountEnabled: typeof args.options.accountEnabled !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined',
-        password: typeof args.options.password !== 'undefined',
-        firstName: typeof args.options.firstName !== 'undefined',
-        lastName: typeof args.options.lastName !== 'undefined',
-        forceChangePasswordNextSignIn: !!args.options.forceChangePasswordNextSignIn,
-        forceChangePasswordNextSignInWithMfa: !!args.options.forceChangePasswordNextSignInWithMfa,
-        usageLocation: typeof args.options.usageLocation !== 'undefined',
-        officeLocation: typeof args.options.officeLocation !== 'undefined',
-        jobTitle: typeof args.options.jobTitle !== 'undefined',
-        companyName: typeof args.options.companyName !== 'undefined',
-        department: typeof args.options.department !== 'undefined',
-        preferredLanguage: typeof args.options.preferredLanguage !== 'undefined',
-        managerUserId: typeof args.options.managerUserId !== 'undefined',
-        managerUserName: typeof args.options.managerUserName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => !(options.managerUserId && options.managerUserName), {
+        error: `Specify either 'managerUserId' or 'managerUserName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['managerUserId', 'managerUserName']
+        }
       });
-      this.trackUnknownOptions(this.telemetryProperties, args.options);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--displayName <displayName>'
-      },
-      {
-        option: '--userName <userName>'
-      },
-      {
-        option: '--accountEnabled [accountEnabled]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--mailNickname [mailNickname]'
-      },
-      {
-        option: '--password [password]'
-      },
-      {
-        option: '--firstName [firstName]'
-      },
-      {
-        option: '--lastName [lastName]'
-      },
-      {
-        option: '--forceChangePasswordNextSignIn'
-      },
-      {
-        option: '--forceChangePasswordNextSignInWithMfa'
-      },
-      {
-        option: '--usageLocation [usageLocation]'
-      },
-      {
-        option: '--officeLocation [officeLocation]'
-      },
-      {
-        option: '--jobTitle [jobTitle]'
-      },
-      {
-        option: '--companyName [companyName]'
-      },
-      {
-        option: '--department [department]'
-      },
-      {
-        option: '--preferredLanguage [preferredLanguage]'
-      },
-      {
-        option: '--managerUserId [managerUserId]'
-      },
-      {
-        option: '--managerUserName [managerUserName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName`;
-        }
-
-        if (args.options.usageLocation) {
-          const regex = new RegExp('^[a-zA-Z]{2}$');
-          if (!regex.test(args.options.usageLocation)) {
-            return `'${args.options.usageLocation}' is not a valid usageLocation.`;
-          }
-        }
-
-        if (args.options.preferredLanguage && args.options.preferredLanguage.length < 2) {
-          return `'${args.options.preferredLanguage}' is not a valid preferredLanguage`;
-        }
-
-        if (args.options.firstName && args.options.firstName.length > 64) {
-          return `The maximum amount of characters for 'firstName' is 64.`;
-        }
-
-        if (args.options.lastName && args.options.lastName.length > 64) {
-          return `The maximum amount of characters for 'lastName' is 64.`;
-        }
-
-        if (args.options.jobTitle && args.options.jobTitle.length > 128) {
-          return `The maximum amount of characters for 'jobTitle' is 128.`;
-        }
-
-        if (args.options.companyName && args.options.companyName.length > 64) {
-          return `The maximum amount of characters for 'companyName' is 64.`;
-        }
-
-        if (args.options.department && args.options.department.length > 64) {
-          return `The maximum amount of characters for 'department' is 64.`;
-        }
-
-        if (args.options.managerUserName && !validation.isValidUserPrincipalName(args.options.managerUserName)) {
-          return `'${args.options.managerUserName}' is not a valid user principal name.`;
-        }
-
-        if (args.options.managerUserId && !validation.isValidGuid(args.options.managerUserId)) {
-          return `'${args.options.managerUserId}' is not a valid GUID.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['managerUserId', 'managerUserName'],
-        runsWhen: (args) => args.options.managerId || args.options.managerUserName
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('accountEnabled');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -261,7 +130,7 @@ class EntraUserAddCommand extends GraphCommand {
       preferredLanguage: options.preferredLanguage
     };
 
-    this.addUnknownOptionsToPayload(requestBody, options);
+    this.addUnknownOptionsToPayloadZod(requestBody, options);
 
     return requestBody;
   }

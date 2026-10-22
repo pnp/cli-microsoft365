@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import appInsights from './appInsights.js';
-import { cli } from "./cli/cli.js";
+import { cli } from './cli/cli.js';
+import { googleAnalytics } from './googleAnalytics.js';
 import { settingsNames } from './settingsNames.js';
 import { telemetry } from './telemetry.js';
 import { pid } from './utils/pid.js';
@@ -15,8 +15,8 @@ describe('Telemetry', () => {
   before(() => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('abc123');
-    trackEventStub = sinon.stub(appInsights, 'trackEvent');
-    trackExceptionStub = sinon.stub(appInsights, 'trackException');
+    trackEventStub = sinon.stub(googleAnalytics, 'trackEvent');
+    trackExceptionStub = sinon.stub(googleAnalytics, 'trackException');
   });
 
   afterEach(() => {
@@ -96,7 +96,7 @@ describe('Telemetry', () => {
     sinon.stub(pid, 'getProcessName').returns(undefined);
 
     await telemetry.trackEvent('foo bar', {});
-    assert.strictEqual(appInsights.commonProperties.shell, '');
+    assert.strictEqual(trackEventStub.lastCall.args[2].shell, '');
   });
 
   it(`fails silently when submitting telemetry fails`, async () => {
@@ -107,8 +107,8 @@ describe('Telemetry', () => {
 
       return defaultValue;
     });
-    sinonUtil.restore(appInsights.trackEvent);
-    sinon.stub(appInsights, 'trackEvent').throws(new Error('foo'));
+    sinonUtil.restore(googleAnalytics.trackEvent);
+    sinon.stub(googleAnalytics, 'trackEvent').throws(new Error('foo'));
 
     await telemetry.trackEvent('foo bar', {});
     assert.ok(true);

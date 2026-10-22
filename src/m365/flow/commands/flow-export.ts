@@ -1,27 +1,32 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request, { CliRequestOptions } from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
-import { validation } from '../../../utils/validation.js';
 import PowerPlatformCommand from '../../base/PowerPlatformCommand.js';
 import commands from '../commands.js';
 import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  name: z.uuid().alias('n'),
+  packageDisplayName: z.string().optional().alias('d'),
+  packageDescription: z.string().optional(),
+  packageCreatedBy: z.string().optional().alias('c'),
+  packageSourceEnvironment: z.string().optional().alias('s'),
+  format: z.string().transform(v => v.toLowerCase()).pipe(z.enum(['json', 'zip'], {
+    error: 'Option format must be json or zip. Default is zip'
+  })).optional().alias('f'),
+  path: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  name: string;
-  packageDisplayName?: string;
-  packageDescription?: string;
-  packageCreatedBy?: string;
-  packageSourceEnvironment?: string;
-  format?: string;
-  path?: string;
 }
 
 class FlowExportCommand extends PowerPlatformCommand {
@@ -33,94 +38,38 @@ class FlowExportCommand extends PowerPlatformCommand {
     return 'Exports the specified Microsoft Flow as a file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        packageDisplayName: typeof args.options.packageDisplayName !== 'undefined',
-        packageDescription: typeof args.options.packageDescription !== 'undefined',
-        packageCreatedBy: typeof args.options.packageCreatedBy !== 'undefined',
-        packageSourceEnvironment: typeof args.options.packageSourceEnvironment !== 'undefined',
-        format: args.options.format,
-        path: typeof args.options.path !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '-d, --packageDisplayName [packageDisplayName]'
-      },
-      {
-        option: '--packageDescription [packageDescription]'
-      },
-      {
-        option: '-c, --packageCreatedBy [packageCreatedBy]'
-      },
-      {
-        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
-      },
-      {
-        option: '-f, --format [format]'
-      },
-      {
-        option: '-p, --path [path]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
-
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID`;
-        }
-
-        if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
-          return 'Option format must be json or zip. Default is zip';
-        }
-
-        if (lowerCaseFormat === 'json') {
-          if (args.options.packageCreatedBy) {
-            return 'packageCreatedBy cannot be specified with output of json';
-          }
-
-          if (args.options.packageDescription) {
-            return 'packageDescription cannot be specified with output of json';
-          }
-
-          if (args.options.packageDisplayName) {
-            return 'packageDisplayName cannot be specified with output of json';
-          }
-
-          if (args.options.packageSourceEnvironment) {
-            return 'packageSourceEnvironment cannot be specified with output of json';
-          }
-        }
-
-        if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-          return 'Specified path where to save the file does not exist';
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => options.format !== 'json' || !options.packageCreatedBy, {
+        error: 'packageCreatedBy cannot be specified with output of json',
+        path: ['packageCreatedBy']
+      })
+      .refine(options => options.format !== 'json' || !options.packageDescription, {
+        error: 'packageDescription cannot be specified with output of json',
+        path: ['packageDescription']
+      })
+      .refine(options => options.format !== 'json' || !options.packageDisplayName, {
+        error: 'packageDisplayName cannot be specified with output of json',
+        path: ['packageDisplayName']
+      })
+      .refine(options => options.format !== 'json' || !options.packageSourceEnvironment, {
+        error: 'packageSourceEnvironment cannot be specified with output of json',
+        path: ['packageSourceEnvironment']
+      })
+      .refine(options => {
+        if (options.path) {
+          return fs.existsSync(path.dirname(options.path));
         }
 
         return true;
-      }
-    );
+      }, {
+        error: 'Specified path where to save the file does not exist',
+        path: ['path']
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

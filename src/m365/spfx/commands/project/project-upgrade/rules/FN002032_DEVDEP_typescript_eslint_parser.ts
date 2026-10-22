@@ -1,8 +1,8 @@
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN002032_DEVDEP_typescript_eslint_parser extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
-    super('@typescript-eslint/parser', packageVersion, true, false, add);
+  constructor(options: { packageVersion: string; add?: boolean }) {
+    super({ ...options, packageName: '@typescript-eslint/parser', isDevDep: true, add: options.add ?? true });
   }
 
   get id(): string {

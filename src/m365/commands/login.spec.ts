@@ -456,6 +456,7 @@ describe(commands.LOGIN, () => {
       certificateFile: 'certificate'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Certificate file certificate does not exist');
   });
 
   it('fails validation cloud is set to an invalid value', () => {
@@ -499,6 +500,7 @@ describe(commands.LOGIN, () => {
         connectionName: 'Contoso'
       });
       assert.notStrictEqual(actual.success, true);
+      assert.strictEqual(actual.error?.issues.find(i => i.path[0] === 'connectionName')?.message, `Connection with name 'Contoso' already exists.`);
     }
     finally {
       (auth as any)._allConnections = [];

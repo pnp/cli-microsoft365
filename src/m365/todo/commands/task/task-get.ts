@@ -23,7 +23,7 @@ class TodoTaskGetCommand extends GraphDelegatedCommand {
   }
 
   public get description(): string {
-    return 'Get a specific task from a Microsoft To Do task list';
+    return 'Gets a specific task from a Microsoft To Do task list';
   }
 
   constructor() {

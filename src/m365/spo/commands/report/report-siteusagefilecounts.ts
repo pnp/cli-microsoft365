@@ -11,7 +11,7 @@ class SpoReportSiteUsageFileCountsCommand extends PeriodBasedReport {
   }
 
   public get description(): string {
-    return 'Get the total number of files across all sites and the number of active files';
+    return 'Gets the total number of files across all sites and the number of active files';
   }
 }
 

@@ -29,7 +29,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes a Home Site';
+    return 'Removes a home site';
   }
 
   public get schema(): z.ZodType {

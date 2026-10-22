@@ -1,20 +1,24 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  environmentName: z.string().alias('e'),
+  entitySetName: z.string().optional(),
+  tableName: z.string().optional(),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  environmentName: string;
-  entitySetName?: string;
-  tableName?: string;
-  asAdmin?: boolean;
 }
 
 class PpDataverseTableRowListCommand extends PowerPlatformCommand {
@@ -27,45 +31,19 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
     return 'Lists table rows for the given Dataverse table';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        entitySetName: typeof args.options.entitySetName !== 'undefined',
-        tableName: typeof args.options.tableName !== 'undefined',
-        asAdmin: !!args.options.asAdmin
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.entitySetName, opts.tableName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'entitySetName' or 'tableName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['entitySetName', 'tableName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--entitySetName [entitySetName]'
-      },
-      {
-        option: '--tableName [tableName]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['entitySetName', 'tableName'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

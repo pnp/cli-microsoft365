@@ -1,18 +1,22 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userName: z.string().alias('u'),
+  propertyName: z.string().alias('n'),
+  propertyValue: z.string().alias('v')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userName: string;
-  propertyName: string;
-  propertyValue: string;
 }
 
 class SpoUserProfileSetCommand extends SpoCommand {
@@ -24,24 +28,8 @@ class SpoUserProfileSetCommand extends SpoCommand {
     return 'Sets user profile property for a SharePoint user';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userName <userName>'
-      },
-      {
-        option: '-n, --propertyName <propertyName>'
-      },
-      {
-        option: '-v, --propertyValue <propertyValue>'
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

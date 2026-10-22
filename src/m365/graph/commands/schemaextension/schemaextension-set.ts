@@ -1,21 +1,25 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  owner: z.string(),
+  description: z.string().optional().alias('d'),
+  status: z.enum(['Available', 'Deprecated']).optional().alias('s'),
+  targetTypes: z.string().optional().alias('t'),
+  properties: z.string().optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  owner: string;
-  description?: string;
-  status?: string;
-  targetTypes?: string;
-  properties?: string;
 }
 
 class GraphSchemaExtensionSetCommand extends GraphCommand {
@@ -27,71 +31,28 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     return 'Updates a Microsoft Graph schema extension';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        targetTypes: typeof args.options.targetTypes !== 'undefined',
-        status: args.options.status
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => validation.isValidGuid(options.owner), {
+        error: e => `The specified owner '${(e.input as Options).owner}' is not a valid App Id`,
+        path: ['owner']
+      })
+      .refine(options => options.status || options.properties || options.targetTypes || options.description, {
+        error: 'No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties'
+      })
+      .refine(options => {
+        if (!options.properties) {
+          return true;
+        }
+        return this.validateProperties(options.properties) === true;
+      }, {
+        error: e => `${this.validateProperties((e.input as Options).properties!)}`,
+        path: ['properties']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-s, --status [status]'
-      },
-      {
-        option: '-t, --targetTypes [targetTypes]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.owner)) {
-          return `The specified owner '${args.options.owner}' is not a valid App Id`;
-        }
-
-        if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
-          return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`;
-        }
-
-        const validStatusValues = ['Available', 'Deprecated'];
-        if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
-          return `Status option is invalid. Valid statuses are: Available or Deprecated`;
-        }
-
-        if (args.options.properties) {
-          return this.validateProperties(args.options.properties);
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

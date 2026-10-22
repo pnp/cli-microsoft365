@@ -13,7 +13,7 @@ class EntraResourcenamespaceListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of the RBAC resource namespaces and their properties';
+    return 'Gets a list of the RBAC resource namespaces and their properties';
   }
 
   public get schema(): z.ZodType | undefined {

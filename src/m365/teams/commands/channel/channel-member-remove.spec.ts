@@ -12,17 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-member-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './channel-member-remove.js';
 
 describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   const groupsResponse = {
     value: [
       {
-        "id": "00000000-0000-0000-0000-000000000000",
-        "resourceProvisioningOptions": [
-          "Team"
-        ]
+        "id": "00000000-0000-0000-0000-000000000000"
       }
     ]
   };
@@ -30,6 +26,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,6 +35,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -88,81 +86,75 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if channelId is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: 'Invalid',
-        id: '00000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if channelId is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: 'Invalid',
+      id: '00000'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userId: '00000000-0000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userId: '00000000-0000'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails to get team when resourceprovisioning does not exist', async () => {
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return {
-          value: [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": [
-              ]
-            }
-          ]
-        };
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+      })
+    }), new CommandError("The specified team 'Team Name' does not exist."));
   });
 
   it('correctly get teams id by team name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams?$filter=displayName eq '`) > -1) {
         return groupsResponse;
       }
 
@@ -178,13 +170,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         force: true,
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -201,14 +193,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+      })
+    }), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
   it('fails to get channel when channel does is not private', async () => {
@@ -229,14 +221,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Other Channel',
         id: '00000',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified channel is not a private channel'));
+      })
+    }), new CommandError('The specified channel is not a private channel'));
   });
 
   it('correctly get channel id by channel name', async () => {
@@ -264,13 +256,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
         force: true,
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -294,14 +286,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return userId', async () => {
@@ -322,14 +314,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not exist by userName', async () => {
@@ -351,14 +343,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return email', async () => {
@@ -379,19 +371,19 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+      })
+    }), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
+      if (settingName === 'prompt') {
         return false;
       }
 
@@ -421,14 +413,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         force: true,
         verbose: true
-      }
-    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
+      })
+    }), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
   });
 
   it('handles selecting single result when multiple members with the specified username found and cli is set to prompt', async () => {
@@ -470,12 +462,12 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -506,13 +498,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         force: true,
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -543,12 +535,12 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -563,13 +555,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         force: true,
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -584,12 +576,12 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         verbose: true
-      }
+      })
     });
     assert.strictEqual(log.length, 1);
   });
@@ -600,11 +592,11 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -614,11 +606,11 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000'
-      }
+      })
     });
 
     assert(confirmationStub.calledOnce);
@@ -639,11 +631,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         force: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
+        teamName: 'Team Name',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        id: '00000',
         verbose: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

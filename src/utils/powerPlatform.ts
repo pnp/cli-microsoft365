@@ -109,6 +109,30 @@ export const powerPlatform = {
   },
 
   /**
+   * Get a website record ID by unique name
+   * Returns the powerpagesiteid of the website
+   * @param dynamicsApiUrl The dynamics api url of the environment
+   * @param websiteUniqueName The unique name of the Power Pages website
+   */
+  async getWebsiteIdByUniqueName(dynamicsApiUrl: string, websiteUniqueName: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${dynamicsApiUrl}/api/data/v9.2/powerpagesites?$filter=name eq '${websiteUniqueName}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ value: any[] }>(requestOptions);
+
+    if (result.value.length === 0) {
+      throw Error(`The specified website '${websiteUniqueName}' does not exist.`);
+    }
+
+    return result.value[0].powerpagesiteid;
+  },
+
+  /**
    * Get a card by name
    * Returns a card object
    * @param dynamicsApiUrl The dynamics api url of the environment

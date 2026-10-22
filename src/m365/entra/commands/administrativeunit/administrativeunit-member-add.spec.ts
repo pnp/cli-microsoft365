@@ -11,12 +11,11 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import command from './administrativeunit-member-add.js';
+import command, { options } from './administrativeunit-member-add.js';
 import { entraAdministrativeUnit } from '../../../../utils/entraAdministrativeUnit.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { entraDevice } from '../../../../utils/entraDevice.js';
-import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
@@ -31,6 +30,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -39,6 +39,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -63,7 +64,6 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       entraUser.getUserIdByUpn,
       entraGroup.getGroupIdByDisplayName,
       entraDevice.getDeviceByDisplayName,
-      cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound,
       cli.promptForSelection
     ]);
@@ -82,270 +82,134 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when administrativeUnitId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, userId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when administrativeUnitId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, userId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if administrativeUnitId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: 'invalid', userId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if administrativeUnitId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: 'invalid', userId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when groupId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when deviceId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: deviceId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when deviceId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: deviceId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if deviceId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if deviceId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName, userId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both administrativeUnitId and administrativeUnitName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, administrativeUnitName: administrativeUnitName, userId: '00000000-0000-0000-0000-000000000000' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both administrativeUnitId and administrativeUnitName options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userId and userName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userId and userName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, userName: userName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userId and groupId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, groupId: groupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userId and groupId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, groupId: groupId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userId and groupName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, groupName: groupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userId and groupName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, groupName: groupName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userId and deviceId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, deviceId: deviceId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userId and deviceId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, deviceId: deviceId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userId and deviceName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, deviceName: deviceName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userId and deviceName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userId: userId, deviceName: deviceName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userName and groupId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, groupId: groupId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userName and groupId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, groupId: groupId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userName and groupName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, groupName: groupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userName and groupName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, groupName: groupName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userName and deviceId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, deviceId: deviceId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userName and deviceId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, deviceId: deviceId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both userName and deviceName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, deviceName: deviceName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both userName and deviceName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', userName: userName, deviceName: deviceName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupId and groupName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, groupName: groupName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupId and groupName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, groupName: groupName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupId and deviceId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, deviceId: deviceId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupId and deviceId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, deviceId: deviceId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupId and deviceName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, deviceName: deviceName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupId and deviceName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupId: groupId, deviceName: deviceName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupName and deviceId options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupName: groupName, deviceId: deviceId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupName and deviceId options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupName: groupName, deviceId: deviceId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupName and deviceName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupName: groupName, deviceName: deviceName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupName and deviceName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', groupName: groupName, deviceName: deviceName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both deviceId and deviceName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: deviceId, deviceName: deviceName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both deviceId and deviceName options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: '00000000-0000-0000-0000-000000000000', deviceId: deviceId, deviceName: deviceName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all the required options are specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all the required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ administrativeUnitId: administrativeUnitId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds a user specified by its id to an administrative unit specified by its id', async () => {

@@ -83,14 +83,7 @@ export const prompt = {
     const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
 
     return inquirerInput
-      .default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout })
-      .catch(error => {
-        if (error instanceof Error && error.name === 'ExitPromptError') {
-          return ''; // noop; handle Ctrl + C
-        }
-
-        throw error;
-      });
+      .default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   },
 
   /* c8 ignore next 9 */

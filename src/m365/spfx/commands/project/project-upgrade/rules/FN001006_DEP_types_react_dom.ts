@@ -3,8 +3,8 @@ import { Project } from '../../project-model/index.js';
 import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001006_DEP_types_react_dom extends DependencyRule {
-  constructor(packageVersion: string, add: boolean = true) {
-    super('@types/react-dom', packageVersion, false, true, add);
+  constructor(options: { packageVersion: string; add?: boolean }) {
+    super({ ...options, packageName: '@types/react-dom', isOptional: true });
   }
 
   get id(): string {

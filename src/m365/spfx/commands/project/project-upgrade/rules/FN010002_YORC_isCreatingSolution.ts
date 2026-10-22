@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN010002_YORC_isCreatingSolution extends JsonRule {
-  constructor(private value: boolean) {
+  private value: boolean;
+
+  constructor(options: { value: boolean }) {
     super();
+    this.value = options.value;
   }
 
   get id(): string {

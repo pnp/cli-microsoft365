@@ -29,7 +29,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Add members to a SharePoint Group';
+    return 'Adds members to a SharePoint Group';
   }
 
   constructor() {

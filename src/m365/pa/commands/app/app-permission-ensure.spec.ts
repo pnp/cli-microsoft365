@@ -14,12 +14,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-permission-ensure.js';
+import command, { options } from './app-permission-ensure.js';
 
 describe(commands.APP_PERMISSION_ENSURE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
   const validAppName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
@@ -90,6 +91,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -131,79 +133,84 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if appName is not a GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: 'invalid', userId: validUserId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appName is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: 'invalid', userId: validUserId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if appName is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if appName is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if userName is not a UPN', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userName: 'John Doe' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userName: 'John Doe' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userName: validUserName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userName: validUserName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if groupId is not a GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, groupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, groupId: validGroupId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if groupId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, groupId: validGroupId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if roleName is not a valid role', async () => {
-    const actual = await command.validate({ options: { roleName: 'invalid', appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if roleName is not a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: 'invalid', appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if roleName is a valid role', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userId: validUserId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if roleName is a valid role', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: validUserId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if asAdmin is used without environmentName', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, userId: validUserId, asAdmin: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if asAdmin is used without environmentName', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: validUserId, asAdmin: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if environmentName is used without asAdmin', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, environmentName: validEnvironmentName, userId: validUserId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if environmentName is used without asAdmin', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, environmentName: validEnvironmentName, userId: validUserId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if environmentName is used with asAdmin', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, asAdmin: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if environmentName is used with asAdmin', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, environmentName: validEnvironmentName, userId: validUserId, asAdmin: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if tenant is used without role CanView', async () => {
-    const actual = await command.validate({ options: { roleName: validRoleName, appName: validAppName, tenant: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if tenant is used without role CanView', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, tenant: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if tenant is used with role CanView', async () => {
-    const actual = await command.validate({ options: { roleName: 'CanView', appName: validAppName, tenant: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if tenant is used with role CanView', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: 'CanView', appName: validAppName, tenant: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ roleName: validRoleName, appName: validAppName, userId: validUserId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('updates permissions to a Power App by userId and sends invitation mail', async () => {
@@ -230,7 +237,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { verbose: true, roleName: validRoleName, appName: validAppName, userId: validUserId, sendInvitationMail: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, roleName: validRoleName, appName: validAppName, userId: validUserId, sendInvitationMail: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -258,7 +265,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { verbose: true, roleName: validRoleName, appName: validAppName, groupId: validGroupId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, roleName: validRoleName, appName: validAppName, groupId: validGroupId }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -288,7 +295,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { verbose: true, roleName: 'CanView', appName: validAppName, tenant: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, roleName: 'CanView', appName: validAppName, tenant: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -318,7 +325,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { verbose: true, roleName: validRoleName, appName: validAppName, userName: validUserName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, roleName: validRoleName, appName: validAppName, userName: validUserName }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -348,7 +355,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { verbose: true, roleName: validRoleName, appName: validAppName, groupName: validGroupName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, roleName: validRoleName, appName: validAppName, groupName: validGroupName }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -376,7 +383,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       ]
     };
 
-    await command.action(logger, { options: { roleName: validRoleName, appName: validAppName, userId: validUserId, environmentName: validEnvironmentName, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ roleName: validRoleName, appName: validAppName, userId: validUserId, environmentName: validEnvironmentName, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
@@ -390,7 +397,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { roleName: validRoleName, appName: validAppName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ roleName: validRoleName, appName: validAppName, userId: validUserId }) }),
       new CommandError(errorMessage));
   });
 });

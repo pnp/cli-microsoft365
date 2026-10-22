@@ -1,19 +1,25 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.uuid().optional(),
+  userName: z.string().optional(),
+  ids: z.string().refine(ids => !ids.split(',').some(e => !validation.isValidGuid(e)), {
+    error: e => `'${e.input}' contains one or more invalid GUIDs.`
+  })
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId: string;
-  userName: string;
-  ids: string;
 }
 
 class EntraUserLicenseAddCommand extends GraphCommand {
@@ -25,58 +31,19 @@ class EntraUserLicenseAddCommand extends GraphCommand {
     return 'Assigns a license to a user';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodTypeAny | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(options => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'userId' or 'userName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--ids <ids>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.ids && args.options.ids.split(',').some(e => !validation.isValidGuid(e))) {
-          return `${args.options.ids} contains one or more invalid GUIDs`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['userId', 'userName'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -84,7 +51,7 @@ class EntraUserLicenseAddCommand extends GraphCommand {
     const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userId || args.options.userName)}/assignLicense`,
+      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userId ?? args.options.userName!)}/assignLicense`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

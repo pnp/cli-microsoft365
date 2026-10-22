@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo file roleinheritance reset
 
@@ -20,7 +22,7 @@ m365 spo file roleinheritance reset [options]
 : The server- or site-relative decoded URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `-i, --fileId [fileId]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
+: The unique ID (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -28,9 +30,28 @@ m365 spo file roleinheritance reset [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
-Reset inheritance of file with the specified id (UniqueId) located in the specified site.
+Reset inheritance of file with the specified id (unique ID) located in the specified site.
 
 ```sh
 m365 spo file roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileId "b2307a39-e878-458b-bc90-03bc578531d6"

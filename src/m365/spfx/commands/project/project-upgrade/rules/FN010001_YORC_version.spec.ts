@@ -9,7 +9,7 @@ describe('FN010001_YORC_version', () => {
 
   beforeEach(() => {
     findings = [];
-    rule = new FN010001_YORC_version('1.5.0');
+    rule = new FN010001_YORC_version({ version: '1.5.0' });
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {

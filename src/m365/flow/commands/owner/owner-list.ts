@@ -1,9 +1,9 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
-import { validation } from '../../../../utils/validation.js';
 import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 import commands from '../../commands.js';
 
@@ -25,14 +25,17 @@ interface FlowPermissionPrincipal {
   type: string;
 }
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  flowName: z.uuid(),
+  environmentName: z.string().alias('e'),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  flowName: string;
-  environmentName: string;
-  asAdmin?: boolean;
 }
 
 class FlowOwnerListCommand extends PowerAutomateCommand {
@@ -48,46 +51,8 @@ class FlowOwnerListCommand extends PowerAutomateCommand {
     return ['roleName', 'id', 'type'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-e, --environmentName <environmentName>'
-      },
-      {
-        option: '--flowName <flowName>'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.flowName)) {
-          return `${args.options.flowName} is not a valid GUID.`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

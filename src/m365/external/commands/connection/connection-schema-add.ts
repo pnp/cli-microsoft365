@@ -1,35 +1,66 @@
 import { ExternalConnectors, NullableOption } from '@microsoft/microsoft-graph-types';
 import { AxiosResponse } from 'axios';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  externalConnectionId: z.string()
+    .min(3, 'externalConnectionId must be between 3 and 32 characters in length.')
+    .max(32, 'externalConnectionId must be between 3 and 32 characters in length.')
+    .refine(id => !/[^\w]|_/g.test(id), {
+      message: 'externalConnectionId must only contain alphanumeric characters.'
+    })
+    .refine(id => !(id.length > 9 && id.startsWith('Microsoft')), {
+      message: 'ID cannot begin with Microsoft'
+    })
+    .alias('i'),
+  schema: z.string()
+    .refine(val => {
+      try {
+        JSON.parse(val);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      message: 'The schema is not a valid JSON string'
+    })
+    .refine(val => {
+      try {
+        const obj = JSON.parse(val);
+        return obj.baseType === 'microsoft.graph.externalItem';
+      }
+      catch {
+        return true;
+      }
+    }, {
+      message: `The schema needs a required property 'baseType' with value 'microsoft.graph.externalItem'`
+    })
+    .refine(val => {
+      try {
+        const obj = JSON.parse(val);
+        return obj.properties && obj.properties.length > 0 && obj.properties.length <= 128;
+      }
+      catch {
+        return true;
+      }
+    }, {
+      message: 'We need at least one property and a maximum of 128 properties in the schema object'
+    })
+    .alias('s'),
+  wait: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  externalConnectionId: string;
-  schema: string;
-  wait: boolean;
-}
-
-interface ExternalItem {
-  baseType: string;
-  properties: Property[];
-}
-
-interface Property {
-  aliases?: string[];
-  isQueryable?: boolean;
-  isRefinable?: boolean;
-  isRetrievable?: boolean;
-  isSearchable?: boolean;
-  labels?: string[];
-  name: string;
-  type: string;
 }
 
 class ExternalConnectionSchemaAddCommand extends GraphCommand {
@@ -45,57 +76,8 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
     return [commands.EXTERNALCONNECTION_SCHEMA_ADD];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --externalConnectionId <externalConnectionId>'
-      },
-      {
-        option: '-s, --schema <schema>'
-      },
-      {
-        option: '--wait'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.externalConnectionId.length < 3 || args.options.externalConnectionId.length > 32) {
-          return 'externalConnectionId must be between 3 and 32 characters in length.';
-        }
-
-        const alphaNumericRegEx = /[^\w]|_/g;
-
-        if (alphaNumericRegEx.test(args.options.externalConnectionId)) {
-          return 'externalConnectionId must only contain alphanumeric characters.';
-        }
-
-        if (args.options.externalConnectionId.length > 9 &&
-          args.options.externalConnectionId.startsWith('Microsoft')) {
-          return 'ID cannot begin with Microsoft';
-        }
-
-        const schemaObject: ExternalItem = JSON.parse(args.options.schema);
-        if (schemaObject.baseType === undefined || schemaObject.baseType !== 'microsoft.graph.externalItem') {
-          return `The schema needs a required property 'baseType' with value 'microsoft.graph.externalItem'`;
-        }
-
-        if (!schemaObject.properties || schemaObject.properties.length > 128) {
-          return `We need at least one property and a maximum of 128 properties in the schema object`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

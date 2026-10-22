@@ -8,20 +8,21 @@ import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
 import commands from '../commands.js';
 import { browserUtil } from '../../../utils/browserUtil.js';
-import command from './cli-issue.js';
+import command, { options } from './cli-issue.js';
 
 describe(commands.ISSUE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let openStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    (command as any).open = () => { };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -56,25 +57,34 @@ describe(commands.ISSUE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('accepts Bug issue Type', async () => {
-    const actual = await command.validate({ options: { type: 'bug' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('accepts Command issue Type', async () => {
-    const actual = await command.validate({ options: { type: 'command' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'bug', unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('accepts Sample issue Type', async () => {
-    const actual = await command.validate({ options: { type: 'sample' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts Bug issue Type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'bug' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid issue type', async () => {
-    const type = 'foo';
-    const actual = await command.validate({ options: { type: type } }, commandInfo);
-    assert.strictEqual(actual, `${type} is not a valid Issue type. Allowed values are bug, command, sample`);
+  it('accepts Command issue Type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'command' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('accepts Sample issue Type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'sample' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('rejects invalid issue type', () => {
+    const actual = commandOptionsSchema.safeParse({ type: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('Opens URL for a command (debug)', async () => {
@@ -88,11 +98,11 @@ describe(commands.ISSUE, () => {
       throw 'Invalid url';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         type: 'command'
-      }
-    } as any);
+      })
+    });
     openStub.calledWith(commandUrl);
   });
 
@@ -106,11 +116,11 @@ describe(commands.ISSUE, () => {
       throw 'Invalid url';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         type: 'bug'
-      }
-    } as any);
+      })
+    });
     openStub.calledWith(bugUrl);
   });
 
@@ -124,11 +134,11 @@ describe(commands.ISSUE, () => {
       throw 'Invalid url';
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         type: 'sample'
-      }
-    } as any);
+      })
+    });
     openStub.calledWith(sampleScriptUrl);
   });
 });

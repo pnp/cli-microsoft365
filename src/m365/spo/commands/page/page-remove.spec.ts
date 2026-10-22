@@ -130,6 +130,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           webUrl: webUrl,
           name: pageName,
+          permanent: true,
           force: true
         }
       });
@@ -146,6 +147,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           webUrl: webUrl,
           name: pageName,
+          permanent: true,
           verbose: true
         }
       });
@@ -160,7 +162,6 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           webUrl: webUrl,
           name: pageName,
-          recycle: true,
           force: true
         }
       });
@@ -176,6 +177,7 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: webUrl,
           name: pageName,
           bypassSharedLock: true,
+          permanent: true,
           force: true
         }
       });
@@ -189,7 +191,6 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           webUrl: webUrl,
           name: pageName.substring(0, pageName.lastIndexOf('.')),
-          recycle: true,
           force: true
         }
       });
@@ -215,6 +216,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           webUrl: webUrl,
           name: pageUrl,
+          permanent: true,
           force: true
         }
       });
@@ -237,7 +239,7 @@ describe(commands.PAGE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: pageName, force: true } }),
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: pageName, permanent: true, force: true } }),
       new CommandError(errorMessage));
   });
 

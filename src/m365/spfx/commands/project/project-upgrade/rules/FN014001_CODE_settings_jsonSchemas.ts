@@ -3,8 +3,11 @@ import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
 
 export class FN014001_CODE_settings_jsonSchemas extends JsonRule {
-  constructor(private add: boolean) {
+  private add: boolean;
+
+  constructor(options: { add: boolean }) {
     super();
+    this.add = options.add;
   }
 
   get id(): string {

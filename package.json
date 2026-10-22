@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "11.9.0",
+  "version": "12.0.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -21,8 +21,8 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsc -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
-    "watch": "tsc-watch --onSuccess \"node scripts/write-all-commands.js\"",
+    "build": "node node_modules/typescript-native/bin/tsc -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
+    "watch": "node scripts/watch.js",
     "clean": "rimraf ./dist",
     "test": "npm run test:version && npm run lint && npm run test:cov",
     "test:version": "node scripts/check-version.js",
@@ -111,11 +111,6 @@
       "name": "Milan Holemans",
       "email": "11723921+milanholemans@users.noreply.github.com",
       "web": "https://github.com/milanholemans"
-    },
-    {
-      "name": "Mathijs Verbeeck",
-      "email": "verbeeckmathijs@gmail.com",
-      "web": "https://github.com/MathijsVerbeeck"
     }
   ],
   "contributors": [
@@ -161,6 +156,7 @@
     "Honen, Nicholas <nickhonen@gmail.com>",
     "Högberg, Joakim <joakim.hogberg@bravero.se>",
     "Hunt, Geoffrey <info@runningdeveloper.com>",
+    "Hutzli, Fabian <136681117+fabianhutzli@users.noreply.github.com>",
     "Hvam, Allan <ahp@delegate.dk>",
     "Jaakke, Robert <robert.jaakke@mavention.nl>",
     "Jain, Ayush <urayushjain@gmail.com>",
@@ -233,6 +229,7 @@
     "Shafi, Danish <33339824+builtbydans@users.noreply.github.com>",
     "Shah, Dipen <Dips365@hotmail.com>",
     "Sharma, Dushyant <dushyantsharma17117@gmail.com>",
+    "Shreshtha, Sarthak <78229815+Sarthak-Shreshtha01@users.noreply.github.com>",
     "Siatka, Piotr <piotr@valointranet.com>",
     "Sinha, Kislay <kislay_sinha@outlook.com>",
     "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com>",
@@ -245,6 +242,7 @@
     "Svenson, Mikael <miksvenson@gmail.com>",
     "Tane, Peter <peter.tane@gmail.come>",
     "Tatti, Anoop <anoop@live.co.uk>",
+    "Thakur, Anikesh <44468436+Anikesh348@users.noreply.github.com>",
     "Thangavel, Sekar <sekar.thangavel@gmail.com>",
     "Thorild, Fredrik <fredrik.thorild@sogeti.com>",
     "Trinder, Garry <garry.trinder@live.com>",
@@ -268,12 +266,13 @@
   ],
   "overrides": {
     "adaptive-expressions": {
-      "fast-xml-parser": "5.7.0",
-      "lodash": "4.18.0",
-      "@xmldom/xmldom": "^0.8.13"
+      "fast-xml-parser": "5.8.0",
+      "lodash": "4.18.1",
+      "@xmldom/xmldom": "^0.8.13",
+      "uuid": "11.1.1"
     },
     "adaptivecards": {
-      "swiper": "12.1.3"
+      "swiper": "12.2.0"
     },
     "mocha": {
       "diff": "8.0.4",
@@ -284,50 +283,40 @@
     },
     "axios": {
       "follow-redirects": "1.16.0"
-    },
-    "@grpc/proto-loader": {
-      "protobufjs": "7.5.6"
-    },
-    "@opentelemetry/otlp-transformer": {
-      "protobufjs": "7.5.6"
-    },
-    "@azure/monitor-opentelemetry": {
-      "@opentelemetry/sdk-node": "0.217.0",
-      "@opentelemetry/exporter-prometheus": "0.217.0"
     }
   },
   "dependencies": {
-    "@azure/msal-common": "^16.5.2",
-    "@azure/msal-node": "^5.1.5",
-    "@inquirer/confirm": "^6.0.12",
-    "@inquirer/input": "^5.0.12",
-    "@inquirer/select": "^5.1.4",
-    "@xmldom/xmldom": "^0.9.10",
+    "@azure/msal-common": "^16.14.2",
+    "@azure/msal-node": "^5.6.0",
+    "@inquirer/confirm": "^6.3.2",
+    "@inquirer/input": "^5.1.6",
+    "@inquirer/select": "^5.2.5",
+    "@xmldom/xmldom": "^0.9.12",
     "adaptive-expressions": "^4.23.3",
     "adaptivecards": "^3.0.6",
     "adaptivecards-templating": "^2.3.1",
-    "adm-zip": "^0.5.17",
-    "applicationinsights": "^3.14.0",
-    "axios": "^1.15.2",
-    "chalk": "^5.6.2",
-    "clipboardy": "^5.3.1",
+    "adm-zip": "^0.6.1",
+    "axios": "^1.20.0",
+    "chalk": "^6.0.1",
+    "clipboardy": "^5.3.2",
     "configstore": "^8.0.0",
     "csv-parse": "^6.2.1",
-    "csv-stringify": "^6.7.0",
+    "csv-stringify": "^6.9.0",
     "easy-table": "^1.2.0",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
     "node-forge": "^1.4.0",
     "omelette": "^0.4.17",
-    "open": "^11.0.0",
-    "semver": "^7.7.4",
+    "open": "^11.0.4",
+    "proper-lockfile": "^4.1.2",
+    "semver": "^7.8.5",
     "strip-json-comments": "^5.0.3",
     "typescript": "^5.9.3",
     "update-notifier": "^7.3.1",
-    "uuid": "^13.0.1",
-    "yaml": "^2.8.3",
+    "uuid": "^14.0.2",
+    "yaml": "^2.9.1",
     "yargs-parser": "^22.0.0",
-    "zod": "^4.4.1"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@actions/core": "^3.0.1",
@@ -339,24 +328,28 @@
     "@types/json-schema": "^7.0.15",
     "@types/json-to-ast": "^2.1.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.12.2",
+    "@types/node": "^24.19.1",
     "@types/node-forge": "^1.3.14",
     "@types/omelette": "^0.4.5",
-    "@types/semver": "^7.7.1",
-    "@types/sinon": "^21.0.1",
+    "@types/proper-lockfile": "^4.1.4",
+    "@types/semver": "^7.8.0",
+    "@types/sinon": "^22.0.0",
     "@types/update-notifier": "^6.0.8",
     "@types/uuid": "^10.0.0",
     "@types/yargs-parser": "^21.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.58.0",
-    "c8": "^11.0.0",
-    "eslint": "^10.2.1",
-    "eslint-plugin-mocha": "^11.2.0",
-    "globals": "^17.5.0",
-    "mocha": "^11.7.5",
+    "c8": "^12.0.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-mocha": "^11.3.0",
+    "globals": "^17.13.0",
+    "mocha": "^11.8.0",
     "rimraf": "^6.1.3",
-    "sinon": "^21.1.2",
+    "sinon": "^22.1.0",
     "source-map-support": "^0.5.21",
-    "tsc-watch": "^7.2.0"
+    "typescript-native": "npm:typescript@^7.0.2"
+  },
+  "optionalDependencies": {
+    "@azure/msal-node-extensions": "^5.5.0"
   }
 }

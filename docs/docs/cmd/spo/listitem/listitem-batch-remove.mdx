@@ -31,8 +31,8 @@ m365 spo listitem batch remove [options]
 `-i, --ids [ids]`
 : Comma separated list of list item IDs. Specify `filePath` or `ids`, but not both.
 
-`-r, --recycle`
-: Recycle the list items. Otherwise, they will be permanently deleted.
+`--permanent`
+: Permanently delete the list items instead of moving them to the recycle bin.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -63,6 +63,12 @@ Remove a list of IDs from a list by specifying the IDs
 
 ```sh
 m365 spo listitem batch remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --ids "123,234,345"
+```
+
+Permanently remove a list of IDs from a list.
+
+```sh
+m365 spo listitem batch remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --ids "123,234,345" --permanent
 ```
 
 ## Response

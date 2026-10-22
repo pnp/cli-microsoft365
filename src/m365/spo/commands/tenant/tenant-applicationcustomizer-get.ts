@@ -27,7 +27,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Get an application customizer that is installed tenant wide';
+    return 'Gets an application customizer that is installed tenant wide';
   }
 
   constructor() {
