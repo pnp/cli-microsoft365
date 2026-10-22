@@ -11,7 +11,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
-import command from './file-roleassignment-list.js';
+import command, { options } from './file-roleassignment-list.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -82,6 +82,7 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -90,6 +91,7 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -129,31 +131,52 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and fileId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if webUrl and fileUrl are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileUrl: fileUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and fileUrl are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileUrl: fileUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if neither fileId nor fileUrl is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both fileId and fileUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, fileUrl: fileUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileUrl: fileUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('tracks whether the fileId and fileUrl options are specified in telemetry', () => {
+    const getTelemetryProperties = (command as any).getTelemetryProperties.bind(command);
+    assert.deepStrictEqual(getTelemetryProperties({ options: { fileId: fileId } }), { fileId: true });
+    assert.deepStrictEqual(getTelemetryProperties({ options: { fileUrl: fileUrl } }), { fileUrl: true });
   });
 
   it('retrieves file role assignments by file id', async () => {
     sinon.stub(spo, 'getFileById').resolves(fileResponse);
     sinon.stub(spo, 'getFileRoleAssignments').resolves(fileRoleAssignmentsResponse.value);
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, fileId: fileId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, fileId: fileId }) });
     assert(loggerLogSpy.calledWith(fileRoleAssignmentsResponse.value));
   });
 
@@ -161,7 +184,7 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
     sinon.stub(spo, 'getFileByUrl').resolves(fileResponse);
     sinon.stub(spo, 'getFileRoleAssignments').resolves(fileRoleAssignmentsResponse.value);
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, fileUrl: fileUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, fileUrl: fileUrl }) });
     assert(loggerLogSpy.calledWith(fileRoleAssignmentsResponse.value));
   });
 
@@ -169,6 +192,6 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
     sinon.stub(spo, 'getFileById').resolves(fileResponse);
     sinon.stub(spo, 'getFileRoleAssignments').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: webUrl, fileId: fileId } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, fileId: fileId }) }), new CommandError('An error has occurred'));
   });
 });
