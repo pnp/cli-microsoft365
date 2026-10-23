@@ -197,7 +197,7 @@ Command | Output changed | `--location` required | `--isExternal` removed
 | - | `OpenInNewWindow` | Added |
 | - | `Translations` | Added |
 
-**`location` option**: `spo navigation node get` and `spo navigation node set` require the `location` option to specify the navigation in which the node is located. Valid values are `QuickLaunch` and `TopNavigationBar`. The error message returned when the navigation node doesn't exist has also changed:
+**`location` option**: `spo navigation node get` and `spo navigation node set` require the `location` option to specify the navigation in which the node is located. Valid values are `QuickLaunch` and `TopNavigationBar`. The error message returned when the navigation node doesn't exist has also changed.
 
 **`isExternal` option**: the new API doesn't support marking navigation nodes as external. The `isExternal` option has been removed from `spo navigation node add` and `spo navigation node set`, and specifying it returns an error. SharePoint doesn't allow changing the URL of a navigation node that points to a page in the current site into an external URL. When you try this using `spo navigation node set`, the URL isn't updated and no error is returned.
 
