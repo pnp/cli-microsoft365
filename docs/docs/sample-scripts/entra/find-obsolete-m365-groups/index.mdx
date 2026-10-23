@@ -112,7 +112,7 @@ Use this script to create a report of all M365 groups that are possibly obsolete
   }
 
   function Get-AllM365Groups {
-    $groups = m365 entra m365group list --includeSiteUrl | ConvertFrom-Json
+    $groups = m365 entra m365group list --withSiteUrl | ConvertFrom-Json
     $Script:Groups = $groups | Where-Object { $null -ne $_.siteUrl }
   }
 
