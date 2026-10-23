@@ -134,11 +134,13 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the fileId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid GUID');
   });
 
   it('passes validation if webUrl and fileId are valid', () => {
