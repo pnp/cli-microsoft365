@@ -1,0 +1,195 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo file roleassignment list
+
+Lists all role assignments from a specific file
+
+## Usage
+
+```sh
+m365 spo file roleassignment list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the file is located.
+
+`--fileUrl [fileUrl]`
+: The server- or site-relative decoded URL of the file. Specify either `fileUrl` or `fileId`, but not both.
+
+`-i, --fileId [fileId]`
+: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId`, but not both.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+List all role assignments of a file specified by URL.
+
+```sh
+m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --fileUrl "/Branding/Logos/Contoso.jpg"
+```
+
+List all role assignments of a file specified by ID.
+
+```sh
+m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --fileId "04796e10-cb5f-4aa3-a438-bc06028a9073"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Member": {
+        "Id": 3,
+        "IsHiddenInUI": false,
+        "LoginName": "CopilotDemo Owners",
+        "Title": "CopilotDemo Owners",
+        "PrincipalType": 8,
+        "AllowMembersEditMembership": false,
+        "AllowRequestToJoinLeave": false,
+        "AutoAcceptRequestToJoinLeave": false,
+        "Description": null,
+        "OnlyAllowMembersViewMembership": false,
+        "OwnerTitle": "CopilotDemo Owners",
+        "RequestToJoinLeaveEmailSetting": ""
+      },
+      "RoleDefinitionBindings": [
+        {
+          "BasePermissions": {
+            "High": "2147483647",
+            "Low": "4294967295"
+          },
+          "Description": "Has full control.",
+          "Hidden": false,
+          "Id": 1073741829,
+          "Name": "Full Control",
+          "Order": 1,
+          "RoleTypeKind": 5,
+          "BasePermissionsValue": [
+            "ViewListItems",
+            "AddListItems",
+            "EditListItems",
+            "DeleteListItems",
+            "ApproveItems",
+            "OpenItems",
+            "ViewVersions",
+            "DeleteVersions",
+            "CancelCheckout",
+            "ManagePersonalViews",
+            "ManageLists",
+            "ViewFormPages",
+            "AnonymousSearchAccessList",
+            "Open",
+            "ViewPages",
+            "AddAndCustomizePages",
+            "ApplyThemeAndBorder",
+            "ApplyStyleSheets",
+            "ViewUsageData",
+            "CreateSSCSite",
+            "ManageSubwebs",
+            "CreateGroups",
+            "ManagePermissions",
+            "BrowseDirectories",
+            "BrowseUserInfo",
+            "AddDelPrivateWebParts",
+            "UpdatePersonalWebParts",
+            "ManageWeb",
+            "AnonymousSearchAccessWebLists",
+            "UseClientIntegration",
+            "UseRemoteAPIs",
+            "ManageAlerts",
+            "CreateAlerts",
+            "EditMyUserInfo",
+            "EnumeratePermissions"
+          ],
+          "RoleTypeKindValue": "Administrator"
+        },
+        {
+          "BasePermissions": {
+            "High": "48",
+            "Low": "134287360"
+          },
+          "Description": "Can view specific lists, document libraries, list items, folders, or documents when given permissions.",
+          "Hidden": true,
+          "Id": 1073741825,
+          "Name": "Limited Access",
+          "Order": 160,
+          "RoleTypeKind": 1,
+          "BasePermissionsValue": [
+            "ViewFormPages",
+            "Open",
+            "BrowseUserInfo",
+            "UseClientIntegration",
+            "UseRemoteAPIs"
+          ],
+          "RoleTypeKindValue": "Guest"
+        }
+      ],
+      "PrincipalId": 3
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Member                : CopilotDemo Owners
+  PrincipalId           : 3
+  RoleDefinitionBindings: Full Control, Limited Access
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  PrincipalId,Member,RoleDefinitionBindings
+  3,CopilotDemo Owners,"Full Control, Limited Access"
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites/CopilotDemo" --fileUrl "/Shared Documents/document.docx"
+
+  Date: 10/22/2026
+
+  Property | Value
+  ---------|-------
+  PrincipalId | 3
+  Member | CopilotDemo Owners
+  RoleDefinitionBindings | Full Control, Limited Access
+  ```
+
+  </TabItem>
+</Tabs>
