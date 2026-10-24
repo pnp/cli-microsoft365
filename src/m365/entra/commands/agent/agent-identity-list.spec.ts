@@ -16,6 +16,7 @@ import command, { options } from './agent-identity-list.js';
 describe(commands.AGENT_IDENTITY_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
   const identities = [{
@@ -51,6 +52,7 @@ describe(commands.AGENT_IDENTITY_LIST, () => {
       logToStderr: async () => {}
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => sinonUtil.restore([request.get]));
@@ -80,6 +82,96 @@ describe(commands.AGENT_IDENTITY_LIST, () => {
 
     await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(identities));
+  });
+
+  it('logs a retrieval message before retrieving agent identities in verbose mode', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      assert(loggerLogToStderrSpy.calledWithExactly('Retrieving agent identities...'));
+      assert.strictEqual(opts.url, 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity');
+      assert.strictEqual(opts.responseType, 'json');
+      return { value: identities };
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
+    assert(loggerLogSpy.calledWith(identities));
+  });
+
+  it('does not log a retrieval message when not in verbose mode', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity') {
+        return { value: identities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(loggerLogToStderrSpy.neverCalledWith('Retrieving agent identities...'));
+    assert(loggerLogSpy.calledOnceWithExactly(identities));
+  });
+
+  it('does not log a retrieval message in normal mode after a verbose invocation', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity') {
+        return { value: identities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
+    assert(loggerLogToStderrSpy.calledWithExactly('Retrieving agent identities...'));
+    assert(loggerLogSpy.calledOnceWithExactly(identities));
+
+    const secondLogger: Logger = {
+      log: async () => {},
+      logRaw: async () => {},
+      logToStderr: async () => {}
+    };
+    const secondLoggerLogSpy = sinon.spy(secondLogger, 'log');
+    const secondLoggerLogToStderrSpy = sinon.spy(secondLogger, 'logToStderr');
+
+    await command.action(secondLogger, { options: commandOptionsSchema.parse({}) });
+    assert(secondLoggerLogToStderrSpy.neverCalledWith('Retrieving agent identities...'));
+    assert(secondLoggerLogSpy.calledOnceWithExactly(identities));
+  });
+
+  it('outputs an empty array when no agent identities are found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity') {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
+  });
+
+  it('lists agent identities across multiple pages', async () => {
+    const nextLink = 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity?$skiptoken=page2';
+    const secondPageIdentities = [{
+      id: '2c8424d5-16e1-4b19-99f4-8c87d114b1b3',
+      displayName: 'My Second Agent Identity'
+    }];
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity') {
+        return { '@odata.nextLink': nextLink, value: identities };
+      }
+
+      if (opts.url === nextLink) {
+        return { value: secondPageIdentities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    assert.strictEqual(getStub.callCount, 2);
+    assert.strictEqual(getStub.firstCall.args[0].url, 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity');
+    assert.strictEqual(getStub.secondCall.args[0].url, nextLink);
+    assert(loggerLogSpy.calledOnceWithExactly([...identities, ...secondPageIdentities]));
   });
 
   it('lists agent identities with the specified properties', async () => {

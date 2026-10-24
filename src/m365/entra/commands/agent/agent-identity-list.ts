@@ -69,6 +69,10 @@ class EntraAgentIdentityListCommand extends GraphCommand {
       : '';
 
     try {
+      if (this.verbose) {
+        await logger.logToStderr('Retrieving agent identities...');
+      }
+
       const results = await odata.getAllItems<AgentIdentity>(`${this.resource}/v1.0/servicePrincipals/microsoft.graph.agentIdentity${queryString}`);
       await logger.log(results);
     }
