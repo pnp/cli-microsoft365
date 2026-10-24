@@ -37,6 +37,10 @@ class SpoFileRoleAssignmentListCommand extends SpoCommand {
     return 'Lists all role assignments from a specific file.';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['PrincipalId', 'Member', 'RoleDefinitionBindings'];
+  }
+
   public get schema(): z.ZodType | undefined {
     return options;
   }
@@ -66,8 +70,22 @@ class SpoFileRoleAssignmentListCommand extends SpoCommand {
         file = await spo.getFileByUrl(args.options.webUrl, args.options.fileUrl!, logger, this.verbose);
       }
 
-      const fileRoleAssignments = await spo.getFileRoleAssignments(args.options.webUrl, file.ServerRelativeUrl, logger, this.verbose);
-      await logger.log(fileRoleAssignments);
+      const fileRoleAssignments: {
+        PrincipalId: number;
+        Member: { Title: string };
+        RoleDefinitionBindings: { Name: string }[];
+      }[] = await spo.getFileRoleAssignments(args.options.webUrl, file.ServerRelativeUrl, logger, this.verbose);
+
+      if (args.options.output && args.options.output !== 'json') {
+        await logger.log(fileRoleAssignments.map(assignment => ({
+          PrincipalId: assignment.PrincipalId,
+          Member: assignment.Member.Title,
+          RoleDefinitionBindings: assignment.RoleDefinitionBindings.map(role => role.Name).join(', ')
+        })));
+      }
+      else {
+        await logger.log(fileRoleAssignments);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

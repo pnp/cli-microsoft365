@@ -27,6 +27,25 @@ m365 spo file roleassignment list [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List all role assignments of a file specified by URL.
@@ -144,17 +163,17 @@ m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites
   <TabItem value="Text">
 
   ```text
-  Member           RoleDefinitionBindings           PrincipalId
-  ---------------  -------------------------------  -----------
-  [object Object]  [object Object],[object Object]  3
+  Member                : CopilotDemo Owners
+  PrincipalId           : 3
+  RoleDefinitionBindings: Full Control, Limited Access
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  PrincipalId
-  3
+  PrincipalId,Member,RoleDefinitionBindings
+  3,CopilotDemo Owners,"Full Control, Limited Access"
   ```
 
   </TabItem>
@@ -168,6 +187,8 @@ m365 spo file roleassignment list --webUrl "https://contoso.sharepoint.com/sites
   Property | Value
   ---------|-------
   PrincipalId | 3
+  Member | CopilotDemo Owners
+  RoleDefinitionBindings | Full Control, Limited Access
   ```
 
   </TabItem>

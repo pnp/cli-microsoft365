@@ -83,6 +83,7 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
+  let commandToExecuteStub: sinon.SinonStub | undefined;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -116,6 +117,8 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
       spo.getFileByUrl,
       spo.getFileRoleAssignments
     ]);
+    commandToExecuteStub?.restore();
+    commandToExecuteStub = undefined;
   });
 
   after(() => {
@@ -129,6 +132,10 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('has the correct default properties', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['PrincipalId', 'Member', 'RoleDefinitionBindings']);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
@@ -188,6 +195,106 @@ describe(commands.FILE_ROLEASSIGNMENT_LIST, () => {
 
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, fileUrl: fileUrl }) });
     assert(loggerLogSpy.calledWith(fileRoleAssignmentsResponse.value));
+  });
+
+  it('preserves nested role assignments for JSON output', async () => {
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
+    sinon.stub(spo, 'getFileRoleAssignments').resolves(fileRoleAssignmentsResponse.value);
+    const options = commandOptionsSchema.parse({ webUrl, fileId, output: 'json' });
+
+    await command.action(logger, { options });
+
+    assert(loggerLogSpy.calledWith(fileRoleAssignmentsResponse.value));
+    assert.deepStrictEqual(JSON.parse(await cli.formatOutput(command, loggerLogSpy.firstCall.args[0], options)), fileRoleAssignmentsResponse.value);
+  });
+
+  ['text', 'csv', 'md'].forEach(output => {
+    it(`renders member titles and comma-separated role names in ${output} output`, async () => {
+      const assignments = [
+        {
+          ...fileRoleAssignmentsResponse.value[0],
+          RoleDefinitionBindings: [
+            ...fileRoleAssignmentsResponse.value[0].RoleDefinitionBindings,
+            { Name: 'Limited Access' }
+          ]
+        },
+        {
+          PrincipalId: 33,
+          Member: { Title: 'Communication site Visitors' },
+          RoleDefinitionBindings: [{ Name: 'Read' }]
+        }
+      ];
+      const originalAssignments = structuredClone(assignments);
+      sinon.stub(spo, 'getFileByUrl').resolves(fileResponse);
+      sinon.stub(spo, 'getFileRoleAssignments').resolves(assignments);
+      commandToExecuteStub = sinon.stub(cli, 'commandToExecute').value(commandInfo);
+      const options = commandOptionsSchema.parse({ webUrl, fileUrl, output });
+
+      await command.action(logger, { options });
+
+      const result = loggerLogSpy.firstCall.args[0];
+      assert.deepStrictEqual(result, [
+        {
+          PrincipalId: 32,
+          Member: 'Communication site Owners',
+          RoleDefinitionBindings: 'Full Control, Limited Access'
+        },
+        {
+          PrincipalId: 33,
+          Member: 'Communication site Visitors',
+          RoleDefinitionBindings: 'Read'
+        }
+      ]);
+      const formatted = await cli.formatOutput(command, result, options);
+      assert(!formatted.includes('[object Object]'));
+      if (output === 'text') {
+        const rows = formatted.trim().split(/\r?\n/)
+          .filter((row: string) => !row.startsWith('---'))
+          .map((row: string) => row.trim().replace(/\s{2,}/g, '|'));
+        assert.deepStrictEqual(rows, [
+          'PrincipalId|Member|RoleDefinitionBindings',
+          '32|Communication site Owners|Full Control, Limited Access',
+          '33|Communication site Visitors|Read'
+        ]);
+      }
+      else if (output === 'csv') {
+        assert.strictEqual(formatted, 'PrincipalId,Member,RoleDefinitionBindings\n32,Communication site Owners,"Full Control, Limited Access"\n33,Communication site Visitors,Read\n');
+      }
+      else {
+        assert(formatted.includes('PrincipalId | 32'));
+        assert(formatted.includes('Member | Communication site Owners'));
+        assert(formatted.includes('RoleDefinitionBindings | Full Control, Limited Access'));
+        assert(formatted.includes('PrincipalId | 33'));
+        assert(formatted.includes('Member | Communication site Visitors'));
+        assert(formatted.includes('RoleDefinitionBindings | Read'));
+      }
+      assert.deepStrictEqual(assignments, originalAssignments);
+    });
+
+    it(`handles no role assignments in ${output} output`, async () => {
+      sinon.stub(spo, 'getFileById').resolves(fileResponse);
+      sinon.stub(spo, 'getFileRoleAssignments').resolves([]);
+
+      await command.action(logger, { options: commandOptionsSchema.parse({ webUrl, fileId, output }) });
+
+      assert(loggerLogSpy.calledOnceWithExactly([]));
+    });
+  });
+
+  it('handles an assignment with no role definition bindings', async () => {
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
+    sinon.stub(spo, 'getFileRoleAssignments').resolves([{
+      ...fileRoleAssignmentsResponse.value[0],
+      RoleDefinitionBindings: []
+    }]);
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl, fileId, output: 'text' }) });
+
+    assert(loggerLogSpy.calledOnceWithExactly([{
+      PrincipalId: 32,
+      Member: 'Communication site Owners',
+      RoleDefinitionBindings: ''
+    }]));
   });
 
   it('correctly handles error when retrieving file role assignments', async () => {
