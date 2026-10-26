@@ -289,7 +289,7 @@
   },
   "dependencies": {
     "@azure/msal-common": "^16.14.2",
-    "@azure/msal-node": "^5.6.0",
+    "@azure/msal-node": "^7.1.0",
     "@inquirer/confirm": "^6.3.3",
     "@inquirer/input": "^5.1.7",
     "@inquirer/select": "^5.2.6",
