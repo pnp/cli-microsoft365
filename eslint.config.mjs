@@ -145,6 +145,7 @@ const dictionary = [
   'user',
   'value',
   'version',
+  'versionpolicy',
   'web',
   'webhook'
 ];
