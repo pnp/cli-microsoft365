@@ -141,8 +141,10 @@ const dictionary = [
   'type',
   'unit',
   'url',
+  'usage',
   'user',
   'value',
+  'version',
   'web',
   'webhook'
 ];
