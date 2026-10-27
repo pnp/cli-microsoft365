@@ -3731,6 +3731,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'report siteusagestorage',
               id: 'cmd/spo/report/report-siteusagestorage'
+            },
+            {
+              type: 'doc',
+              label: 'report siteversionstorageusage status get',
+              id: 'cmd/spo/report/report-siteversionstorageusage-status-get'
             }
           ]
         },

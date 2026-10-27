@@ -1,0 +1,102 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo report siteversionstorageusage status get
+
+Retrieves the status of a version storage usage report
+
+## Usage
+
+```sh
+m365 spo report siteversionstorageusage status get [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --siteUrl <siteUrl>`
+: URL of the site collection to target.
+
+`--fileUrl <fileUrl>`
+: Server-relative URL of the file where the report will be stored.
+```
+
+<Global />
+
+## Remarks
+
+:::important
+
+While the job is being processed, you can see the report file being gradually populated. Do not update the file during this time. It will cause the job to fail. Check the progress of the report generation to confirm that the report is fully populated and ready to process.
+
+:::
+
+If you wish to cancel an in-progress report generation, you may simply delete the report file.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Get the status of a specific version storage usage report.
+
+```sh
+m365 spo report siteversionstorageusage status get --siteUrl "https://contoso.sharepoint.com/sites/marketing" --fileUrl "/sites/marketing/Reports/FileUsage.csv"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "status": "completed"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  status: completed
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  status
+  completed
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo report siteversionstorageusage status get --debug "false" --verbose "false" --siteUrl "https://contoso.sharepoint.com/sites/marketing" --fileUrl "/sites/marketing/Reports/FileUsage.csv"
+
+  Date: 10/26/2026
+
+  Property | Value
+  ---------|-------
+  status | completed
+  ```
+
+  </TabItem>
+</Tabs>
