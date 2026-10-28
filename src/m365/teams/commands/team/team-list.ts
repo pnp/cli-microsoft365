@@ -67,7 +67,8 @@ class TeamsTeamListCommand extends GraphCommand {
       .refine(opts => !(opts.userId || opts.userName) || opts.joined || opts.associated, {
         message: `Specify 'joined' or 'associated' when specifying 'userId' or 'userName'.`,
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['joined', 'associated']
         }
       });
   }

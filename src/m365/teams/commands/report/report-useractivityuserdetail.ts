@@ -35,7 +35,8 @@ class TeamsReportUserActivityUserDetailCommand extends DateAndPeriodBasedReport 
         params: { customCode: 'optionSet', options: ['period', 'date'] }
       })
       .refine((opts: Options) => !(opts.period !== undefined && opts.date !== undefined), {
-        message: 'Specify period or date but not both.'
+        message: 'Specify period or date but not both.',
+        params: { customCode: 'optionSet', options: ['period', 'date'] }
       });
   }
 }

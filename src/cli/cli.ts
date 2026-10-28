@@ -1104,6 +1104,10 @@ async function promptForOptionSetNameAndValue(args: CommandArgs, options: string
     }
   }
 
+  options
+    .filter(optionName => optionName !== selectedOptionName)
+    .forEach(optionName => args.options[optionName] = undefined);
+
   args.options[selectedOptionName] = coercedValue as any;
   await cli.error('');
 }

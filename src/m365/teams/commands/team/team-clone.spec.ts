@@ -220,4 +220,26 @@ describe(commands.TEAM_CLONE, () => {
       })
     }), new CommandError('An error has occurred'));
   });
+
+  it('exposes autocomplete values for partsToClone', () => {
+    const partsToCloneOption = commandInfo.options.find(option => option.long === 'partsToClone');
+
+    assert.deepStrictEqual(partsToCloneOption?.autocomplete, [
+      'apps',
+      'channels',
+      'members',
+      'settings',
+      'tabs'
+    ]);
+  });
+
+  it('passes case-insensitive validation for comma-separated partsToClone values', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: 'APPS, Channels, MEMBERS, settings, Tabs'
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
 });

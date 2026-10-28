@@ -13,6 +13,8 @@ const VisibilityEnum = {
   Public: 'Public'
 } as const;
 
+const partsToCloneValues = ['apps', 'channels', 'members', 'settings', 'tabs'] as const;
+
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   id: z.string()
@@ -22,9 +24,11 @@ export const options = z.strictObject({
     .alias('i'),
   name: z.string().alias('n'),
   partsToClone: z.string()
-    .refine(val => val.replace(/\s/g, '').split(',').every(part => ['apps', 'channels', 'members', 'settings', 'tabs'].includes(part.toLowerCase())), {
-      message: `The value must be a comma-separated list of the following values: apps, channels, members, settings, tabs.`
+    .refine(val => val.replace(/\s/g, '').split(',').every(part =>
+      partsToCloneValues.some(value => value === part.toLowerCase())), {
+      message: `The value must be a comma-separated list of the following values: ${partsToCloneValues.join(', ')}.`
     })
+    .meta({ enum: partsToCloneValues })
     .alias('p'),
   description: z.string().optional().alias('d'),
   classification: z.string().optional().alias('c'),
