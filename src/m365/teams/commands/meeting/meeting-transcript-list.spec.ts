@@ -13,8 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './meeting-transcript-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './meeting-transcript-list.js';
 
 describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
@@ -37,10 +36,13 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       }
     ];
 
+  const validOptions = { meetingId: meetingId };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -53,6 +55,7 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,9 +77,7 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
-      request.get,
-      cli.executeCommandWithOutput,
-      cli.getSettingWithDefaultValue
+      request.get
     ]);
   });
 
@@ -94,77 +95,118 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('preserves option aliases, types and requirements in command metadata', () => {
+    const actual = commandInfo.options
+      .filter(option => !['debug', 'verbose', 'output', 'query'].includes(option.name))
+      .map(option => ({ name: option.name, short: option.short, type: option.type, required: option.required }));
+    assert.deepStrictEqual(actual, [
+      { name: 'userId', short: 'u', type: 'string', required: false },
+      { name: 'userName', short: 'n', type: 'string', required: false },
+      { name: 'email', short: undefined, type: 'string', required: false },
+      { name: 'meetingId', short: 'm', type: 'string', required: true }
+    ]);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ ...validOptions, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation without a user selector', () => {
+    const actual = commandOptionsSchema.safeParse(validOptions);
+    assert.strictEqual(actual.success, true);
+  });
+
+  for (const [selector, value, token] of [
+    ['userId', userId, '@meid'],
+    ['userName', userName, '@meusername'],
+    ['email', userName, '@meusername']
+  ]) {
+    it(`passes validation with a valid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: value });
+      assert.strictEqual(actual.success, true);
+    });
+
+    it(`fails validation with an invalid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: 'invalid' });
+      assert.strictEqual(actual.success, false);
+    });
+
+    it(`passes validation with the runtime token for ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: token });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const selectors of [
+    { userId: userId, userName: userName },
+    { userId: userId, email: userName },
+    { userName: userName, email: userName },
+    { userId: userId, userName: userName, email: userName }
+  ]) {
+    it(`fails validation with conflicting selectors: ${Object.keys(selectors).join(', ')}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, ...selectors });
+      assert.strictEqual(actual.success, false);
+      assert(actual.error?.issues.some(issue => issue.code === 'custom' &&
+        issue.params?.customCode === 'optionSet' &&
+        JSON.stringify(issue.params.options) === JSON.stringify(['userId', 'userName', 'email'])));
+    });
+  }
+
+  for (const requiredOption of Object.keys(validOptions)) {
+    it(`fails validation without required option ${requiredOption}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [requiredOption]: undefined });
+      assert.strictEqual(actual.success, false);
+    });
+  }
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'createdDateTime']);
   });
 
-  it('fails validation when the userId is not a GUID', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userId: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the userName is not valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userName: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userName is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userName: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('succeeds validation when the userId and meetingId are valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('succeeds validation when the userId and meetingId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('succeeds validation when the userName and meetingId are valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('succeeds validation when the userName and meetingId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('succeeds validation when the email and meetingId are valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, email: email } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('succeeds validation when the email and meetingId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, email: email });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the userId and email and userName are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName, email: email } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userId and email and userName are given', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userId: userId, userName: userName, email: email });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when given email is not valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, email: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when given email is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, email: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the userId and email are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, email: email } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userId and email are given', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userId: userId, email: email });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the userId and userName are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userId and userName are given', () => {
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, userId: userId, userName: userName });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves transcript list correctly for the given meetingId for the current user', async () => {
@@ -179,9 +221,9 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         meetingId: meetingId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptsResponse));
@@ -199,10 +241,10 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         meetingId: meetingId,
         userId: userId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptsResponse));
@@ -220,10 +262,10 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         meetingId: meetingId,
         userName: userName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptsResponse));
@@ -251,11 +293,11 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
     await command.action(logger, {
       options:
-      {
+      commandOptionsSchema.parse({
         meetingId: meetingId,
         email: email,
         verbose: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptsResponse));
@@ -266,21 +308,21 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
     sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, meetingId: meetingId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, meetingId: meetingId }) }),
       new CommandError(errorMessage));
   });
 
   it('correctly handles error when options are missing', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { meetingId: meetingId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId }) }),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting transcripts list using app only permissions`));
   });
 
   it('correctly handles error when options are missing with a delegated token', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
-    await assert.rejects(command.action(logger, { options: { meetingId: meetingId, userId: userId } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId, userId: userId }) }),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used while retrieving meeting transcripts using delegated permissions`));
   });
 });

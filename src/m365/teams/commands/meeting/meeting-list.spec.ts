@@ -14,7 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
-import command from './meeting-list.js';
+import command, { options } from './meeting-list.js';
 
 describe(commands.MEETING_LIST, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
@@ -138,10 +138,13 @@ describe(commands.MEETING_LIST, () => {
 
   // #endregion
 
+  const validOptions = { startDateTime: startDateTime };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -154,6 +157,7 @@ describe(commands.MEETING_LIST, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
@@ -196,55 +200,139 @@ describe(commands.MEETING_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('preserves option aliases, types and requirements in command metadata', () => {
+    const actual = commandInfo.options
+      .filter(option => !['debug', 'verbose', 'output', 'query'].includes(option.name))
+      .map(option => ({ name: option.name, short: option.short, type: option.type, required: option.required }));
+    assert.deepStrictEqual(actual, [
+      { name: 'userId', short: 'u', type: 'string', required: false },
+      { name: 'userName', short: 'n', type: 'string', required: false },
+      { name: 'email', short: undefined, type: 'string', required: false },
+      { name: 'startDateTime', short: undefined, type: 'string', required: true },
+      { name: 'endDateTime', short: undefined, type: 'string', required: false },
+      { name: 'isOrganizer', short: undefined, type: 'boolean', required: false }
+    ]);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ ...validOptions, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation without a user selector', () => {
+    const actual = commandOptionsSchema.safeParse(validOptions);
+    assert.strictEqual(actual.success, true);
+  });
+
+  for (const [selector, value, token] of [
+    ['userId', userId, '@meid'],
+    ['userName', userName, '@meusername'],
+    ['email', userName, '@meusername']
+  ]) {
+    it(`passes validation with a valid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: value });
+      assert.strictEqual(actual.success, true);
+    });
+
+    it(`fails validation with an invalid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: 'invalid' });
+      assert.strictEqual(actual.success, false);
+    });
+
+    it(`passes validation with the runtime token for ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: token });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const selectors of [
+    { userId: userId, userName: userName },
+    { userId: userId, email: userName },
+    { userName: userName, email: userName },
+    { userId: userId, userName: userName, email: userName }
+  ]) {
+    it(`preserves acceptance of multiple selectors: ${Object.keys(selectors).join(', ')}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, ...selectors });
+      assert.strictEqual(actual.success, true);
+    });
+  }
+
+  for (const requiredOption of Object.keys(validOptions)) {
+    it(`fails validation without required option ${requiredOption}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [requiredOption]: undefined });
+      assert.strictEqual(actual.success, false);
+    });
+  }
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['subject', 'startDateTime', 'endDateTime']);
   });
 
-  it('completes validation when the startDateTime is a valid ISODateTime, endDateTime is a valid ISODateTime and userId is a valid Guid', async () => {
-    const actual = await command.validate({ options: { startDateTime: startDateTime, endDateTime: endDateTime, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('completes validation when the startDateTime is a valid ISODateTime, endDateTime is a valid ISODateTime and userId is a valid Guid', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, endDateTime: endDateTime, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the startDateTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { startDateTime: 'foo', userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the startDateTime is not a valid ISODateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: 'foo', userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the userId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { startDateTime: startDateTime, userId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, userId: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { startDateTime: startDateTime, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the email is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { startDateTime: startDateTime, email: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the email is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, email: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when startDateTime is behind endDateTime', async () => {
-    const actual = await command.validate({ options: { startDateTime: '2023-01-01', endDateTime: '2022-12-31' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when startDateTime is behind endDateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: '2023-01-01', endDateTime: '2022-12-31' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the endDateTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { startDateTime: startDateTime, endDateTime: 'foo', userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the endDateTime is not a valid ISODateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, endDateTime: 'foo', userId: userId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, "'foo' is not a valid ISO date string for endDateTime.");
+  });
+
+  it('passes validation when startDateTime and endDateTime are equal', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: startDateTime, endDateTime: startDateTime });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with long fractional-second date formats', () => {
+    const actual = commandOptionsSchema.safeParse({
+      startDateTime: '2022-01-01T00:00:00.0000000Z',
+      endDateTime: '2022-12-31T00:00:00.0000000Z'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('reports the invalid startDateTime value', () => {
+    const actual = commandOptionsSchema.safeParse({ startDateTime: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, "'invalid' is not a valid ISO date string for startDateTime.");
   });
 
   it('throws an error when the userName, userId or email is not filled in when signed in using app-only authentication', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { startDateTime: '2022-04-04' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ startDateTime: '2022-04-04' }) }),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`));
   });
 
   it('throws an error when the userName is filled in when signed in using delegated authentication', async () => {
-    await assert.rejects(command.action(logger, { options: { startDateTime: '2022-04-04', email: userName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ startDateTime: '2022-04-04', email: userName }) }),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`));
   });
 
@@ -266,12 +354,12 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         endDateTime: endDateTime,
         isOrganizer: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetings));
@@ -298,11 +386,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         userId: userId
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetings));
@@ -329,11 +417,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         userName: userName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetings));
@@ -361,11 +449,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         email: userName
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(meetings));
@@ -396,10 +484,10 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -434,11 +522,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         userId: userId
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -473,11 +561,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         userName: userName
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -513,11 +601,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         email: userName
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.firstCall.args[0].data, {
@@ -544,11 +632,11 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime,
         userId: userId
-      }
+      })
     }), new CommandError('User could not be found.'));
   });
 
@@ -570,10 +658,10 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime
-      }
+      })
     }), new CommandError('Something went wrong.'));
   });
 
@@ -596,10 +684,10 @@ describe(commands.MEETING_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startDateTime: startDateTime
-      }
+      })
     }), new CommandError('Forbidden'));
   });
 });
