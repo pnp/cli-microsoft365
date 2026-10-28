@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tab-list.js';
+import command, { options } from './tab-list.js';
 
 describe(commands.TAB_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.TAB_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -60,14 +62,12 @@ describe(commands.TAB_LIST, () => {
     assert.strictEqual(command.name, commands.TAB_LIST);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('has a description', () => {
@@ -78,34 +78,51 @@ describe(commands.TAB_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'teamsAppTabId']);
   });
 
-  it('fails validation for a incorrect channelId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect channelId missing trailing @thread.skype.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect channelId missing trailing @thread.skype.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if teamId is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if channelId is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly handles teams tabs request failure', async () => {
@@ -126,11 +143,11 @@ describe(commands.TAB_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
-      }
-    } as any), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
+      })
+    }), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
   });
 
   it('correctly lists all tabs in a Microsoft Teams channel in text format', async () => {
@@ -173,11 +190,11 @@ describe(commands.TAB_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         output: 'text'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith([{
@@ -298,11 +315,11 @@ describe(commands.TAB_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         output: 'json'
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith([{

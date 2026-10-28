@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-unarchive.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './team-unarchive.js';
 
 describe(commands.TEAM_UNARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +26,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -48,8 +49,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -66,56 +66,32 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the input is correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the input is correct', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when no option is specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation when no option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation when both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Finance',
+      id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both id and name are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails when team name does not exist', async () => {
@@ -131,12 +107,11 @@ describe(commands.TEAM_UNARCHIVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
-        name: 'Finance',
-        force: true
-      }
-    } as any), new CommandError("The specified team 'Finance' does not exist."));
+        name: 'Finance'
+      })
+    }), new CommandError("The specified team 'Finance' does not exist."));
   });
 
   it('restores an archived Microsoft Team by id', async () => {
@@ -149,10 +124,10 @@ describe(commands.TEAM_UNARCHIVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    } as any);
+      })
+    });
   });
 
   it('restores an archived Microsoft Team by name', async () => {
@@ -178,10 +153,10 @@ describe(commands.TEAM_UNARCHIVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Finance'
-      }
-    } as any);
+      })
+    });
   });
 
   it('should correctly handle graph error response', async () => {
@@ -202,6 +177,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6' } } as any), new CommandError('No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6' }) }), new CommandError('No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6'));
   });
 });

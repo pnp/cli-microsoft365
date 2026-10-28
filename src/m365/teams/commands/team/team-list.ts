@@ -1,6 +1,7 @@
 import { Team } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -8,15 +9,26 @@ import commands from '../../commands.js';
 import { validation } from '../../../../utils/validation.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  joined: z.boolean().optional().alias('j'),
+  associated: z.boolean().optional().alias('a'),
+  userId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional(),
+  userName: z.string()
+    .refine(val => validation.isValidUserPrincipalName(val), {
+      message: 'The value must be a valid user principal name.'
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  joined?: boolean;
-  associated?: boolean;
-  userId?: string;
-  userName?: string;
 }
 
 class TeamsTeamListCommand extends GraphCommand {
@@ -32,79 +44,32 @@ class TeamsTeamListCommand extends GraphCommand {
     return ['id', 'displayName', 'isArchived', 'description'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        joined: !!args.options.joined,
-        associated: !!args.options.associated,
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.joined, opts.associated].filter(o => o !== undefined).length <= 1, {
+        message: `Specify either 'joined' or 'associated', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['joined', 'associated']
+        }
+      })
+      .refine(opts => [opts.userId, opts.userName].filter(o => o !== undefined).length <= 1, {
+        message: `Specify either 'userId' or 'userName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName']
+        }
+      })
+      .refine(opts => !(opts.userId || opts.userName) || opts.joined || opts.associated, {
+        message: `Specify 'joined' or 'associated' when specifying 'userId' or 'userName'.`,
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-j, --joined'
-      },
-      {
-        option: '-a, --associated'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID for userId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userId} is not a valid UPN for userName.`;
-        }
-
-        if ((args.options.userId || args.options.userName) && !args.options.joined && !args.options.associated) {
-          return 'You must specify either joined or associated when specifying userId or userName.';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['joined', 'associated'],
-        runsWhen: (args: CommandArgs) => !!args.options.joined || !!args.options.associated
-      },
-      {
-        options: ['userId', 'userName'],
-        runsWhen: (args: CommandArgs) => typeof args.options.userId !== 'undefined' || typeof args.options.userName !== 'undefined'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('userId', 'userName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

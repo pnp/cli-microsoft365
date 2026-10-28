@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-app-upgrade.js';
+import command, { options } from './user-app-upgrade.js';
 import { odata } from '../../../../utils/odata.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -19,6 +19,7 @@ describe(commands.USER_APP_UPGRADE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const userId = '520883a5-a09f-4ff4-bfbc-4ae8b57b1e39';
   const userName = 'adelev@contoso.com';
@@ -32,6 +33,7 @@ describe(commands.USER_APP_UPGRADE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,24 +72,29 @@ describe(commands.USER_APP_UPGRADE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the userId is not a valid guid.', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid', id: installedAppId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'invalid', id: installedAppId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userName is not a valid UPN.', async () => {
-    const actual = await command.validate({ options: { userName: 'invalid', id: installedAppId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userName is not a valid UPN.', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'invalid', id: installedAppId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the userName is a valid userName', async () => {
-    const actual = await command.validate({ options: { id: installedAppId, userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the userName is a valid userName', () => {
+    const actual = commandOptionsSchema.safeParse({ id: installedAppId, userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: installedAppId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: installedAppId, userId: userId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: installedAppId, userId: userId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('upgrades application retrieved by name and handles multiple values found', async () => {
@@ -110,7 +117,7 @@ describe(commands.USER_APP_UPGRADE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: userId, name: installedAppName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: userId, name: installedAppName }) });
     assert(postStub.calledOnce);
   });
 
@@ -132,7 +139,7 @@ describe(commands.USER_APP_UPGRADE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: userId, name: installedAppName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: userId, name: installedAppName }) });
     assert(postStub.calledOnce);
   });
 
@@ -144,7 +151,7 @@ describe(commands.USER_APP_UPGRADE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { userName: userName, name: installedAppName, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, name: installedAppName, verbose: true }) }),
       new CommandError(`The specified Teams app ${installedAppName} does not exist or is not installed for the user`));
   });
 
@@ -171,7 +178,7 @@ describe(commands.USER_APP_UPGRADE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { userName: userName, id: installedAppId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, id: installedAppId, verbose: true }) }),
       new CommandError(error.error.message));
   });
 });

@@ -1,21 +1,37 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .alias('t'),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value must be a valid Teams channel ID.'
+    })
+    .alias('c'),
+  id: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .alias('i'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId: string;
-  channelId: string;
-  id: string;
-  force?: boolean;
 }
 
 class TeamsTabRemoveCommand extends GraphCommand {
@@ -27,57 +43,8 @@ class TeamsTabRemoveCommand extends GraphCommand {
     return "Removes a tab from the specified channel";
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: (!!args.options.force).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --teamId <teamId>'
-      },
-      {
-        option: '-c, --channelId <channelId>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
-        }
-
-        if (!validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

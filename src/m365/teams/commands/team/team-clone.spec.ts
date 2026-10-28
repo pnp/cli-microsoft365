@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-clone.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './team-clone.js';
 
 describe(commands.TEAM_CLONE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +26,7 @@ describe(commands.TEAM_CLONE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -46,8 +47,7 @@ describe(commands.TEAM_CLONE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -64,119 +64,83 @@ describe(commands.TEAM_CLONE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation on invalid visibility', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the id is not a valid GUID.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members"
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation on valid \'private\' visibility', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: 'private'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation on invalid visibility', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members",
+      visibility: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation on valid \'public\' visibility', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: 'public'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid \'private\' visibility', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members",
+      visibility: 'private'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the input is correct with mandatory parameters', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid \'public\' visibility', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members",
+      visibility: 'public'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the input is correct with mandatory and optional parameters', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        description: "Self help community for library",
-        visibility: "public",
-        classification: "public"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the input is correct with mandatory parameters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if visibility is set to private', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: "abc"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the input is correct with mandatory and optional parameters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members",
+      description: "Self help community for library",
+      visibility: "public",
+      classification: "public"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if partsToClone is set to invalid value', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "abc"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if partsToClone is set to invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "abc"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if visibility is set to private', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'My new cloned team',
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: "private"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'My new cloned team',
+      partsToClone: "apps,tabs,settings,channels,members",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('creates a clone of a Microsoft Teams team with mandatory parameters', async () => {
@@ -191,12 +155,12 @@ describe(commands.TEAM_CLONE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
-      }
-    } as any);
+      })
+    });
   });
 
   it('creates a clone of a Microsoft Teams team with optional parameters (debug)', async () => {
@@ -211,7 +175,7 @@ describe(commands.TEAM_CLONE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: 'Library Assist',
@@ -219,13 +183,13 @@ describe(commands.TEAM_CLONE, () => {
         description: 'abc',
         visibility: 'public',
         classification: 'label'
-      }
-    } as any);
+      })
+    });
     assert.strictEqual(sinonStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone');
     assert.strictEqual(sinonStub.lastCall.args[0].data.displayName, 'Library Assist');
     assert.strictEqual(sinonStub.lastCall.args[0].data.partsToClone, 'apps,tabs,settings,channels,members');
     assert.strictEqual(sinonStub.lastCall.args[0].data.description, 'abc');
-    assert.strictEqual(sinonStub.lastCall.args[0].data.visibility, 'public');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.visibility, 'Public');
     assert.strictEqual(sinonStub.lastCall.args[0].data.classification, 'label');
     assert.notStrictEqual(sinonStub.lastCall.args[0].data.mailNickname.length, 0);
   });
@@ -245,7 +209,7 @@ describe(commands.TEAM_CLONE, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: 'Library Assist',
@@ -253,7 +217,7 @@ describe(commands.TEAM_CLONE, () => {
         description: 'abc',
         visibility: 'public',
         classification: 'label'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

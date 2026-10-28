@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-add.js';
+import command, { options } from './team-add.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 
@@ -21,6 +21,7 @@ describe(commands.TEAM_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +36,7 @@ describe(commands.TEAM_ADD, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -80,69 +82,115 @@ describe(commands.TEAM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if the template is not set and name and description is passed', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the template is not set and name and description is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if ownerUserNames is set and it contains one or more invalid user principal names', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerUserNames: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ownerUserNames is set and it contains one or more invalid user principal names', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerUserNames: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following user principal names are invalid for option 'ownerUserNames': invalid.`);
   });
 
-  it('fails validation if ownerEmails is set and it contains one or more invalid user principal names', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerEmails: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ownerEmails is set and it contains one or more invalid user principal names', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerEmails: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following user principal names are invalid for option 'ownerEmails': invalid.`);
   });
 
-  it('fails validation if ownerIds is set and it contains one or more invalid GUIDs', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerIds: 'invalid,f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ownerIds is set and it contains one or more invalid GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerIds: 'invalid,f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following GUIDs are invalid for option 'ownerIds': invalid.`);
   });
 
-  it('fails validation if memberUserNames is set and it contains one or more invalid user principal names', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberUserNames: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if memberUserNames is set and it contains one or more invalid user principal names', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberUserNames: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following user principal names are invalid for option 'memberUserNames': invalid.`);
   });
 
-  it('fails validation if memberEmails is set and it contains one or more invalid user principal names', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberEmails: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if memberEmails is set and it contains one or more invalid user principal names', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberEmails: 'invalid,john@contoso.com,doe@contoso.com,kevin@contoso' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following user principal names are invalid for option 'memberEmails': invalid.`);
   });
 
-  it('fails validation if memberIds is set and it contains one or more invalid GUIDs', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberIds: 'invalid,f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if memberIds is set and it contains one or more invalid GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberIds: 'invalid,f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error!.issues[0].message, `The following GUIDs are invalid for option 'memberIds': invalid.`);
   });
 
-  it('passes validation if ownerUserNames is set and it contains valid userNames', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerUserNames: 'john@contoso.com,doe@contoso.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if ownerUserNames is set and it contains valid userNames', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerUserNames: 'john@contoso.com,doe@contoso.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if ownerEmails is set and it contains valid userNames', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerEmails: 'john@contoso.com,doe@contoso.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if ownerEmails is set and it contains valid userNames', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerEmails: 'john@contoso.com,doe@contoso.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if ownerIds is set and it contains valid GUIDs', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', ownerIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if ownerIds is set and it contains valid GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', ownerIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if memberUserNames is set and it contains valid userNames', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberUserNames: 'john@contoso.com,doe@contoso.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if memberUserNames is set and it contains valid userNames', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberUserNames: 'john@contoso.com,doe@contoso.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if memberEmails is set and it contains valid userNames', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberEmails: 'john@contoso.com,doe@contoso.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if memberEmails is set and it contains valid userNames', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberEmails: 'john@contoso.com,doe@contoso.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if memberIds is set and it contains valid GUIDs', async () => {
-    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description', memberIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if memberIds is set and it contains valid GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', memberIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1,80fcda19-6c95-4c58-bc98-bc9dfb49bd0d' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if name is not specified and no template is used', () => {
+    const actual = commandOptionsSchema.safeParse({ description: 'Description' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if description is not specified and no template is used', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if only a template is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ template: '{"template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates(\'standard\')"}' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if more than one owner option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'TeamName',
+      description: 'Description',
+      ownerUserNames: 'john@contoso.com',
+      ownerIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if more than one member option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'TeamName',
+      description: 'Description',
+      memberUserNames: 'john@contoso.com',
+      memberIds: 'f5332379-663f-49b7-b5c6-84424ab9a0d1'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'TeamName', description: 'Description', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws error when trying to create a team using application permissions and not specifying an owner', async () => {
@@ -150,10 +198,10 @@ describe(commands.TEAM_ADD, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'TeamName',
         description: 'Description'
-      }
+      })
     }), new CommandError(`Specify at least 'ownerUserNames', 'ownerIds' or 'ownerEmails' when using application permissions.`));
   });
 
@@ -189,11 +237,11 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         template: '{"template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates(\'standard\')"}',
         wait: true
-      }
+      })
     });
     assert(aadGroupStub.calledTwice);
   });
@@ -226,11 +274,11 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion'
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -274,10 +322,10 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         template
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -321,11 +369,11 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Sample Classroom Team',
         template
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -369,11 +417,11 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -417,12 +465,12 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -506,13 +554,13 @@ describe(commands.TEAM_ADD, () => {
 
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -527,12 +575,12 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles operation error when creating a Team when waiting for command to complete', async () => {
@@ -591,13 +639,13 @@ describe(commands.TEAM_ADD, () => {
 
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
 
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -660,13 +708,13 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
-      }
-    } as any);
+      })
+    });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       displayName: 'Sample Classroom Team',
@@ -717,13 +765,13 @@ describe(commands.TEAM_ADD, () => {
     sinon.stub(entraUser, 'getUserIdsByUpns').resolves([userId]);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion',
         ownerEmails: 'john@contoso.com,doe@contoso.com',
         memberUserNames: 'john@contoso.com'
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -770,12 +818,12 @@ describe(commands.TEAM_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion',
         ownerIds: userId
-      }
+      })
     });
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",

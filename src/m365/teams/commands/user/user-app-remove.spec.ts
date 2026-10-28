@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-app-remove.js';
+import command, { options } from './user-app-remove.js';
 
 describe(commands.USER_APP_REMOVE, () => {
   const userId = '15d7a78e-fd77-4599-97a5-dbb6372846c6';
@@ -22,6 +22,7 @@ describe(commands.USER_APP_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,6 +31,7 @@ describe(commands.USER_APP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -59,7 +61,6 @@ describe(commands.USER_APP_REMOVE, () => {
       request.get,
       request.delete,
       cli.promptForConfirmation,
-      cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
   });
@@ -77,53 +78,54 @@ describe(commands.USER_APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the userId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: 'invalid',
-        id: appId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: 'invalid',
+      id: appId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userName is not a valid UPN.', async () => {
-    const actual = await command.validate({
-      options: {
-        userName: "no-an-email",
-        id: appId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userName is not a valid UPN.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userName: "no-an-email",
+      id: appId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the input is correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: appId,
-        userId: userId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the input is correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: appId,
+      userId: userId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the input is correct (userName)', async () => {
-    const actual = await command.validate({
-      options: {
-        id: appId,
-        userName: userName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the input is correct (userName)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: appId,
+      userName: userName
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: appId,
+      userId: userId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the app when confirmation argument is not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: userId,
         id: appId
-      }
-    } as any);
+      })
+    });
 
     assert(promptIssued);
   });
@@ -132,11 +134,11 @@ describe(commands.USER_APP_REMOVE, () => {
     const requestDeleteSpy = sinon.stub(request, 'delete');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: userId,
         id: appId
-      }
-    } as any);
+      })
+    });
     assert(requestDeleteSpy.notCalled);
   });
 
@@ -149,13 +151,13 @@ describe(commands.USER_APP_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: userId,
         id: appId,
         debug: true,
         force: true
-      }
-    } as any);
+      })
+    });
   });
 
   it('removes the app by id for the specified user using username when confirmation is specified.', async () => {
@@ -167,12 +169,12 @@ describe(commands.USER_APP_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: userName,
         id: appId,
         force: true
-      }
-    } as any);
+      })
+    });
   });
 
   it('removes the app by id for the specified user when prompt is confirmed (debug)', async () => {
@@ -187,12 +189,12 @@ describe(commands.USER_APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: userId,
         id: appId,
         debug: true
-      }
-    } as any);
+      })
+    });
   });
 
   it('removes the app for the specified user using username', async () => {
@@ -204,11 +206,11 @@ describe(commands.USER_APP_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: userName,
         id: appId
-      }
-    } as any);
+      })
+    });
   });
 
   it('removes the app by name for the specified user when prompt is confirmed (debug)', async () => {
@@ -239,12 +241,12 @@ describe(commands.USER_APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'TeamsApp',
         debug: true
-      }
-    } as any);
+      })
+    });
   });
 
   it('fails to get teams app when app by name does not exists', async () => {
@@ -257,13 +259,13 @@ describe(commands.USER_APP_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'TeamsApp',
         force: true
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
+      })
+    }), new CommandError('The specified Teams app does not exist'));
   });
 
   it('handles selecting single result when multiple teams apps with the specified name found and cli is set to prompt', async () => {
@@ -299,7 +301,7 @@ describe(commands.USER_APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: 'c527a470-a882-481c-981c-ee6efaba85c7', name: 'TeamsApp', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: 'c527a470-a882-481c-981c-ee6efaba85c7', name: 'TeamsApp', force: true }) });
     assert(removeRequestIssued);
   });
 
@@ -324,11 +326,11 @@ describe(commands.USER_APP_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: userId,
         id: appId,
         force: true
-      }
-    } as any), new CommandError(error.error.message));
+      })
+    }), new CommandError(error.error.message));
   });
 });

@@ -1,22 +1,40 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+const VisibilityEnum = {
+  Private: 'Private',
+  Public: 'Public'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .alias('i'),
+  name: z.string().alias('n'),
+  partsToClone: z.string()
+    .refine(val => val.replace(/\s/g, '').split(',').every(part => ['apps', 'channels', 'members', 'settings', 'tabs'].includes(part.toLowerCase())), {
+      message: `The value must be a comma-separated list of the following values: apps, channels, members, settings, tabs.`
+    })
+    .alias('p'),
+  description: z.string().optional().alias('d'),
+  classification: z.string().optional().alias('c'),
+  visibility: zod.coercedEnum(VisibilityEnum).optional().alias('v')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  name: string;
-  partsToClone: string;
-  description?: string;
-  classification?: string;
-  visibility?: string;
 }
 
 class TeamsTeamCloneCommand extends GraphCommand {
@@ -28,80 +46,8 @@ class TeamsTeamCloneCommand extends GraphCommand {
     return 'Creates a clone of a Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        classification: typeof args.options.classification !== 'undefined',
-        visibility: typeof args.options.visibility !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-p, --partsToClone <partsToClone>',
-        autocomplete: ['apps', 'channels', 'members', 'settings', 'tabs']
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '-v, --visibility [visibility]',
-        autocomplete: ['Private', 'Public']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-        for (const partToClone of partsToClone) {
-          const part: string = partToClone.toLowerCase();
-          if (part !== 'apps' &&
-            part !== 'channels' &&
-            part !== 'members' &&
-            part !== 'settings' &&
-            part !== 'tabs') {
-            return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-          }
-        }
-
-        if (args.options.visibility) {
-          const visibility: string = args.options.visibility.toLowerCase();
-
-          if (visibility !== 'private' &&
-            visibility !== 'public') {
-            return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
