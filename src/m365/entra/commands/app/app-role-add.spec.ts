@@ -360,22 +360,22 @@ describe(commands.APP_ROLE_ADD, () => {
   });
 
   it('fails validation if appId and appObjectId specified', () => {
-    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' });
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if appId and appName specified', () => {
-    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' });
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if appObjectId and appName specified', () => {
-    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' });
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if neither appId, appObjectId nor appName specified', () => {
-    const actual = commandOptionsSchema.safeParse({ name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' });
+    const actual = commandOptionsSchema.safeParse({ name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
     assert.strictEqual(actual.success, false);
   });
 
