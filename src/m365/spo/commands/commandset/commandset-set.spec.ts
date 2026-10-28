@@ -187,6 +187,7 @@ describe(commands.COMMANDSET_SET, () => {
   it('fails if the specified URL is invalid', () => {
     const actual = commandOptionsSchema.safeParse({ id: validId, webUrl: 'foo', newTitle: validNewTitle });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if id, title and clientSideComponentId are provided', () => {

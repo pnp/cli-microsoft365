@@ -107,6 +107,7 @@ describe(commands.COMMANDSET_LIST, () => {
       webUrl: 'foo'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the scope is not a valid scope', async () => {

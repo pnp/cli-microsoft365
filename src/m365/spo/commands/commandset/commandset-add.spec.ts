@@ -146,6 +146,7 @@ describe(commands.COMMANDSET_ADD, () => {
       clientSideComponentId: validClientSideComponentId
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid web url' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if all required options specified', () => {
