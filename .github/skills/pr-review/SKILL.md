@@ -45,7 +45,8 @@ git diff $base_sha..<sha>
 8. **Build, test, and lint** when feasible, without modifying the user's working tree. Use a separate worktree:
 
 ```bash
-git worktree add ../pr-<number>-review <sha>
+git fetch <remote> pull/<number>/head:pr-<number>   # <remote> points at the base repository; this also works for fork PRs
+git worktree add ../pr-<number>-review pr-<number>
 cd ../pr-<number>-review && npm ci && npm run build
 npx mocha --no-config --require source-map-support/register --timeout 10000 "dist/**/<changed-file>.spec.js"
 npx eslint <changed files>
