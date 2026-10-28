@@ -28,11 +28,15 @@ gh pr view <number> --json number,title,body,author,files,additions,deletions,ba
 gh pr diff <number>
 ```
 
-4. **Reviewing a specific commit**: `gh pr diff` always shows the latest PR state. When asked to review a specific commit (or an earlier state of the PR), fetch the PR head and diff from the merge base instead:
+4. **Reviewing a specific commit**: `gh pr diff` always shows the latest PR state. When asked to review a specific commit (or an earlier state of the PR), resolve the PR's target branch and the base at the reviewed revision. Do not use the merge base with today's target branch: a historical PR commit that is already an ancestor of that branch would produce an empty diff.
 
 ```bash
-git fetch <remote> pull/<number>/head:pr-<number>   # <remote> = the remote pointing at the base repository
-git diff $(git merge-base <remote>/main <sha>)..<sha>
+repo=<base-owner>/<base-repo>   # repository containing the PR, not the contributor's fork
+base_ref=$(gh api repos/$repo/pulls/<number> --jq '.base.ref')
+first_pr_commit=$(gh api --paginate repos/$repo/pulls/<number>/commits --jq '.[].sha' | head -n 1)
+base_sha=$(gh api repos/$repo/commits/$first_pr_commit --jq '.parents[0].sha')
+git fetch <remote> $base_ref $base_sha <sha>   # <remote> points at the base repository
+git diff $base_sha..<sha>
 ```
 
 5. **Read the linked issue(s)** (`closingIssuesReferences`, or `Closes #<n>` in the body) with `gh issue view <n> --comments`. The issue is the specification: verify the PR implements what was agreed (option names, aliases, behavior, output).
@@ -43,9 +47,11 @@ git diff $(git merge-base <remote>/main <sha>)..<sha>
 ```bash
 git worktree add ../pr-<number>-review <sha>
 cd ../pr-<number>-review && npm ci && npm run build
-npx mocha "dist/**/<changed-file>.spec.js"   # targeted tests for changed files
+npx mocha --no-config --require source-map-support/register --timeout 10000 "dist/**/<changed-file>.spec.js"
 npx eslint <changed files>
 ```
+
+   `--no-config` prevents `.mocharc.json` from adding its repository-wide `dist/**/*.spec.js` pattern to the positional spec and turning a targeted run into the full suite.
 
    Remove the worktree when done (`git worktree remove ../pr-<number>-review`). If you did not build, test, or lint, say so explicitly in the findings and the review summary (for example, "Not verified by running tests or lint").
 
@@ -103,7 +109,7 @@ Review the implementation for:
 
 - Release notes (`docs/docs/about/release-notes.mdx`) use accurate wording: *removed* vs *renamed* vs *deprecated*.
 - Upgrade guidance is added for the target major version (`docs/docs/v<N>-upgrade-guidance.mdx`), explaining what changed and what users should do.
-- No leftover references to the removed option or command in `src/` and `docs/` (e.g. `grep -rn -- '--<option>' src docs`), including examples, remarks, and tests.
+- No active usage of the removed option or command remains in source or current command documentation (e.g. `grep -rn -- '--<option>' src docs`). Preserve valid historical references in release notes, migration or upgrade guidance, and tests that verify the removed option is rejected.
 - Removed options are actually rejected (check `allowUnknownOptions()` and schema strictness), not silently accepted.
 
 **Refactors and migrations** (e.g. migrating a command to Zod) — verify behavior parity with the previous implementation:
@@ -137,7 +143,7 @@ Check documentation files (`.mdx`) for:
 - The `.mdx` file name matches the command file name.
 - Must include: title, description, usage, options table, examples, permissions, and response. A remarks section can be used for additional information, but is not mandatory.
 - When a command has a response, include sample output for all four output formats: JSON, Markdown, text, and CSV.
-- Each format's sample matches real output. Formats treat `defaultProperties` differently: only `text` output is trimmed to `defaultProperties`; JSON, CSV, and Markdown include all properties. A CSV or Markdown sample showing only the default properties is wrong.
+- Each format's sample matches real output. Without `--query`, only `text` output is trimmed to `defaultProperties`; JSON includes all properties, CSV omits non-null object and array values, and Markdown omits object-valued properties, including arrays and `null`. A CSV or Markdown sample may therefore omit nested properties even when JSON includes them.
 - Include at least 2 examples for the examples section, covering different option combinations.
 - Import and use `<Global />` for standard CLI options.
 - Examples should use `m365` prefix and long option names (not short aliases).

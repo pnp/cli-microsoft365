@@ -7,7 +7,7 @@ Apply these in addition to the general checklist when the PR touches the corresp
 Code under `src/m365/spfx/commands/project/` (`project-upgrade/`, `project-doctor/`, rules, and `test-projects/`).
 
 - Reuse existing rules instead of adding near-duplicates. For example, update the Node.js `engines` requirement via `FN021003_PKG_engines_node` rather than a new rule. Search `rules/` for a rule with the same ID prefix or purpose first.
-- New SPFx versions are added to `supportedVersions` in every command that declares it (e.g. `project-upgrade.ts`, `project-doctor.ts`, `project-externalize.ts`).
+- When a command's support range is intentionally extended, add the new SPFx version to that command's `supportedVersions` and its related docs/tests. Do not require unrelated commands such as `project-externalize` to match the upgrade/doctor support matrix when their implementations have a separately validated range.
 - The version-specific upgrade/doctor file (e.g. `upgrade-<version>.ts`, `doctor-<version>.ts`) lists rules in the expected order and includes every rule the SPFx release requires.
 - Rules that modify `package.json` overrides, resolutions, or arrays (e.g. `excludeDirectories`) don't overwrite or drop user-defined entries, and don't remove a value without re-adding the required one.
 - Matching `test-projects/` fixtures are added or updated, and specs exercise both the "fix needed" and "already compliant" cases.
