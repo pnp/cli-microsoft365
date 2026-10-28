@@ -7207,7 +7207,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "signInAudience": "AzureADMyOrg"
         })) {
         return {
@@ -7216,7 +7216,7 @@ describe(commands.APP_ADD, () => {
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
           "applicationTemplateId": null,
           "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "description": null,
           "groupMembershipClaims": null,
           "identifierUris": [],
@@ -7287,7 +7287,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifestWithSecret;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        name: 'My Microsoft Entra app',
         manifest: JSON.stringify(manifestWithSecret),
         withSecret: true
       })
@@ -7366,7 +7365,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
           "keyCredentials": [{
             "type": "AsymmetricX509Cert",
@@ -7381,7 +7380,7 @@ describe(commands.APP_ADD, () => {
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
           "applicationTemplateId": null,
           "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "description": null,
           "groupMembershipClaims": null,
           "identifierUris": [],
@@ -7446,7 +7445,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
@@ -7520,7 +7518,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "signInAudience": "AzureADMyOrg",
           "publicClient": {
             "redirectUris": ["https://login.microsoftonline.com/common/oauth2/nativeclient"]
@@ -7532,7 +7530,7 @@ describe(commands.APP_ADD, () => {
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
           "applicationTemplateId": null,
           "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "description": null,
           "groupMembershipClaims": null,
           "identifierUris": [],
@@ -7597,7 +7595,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         platform: 'publicClient',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient'
@@ -7668,7 +7665,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "signInAudience": "AzureADMultipleOrgs",
           "web": {
             "implicitGrantSettings": {
@@ -7683,7 +7680,7 @@ describe(commands.APP_ADD, () => {
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
           "applicationTemplateId": null,
           "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "description": null,
           "groupMembershipClaims": null,
           "identifierUris": [],
@@ -7748,7 +7745,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         implicitFlow: true,
         multitenant: true
@@ -7843,7 +7839,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "signInAudience": "AzureADMyOrg"
         })) {
         return {
@@ -7852,7 +7848,7 @@ describe(commands.APP_ADD, () => {
           "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
           "applicationTemplateId": null,
           "createdDateTime": "2020-12-31T14:44:13.7945807Z",
-          "displayName": "My Microsoft Entra app",
+          "displayName": "My app",
           "description": null,
           "groupMembershipClaims": null,
           "identifierUris": [],
@@ -7917,7 +7913,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
-        name: 'My Microsoft Entra app',
         manifest: JSON.stringify(basicManifest),
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
