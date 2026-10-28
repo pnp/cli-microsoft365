@@ -278,6 +278,7 @@ describe(commands.COMMANDSET_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', id: commandSetId });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the id option is not a valid GUID', async () => {
