@@ -193,6 +193,24 @@ describe(commands.TEAM_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if template is empty and name is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      template: '',
+      description: 'Description'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if template is empty and description is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      template: '',
+      name: 'TeamName'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
   it('throws error when trying to create a team using application permissions and not specifying an owner', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);

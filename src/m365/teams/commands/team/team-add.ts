@@ -74,14 +74,14 @@ class TeamsTeamAddCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(opts => opts.template !== undefined || opts.name !== undefined, {
+      .refine(opts => !!opts.template || opts.name !== undefined, {
         message: `Specify 'name' when not using a template.`,
         path: ['name'],
         params: {
           customCode: 'required'
         }
       })
-      .refine(opts => opts.template !== undefined || opts.description !== undefined, {
+      .refine(opts => !!opts.template || opts.description !== undefined, {
         message: `Specify 'description' when not using a template.`,
         path: ['description'],
         params: {
