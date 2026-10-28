@@ -46,7 +46,8 @@ git diff $base_sha..<sha>
 
 ```bash
 git fetch <remote> pull/<number>/head:pr-<number>   # <remote> points at the base repository; this also works for fork PRs
-git worktree add ../pr-<number>-review pr-<number>
+review_sha=<sha>   # requested commit, or the headRefOid captured in step 3 for a latest-state review
+git worktree add --detach ../pr-<number>-review $review_sha
 cd ../pr-<number>-review && npm ci && npm run build
 npx mocha --no-config --require source-map-support/register --timeout 10000 "dist/**/<changed-file>.spec.js"
 npx eslint <changed files>
