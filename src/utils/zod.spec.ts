@@ -98,6 +98,7 @@ describe('utils/zod', () => {
     });
     const options = zod.schemaToOptionInfo(schema);
     assert.strictEqual(options[0].name, 'boolOption');
+    assert.strictEqual(options[0].type, 'boolean');
   });
 
   it('parses extended schema', () => {
