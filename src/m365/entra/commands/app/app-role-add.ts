@@ -15,7 +15,7 @@ export const options = z.strictObject({
   appName: z.string().optional(),
   name: z.string().alias('n'),
   description: z.string().alias('d'),
-  allowedMembers: z.enum(['usersGroups', 'applications', 'both']).alias('m'),
+  allowedMembers: z.string().pipe(z.enum(['usersGroups', 'applications', 'both'])).alias('m'),
   claim: z.string()
     .max(120, `Claim must not be longer than 120 characters`)
     .refine(claim => !claim.startsWith('.'), {
