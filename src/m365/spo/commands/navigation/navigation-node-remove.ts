@@ -14,9 +14,7 @@ export const options = z.strictObject({
     message: 'The value of the option \'webUrl\' is not a valid SharePoint Online site URL.'
   }).alias('u'),
   location: z.string().pipe(z.enum(['QuickLaunch', 'TopNavigationBar'])).alias('l'),
-  id: z.coerce.number().refine(val => !isNaN(val), {
-    message: 'id is not a number'
-  }).alias('i'),
+  id: z.int().positive().alias('i'),
   force: z.boolean().optional().alias('f')
 });
 

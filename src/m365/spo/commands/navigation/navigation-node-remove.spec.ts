@@ -189,4 +189,18 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     });
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['abc', '', ' ', '\t', '\n', 0, -1, 1.5];
+
+    invalidIds.forEach(id => {
+      const actual = commandOptionsSchema.safeParse({
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+        location: 'TopNavigationBar',
+        id
+      });
+
+      assert.strictEqual(actual.success, false, `Expected '${id}' to fail validation`);
+    });
+  });
 });
