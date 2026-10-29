@@ -339,6 +339,32 @@ class MockCommandWithSchemaAndNumberRequiredOption extends AnonymousCommand {
   }
 }
 
+class MockCommandWithProcessedPromptedOption extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema processed prompt';
+  }
+
+  public get description(): string {
+    return 'Mock command with a prompted option requiring processing';
+  }
+
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string().refine(value => value.startsWith('https://'))
+    });
+  }
+
+  public async processOptions(options: any): Promise<void> {
+    if (options.url?.startsWith('/')) {
+      options.url = `https://contoso.sharepoint.com${options.url}`;
+    }
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+}
+
 const refinedSchemaOptions = z.strictObject({
   ...globalOptionsZod.shape,
   authType: z.string().optional(),
@@ -497,6 +523,8 @@ describe('cli', () => {
   let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
+  let mockCommandWithProcessedPromptedOption: Command;
+  let mockCommandWithProcessedPromptedOptionActionSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -525,6 +553,8 @@ describe('cli', () => {
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
+    mockCommandWithProcessedPromptedOption = new MockCommandWithProcessedPromptedOption();
+    mockCommandWithProcessedPromptedOptionActionSpy = sinon.spy(mockCommandWithProcessedPromptedOption, 'action');
 
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
@@ -552,6 +582,8 @@ describe('cli', () => {
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
       cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx')
+      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithProcessedPromptedOption, 'cli-schema-processed-prompt-mock.js', 'help.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -564,6 +596,7 @@ describe('cli', () => {
     processExitStub.reset();
     md2plainSpy.resetHistory();
     mockCommandActionSpy.resetHistory();
+    mockCommandWithProcessedPromptedOptionActionSpy.resetHistory();
     sinonUtil.restore([
       cli.closeWithError,
       cli.executeCommand,
@@ -582,6 +615,7 @@ describe('cli', () => {
       mockCommand.processOptions,
       mockCommandWithSchemaAndProcessedRequiredOptions.processOptions,
       mockCommandWithRefinedSchema.processOptions,
+      mockCommandWithProcessedPromptedOption.processOptions,
       prompt.forInput,
       prompt.forSelection,
       prompt.forConfirmation,
@@ -2621,5 +2655,50 @@ describe('cli', () => {
 
     assert(promptForValueSpy.notCalled);
     assert(executeCommandSpy.notCalled);
+  });
+
+  it('processes prompted options before retrying schema validation', async () => {
+    sinon.stub(prompt, 'forInput').resolves('/sites/Sales');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed prompt');
+
+    await cli.execute(['cli', 'mock', 'schema', 'processed', 'prompt']);
+
+    assert(mockCommandWithProcessedPromptedOptionActionSpy.calledOnce);
+    assert.strictEqual(
+      mockCommandWithProcessedPromptedOptionActionSpy.firstCall.args[1].options.url,
+      'https://contoso.sharepoint.com/sites/Sales'
+    );
+  });
+
+  it(`handles errors when processing prompted options`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed prompt');
+    sinon.stub(prompt, 'forInput').resolves('/sites/Sales');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(mockCommandWithProcessedPromptedOption, 'processOptions')
+      .onFirstCall().resolves()
+      .onSecondCall().rejects(new Error('Failed to process prompted options'));
+
+    await assert.rejects(
+      cli.execute(['cli', 'mock', 'schema', 'processed', 'prompt']),
+      /Failed to process prompted options/
+    );
+
+    assert(processExitStub.calledWith(1));
+    assert(mockCommandWithProcessedPromptedOptionActionSpy.notCalled);
   });
 });
