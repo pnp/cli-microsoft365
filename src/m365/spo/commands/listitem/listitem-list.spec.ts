@@ -208,6 +208,11 @@ describe(commands.LISTITEM_LIST, () => {
     assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 
+  it('passes validation if the specific pageNumber is 0', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageSize: 3, pageNumber: 0 });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);

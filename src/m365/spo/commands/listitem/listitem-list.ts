@@ -29,7 +29,7 @@ export const options = z.strictObject({
   listTitle: z.string().optional().alias('t'),
   listUrl: z.string().optional(),
   pageSize: z.number().int().positive().optional().alias('s'),
-  pageNumber: z.number().int().positive().optional().alias('n'),
+  pageNumber: z.number().int().nonnegative().optional().alias('n'),
   camlQuery: z.string().optional().alias('q'),
   fields: z.string().optional(),
   filter: z.string().optional().alias('l')
