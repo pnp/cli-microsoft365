@@ -160,4 +160,81 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
       new CommandError('An error has occurred')
     );
   });
+
+  it('preserves explicitly requested properties in text output', async () => {
+    sinon.stub(request, 'get').resolves({
+      value: [{
+        id: '59246ef4-b832-48eb-a5e0-87748132e12c',
+        appDescription: 'Agent blueprint principal'
+      }]
+    });
+
+    cli.commandToExecute = commandInfo;
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id,appDescription',
+        output: 'text'
+      })
+    });
+
+    assert.deepStrictEqual(
+      cli.commandToExecute.defaultProperties,
+      ['id', 'appDescription']
+    );
+  });
+
+  it('serializes a requested slash-qualified property in text output', async () => {
+    const result = [{
+      id: '59246ef4-b832-48eb-a5e0-87748132e12c',
+      info: {
+        logoUrl: 'https://contoso.com/logo.png'
+      }
+    }];
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      assert.strictEqual(
+        opts.url,
+        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id'
+      );
+
+      return { value: result };
+    });
+
+    cli.commandToExecute = commandInfo;
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id,info/logoUrl',
+        output: 'text'
+      })
+    });
+
+    assert.deepStrictEqual(cli.commandToExecute.defaultProperties, ['id', 'info']);
+
+    const output = await cli.formatOutput(command, result, { output: 'text' });
+
+    assert(output.includes('"logoUrl":"https://contoso.com/logo.png"'));
+  });
+
+  it('excludes slash-qualified properties from the select query', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      assert.strictEqual(
+        opts.url,
+        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,appDisplayName'
+      );
+
+      return { value: limitedResponse };
+    });
+
+    cli.commandToExecute = commandInfo;
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id,info/logoUrl,appDisplayName'
+      })
+    });
+
+    assert(loggerLogSpy.calledWith(limitedResponse));
+  });
 });

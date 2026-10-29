@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
@@ -41,6 +42,12 @@ class EntraAgentBlueprintprincipalListCommand extends GraphCommand {
 
       if (selectProperties.length > 0) {
         queryParameters.push(`$select=${selectProperties}`);
+      }
+
+      if (cli.commandToExecute) {
+        cli.commandToExecute.defaultProperties = [
+          ...new Set<string>(allProperties.map(prop => prop.split('/')[0]))
+        ];
       }
     }
 
