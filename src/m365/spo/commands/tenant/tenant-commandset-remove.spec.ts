@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-commandset-remove.js';
+import command, { options } from './tenant-commandset-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_COMMANDSET_REMOVE, () => {
@@ -51,6 +51,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -61,6 +62,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -116,126 +118,77 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: 'abc' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when all options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when all options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: String(id),
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when no options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when no options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
     });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when title and id options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when title and id options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: String(id)
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when title and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when title and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when id and clientSideComponentId options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when id and clientSideComponentId options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: String(id),
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if id is a valid number', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: String(id) });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passed validation when title specified', async () => {
-    const actual = await command.validate({ options: { title: title } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation when title specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if clientSideComponentId is valid', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if clientSideComponentId is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: clientSideComponentId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title, unknownOption: 'value' });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified tenant command set when force option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        id: id
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: String(id) }) });
 
     assert(promptIssued);
   });
@@ -244,11 +197,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, {
-      options: {
-        id: id
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: String(id) }) });
     assert(postSpy.notCalled);
   });
 
@@ -263,12 +212,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) }), new CommandError(errorMessage));
   });
 
   it('throws error when retrieving a tenant app catalog fails with an exception', async () => {
@@ -282,12 +226,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) }), new CommandError(errorMessage));
   });
 
   it('removes a command set by title (debug)', async () => {
@@ -314,12 +253,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        verbose: true,
-        title: title
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, title: title }) });
     assert(postSpy.called);
   });
 
@@ -347,12 +281,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) });
     assert(postSpy.called);
   });
 
@@ -380,12 +309,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        verbose: true,
-        id: id
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, id: String(id) }) });
     assert(postSpy.called);
   });
 
@@ -413,12 +337,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        verbose: true,
-        clientSideComponentId: clientSideComponentId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, clientSideComponentId: clientSideComponentId }) });
     assert(postSpy.called);
   });
 
@@ -449,12 +368,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    }), new CommandError("Multiple command sets with Some commandset were found. Found: 4, 5."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) }), new CommandError("Multiple command sets with Some commandset were found. Found: 4, 5."));
   });
 
   it('handles error when multiple command sets with the clientSideComponentId found', async () => {
@@ -484,12 +398,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId,
-        force: true
-      }
-    }), new CommandError("Multiple command sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 4, 5."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, force: true }) }), new CommandError("Multiple command sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 4, 5."));
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
@@ -524,12 +433,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) });
     assert(postSpy.called);
   });
 
@@ -547,12 +451,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        force: true
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, force: true }) }), new CommandError(errorMessage));
   });
 
   it('handles error when retrieving command set', async () => {
@@ -570,11 +469,6 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId,
-        force: true
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, force: true }) }), new CommandError(errorMessage));
   });
 });

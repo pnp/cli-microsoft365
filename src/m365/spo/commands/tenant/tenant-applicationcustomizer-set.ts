@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -14,6 +15,26 @@ import { ListItemInstance } from '../listitem/ListItemInstance.js';
 import spoListItemListCommand, { Options as spoListItemListCommandOptions } from '../listitem/listitem-list.js';
 import { Solution } from './Solution.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => !isNaN(Number(val)), { message: 'id is not a number' }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
+  newTitle: z.string().optional(),
+  newClientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'newClientSideComponentId is not a valid GUID' }).optional(),
+  clientSideComponentProperties: z.string().refine(val => {
+    try { JSON.parse(val); return true; }
+    catch { return false; }
+  }, { message: 'clientSideComponentProperties is not valid JSON' }).optional().alias('p'),
+  hostProperties: z.string().refine(val => {
+    try { JSON.parse(val); return true; }
+    catch { return false; }
+  }, { message: 'hostProperties is not valid JSON' }).optional(),
+  webTemplate: z.string().optional().alias('w')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
@@ -21,17 +42,6 @@ interface CommandArgs {
 interface FormValue {
   FieldName: string;
   FieldValue: string;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  clientSideComponentId?: string;
-  newTitle?: string;
-  newClientSideComponentId?: string;
-  clientSideComponentProperties?: string;
-  hostProperties?: string;
-  webTemplate?: string;
 }
 
 class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
@@ -43,103 +53,22 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     return 'Updates an Application Customizer that is deployed as a tenant-wide extension';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        newTitle: typeof args.options.newTitle !== 'undefined',
-        newClientSideComponentId: typeof args.options.newClientSideComponentId !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        hostProperties: typeof args.options.hostProperties !== 'undefined',
-        webTemplate: typeof args.options.webTemplate !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.title, opts.id, opts.clientSideComponentId].filter(v => v !== undefined).length === 1, {
+        error: `Specify exactly one of the following options: 'title', 'id', or 'clientSideComponentId'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['title', 'id', 'clientSideComponentId']
+        }
+      })
+      .refine(opts => opts.newTitle || opts.newClientSideComponentId || opts.clientSideComponentProperties || opts.hostProperties !== undefined || opts.webTemplate, {
+        error: 'Please specify an option to be updated'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-c, --clientSideComponentId  [clientSideComponentId]'
-      },
-      {
-        option: '--newTitle [newTitle]'
-      },
-      {
-        option: '--newClientSideComponentId [newClientSideComponentId]'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '--hostProperties [hostProperties]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && isNaN(parseInt(args.options.id))) {
-          return `${args.options.id} is not a number`;
-        }
-
-        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.newClientSideComponentId && !validation.isValidGuid(args.options.newClientSideComponentId)) {
-          return `${args.options.newClientSideComponentId} is not a valid GUID`;
-        }
-
-        if (args.options.clientSideComponentProperties) {
-          try {
-            JSON.parse(args.options.clientSideComponentProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
-          }
-        }
-
-        if (args.options.hostProperties) {
-          try {
-            JSON.parse(args.options.hostProperties);
-          }
-          catch (e) {
-            return `An error has occurred while parsing hostProperties: ${e}`;
-          }
-        }
-
-        if (!args.options.newTitle && !args.options.newClientSideComponentId && !args.options.clientSideComponentProperties && args.options.hostProperties === undefined && !args.options.webTemplate) {
-          return `Please specify an option to be updated`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['title', 'id', 'clientSideComponentId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
