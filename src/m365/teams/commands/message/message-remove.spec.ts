@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './message-remove.js';
+import command, { options } from './message-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
@@ -27,6 +27,7 @@ describe(commands.MESSAGE_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,6 +39,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinon.stub(teams, 'getChannelIdByDisplayName').resolves(channelId);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,34 +83,44 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { teamId: 'invalid', channelId: channelId, id: messageId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: 'invalid', channelId: channelId, id: messageId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the channel id is not a valid channel id', async () => {
-    const actual = await command.validate({ options: { teamId: teamId, channelId: 'invalid', id: messageId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the channel id is not a valid channel id', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: teamId, channelId: 'invalid', id: messageId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the channel id and team id both are valid', async () => {
-    const actual = await command.validate({ options: { teamId: teamId, channelId: channelId, id: messageId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the channel id and team id both are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: teamId, channelId: channelId, id: messageId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the channel name and team name are set', async () => {
-    const actual = await command.validate({ options: { teamName: teamName, channelName: channelName, id: messageId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the channel name and team name are set', () => {
+    const actual = commandOptionsSchema.safeParse({ teamName: teamName, channelName: channelName, id: messageId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      channelId: channelId,
+      id: messageId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified message when force option not passed', async () => {
-    await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, teamId: teamId, channelId: channelId }) });
     assert(promptIssued);
   });
 
   it('aborts removing the specified message when force option not passed and prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
-    await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, teamId: teamId, channelId: channelId }) });
     assert(postStub.notCalled);
   });
 
@@ -121,7 +133,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: messageId, teamId: teamId, channelId: channelId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, teamId: teamId, channelId: channelId, force: true, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -137,7 +149,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: messageId, teamName: teamName, channelName: channelName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, teamName: teamName, channelName: channelName, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -159,7 +171,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, teamName: teamName, channelName: channelName, force: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, teamName: teamName, channelName: channelName, force: true, verbose: true }) }),
       new CommandError('The message was not found in the Teams channel.'));
   });
 
@@ -178,7 +190,7 @@ describe(commands.MESSAGE_REMOVE, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { id: messageId, channelId: channelId, teamName: teamName, force: true, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: messageId, channelId: channelId, teamName: teamName, force: true, verbose: true }) }),
       new CommandError('An error has occurred'));
   });
 });
