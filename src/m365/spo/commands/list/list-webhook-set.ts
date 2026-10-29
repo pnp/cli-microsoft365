@@ -73,7 +73,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
       .refine(opts => opts.notificationUrl || opts.expirationDateTime || opts.clientState, {
         error: 'Specify notificationUrl, expirationDateTime, clientState or multiple, at least one is required',
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['notificationUrl', 'expirationDateTime', 'clientState']
         }
       });
   }
