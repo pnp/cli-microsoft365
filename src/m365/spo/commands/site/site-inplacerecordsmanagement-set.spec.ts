@@ -83,7 +83,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' }) }), new CommandError("Feature 'InPlaceRecords' (ID: da2e115b-07e4-49d9-bb2c-35e93bb9fca9) is already activated at scope 'https://contoso.sharepoint.com/sites/team-a'."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true }) }), new CommandError("Feature 'InPlaceRecords' (ID: da2e115b-07e4-49d9-bb2c-35e93bb9fca9) is already activated at scope 'https://contoso.sharepoint.com/sites/team-a'."));
   });
 
   it('correctly handles error when in-place records management already deactivated', async () => {
@@ -106,7 +106,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' }) }), new CommandError("Feature 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9' is not activated at this scope."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: false }) }), new CommandError("Feature 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9' is not activated at this scope."));
   });
 
   it('should deactivate in-place records management', async () => {
@@ -119,7 +119,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: false }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/remove');
     assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
     assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
@@ -136,7 +136,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/add');
     assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
     assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
@@ -152,30 +152,30 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/add');
     assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
     assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
   });
 
   it('fails validation if siteUrl is not a valid SharePoint URL', () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'abc', enabled: 'true' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'abc', enabled: true });
     assert.strictEqual(actual.success, false);
     assert.strictEqual(actual.error.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "true"', () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "false"', () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: false });
     assert.strictEqual(actual.success, true);
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true', unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 });
