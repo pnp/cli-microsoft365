@@ -50,7 +50,8 @@ class SpoFolderSetCommand extends SpoCommand {
       .refine(opts => opts.name !== undefined || opts.color !== undefined, {
         error: `Specify at least one of the options: name or color.`,
         params: {
-          customCode: 'required'
+          customCode: 'optionSet',
+          options: ['name', 'color']
         }
       });
   }

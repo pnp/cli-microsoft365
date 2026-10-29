@@ -27,9 +27,9 @@ export const options = z.strictObject({
     })
     .optional(),
   folderUrl: z.string().optional(),
-  type: z.enum(allowedTypes, {
+  type: z.string().pipe(z.enum(allowedTypes, {
     error: e => `'${e.input}' is not a valid type. Allowed values are: ${allowedTypes.join(',')}`
-  }),
+  })),
   expirationDateTime: z.string()
     .refine(dateTime => validation.isValidISODateTime(dateTime), {
       error: e => `'${e.input}' is not a valid ISO date string.`
