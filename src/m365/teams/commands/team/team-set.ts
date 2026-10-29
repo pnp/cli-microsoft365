@@ -1,32 +1,40 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+
+const VisibilityEnum = {
+  Private: 'Private',
+  Public: 'Public'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional()
+    .alias('i'),
+  name: z.string().optional().alias('n'),
+  description: z.string().optional(),
+  mailNickName: z.string().optional(),
+  classification: z.string().optional(),
+  visibility: zod.coercedEnum(VisibilityEnum).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
-  description?: string;
-  mailNickName?: string;
-  classification?: string;
-  visibility?: string;
-}
-
 class TeamsTeamSetCommand extends GraphCommand {
-  private static props: string[] = [
-    'description',
-    'mailNickName',
-    'classification',
-    'visibility '
-  ];
-
   public get name(): string {
     return commands.TEAM_SET;
   }
@@ -35,62 +43,8 @@ class TeamsTeamSetCommand extends GraphCommand {
     return 'Updates settings of a Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      TeamsTeamSetCommand.props.forEach((p: string) => {
-        this.telemetryProperties[p] = typeof (args.options as any)[p] !== 'undefined';
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--mailNickName [mailNickName]'
-      },
-      {
-        option: '--classification [classification]'
-      },
-      {
-        option: '--visibility [visibility]',
-        autocomplete: ['Private', 'Public']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.visibility) {
-          if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
-            return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   private mapRequestBody(options: Options): any {

@@ -1,18 +1,27 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphApplicationCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-interface CommandArgs {
-  options: DateTimeOptions;
-}
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  output: z.enum(['csv', 'json']).optional().alias('o'),
+  fromDateTime: z.string().refine(val => validation.isValidISODateDashOnly(val), {
+    message: 'The fromDateTime is not a valid ISO date string (YYYY-MM-DD)'
+  }),
+  toDateTime: z.string().refine(val => validation.isValidISODateDashOnly(val), {
+    message: 'The toDateTime is not a valid ISO date string (YYYY-MM-DD)'
+  }).optional()
+});
 
-interface DateTimeOptions extends GlobalOptions {
-  fromDateTime: string;
-  toDateTime?: string;
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class TeamsReportDirectroutingcallsCommand extends GraphApplicationCommand {
@@ -32,52 +41,14 @@ class TeamsReportDirectroutingcallsCommand extends GraphApplicationCommand {
     return ['id', 'calleeNumber', 'callerNumber', 'startDateTime'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        toDateTime: typeof args.options.toDateTime !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema.refine(opts => Math.ceil((new Date(opts.toDateTime || new Date().toISOString()).getTime() - new Date(opts.fromDateTime).getTime()) / (1000 * 3600 * 24)) <= 90, {
+      message: 'The maximum number of days between fromDateTime and toDateTime cannot exceed 90'
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--fromDateTime <fromDateTime>'
-      },
-      {
-        option: '--toDateTime [toDateTime]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidISODateDashOnly(args.options.fromDateTime)) {
-          return 'The fromDateTime is not a valid ISO date string (YYYY-MM-DD)';
-        }
-
-        if (args.options.toDateTime &&
-          !validation.isValidISODateDashOnly(args.options.toDateTime)) {
-          return 'The toDateTime is not a valid ISO date string (YYYY-MM-DD)';
-        }
-
-        if (Math.ceil((new Date(args.options.toDateTime || new Date().toISOString()).getTime() - new Date(args.options.fromDateTime).getTime()) / (1000 * 3600 * 24)) > 90) {
-          return 'The maximum number of days between fromDateTime and toDateTime cannot exceed 90';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

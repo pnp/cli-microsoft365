@@ -2293,4 +2293,49 @@ describe('cli', () => {
       'camel-case-expansion': false
     });
   });
+
+  it(`clears unselected option when multiple option-set options are specified`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined');
+
+    const promptSelectionStub = sinon.stub(prompt, 'forSelection');
+    promptSelectionStub.onFirstCall().resolves('certificateFile');
+    promptSelectionStub.onSecondCall().rejects(new Error('Option set prompted repeatedly'));
+
+    const promptInputStub = sinon.stub(prompt, 'forInput').resolves('/path/to/selected-cert.pem');
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'refined',
+      '--authType',
+      'certificate',
+      '--certificateFile',
+      '/path/to/original-cert.pem',
+      '--certificateBase64Encoded',
+      'base64-value'
+    ]);
+
+    assert(promptSelectionStub.calledOnce);
+    assert(promptInputStub.calledOnce);
+    assert(executeCommandSpy.calledOnce);
+    assert.strictEqual(
+      executeCommandSpy.firstCall.args[1].options.certificateFile,
+      '/path/to/selected-cert.pem'
+    );
+    assert.strictEqual(
+      executeCommandSpy.firstCall.args[1].options.certificateBase64Encoded,
+      undefined
+    );
+  });
 });

@@ -12,8 +12,7 @@ import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import { formatting } from '../../../../utils/formatting.js';
-import command from './team-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './team-list.js';
 
 describe(commands.TEAM_LIST, () => {
   const userId = '2630257f-11d4-4244-b4a1-3707b79f142d';
@@ -202,6 +201,7 @@ describe(commands.TEAM_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let postStub: sinon.SinonStub;
 
   before(() => {
@@ -211,7 +211,7 @@ describe(commands.TEAM_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').returnsArg(1);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -242,8 +242,7 @@ describe(commands.TEAM_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -264,78 +263,64 @@ describe(commands.TEAM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'isArchived', 'description']);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { joined: true, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { joined: true, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation userName is used without joined or associated option', async () => {
-    const actual = await command.validate({ options: { userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation userName is used without joined or associated option', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation userId is used without joined or associated option', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation userId is used without joined or associated option', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both userId and userName are used', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { joined: true, userId: userId, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both userId and userName are used', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, userId: userId, userName: userName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both joined and associated options are used', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { joined: true, associated: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both joined and associated options are used', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, associated: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if userId is used with joined option', async () => {
-    const actual = await command.validate({ options: { joined: true, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userId is used with joined option', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if userName is used with associated option', async () => {
-    const actual = await command.validate({ options: { associated: true, userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if userName is used with associated option', () => {
+    const actual = commandOptionsSchema.safeParse({ associated: true, userName: userName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if only joined option is used', async () => {
-    const actual = await command.validate({ options: { joined: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only joined option is used', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if only associated option is used', async () => {
-    const actual = await command.validate({ options: { associated: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only associated option is used', () => {
+    const actual = commandOptionsSchema.safeParse({ associated: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ joined: true, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves all teams in the tenant', async () => {
@@ -348,9 +333,9 @@ describe(commands.TEAM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -376,10 +361,10 @@ describe(commands.TEAM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         joined: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -405,11 +390,11 @@ describe(commands.TEAM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userName: userName,
         joined: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -435,10 +420,10 @@ describe(commands.TEAM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         associated: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -464,11 +449,11 @@ describe(commands.TEAM_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         userId: userId,
         associated: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
@@ -505,6 +490,6 @@ describe(commands.TEAM_LIST, () => {
     sinon.stub(request, 'post').resolves(failedResponse);
     sinon.stub(request, 'get').resolves(groupIdResponse);
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Resource not found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Resource not found.'));
   });
 });

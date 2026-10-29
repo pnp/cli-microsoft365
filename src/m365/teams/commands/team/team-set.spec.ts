@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-set.js';
+import command, { options } from './team-set.js';
 
 describe(commands.TEAM_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.TEAM_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,13 +64,9 @@ describe(commands.TEAM_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('sets the visibility settings correctly', async () => {
@@ -84,8 +82,8 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
-    } as any);
+      options: commandOptionsSchema.parse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' })
+    });
   });
 
   it('sets the mailNickName correctly', async () => {
@@ -101,8 +99,8 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
-    } as any);
+      options: commandOptionsSchema.parse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' })
+    });
   });
 
   it('sets the description settings correctly', async () => {
@@ -117,8 +115,8 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', description: 'desc' }
-    } as any);
+      options: commandOptionsSchema.parse({ debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', description: 'desc' })
+    });
   });
 
   it('sets the classification settings correctly', async () => {
@@ -133,8 +131,8 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', classification: 'MBI' }
-    } as any);
+      options: commandOptionsSchema.parse({ debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', classification: 'MBI' })
+    });
   });
 
   it('should handle Microsoft graph error response', async () => {
@@ -156,30 +154,36 @@ describe(commands.TEAM_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         name: 'NewName'
-      }
-    } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
+      })
+    }), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if visibility is not a valid visibility Private|Public', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        visibility: 'hidden'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, false);
+  it('fails validation if visibility is not a valid visibility Private|Public', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+      visibility: 'hidden'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
