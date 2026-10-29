@@ -13,7 +13,7 @@ export const options = z.strictObject({
   webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
     message: 'The value of the option \'webUrl\' is not a valid SharePoint Online site URL.'
   }).alias('u'),
-  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l'),
+  location: z.string().pipe(z.enum(['QuickLaunch', 'TopNavigationBar'])).alias('l'),
   id: z.coerce.number().refine(val => !isNaN(val), {
     message: 'id is not a number'
   }).alias('i'),
