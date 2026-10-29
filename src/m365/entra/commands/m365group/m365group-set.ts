@@ -103,7 +103,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
           options: ['memberIds', 'memberUserNames']
         }
       })
-      .refine(opts => opts.newDisplayName !== undefined ||
+      .refine(opts => !!opts.newDisplayName ||
         opts.description !== undefined ||
         opts.ownerIds !== undefined ||
         opts.ownerUserNames !== undefined ||
@@ -115,10 +115,7 @@ class EntraM365GroupSetCommand extends GraphCommand {
         opts.autoSubscribeNewMembers !== undefined ||
         opts.hideFromAddressLists !== undefined ||
         opts.hideFromOutlookClients !== undefined, {
-        error: 'Specify at least one option to update.',
-        params: {
-          customCode: 'required'
-        }
+        error: 'Specify at least one option to update.'
       });
   }
 
