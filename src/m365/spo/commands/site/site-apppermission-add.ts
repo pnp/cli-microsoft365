@@ -21,7 +21,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  permission: z.enum(['read', 'write', 'manage', 'fullcontrol']).alias('p'),
+  permission: z.string().pipe(z.enum(['read', 'write', 'manage', 'fullcontrol']).alias('p')),
   appId: z.string()
     .refine(appId => validation.isValidGuid(appId) === true, {
       error: e => `'${e.input}' is not a valid GUID.`

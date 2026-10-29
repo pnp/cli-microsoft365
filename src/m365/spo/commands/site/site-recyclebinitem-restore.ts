@@ -45,14 +45,14 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(o => o.ids !== undefined || o.allPrimary !== undefined || o.allSecondary !== undefined, {
+      .refine(o => o.ids !== undefined || o.allPrimary || o.allSecondary, {
         error: `Specify either 'ids', 'allPrimary', or 'allSecondary'.`,
         params: {
           customCode: 'optionSet',
           options: ['ids', 'allPrimary', 'allSecondary']
         }
       })
-      .refine(o => !(o.ids !== undefined && (o.allPrimary !== undefined || o.allSecondary !== undefined)), {
+      .refine(o => !(o.ids !== undefined && (o.allPrimary || o.allSecondary)), {
         error: `Option 'ids' cannot be used with 'allPrimary' or 'allSecondary'.`
       });
   }
