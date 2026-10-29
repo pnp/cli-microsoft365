@@ -187,8 +187,18 @@ describe(commands.LISTITEM_LIST, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if camlQuery and pageNumber 0 are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 0 });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if pageNumber is specified and pageSize is not', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageNumber: 3 });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if pageNumber 0 is specified and pageSize is not', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageNumber: 0 });
     assert.strictEqual(actual.success, false);
   });
 

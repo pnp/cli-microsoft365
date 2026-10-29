@@ -69,10 +69,10 @@ class SpoListItemListCommand extends SpoCommand {
       .refine(opts => !opts.camlQuery || !opts.pageSize, {
         error: 'You cannot use the pageSize-option when specifying a camlQuery'
       })
-      .refine(opts => !opts.camlQuery || !opts.pageNumber, {
+      .refine(opts => !opts.camlQuery || opts.pageNumber === undefined, {
         error: 'You cannot use the pageNumber-option when specifying a camlQuery'
       })
-      .refine(opts => !opts.pageNumber || opts.pageSize !== undefined, {
+      .refine(opts => opts.pageNumber === undefined || opts.pageSize !== undefined, {
         error: 'pageSize must be specified if pageNumber is specified'
       });
   }
