@@ -70,7 +70,7 @@ class OutlookCalendarGroupAddCommand extends GraphCommand {
       else if (args.options.userId || args.options.userName) {
         const currentUserId = accessToken.getUserIdFromAccessToken(token);
         const currentUserName = accessToken.getUserNameFromAccessToken(token);
-        const isOtherUser = (args.options.userId && args.options.userId !== currentUserId) ||
+        const isOtherUser = (args.options.userId && args.options.userId.toLowerCase() !== currentUserId?.toLowerCase()) ||
           (args.options.userName && args.options.userName.toLowerCase() !== currentUserName?.toLowerCase());
 
         if (isOtherUser) {
