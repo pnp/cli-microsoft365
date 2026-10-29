@@ -931,7 +931,7 @@ describe(commands.FILE_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if --approveComment specified, but not --approve', () => {
+  it('fails validation on --approve if --approveComment specified, but not --approve', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: 'https://contoso.sharepoint.com',
       folder: 'abc',
@@ -939,9 +939,10 @@ describe(commands.FILE_ADD, () => {
       approveComment: 'abc'
     });
     assert.strictEqual(actual.success, false);
+    assert.deepStrictEqual(actual.error?.issues[0].path, ['approve']);
   });
 
-  it('fails validation if --publishComment specified, but not --publish', () => {
+  it('fails validation on --publish if --publishComment specified, but not --publish', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: 'https://contoso.sharepoint.com',
       folder: 'abc',
@@ -949,6 +950,7 @@ describe(commands.FILE_ADD, () => {
       publishComment: 'abc'
     });
     assert.strictEqual(actual.success, false);
+    assert.deepStrictEqual(actual.error?.issues[0].path, ['publish']);
   });
 
   it('passed validation if options correct', () => {
