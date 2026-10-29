@@ -137,7 +137,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       userName: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid UPN.`);
+    assert.strictEqual(actual.error?.issues.find(issue => issue.path[0] === 'userName')?.message, `'invalid' is not a valid UPN.`);
   });
 
   it('passes validation if userName is specified', () => {
