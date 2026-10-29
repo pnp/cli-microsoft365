@@ -100,6 +100,9 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are passed', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     const actual = commandOptionsSchema.safeParse({
       id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
       name: 'Test app',
@@ -109,6 +112,9 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are not passed', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     const actual = commandOptionsSchema.safeParse({
       filePath: 'teamsapp.zip'
     });
@@ -116,6 +122,9 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if the id is not a valid GUID.', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     const actual = commandOptionsSchema.safeParse({
       id: 'invalid',
       filePath: 'teamsapp.zip'
@@ -347,6 +356,9 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation with unknown options', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     const actual = commandOptionsSchema.safeParse({
       id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
       filePath: 'teamsapp.zip',
