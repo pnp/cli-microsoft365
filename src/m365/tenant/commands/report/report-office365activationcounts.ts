@@ -6,7 +6,10 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-export const options = globalOptionsZod.strict();
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  output: z.enum(['json', 'csv']).optional().alias('o')
+});
 
 declare type Options = z.infer<typeof options>;
 
