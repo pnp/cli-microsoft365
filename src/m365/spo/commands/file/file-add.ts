@@ -97,14 +97,14 @@ class SpoFileAddCommand extends SpoCommand {
     return schema
       .refine(opts => !opts.publishComment || opts.publish, {
         error: '--publishComment cannot be used without --publish',
-        path: ['publishComment'],
+        path: ['publish'],
         params: {
           customCode: 'required'
         }
       })
       .refine(opts => !opts.approveComment || opts.approve, {
         error: '--approveComment cannot be used without --approve',
-        path: ['approveComment'],
+        path: ['approve'],
         params: {
           customCode: 'required'
         }
