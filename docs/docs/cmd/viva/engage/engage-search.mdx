@@ -37,6 +37,23 @@ In order to use this command, you need to grant the Microsoft Entra application 
 
 Using the `--show` option in JSON output is not supported. To filter JSON results, use either a JMESPath query or filter the data yourself after retrieving them.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource                    | Permissions    |
+  |-----------------------------|----------------|
+  | Viva Engage Legacy REST API | access_as_user |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  This command does not support application permissions.
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Returns search result for the query `community`
