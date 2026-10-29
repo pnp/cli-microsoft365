@@ -65,10 +65,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       })
       .refine(opts => !(opts.listId || opts.listTitle || opts.listUrl) || !opts.updateChildren, {
         error: 'It is impossible to pass updateChildren when trying to update a list content type.',
-        path: ['updateChildren'],
-        params: {
-          customCode: 'required'
-        }
+        path: ['updateChildren']
       });
   }
 
