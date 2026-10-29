@@ -185,6 +185,9 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   it('fails validation with unknown options', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(fsStats);
+
     const actual = commandOptionsSchema.safeParse({
       filePath: 'teamsapp.zip',
       unknownOption: 'value'
