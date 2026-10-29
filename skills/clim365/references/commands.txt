@@ -208,6 +208,7 @@ outlook calendar get|Retrieves the calendar of a user or a group
 outlook calendar list|Retrieves a list of all calendars of a user or a group
 outlook calendar remove|Removes the calendar of a user
 outlook calendar set|Updates a calendar for a user
+outlook calendargroup add|Creates a new calendar group for a user
 outlook calendargroup get|Retrieves a calendar group for a user
 outlook calendargroup list|Retrieves calendar groups for a user
 outlook calendargroup remove|Removes a calendar group

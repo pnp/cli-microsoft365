@@ -118,11 +118,13 @@ describe(commands.CALENDARGROUP_ADD, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: calendarGroupName, userId: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ name: calendarGroupName, userName: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation with unknown options', () => {
@@ -133,6 +135,10 @@ describe(commands.CALENDARGROUP_ADD, () => {
   it('creates a calendar group for the signed-in user', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/calendarGroups') {
+        assert.deepStrictEqual(opts.data, {
+          name: calendarGroupName
+        });
+
         return response;
       }
 
