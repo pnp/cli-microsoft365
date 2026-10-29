@@ -175,6 +175,7 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/createLink`) {
+        assert.strictEqual(opts.data.retainInheritedPermissions, false);
         return graphResponse;
       }
 
@@ -190,13 +191,14 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/createLink`) {
+        assert.strictEqual(opts.data.retainInheritedPermissions, true);
         return graphResponse;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, type: 'view', scope: 'users', recipients: 'john@contoso.com', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, type: 'view', scope: 'users', recipients: 'john@contoso.com', retainInheritedPermissions: true, verbose: true }) });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
 
