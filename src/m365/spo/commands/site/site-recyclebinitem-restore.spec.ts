@@ -123,6 +123,44 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation if allPrimary is false and no ids are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      allPrimary: false
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if allSecondary is false and no ids are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      allSecondary: false
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if valid ids and allPrimary false are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526',
+      allPrimary: false
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if valid ids and allSecondary false are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526',
+      allSecondary: false
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       siteUrl: 'https://contoso.sharepoint.com',

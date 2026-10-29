@@ -22,7 +22,7 @@ export const options = z.strictObject({
     })
     .optional(),
   appDisplayName: z.string().optional().alias('n'),
-  permission: z.enum(['read', 'write', 'manage', 'fullcontrol']).alias('p')
+  permission: z.string().pipe(z.enum(['read', 'write', 'manage', 'fullcontrol']).alias('p'))
 });
 
 declare type Options = z.infer<typeof options>;
