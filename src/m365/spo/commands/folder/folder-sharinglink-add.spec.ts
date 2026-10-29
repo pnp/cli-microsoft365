@@ -139,6 +139,11 @@ describe(commands.FOLDER_SHARINGLINK_ADD, () => {
     assert.strictEqual(actual.error?.issues[0].message, `'invalid type' is not a valid type. Allowed values are: view,edit`);
   });
 
+  it('fails validation if type is missing', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if scope is users but recipients are not specified', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, type: 'view', scope: 'users' });
     assert.strictEqual(actual.success, false);
