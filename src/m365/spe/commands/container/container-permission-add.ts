@@ -15,7 +15,7 @@ export const options = z.strictObject({
   containerName: z.string().alias('n').optional(),
   containerTypeId: z.uuid().optional(),
   containerTypeName: z.string().optional(),
-  roles: z.string().alias('r').transform((value) => value.split(',')).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()),
+  roles: z.string().transform((value) => value.split(',')).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()).alias('r'),
   userId: z.string().refine(id => validation.isValidGuid(id), {
     error: e => `'${e.input}' is not a valid GUID.`
   }).optional(),
@@ -44,13 +44,25 @@ class SpeContainerPermissionAddCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine((options: Options) => [options.containerId, options.containerName].filter(o => o !== undefined).length === 1, {
+      .refine((options: Options) => [options.containerId, options.containerName].filter(o => o !== undefined).length >= 1, {
+        error: 'Use one of the following options: containerId or containerName.',
+        params: { customCode: 'optionSet', options: ['containerId', 'containerName'] }
+      })
+      .refine((options: Options) => [options.containerId, options.containerName].filter(o => o !== undefined).length <= 1, {
         error: 'Use one of the following options: containerId or containerName.'
       })
-      .refine((options: Options) => [options.userId, options.userName].filter(o => o !== undefined).length === 1, {
+      .refine((options: Options) => [options.userId, options.userName].filter(o => o !== undefined).length >= 1, {
+        error: 'Use one of the following options: userId or userName.',
+        params: { customCode: 'optionSet', options: ['userId', 'userName'] }
+      })
+      .refine((options: Options) => [options.userId, options.userName].filter(o => o !== undefined).length <= 1, {
         error: 'Use one of the following options: userId or userName.'
       })
-      .refine((options: Options) => !options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
+      .refine((options: Options) => !options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length >= 1, {
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.',
+        params: { customCode: 'optionSet', options: ['containerTypeId', 'containerTypeName'] }
+      })
+      .refine((options: Options) => !options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length <= 1, {
         error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
       })
       .refine((options: Options) => options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {

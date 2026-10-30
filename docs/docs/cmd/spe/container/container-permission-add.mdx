@@ -56,6 +56,18 @@ m365 spe container permission add [options]
   </TabItem>
 </Tabs>
 
+:::note
+
+When using `--userId`, Microsoft Graph also requires `User.ReadBasic.All` for delegated authentication or `User.Read.All` for application authentication to resolve the user's principal name.
+
+:::
+
+:::note
+
+When using `--containerTypeName`, resolving the container type requires delegated authentication, the `FileStorageContainerType.Manage.All` permission, and the **SharePoint Administrator** or **Global Administrator** role. For application authentication, use `--containerId`, or `--containerName` with `--containerTypeId`, instead.
+
+:::
+
 ## Examples
 
 Adds a reader role for the specified user to the container
