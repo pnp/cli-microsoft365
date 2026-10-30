@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import { BasePermissions, PermissionKind } from '../../base-permissions.js';
 import commands from '../../commands.js';
@@ -13,6 +14,16 @@ const permissionKinds = Object.entries(PermissionKind)
   .map(([key]) => key);
 
 const permissionKindSet = new Set(permissionKinds);
+
+const registrationTypes = {
+  None: 'None',
+  List: 'List',
+  ContentType: 'ContentType',
+  ProgId: 'ProgId',
+  FileType: 'FileType'
+} as const;
+
+const registrationTypeValues = Object.values(registrationTypes);
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -31,12 +42,9 @@ export const options = z.strictObject({
   imageUrl: z.string().optional(),
   commandUIExtension: z.string().optional().alias('e'),
   registrationId: z.string().optional(),
-  registrationType: z.preprocess(value => {
-    const values = ['None', 'List', 'ContentType', 'ProgId', 'FileType'];
-    return typeof value === 'string'
-      ? values.find(type => type.toLowerCase() === value.toLowerCase()) ?? value
-      : value;
-  }, z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType'])).optional(),
+  registrationType: zod.coercedEnum(registrationTypes)
+    .optional()
+    .autocomplete(registrationTypeValues),
   rights: z.string().refine(val => {
     const items = val.split(',').map(item => item.trim());
     return items.every(item => permissionKindSet.has(item));

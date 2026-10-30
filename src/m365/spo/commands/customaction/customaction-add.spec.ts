@@ -710,4 +710,19 @@ describe(commands.CUSTOMACTION_ADD, () => {
       (command as any).permissionsKindMap
     );
   });
+
+  it('has autocomplete values for registrationType', () => {
+    const registrationTypeOption = commandInfo.options.find(option => option.long === 'registrationType');
+
+    assert.deepStrictEqual(
+      registrationTypeOption?.autocomplete,
+      ['None', 'List', 'ContentType', 'ProgId', 'FileType']
+    );
+  });
+
+  it('has autocomplete values for scope', () => {
+    const scopeOption = commandInfo.options.find(option => option.long === 'scope');
+
+    assert.deepStrictEqual(scopeOption?.autocomplete, ['Site', 'Web']);
+  });
 });
