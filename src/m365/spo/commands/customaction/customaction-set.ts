@@ -50,7 +50,7 @@ export const options = z.strictObject({
       const invalid = items.find(item => !permissionKindSet.has(item));
       return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
     }
-  }).optional(),
+  }).optional().autocomplete(permissionKinds),
   scriptSrc: z.string().optional(),
   scriptBlock: z.string().optional(),
   scope: z.enum(['Site', 'Web', 'All']).optional().alias('s'),

@@ -701,4 +701,13 @@ describe(commands.CUSTOMACTION_ADD, () => {
       })
     })));
   });
+
+  it('provides autocomplete values for rights', () => {
+    const rightsOption = commandInfo.options.find(option => option.name === 'rights');
+
+    assert.deepStrictEqual(
+      rightsOption?.autocomplete,
+      (command as any).permissionsKindMap
+    );
+  });
 });

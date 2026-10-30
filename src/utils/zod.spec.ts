@@ -149,4 +149,14 @@ describe('utils/zod', () => {
     assert.strictEqual(result.success, true);
     assert.strictEqual(result.data, TestEnum.Owner);
   });
+
+  it('parses custom autocomplete values', () => {
+    const schema = z.strictObject({
+      stringOption: z.string().autocomplete(['value1', 'value2'])
+    });
+
+    const options = zod.schemaToOptionInfo(schema);
+
+    assert.deepStrictEqual(options[0].autocomplete, ['value1', 'value2']);
+  });
 });
