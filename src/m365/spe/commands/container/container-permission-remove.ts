@@ -39,10 +39,18 @@ class SpeContainerPermissionRemoveCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine((options: Options) => [options.containerId, options.containerName].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options: containerId or containerName.'
+        error: 'Use one of the following options: containerId or containerName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['containerId', 'containerName']
+        }
       })
       .refine((options: Options) => !options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 1, {
-        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.'
+        error: 'Use one of the following options when specifying the container name: containerTypeId or containerTypeName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['containerTypeId', 'containerTypeName']
+        }
       })
       .refine((options: Options) => options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
         error: 'Options containerTypeId and containerTypeName are only required when removing permissions from a container by name.'
@@ -66,7 +74,7 @@ class SpeContainerPermissionRemoveCommand extends GraphCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${args.options.id}`,
+        url: `${this.resource}/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(args.options.id)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

@@ -34,17 +34,23 @@ m365 spe container permission remove [options]
 : Don't prompt for confirmation.
 ```
 
+<Global />
+
 ## Permissions
 
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource        | Permissions                   |
-  |-----------------|-------------------------------|
-  | Microsoft Graph | FileStorageContainer.Selected |
+  | Resource        | Permissions                                                        |
+  |-----------------|--------------------------------------------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected, FileStorageContainerType.Manage.All |
+
+  `FileStorageContainerType.Manage.All` is required only when using `containerTypeName`.
 
   </TabItem>
   <TabItem value="Application">
+
+  This command only supports application permissions when **not** using the `containerTypeName` option.
 
   | Resource        | Permissions                   |
   |-----------------|-------------------------------|
@@ -58,13 +64,13 @@ m365 spe container permission remove [options]
 Removes the specified permission from a container
 
 ```sh
-m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --Id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ"
+m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ"
 ```
 
 Removes the specified permission from a container and doesn't prompt for confirmation
 
 ```sh
-m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --Id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ" --force
+m365 spe container permission remove --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --id "cmVhZGVyX2k6MCMuZnxtZW1iZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ" --force
 ```
 
 ## Response

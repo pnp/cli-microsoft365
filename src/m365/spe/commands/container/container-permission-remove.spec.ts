@@ -113,7 +113,7 @@ describe(commands.CONTAINER_PERMISSION_REMOVE, () => {
 
   it('correctly removes permissions for a container by id', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -129,7 +129,7 @@ describe(commands.CONTAINER_PERMISSION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -142,7 +142,7 @@ describe(commands.CONTAINER_PERMISSION_REMOVE, () => {
 
   it('correctly removes permissions for a container by name and container type by name', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
