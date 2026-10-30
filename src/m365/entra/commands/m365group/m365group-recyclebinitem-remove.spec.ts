@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-recyclebinitem-remove.js';
+import command, { options } from './m365group-recyclebinitem-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
@@ -60,6 +60,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -69,6 +70,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -121,29 +123,41 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when id is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input with id', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validGroupId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validGroupId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when more than one of id, displayName and mailNickname is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validGroupId,
+      displayName: validGroupDisplayName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: validGroupId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified group when force option not passed with id', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
 
     assert(promptIssued);
@@ -152,9 +166,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   it('aborts removing the specified group when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
     assert(deleteSpy.notCalled);
   });
@@ -169,10 +183,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname,
         force: true
-      }
+      })
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
@@ -194,10 +208,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname,
         force: true
-      }
+      })
     }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
@@ -228,9 +242,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: validGroupDisplayName
-      }
+      })
     });
     assert(removeRequestIssued);
   });
@@ -245,10 +259,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId,
         force: true
-      }
+      })
     });
   });
 
@@ -264,9 +278,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId
-      }
+      })
     });
   });
 
@@ -289,9 +303,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: validGroupDisplayName
-      }
+      })
     });
   });
 
@@ -312,9 +326,9 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         mailNickname: validGroupMailNickname
-      }
+      })
     });
   });
 
@@ -327,10 +341,10 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: validGroupId,
         force: true
-      }
+      })
     }), new CommandError("An error has occurred"));
   });
 }); 

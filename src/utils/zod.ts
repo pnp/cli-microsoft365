@@ -146,15 +146,17 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
-    z.preprocess(val => {
-      const target = String(val)?.toLowerCase();
-      for (const k of Object.values(e)) {
-        if (String(k)?.toLowerCase() === target) {
-          return k;
+  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPipe<z.ZodString, z.ZodPreprocess<z.ZodEnum<T>, string>> =>
+    z.string().pipe(
+      z.preprocess(val => {
+        const target = String(val).toLowerCase();
+        for (const k of Object.values(e)) {
+          if (String(k).toLowerCase() === target) {
+            return k;
+          }
         }
-      }
 
-      return null;
-    }, z.enum(e))
+        return null;
+      }, z.enum(e))
+    )
 };

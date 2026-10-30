@@ -124,4 +124,29 @@ describe('utils/zod', () => {
     zod.schemaToOptionInfo(schema);
     assert(true);
   });
+
+  it('returns an invalid_type issue when a required coerced enum is undefined', () => {
+    enum TestEnum {
+      Owner = 'Owner',
+      Member = 'Member'
+    }
+
+    const result = zod.coercedEnum(TestEnum).safeParse(undefined);
+
+    assert.strictEqual(result.success, false);
+    assert.strictEqual(result.error.issues[0].code, 'invalid_type');
+    assert.strictEqual(result.error.issues[0].input, undefined);
+  });
+
+  it('parses coerced enum values case-insensitively', () => {
+    enum TestEnum {
+      Owner = 'Owner',
+      Member = 'Member'
+    }
+
+    const result = zod.coercedEnum(TestEnum).safeParse('owner');
+
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.data, TestEnum.Owner);
+  });
 });
