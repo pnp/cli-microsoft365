@@ -6,6 +6,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
+import { zod } from '../../../../utils/zod.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -15,11 +16,7 @@ export const options = z.strictObject({
     })
     .alias('i'),
   allowGiphy: z.boolean().optional(),
-  giphyContentRating: z.string()
-    .refine(val => ['strict', 'moderate'].includes(val.toLowerCase()), {
-      message: `giphyContentRating value must be 'Strict' or 'Moderate'`
-    })
-    .optional(),
+  giphyContentRating: zod.coercedEnum({ Strict: 'strict', Moderate: 'moderate' }).optional(),
   allowStickersAndMemes: z.boolean().optional(),
   allowCustomMemes: z.boolean().optional()
 });
