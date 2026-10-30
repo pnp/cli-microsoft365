@@ -608,6 +608,7 @@ spo report siteusagefilecounts|Gets the total number of files across all sites a
 spo report siteusagepages|Gets the number of pages viewed across all sites
 spo report siteusagesitecounts|Gets the total number of files across all sites and the number of active files
 spo report siteusagestorage|Gets the trend of storage allocated and consumed during the reporting period
+spo report siteversionstorageusage status get|Retrieves the status of a version storage usage report
 spo roledefinition add|Adds a new roledefinition to web
 spo roledefinition get|Gets specified role definition from web by id
 spo roledefinition list|Gets list of role definitions for the specified site
