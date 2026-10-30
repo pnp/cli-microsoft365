@@ -81,7 +81,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation with no options', () => {
+  it('fails validation with no options', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });
