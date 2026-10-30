@@ -9,7 +9,10 @@ import { profileCardPropertyNames } from './profileCardProperties.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  name: z.string().alias('n'),
+  name: z.string()
+    .transform(value => profileCardPropertyNames.find(p => p.toLowerCase() === value.toLowerCase()) ?? value)
+    .pipe(z.enum(profileCardPropertyNames))
+    .alias('n'),
   force: z.boolean().optional().alias('f')
 });
 
@@ -30,18 +33,6 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
 
   public get schema(): z.ZodType | undefined {
     return options;
-  }
-
-  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
-    return schema
-      .superRefine((opts, ctx) => {
-        if (!profileCardPropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `${opts.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`
-          });
-        }
-      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
