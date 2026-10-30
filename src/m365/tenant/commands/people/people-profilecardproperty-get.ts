@@ -8,7 +8,10 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  name: z.string().alias('n')
+  name: z.string()
+    .transform(value => profileCardPropertyNames.find(p => p.toLowerCase() === value.toLowerCase()) ?? value)
+    .pipe(z.enum(profileCardPropertyNames))
+    .alias('n')
 });
 
 declare type Options = z.infer<typeof options>;
@@ -28,18 +31,6 @@ class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
 
   public get schema(): z.ZodType | undefined {
     return options;
-  }
-
-  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
-    return schema
-      .superRefine((opts, ctx) => {
-        if (!profileCardPropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `'${opts.name}' is not a valid value for option name. Allowed values are: ${profileCardPropertyNames.join(', ')}.`
-          });
-        }
-      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

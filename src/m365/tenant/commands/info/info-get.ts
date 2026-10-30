@@ -47,11 +47,7 @@ class TenantInfoGetCommand extends GraphCommand {
       .refine(
         opts => !(opts.tenantId && opts.domainName),
         {
-          message: 'Specify either domainName or tenantId but not both',
-          params: {
-            customCode: 'optionSet',
-            options: ['domainName', 'tenantId']
-          }
+          message: 'Specify either domainName or tenantId but not both'
         }
       );
   }

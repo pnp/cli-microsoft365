@@ -12,7 +12,10 @@ const customAttributePropertyNames = profileCardPropertyNames.filter(p => p.toLo
 
 export const options = z.looseObject({
   ...globalOptionsZod.shape,
-  name: z.string().alias('n'),
+  name: z.string()
+    .transform(value => customAttributePropertyNames.find(p => p.toLowerCase() === value.toLowerCase()) ?? value)
+    .pipe(z.enum(customAttributePropertyNames))
+    .alias('n'),
   displayName: z.string().optional().alias('d')
 });
 
@@ -41,14 +44,6 @@ class TenantPeopleProfileCardPropertySetCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
     return schema
-      .superRefine((opts, ctx) => {
-        if (!customAttributePropertyNames.some(p => p.toLowerCase() === opts.name.toLowerCase())) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `${opts.name} is not a valid value for name. Allowed values are ${customAttributePropertyNames.join(', ')}`
-          });
-        }
-      })
       .superRefine((opts, ctx) => {
         const knownKeys = new Set([...Object.keys(globalOptionsZod.shape), 'name', 'displayName']);
         const unknownKeys = Object.keys(opts).filter(k => !knownKeys.has(k));
