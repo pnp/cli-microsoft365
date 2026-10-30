@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-remove.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.LIST_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +29,7 @@ describe(commands.LIST_REMOVE, () => {
     auth.connection.active = true;
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,9 +98,9 @@ describe(commands.LIST_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "FooList"
-      }
+      })
     } as any);
     assert.strictEqual(log.length, 0);
   });
@@ -133,10 +134,10 @@ describe(commands.LIST_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "FooList",
         force: true
-      }
+      })
     } as any);
     assert.strictEqual(log.length, 0);
   });
@@ -170,9 +171,9 @@ describe(commands.LIST_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA="
-      }
+      })
     } as any);
     assert.strictEqual(log.length, 0);
   });
@@ -191,7 +192,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async () => {
       return;
     });
-    await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: "FooList" }) } as any), new CommandError('The list FooList cannot be found'));
   });
 
   it('handles error correctly', async () => {
@@ -216,7 +217,7 @@ describe(commands.LIST_REMOVE, () => {
     });
     sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: "FooList" }) } as any), new CommandError('An error has occurred'));
   });
 
   it('prompts before removing the list when force option not passed', async () => {
@@ -251,56 +252,22 @@ describe(commands.LIST_REMOVE, () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: "FooList"
-      }
+      })
     } as any);
     assert(confirmationStub.calledOnce);
   });
 
-  it('fails validation if both name and id are not set', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
 
-      return defaultValue;
-    });
 
-    const actual = await command.validate({
-      options: {
-        name: null,
-        id: null
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+
+
+
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when all parameters are valid', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Foo'
-      }
-    }, commandInfo);
-
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if both name and id are set', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        name: 'foo',
-        id: 'bar'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 });

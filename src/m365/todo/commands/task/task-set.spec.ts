@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './task-set.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.TASK_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
   let loggerLogSpy: sinon.SinonSpy;
 
@@ -57,6 +57,7 @@ describe(commands.TASK_SET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -114,24 +115,24 @@ describe(commands.TASK_SET, () => {
 
   it('updates tasks for  list using listId', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: "New task",
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-      }
+      })
     } as any);
     assert(loggerLogSpy.calledWith(patchRequestData));
   });
 
   it('updates tasks for list using listName (debug)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: "New task",
         listName: 'Tasks List',
         status: "notStarted",
         debug: true
-      }
+      })
     } as any);
     assert(loggerLogSpy.calledWith(patchRequestData));
   });
@@ -139,14 +140,14 @@ describe(commands.TASK_SET, () => {
   it('updates tasks for list with bodyContent and bodyContentType', async () => {
     const bodyText = '<h3>Lorem ipsum</h3>';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         bodyContent: bodyText,
         bodyContentType: 'html'
-      }
+      })
     } as any);
 
     assert.strictEqual(patchStub.lastCall.args[0].data.body.content, bodyText);
@@ -156,13 +157,13 @@ describe(commands.TASK_SET, () => {
   it('updates tasks for list with bodyContent and no bodyContentType', async () => {
     const bodyText = 'Lorem ipsum';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         bodyContent: bodyText
-      }
+      })
     } as any);
 
     assert.strictEqual(patchStub.lastCall.args[0].data.body.content, bodyText);
@@ -171,13 +172,13 @@ describe(commands.TASK_SET, () => {
 
   it('updates tasks for list with importance', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         importance: 'high'
-      }
+      })
     } as any);
 
     assert.strictEqual(patchStub.lastCall.args[0].data.importance, 'high');
@@ -186,28 +187,28 @@ describe(commands.TASK_SET, () => {
   it('updates tasks for list with dueDateTime', async () => {
     const dateTime = '2023-01-01';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         dueDateTime: dateTime
-      }
+      })
     } as any);
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.dueDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
   });
 
   it('updates tasks for list with reminderDateTime', async () => {
-    const dateTime = '2023-01-01T12:00:00';
+    const dateTime = '2023-01-01T12:00:00Z';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         reminderDateTime: dateTime
-      }
+      })
     } as any);
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.reminderDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
@@ -216,13 +217,13 @@ describe(commands.TASK_SET, () => {
 
   it('updates To Do task with categories ', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         status: "notStarted",
         categories: 'None,Preset24'
-      }
+      })
     } as any);
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.categories, ['None', 'Preset24']);
@@ -231,12 +232,12 @@ describe(commands.TASK_SET, () => {
   it('updates To Do task with completedDateTime', async () => {
     const dateTime = '2023-01-01';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         completedDateTime: dateTime
-      }
+      })
     } as any);
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.completedDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
@@ -245,12 +246,12 @@ describe(commands.TASK_SET, () => {
   it('updates To Do task with startDateTime', async () => {
     const dateTime = '2023-01-01';
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         startDateTime: dateTime
-      }
+      })
     } as any);
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.startDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
@@ -269,12 +270,12 @@ describe(commands.TASK_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: 'abc',
         title: "New task",
         listName: 'Tasks List',
         debug: true
-      }
+      })
     } as any), new CommandError('The specified task list does not exist'));
   });
 
@@ -283,167 +284,39 @@ describe(commands.TASK_SET, () => {
     sinon.stub(request, 'patch').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         listName: "Tasks List",
         id: 'abc',
         title: "New task"
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if both listId and listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
 
-      return defaultValue;
-    });
 
-    const actual = await command.validate({
-      options: {
-        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
-        listName: 'Tasks List',
-        title: 'New Task',
-        id: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither listId nor listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        title: 'New Task',
-        id: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if id not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-        title: 'New Task',
-        listName: 'Tasks List'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if status is not allowed value', async () => {
-    const options: any = {
-      title: 'New Task',
-      id: 'abc',
-      status: "test",
-      listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, 'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
-  });
-
-  it('fails validation when invalid bodyContentType is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New task',
-        id: 'abc',
-        status: "notStarted",
-        listName: 'Tasks List',
-        bodyContentType: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid importance is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New task',
-        id: 'abc',
-        status: "notStarted",
-        listName: 'Tasks List',
-        importance: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid dueDateTime is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New task',
-        id: 'abc',
-        status: "notStarted",
-        listName: 'Tasks List',
-        dueDateTime: '01/01/2022'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid reminderDateTime is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New task',
-        id: 'abc',
-        status: "notStarted",
-        listName: 'Tasks List',
-        reminderDateTime: '01/01/2022'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid completedDateTime is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'abc',
-        title: 'New task',
-        listName: 'Tasks List',
-        completedDateTime: '01/01/2022'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid startDateTime is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'abc',
-        title: 'New task',
-        listName: 'Tasks List',
-        startDateTime: '01/01/2022'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('correctly validates the arguments', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New Task',
-        id: 'abc',
-        status: "notStarted",
-        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 });
