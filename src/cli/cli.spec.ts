@@ -557,6 +557,8 @@ describe('cli', () => {
       mockCommandWithSchema.action,
       mockCommand.commandAction,
       mockCommand.processOptions,
+      mockCommandWithSchemaAndProcessedRequiredOptions.processOptions,
+      mockCommandWithRefinedSchema.processOptions,
       prompt.forInput,
       prompt.forSelection,
       prompt.forConfirmation,
@@ -1280,6 +1282,74 @@ describe('cli', () => {
       executeCommandSpy.firstCall.args[1].options.url,
       'https://contoso.sharepoint.com/sites/branding/assets'
     );
+  });
+
+  it(`shows an error when processing prompted required options fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed required');
+    sinon.stub(prompt, 'forInput').resolves('/sites/branding/assets');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithSchemaAndProcessedRequiredOptions, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted options'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute(['cli', 'mock', 'schema', 'processed', 'required']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted options')
+      ));
+    }
+  });
+
+  it(`shows an error when processing prompted option set values fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined');
+    sinon.stub(prompt, 'forSelection').resolves('certificateFile');
+    sinon.stub(prompt, 'forInput').resolves('/path/to/cert.pem');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithRefinedSchema, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted option set'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute([
+        'cli',
+        'mock',
+        'schema',
+        'refined',
+        '--authType',
+        'certificate'
+      ]);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted option set')
+      ));
+    }
   });
 
   it(`shows validation error for missing required options when validating schema and prompting disabled`, (done) => {
