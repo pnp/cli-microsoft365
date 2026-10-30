@@ -398,7 +398,7 @@ describe(commands.SITEDESIGN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055', debug: true }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
