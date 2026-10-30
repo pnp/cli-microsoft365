@@ -5,6 +5,7 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -41,7 +42,7 @@ class EntraAgentBlueprintprincipalListCommand extends GraphCommand {
       const selectProperties = [...new Set(allProperties.map(prop => prop.split('/')[0]))];
 
       if (selectProperties.length > 0) {
-        queryParameters.push(`$select=${selectProperties}`);
+        queryParameters.push(`$select=${selectProperties.map(property => formatting.encodeQueryParameter(property)).join(',')}`);
       }
 
       if (cli.commandToExecute) {
@@ -56,6 +57,9 @@ class EntraAgentBlueprintprincipalListCommand extends GraphCommand {
       : '';
 
     try {
+      if (this.verbose) {
+        await logger.logToStderr(`Retrieving a list of agent blueprint principals...`);
+      }
       const results = await odata.getAllItems<any>(`${this.resource}/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal${queryString}`);
       await logger.log(results);
     }
