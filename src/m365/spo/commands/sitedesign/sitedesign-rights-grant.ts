@@ -11,7 +11,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   siteDesignId: z.string().refine(val => validation.isValidGuid(val), { message: 'The value must be a valid GUID.' }).alias('i'),
   principals: z.string().alias('p'),
-  rights: z.enum(['View']).alias('r')
+  rights: z.string().pipe(z.enum(['View'])).alias('r')
 });
 
 declare type Options = z.infer<typeof options>;
