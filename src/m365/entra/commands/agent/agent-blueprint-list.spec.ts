@@ -169,6 +169,42 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
     );
   });
 
+  it('should exclude nested properties from the select query parameter', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      value: limitedResponse
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id,api/oauth2PermissionScopes,displayName'
+      })
+    });
+
+    assert.strictEqual(
+      requestStub.firstCall.args[0].url,
+      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id,displayName'
+    );
+    assert(loggerLogSpy.calledWith(limitedResponse));
+  });
+
+  it('should omit the select query parameter when all specified properties are nested', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      value: response
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'api/oauth2PermissionScopes,web/redirectUris'
+      })
+    });
+
+    assert.strictEqual(
+      requestStub.firstCall.args[0].url,
+      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint'
+    );
+    assert(loggerLogSpy.calledWith(response));
+  });
+
   it('handles error when retrieving administrative units list failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint`) {
