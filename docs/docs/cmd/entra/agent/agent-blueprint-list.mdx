@@ -23,13 +23,13 @@ m365 entra agent blueprint list [options]
 
 ## Remarks
 
-Using the `--properties` option, you can specify a comma-separated list of agent blueprint properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+Using the `--properties` option, you can specify a comma-separated list of agent blueprint properties to retrieve from Microsoft Graph. If you don't specify any properties, Graph returns the full objects; the CLI's default properties are used for text output.
 
 :::note
 
 A principal who creates a blueprint or blueprint principal is assigned as the owner. Owners can create agent identities and modify only the resources they own, even if they aren't assigned an Agent ID role.
 
-For nonowners to call this API in delegated scenarios using work or school accounts, the admin must be assigned a supported [Microsoft Entra role](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This operation supports the following built-in roles:
+For nonowners to call this API in delegated scenarios using work or school accounts, the admin must be assigned a supported [Microsoft Entra role](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This operation supports the following built-in roles, which provide only the least privilege necessary:
 
 - **Agent ID Administrator**.
 - **Agent ID Developer** - Create agent identity blueprints and blueprint principals.

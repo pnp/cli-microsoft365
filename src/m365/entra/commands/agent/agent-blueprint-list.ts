@@ -4,6 +4,7 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -40,7 +41,7 @@ class EntraAgentBlueprintListCommand extends GraphCommand {
       const selectProperties = allProperties.filter(prop => !prop.includes('/'));
 
       if (selectProperties.length > 0) {
-        queryParameters.push(`$select=${selectProperties}`);
+        queryParameters.push(`$select=${formatting.encodeQueryParameter(selectProperties.join(','))}`);
       }
     }
 

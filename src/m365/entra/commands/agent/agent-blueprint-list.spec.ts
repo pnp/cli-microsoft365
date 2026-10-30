@@ -151,9 +151,9 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
     );
   });
 
-  it(`should get a list of administrative units with specified properties`, async () => {
+  it(`should get a list of agent identity blueprints with specified properties`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id,displayName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id%2CdisplayName`) {
         return {
           value: limitedResponse
         };
@@ -182,7 +182,25 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
 
     assert.strictEqual(
       requestStub.firstCall.args[0].url,
-      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id,displayName'
+      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id%2CdisplayName'
+    );
+    assert(loggerLogSpy.calledWith(limitedResponse));
+  });
+
+  it('should encode properties to prevent query parameter injection', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      value: limitedResponse
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id&$filter=displayName'
+      })
+    });
+
+    assert.strictEqual(
+      requestStub.firstCall.args[0].url,
+      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id%26%24filter%3DdisplayName'
     );
     assert(loggerLogSpy.calledWith(limitedResponse));
   });
