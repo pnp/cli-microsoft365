@@ -93,12 +93,12 @@ describe(commands.CONTAINER_PERMISSION_ADD, () => {
   });
 
   it('fails validation if both containerId and containerName options are passed', async () => {
-    const actual = commandOptionsSchema.safeParse({ containerId: containerId, containerName: containerName, roles: 'reader' });
+    const actual = commandOptionsSchema.safeParse({ containerId: containerId, containerName: containerName, roles: 'reader', userId: userId });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if neither containerId nor containerName options are passed', async () => {
-    const actual = commandOptionsSchema.safeParse({ roles: 'reader' });
+    const actual = commandOptionsSchema.safeParse({ roles: 'reader', userId: userId });
     assert.strictEqual(actual.success, false);
   });
 
