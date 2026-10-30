@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,16 +9,23 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { EventReceiver } from './EventReceiver.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listId: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `${e.input} is not a valid GUID.`
+  }).optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  scope: z.enum(['web', 'site']).optional().alias('s')
+});
+
+export type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  scope?: string;
 }
 
 class SpoEventreceiverListCommand extends SpoCommand {
@@ -33,74 +41,27 @@ class SpoEventreceiverListCommand extends SpoCommand {
     return ['ReceiverId', 'ReceiverName'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => {
+        const listOptions = [opts.listId, opts.listTitle, opts.listUrl];
+        return !(listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1);
+      }, {
+        message: `Specify either list id or title or list url`,
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !(opts.scope === 'site' && (opts.listId || opts.listUrl || opts.listTitle)), {
+        message: 'Scope cannot be set to site when retrieving list event receivers.',
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listId  [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['web', 'site']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
-          return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
-        }
-
-        if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
-          return 'Scope cannot be set to site when retrieving list event receivers.';
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

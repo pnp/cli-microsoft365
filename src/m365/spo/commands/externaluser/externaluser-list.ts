@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -9,16 +10,31 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { GetExternalUsersResults } from './GetExternalUsersResults.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  filter: z.string().optional(),
+  pageSize: z.string().refine(val => {
+    const num = parseInt(val);
+    return !isNaN(num) && num >= 1 && num <= 50;
+  }, {
+    error: e => `pageSize must be between 1 and 50. The specified value ${e.input} is not valid.`
+  }).optional().alias('p'),
+  position: z.string().refine(val => {
+    const num = parseInt(val);
+    return !isNaN(num) && num >= 0;
+  }, {
+    error: e => `position must be greater than or equal to 0. The specified value ${e.input} is not valid.`
+  }).optional().alias('i'),
+  sortOrder: z.enum(['asc', 'desc']).optional().alias('s'),
+  siteUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).optional().alias('u')
+});
+
+export type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  filter?: string;
-  pageSize?: string;
-  position?: string;
-  sortOrder?: string;
-  siteUrl?: string;
 }
 
 class SpoExternalUserListCommand extends SpoCommand {
@@ -30,85 +46,8 @@ class SpoExternalUserListCommand extends SpoCommand {
     return 'Lists external users in the tenant';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        filter: (!(!args.options.filter)).toString(),
-        pageSize: (!(!args.options.pageSize)).toString(),
-        position: (!(!args.options.position)).toString(),
-        sortOrder: (!(!args.options.sortOrder)).toString(),
-        siteUrl: (!(!args.options.siteUrl)).toString()
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--filter [filter]'
-      },
-      {
-        option: '-p, --pageSize [pageSize]'
-      },
-      {
-        option: '-i, --position [position]'
-      },
-      {
-        option: '-s, --sortOrder [sortOrder]',
-        autocomplete: ['asc', 'desc']
-      },
-      {
-        option: '-u, --siteUrl [siteUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.pageSize) {
-          const pageSize: number = parseInt(args.options.pageSize);
-          if (isNaN(pageSize)) {
-            return `${args.options.pageSize} is not a valid number`;
-          }
-
-          if (pageSize < 1 || pageSize > 50) {
-            return 'pageSize must be between 1 and 50';
-          }
-        }
-
-        if (args.options.position) {
-          const position: number = parseInt(args.options.position);
-          if (isNaN(position)) {
-            return `${args.options.position} is not a valid number`;
-          }
-
-          if (position < 0) {
-            return 'position must be greater than or 0';
-          }
-        }
-
-        if (args.options.sortOrder &&
-          args.options.sortOrder !== 'asc' &&
-          args.options.sortOrder !== 'desc') {
-          return `${args.options.sortOrder} is not a valid sortOrder value. Allowed values asc|desc`;
-        }
-
-        if (args.options.siteUrl) {
-          return validation.isValidSharePointUrl(args.options.siteUrl);
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
