@@ -1,29 +1,70 @@
 import fs from 'fs';
 import os from 'os';
+import { v4 } from 'uuid';
+import { z } from 'zod';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
-import { v4 } from 'uuid';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import { cli } from '../../../../cli/cli.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option listId is not a valid GUID.`
+  }).optional().alias('l'),
+  listTitle: z.string().optional().alias('t'),
+  listUrl: z.string().optional(),
+  filePath: z.string()
+    .superRefine((path, ctx) => {
+      if (!fs.existsSync(path)) {
+        ctx.addIssue({ code: 'custom', message: `File with path ${path} does not exist.` });
+        return;
+      }
+
+      const fileContent = fs.readFileSync(path, 'utf-8');
+      const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
+
+      const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
+
+      if (!idKey) {
+        ctx.addIssue({ code: 'custom', message: `The file does not contain the required header row with the column name 'ID'.` });
+        return;
+      }
+
+      const invalidIDs = validation.isValidPositiveIntegerArray(jsonContent.map(element => element[idKey].toString().trim()).join(','));
+
+      if (invalidIDs !== true) {
+        ctx.addIssue({ code: 'custom', message: `The file contains one or more invalid IDs: '${invalidIDs}'.` });
+      }
+    })
+    .optional()
+    .alias('p'),
+  ids: z.string()
+    .superRefine((val, ctx) => {
+      const invalidIDs = validation.isValidPositiveIntegerArray(val);
+
+      if (invalidIDs !== true) {
+        ctx.addIssue({ code: 'custom', message: `Option 'ids' contains one or more invalid IDs: '${invalidIDs}'.` });
+      }
+    })
+    .optional()
+    .alias('i'),
+  permanent: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  filePath?: string;
-  ids?: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  permanent?: boolean;
-  force?: boolean;
 }
 
 class SpoListItemBatchRemoveCommand extends SpoCommand {
@@ -35,127 +76,26 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
     return 'Removes items from a list in batch';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        filePath: typeof args.options.filePath !== 'undefined',
-        ids: typeof args.options.ids !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        permanent: !!args.options.permanent,
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
+      })
+      .refine(opts => [opts.filePath, opts.ids].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: filePath, ids.',
+        params: {
+          customCode: 'optionSet',
+          options: ['filePath', 'ids']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-p, --filePath [filePath]'
-      },
-      {
-        option: '-i, --ids [ids]'
-      },
-      {
-        option: '--permanent'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId &&
-          !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID.`;
-        }
-
-        if (args.options.filePath) {
-          if (!fs.existsSync(args.options.filePath)) {
-            return `File with path ${args.options.filePath} does not exist.`;
-          }
-
-          const fileContent = fs.readFileSync(args.options.filePath, 'utf-8');
-          const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
-
-          const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
-
-          if (!idKey) {
-            return `The file does not contain the required header row with the column name 'ID'.`;
-          }
-
-          const invalidIDs = validation.isValidPositiveIntegerArray(jsonContent.map(element => element[idKey].toString().trim()).join(','));
-
-          if (invalidIDs !== true) {
-            return `The file contains one or more invalid IDs: '${invalidIDs}'.`;
-          }
-        }
-
-        if (args.options.ids) {
-          const isValidIntegerArray = validation.isValidPositiveIntegerArray(args.options.ids);
-
-          if (isValidIntegerArray !== true) {
-            return `Option 'ids' contains one or more invalid IDs: '${isValidIntegerArray}'.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push(
-      'webUrl',
-      'listId',
-      'listTitle',
-      'listUrl',
-      'ids',
-      'filePath'
-    );
-    this.types.boolean.push('permanent', 'force');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['listId', 'listTitle', 'listUrl']
-      },
-      {
-        options: ['filePath', 'ids']
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

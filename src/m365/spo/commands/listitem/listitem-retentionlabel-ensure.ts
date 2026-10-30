@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -10,19 +11,35 @@ import { spo } from '../../../../utils/spo.js';
 import { SiteRetentionLabel } from './SiteRetentionLabel.js';
 import { odata } from '../../../../utils/odata.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listItemId: z.number(),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  name: z.string().optional().alias('n'),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional()
+    .alias('i'),
+  assetId: z.string().optional().alias('a')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  listItemId: string;
-  name?: string;
-  id?: string;
-  assetId?: string;
 }
 
 class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
@@ -34,88 +51,26 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     return 'Applies a retention label to a list item';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        assetId: typeof args.options.assetId !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either listId, listTitle or listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
+      })
+      .refine(opts => [opts.name, opts.id].filter(o => o !== undefined).length === 1, {
+        error: 'Specify either name or id.',
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'id']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listItemId <listItemId>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-a, --assetId [assetId]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const id: number = parseInt(args.options.listItemId);
-        if (isNaN(id)) {
-          return `${args.options.listItemId} is not a valid list item ID`;
-        }
-
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId &&
-          !validation.isValidGuid(args.options.listId as string)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        if (args.options.id &&
-          !validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
-    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -127,7 +82,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
         await this.applyAssetId(args.options, logger);
       }
 
-      await spo.applyRetentionLabelToListItems(args.options.webUrl, labelName, listAbsoluteUrl, [parseInt(args.options.listItemId)], logger, args.options.verbose);
+      await spo.applyRetentionLabelToListItems(args.options.webUrl, labelName, listAbsoluteUrl, [args.options.listItemId], logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -200,7 +155,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     return listAbsoluteUrl;
   }
 
-  async applyAssetId(options: GlobalOptions, logger: Logger): Promise<void> {
+  async applyAssetId(options: Options, logger: Logger): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Applying the asset Id ${options.assetId}...`);
     }
