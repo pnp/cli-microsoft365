@@ -26,7 +26,7 @@ function getProcessNameOnLinux(pid: number): string | undefined {
 }
 
 function getProcessNameOnWindows(pid: number): string | undefined {
-  const tasklist = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'tasklist.exe');
+  const tasklist = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tasklist.exe');
   const res = child_process.spawnSync(tasklist, ['/FI', `PID eq ${pid}`, '/FO', 'CSV', '/NH'], { encoding: 'utf8' });
   if (res.error || res.status !== 0) {
     return undefined;

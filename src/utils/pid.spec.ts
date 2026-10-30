@@ -116,6 +116,26 @@ describe('utils/pid', () => {
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
+  it('runs tasklist from the default Windows system directory when SystemRoot is empty', () => {
+    const systemRoot = process.env.SystemRoot;
+    process.env.SystemRoot = '';
+    sinon.stub(os, 'platform').returns('win32');
+    const spawnSyncStub = sinon.stub(child_process, 'spawnSync').returns({ status: 0, stdout: '"pwsh.exe","123","Console","1","98,765 K"\r\n' } as any);
+
+    try {
+      pid.getProcessName(123);
+      assert.strictEqual(spawnSyncStub.firstCall.args[0], path.join('C:\\Windows', 'System32', 'tasklist.exe'));
+    }
+    finally {
+      if (systemRoot === undefined) {
+        delete process.env.SystemRoot;
+      }
+      else {
+        process.env.SystemRoot = systemRoot;
+      }
+    }
+  });
+
   it('returns undefined when tasklist exits with a non-zero code on Windows', () => {
     sinon.stub(os, 'platform').returns('win32');
     sinon.stub(child_process, 'spawnSync').returns({ status: 1, stdout: '' } as any);
