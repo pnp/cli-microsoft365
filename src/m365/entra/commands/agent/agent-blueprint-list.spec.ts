@@ -223,7 +223,7 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
     assert(loggerLogSpy.calledWith(response));
   });
 
-  it('handles error when retrieving administrative units list failed', async () => {
+  it('handles error when retrieving agent blueprint list failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint`) {
         throw { error: { message: 'An error has occurred' } };
