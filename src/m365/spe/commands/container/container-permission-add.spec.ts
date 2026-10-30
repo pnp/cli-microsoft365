@@ -229,6 +229,26 @@ describe(commands.CONTAINER_PERMISSION_ADD, () => {
     });
   });
 
+  it('correctly adds spaced comma-separated multiple permissions to a user for a container by id', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions`) {
+        return containerPermissionResponse;
+      }
+
+      throw 'Invalid POST request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ containerId: containerId, roles: 'reader, writer', userId: userId, verbose: true }) });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      roles: ['reader', 'writer'],
+      grantedToV2: {
+        user: {
+          userPrincipalName: userName
+        }
+      }
+    });
+  });
+
   it('correctly handles unexpected error', async () => {
     const errorMessage = 'Access denied';
     sinon.stub(request, 'post').rejects({

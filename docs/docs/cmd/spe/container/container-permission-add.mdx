@@ -108,17 +108,17 @@ m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zS
   <TabItem value="Text">
 
   ```text
-  id                                                                          userPrincipalName      roles
-  --------------------------------------------------------------------------  ---------------------  ------
-  cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ  john.doe@contoso..com  reader
+  grantedToV2: {"user":{"id":"89ea5c94-7736-4e25-95ad-3fa95f62b66e","userPrincipalName":"john.doe@contoso.com","displayName":"John Doe","email":"john.doe@contoso.com"}}
+  id         : cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
+  roles      : ["reader"]
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  id,roles,userPrincipalName
-  cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ,reader,john.doe@contoso.com
+  id
+  cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
   ```
 
   </TabItem>
@@ -129,13 +129,11 @@ m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zS
 
   Date: 8/5/2025
 
-  ## X2k6MCMuZnxtZW1iZXJzaGlwfGRlYnJhYkBuYWNoYW4zNjUub25taWNyb3NvZnQuY29t
+  ## cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
 
   Property | Value
   ---------|-------
   id | cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
-  roles | reader
-  userPrincipalName | john.doe@contoso.com
   ```
 
   </TabItem>

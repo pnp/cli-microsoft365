@@ -15,7 +15,7 @@ export const options = z.strictObject({
   containerName: z.string().alias('n').optional(),
   containerTypeId: z.uuid().optional(),
   containerTypeName: z.string().optional(),
-  roles: z.string().transform((value) => value.split(',')).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()).alias('r'),
+  roles: z.string().transform((value) => value.split(',').map(role => role.trim())).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()).alias('r'),
   userId: z.string().refine(id => validation.isValidGuid(id), {
     error: e => `'${e.input}' is not a valid GUID.`
   }).optional(),
