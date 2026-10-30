@@ -111,7 +111,7 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'appDisplayName', 'appId']);
   });
 
-  it(`should get a list of agent identity blueprints`, async () => {
+  it(`should get a list of agent blueprint principals`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal`) {
         return {
@@ -129,7 +129,7 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     );
   });
 
-  it(`should get a list of administrative units with specified properties`, async () => {
+  it(`should get a list of agent blueprint principals with specified properties`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,appDisplayName`) {
         return {
@@ -147,7 +147,7 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     );
   });
 
-  it('handles error when retrieving administrative units list failed', async () => {
+  it('handles error when retrieving agent blueprint principals list failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal`) {
         throw { error: { message: 'An error has occurred' } };
@@ -232,6 +232,26 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         properties: 'id,info/logoUrl,appDisplayName'
+      })
+    });
+
+    assert(loggerLogSpy.calledWith(limitedResponse));
+  });
+
+  it('encodes properties used in the select query (verbose)', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      assert.strictEqual(
+        opts.url,
+        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,displayName%26%24filter%3DaccountEnabled'
+      );
+
+      return { value: limitedResponse };
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: 'id,displayName&$filter=accountEnabled',
+        verbose: true
       })
     });
 
