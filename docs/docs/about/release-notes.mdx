@@ -14,6 +14,10 @@ sidebar_position: 4
 - [spo page unpublish](../cmd/spo/page/page-unpublish.mdx) - unpublishes a modern page [#7540](https://github.com/pnp/cli-microsoft365/issues/7540)
 - [spo web rule get](../cmd/spo/web/web-rule-get.mdx) - retrieves information about a specific alert from a SharePoint list [#6862](https://github.com/pnp/cli-microsoft365/issues/6862)
 
+**SharePoint Embedded:**
+
+- [spe container permission remove](../cmd/spe/container/container-permission-remove.mdx) - removes permissions from a SharePoint Embedded container [#6161](https://github.com/pnp/cli-microsoft365/issues/6161)
+
 ### Changes
 
 - added support for heft for spfx CI/CD commands [#7091](https://github.com/pnp/cli-microsoft365/issues/7091)
@@ -66,6 +70,11 @@ sidebar_position: 4
 - added support for SPFx v1.24.0 [#7670](https://github.com/pnp/cli-microsoft365/pull/7670)
 - fixed retrieving client ID using [cli consent](../cmd/cli/cli-consent.mdx) command [#7654](https://github.com/pnp/cli-microsoft365/issues/7654)
 - migrated `teams message` commands to Zod [#7351](https://github.com/pnp/cli-microsoft365/issues/7351)
+- migrated `teams report`, `teams tab`, `teams team`, and `teams user` commands to Zod [#7353](https://github.com/pnp/cli-microsoft365/issues/7353)
+- fixed app-only login failing when the access token has no `oid` claim [#7589](https://github.com/pnp/cli-microsoft365/issues/7589)
+- migrated `entra m365group` commands to Zod [#6849](https://github.com/pnp/cli-microsoft365/issues/6849)
+- migrated `spo listitem` commands to Zod [#7334](https://github.com/pnp/cli-microsoft365/issues/7334)
+- migrated `tenant report` and `tenant serviceannouncement` commands to Zod [#7355](https://github.com/pnp/cli-microsoft365/issues/7355)
 
 ### ⚠️ Breaking changes
 
