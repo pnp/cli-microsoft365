@@ -514,9 +514,16 @@ describe(commands.CUSTOMACTION_ADD, () => {
     });
 
     assert.strictEqual(actual.success, false);
-    assert.deepStrictEqual(actual.error.issues[0].path, ['scriptSrc']);
+    const issue = actual.error.issues[0];
+    if (issue.code !== 'custom') {
+      assert.fail(`Expected a custom Zod issue, but received '${issue.code}'`);
+    }
+    assert.deepStrictEqual(issue.params, {
+      customCode: 'optionSet',
+      options: ['scriptSrc', 'scriptBlock']
+    });
     assert.strictEqual(
-      actual.error.issues[0].message,
+      issue.message,
       'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink'
     );
   });

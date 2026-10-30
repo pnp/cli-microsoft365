@@ -124,9 +124,8 @@ class SpoCustomActionAddCommand extends SpoCommand {
         return true;
       }, {
         message: 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink',
-        path: ['scriptSrc'],
         params: {
-          customCode: 'required',
+          customCode: 'optionSet',
           options: ['scriptSrc', 'scriptBlock']
         }
       })
