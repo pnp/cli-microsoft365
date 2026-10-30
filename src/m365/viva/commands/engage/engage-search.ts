@@ -106,8 +106,7 @@ class VivaEngageSearchCommand extends VivaEngageCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => opts.output !== 'json' || !opts.show, {
-        message: `show can't be used when --output set to json`,
-        params: { customCode: 'required' }
+        message: `show can't be used when --output set to json`
       });
   }
 

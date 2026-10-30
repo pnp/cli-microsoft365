@@ -10,7 +10,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   messageId: z.coerce.number(),
   enable: z.boolean().optional(),
-  force: z.boolean().optional()
+  force: z.boolean().optional().alias('f')
 });
 
 declare type Options = z.infer<typeof options>;

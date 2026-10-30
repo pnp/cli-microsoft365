@@ -3,17 +3,16 @@ import { Logger } from '../../../../cli/Logger.js';
 import { cli } from '../../../../cli/cli.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().optional(),
-  displayName: z.string().optional(),
-  entraGroupId: z.string().optional(),
-  force: z.boolean().optional()
+  id: z.string().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  entraGroupId: z.guid().optional(),
+  force: z.boolean().optional().alias('f')
 });
 
 declare type Options = z.infer<typeof options>;
@@ -36,16 +35,15 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either id, displayName, or entraGroupId, but not multiple.',
+      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].some(x => x !== undefined), {
+        message: 'Specify either id, displayName, or entraGroupId.',
         params: {
           customCode: 'optionSet',
           options: ['id', 'displayName', 'entraGroupId']
         }
       })
-      .refine(opts => !opts.entraGroupId || validation.isValidGuid(opts.entraGroupId), {
-        error: opts => `${opts.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`,
-        params: { customCode: 'required' }
+      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length <= 1, {
+        message: 'Specify either id, displayName, or entraGroupId, but not multiple.'
       });
   }
 

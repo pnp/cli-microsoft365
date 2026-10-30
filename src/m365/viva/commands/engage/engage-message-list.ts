@@ -43,12 +43,10 @@ class VivaEngageMessageListCommand extends VivaEngageCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !(opts.groupId && opts.threadId), {
-        message: 'You cannot specify groupId and threadId at the same time',
-        params: { customCode: 'required' }
+        message: 'You cannot specify groupId and threadId at the same time'
       })
       .refine(opts => !(opts.feedType && (opts.groupId || opts.threadId)), {
-        message: 'You cannot specify the feedType with groupId or threadId at the same time',
-        params: { customCode: 'required' }
+        message: 'You cannot specify the feedType with groupId or threadId at the same time'
       });
   }
 

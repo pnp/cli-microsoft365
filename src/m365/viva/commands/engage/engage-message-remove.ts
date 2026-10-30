@@ -9,7 +9,7 @@ import commands from '../../commands.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   id: z.coerce.number(),
-  force: z.boolean().optional()
+  force: z.boolean().optional().alias('f')
 });
 
 declare type Options = z.infer<typeof options>;

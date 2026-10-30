@@ -2,19 +2,18 @@ import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { validation } from '../../../../utils/validation.js';
 import { vivaEngage } from '../../../../utils/vivaEngage.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().optional(),
-  displayName: z.string().optional(),
-  entraGroupId: z.string().optional(),
+  id: z.string().optional().alias('i'),
+  displayName: z.string().optional().alias('d'),
+  entraGroupId: z.guid().optional(),
   newDisplayName: z.string().optional(),
   description: z.string().optional(),
-  privacy: z.string().optional()
+  privacy: z.string().pipe(z.enum(['public', 'private'])).optional()
 });
 
 declare type Options = z.infer<typeof options>;
@@ -38,38 +37,28 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length === 1, {
-        message: 'Specify either id, displayName, or entraGroupId, but not multiple.',
+      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].some(x => x !== undefined), {
+        message: 'Specify either id, displayName, or entraGroupId.',
         params: {
           customCode: 'optionSet',
           options: ['id', 'displayName', 'entraGroupId']
         }
       })
-      .refine(opts => !opts.entraGroupId || validation.isValidGuid(opts.entraGroupId), {
-        error: opts => `${opts.entraGroupId} is not a valid GUID for the option 'entraGroupId'.`,
-        params: { customCode: 'required' }
+      .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length <= 1, {
+        message: 'Specify either id, displayName, or entraGroupId, but not multiple.'
       })
       .refine(opts => !opts.newDisplayName || opts.newDisplayName.length <= 255, {
-        message: "The maximum amount of characters for 'newDisplayName' is 255.",
-        params: { customCode: 'required' }
+        message: "The maximum amount of characters for 'newDisplayName' is 255."
       })
       .refine(opts => !opts.description || opts.description.length <= 1024, {
-        message: "The maximum amount of characters for 'description' is 1024.",
-        params: { customCode: 'required' }
-      })
-      .refine(opts => {
-        if (!opts.privacy) {
-          return true;
-        }
-        const validPrivacy = ['public', 'private'];
-        return validPrivacy.indexOf(opts.privacy.toLowerCase()) !== -1;
-      }, {
-        error: opts => `${opts.privacy} is not a valid privacy. Allowed values are public, private`,
-        params: { customCode: 'required' }
+        message: "The maximum amount of characters for 'description' is 1024."
       })
       .refine(opts => opts.newDisplayName || opts.description || opts.privacy, {
         message: 'Specify at least newDisplayName, description, or privacy.',
-        params: { customCode: 'required' }
+        params: {
+          customCode: 'optionSet',
+          options: ['newDisplayName', 'description', 'privacy']
+        }
       });
   }
 

@@ -368,6 +368,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       outlineIconPath: 'icon-outline.png'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File ${path.resolve('icon-color.png')} doesn't exist`);
   });
 
   it(`fails validation if the specified outline icon doesn't exist`, () => {
@@ -389,6 +390,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       outlineIconPath: 'icon-outline.png'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File ${path.resolve('icon-outline.png')} doesn't exist`);
   });
 
   it(`passes validation if a file with the app name already exists and force flag specified`, () => {
