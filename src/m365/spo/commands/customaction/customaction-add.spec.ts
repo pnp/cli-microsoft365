@@ -522,7 +522,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
       name: 'name',
       location: 'Microsoft.SharePoint.StandardMenu',
       group: 'SiteActions',
-      registrationType: 'abc'
+      registrationType: 'List'
     });
     assert.strictEqual(actual.success, false);
   });
@@ -565,6 +565,15 @@ describe(commands.CUSTOMACTION_ADD, () => {
     const actual = commandOptionsSchema.safeParse({
       ...defaultCommandOptions,
       registrationType: 1
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails if registrationType is not recognized', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      registrationType: 'Invalid'
     });
 
     assert.strictEqual(actual.success, false);

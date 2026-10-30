@@ -834,4 +834,24 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
     assert.strictEqual(actual.success, false);
   });
+
+  it('updates sequence when set to 0', async () => {
+    const postRequestSpy = initDefaultPostStubs();
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
+        webUrl: 'https://contoso.sharepoint.com',
+        sequence: 0,
+        scope: 'Web'
+      })
+    });
+
+    assert(postRequestSpy.calledOnce);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Sequence: 0
+      }
+    })));
+  });
 });

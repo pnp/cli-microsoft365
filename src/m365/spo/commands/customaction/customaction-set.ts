@@ -41,7 +41,7 @@ export const options = z.strictObject({
   }, {
     error: e => {
       const items = (e.input as string).split(',').map((s: string) => s.trim());
-      const invalid = items.find((item: string) => !PermissionKind[(item as keyof typeof PermissionKind)]);
+      const invalid = items.find((item: string) => PermissionKind[(item as keyof typeof PermissionKind)] === undefined);
       return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`;
     }
   }).optional(),
@@ -80,7 +80,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
         opts.commandUIExtension || opts.group || opts.imageUrl ||
         opts.description || opts.registrationId || opts.registrationType ||
         opts.rights || opts.scriptBlock || opts.scriptSrc ||
-        opts.sequence, {
+        opts.sequence !== undefined, {
         message: 'Please specify option to be updated'
       })
       .refine(opts => !(opts.scriptSrc && opts.scriptBlock), {
@@ -185,7 +185,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       requestBody.Description = options.description;
     }
 
-    if (options.sequence) {
+    if (options.sequence !== undefined) {
       requestBody.Sequence = options.sequence;
     }
 

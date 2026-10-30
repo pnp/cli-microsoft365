@@ -37,7 +37,7 @@ export const options = z.strictObject({
   }, {
     error: e => {
       const items = (e.input as string).split(',').map((s: string) => s.trim());
-      const invalid = items.find((item: string) => !PermissionKind[(item as keyof typeof PermissionKind)]);
+      const invalid = items.find((item: string) => PermissionKind[(item as keyof typeof PermissionKind)] === undefined);
       return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
     }
   }).optional(),
