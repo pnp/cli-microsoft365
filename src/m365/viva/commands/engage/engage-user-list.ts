@@ -7,8 +7,8 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  groupId: z.coerce.number().optional(),
-  letter: z.string().optional(),
+  groupId: z.coerce.number().optional().alias('g'),
+  letter: z.string().optional().alias('l'),
   reverse: z.boolean().optional(),
   limit: z.coerce.number().optional(),
   sortBy: z.enum(['messages', 'followers']).optional()
@@ -42,12 +42,10 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !opts.letter || /^(?!\d)[a-zA-Z]+$/i.test(opts.letter), {
-        message: "Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.",
-        params: { customCode: 'required' }
+        message: "Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed."
       })
       .refine(opts => !opts.letter || opts.letter.length === 1, {
-        message: "Only one char as value of 'letter' accepted.",
-        params: { customCode: 'required' }
+        message: "Only one char as value of 'letter' accepted."
       });
   }
 

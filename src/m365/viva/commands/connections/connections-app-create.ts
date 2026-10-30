@@ -58,8 +58,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
         if (fs.existsSync(appFilePath) && !opts.force) {
           ctx.addIssue({
             message: `File ${path.resolve(`${opts.name}.zip`)} already exists. Delete the file or use the --force option to overwrite the existing file`,
-            code: z.ZodIssueCode.custom,
-            params: { customCode: 'required' }
+            code: z.ZodIssueCode.custom
           });
         }
       });

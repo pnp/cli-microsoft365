@@ -45,12 +45,10 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => opts.displayName.length <= 255, {
-        message: "The maximum amount of characters for 'displayName' is 255.",
-        params: { customCode: 'required' }
+        message: "The maximum amount of characters for 'displayName' is 255."
       })
       .refine(opts => opts.description.length <= 1024, {
-        message: "The maximum amount of characters for 'description' is 1024.",
-        params: { customCode: 'required' }
+        message: "The maximum amount of characters for 'description' is 1024."
       })
       .superRefine((opts, ctx) => {
         if (opts.adminEntraIds) {
@@ -59,8 +57,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
           if (invalid.length > 0) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `The following GUIDs are invalid for the option 'adminEntraIds': ${invalid.join(', ')}`,
-              params: { customCode: 'required' }
+              message: `The following GUIDs are invalid for the option 'adminEntraIds': ${invalid.join(', ')}`
             });
           }
         }
@@ -71,8 +68,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         }
         return formatting.splitAndTrim(opts.adminEntraIds).length <= 20;
       }, {
-        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.',
-        params: { customCode: 'required' }
+        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.'
       })
       .superRefine((opts, ctx) => {
         if (opts.adminEntraUserNames) {
@@ -81,8 +77,7 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
           if (invalid.length > 0) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `The following user principal names are invalid for the option 'adminEntraUserNames': ${invalid.join(', ')}`,
-              params: { customCode: 'required' }
+              message: `The following user principal names are invalid for the option 'adminEntraUserNames': ${invalid.join(', ')}`
             });
           }
         }
@@ -93,15 +88,10 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         }
         return formatting.splitAndTrim(opts.adminEntraUserNames).length <= 20;
       }, {
-        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.',
-        params: { customCode: 'required' }
+        message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.'
       })
       .refine(opts => !opts.adminEntraIds || !opts.adminEntraUserNames, {
-        message: 'Specify either adminEntraIds or adminEntraUserNames, but not both.',
-        params: {
-          customCode: 'optionSet',
-          options: ['adminEntraIds', 'adminEntraUserNames']
-        }
+        message: 'Specify either adminEntraIds or adminEntraUserNames, but not both.'
       });
   }
 

@@ -8,7 +8,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.coerce.number().optional(),
+  id: z.coerce.number().optional().alias('i'),
   email: z.string().optional()
 });
 
@@ -34,11 +34,7 @@ class VivaEngageUserGetCommand extends VivaEngageCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !(opts.id !== undefined && opts.email !== undefined), {
-        message: 'You are only allowed to search by ID or e-mail but not both',
-        params: {
-          customCode: 'optionSet',
-          options: ['id', 'email']
-        }
+        message: 'You are only allowed to search by ID or e-mail but not both'
       });
   }
 

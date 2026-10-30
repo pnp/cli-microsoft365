@@ -144,7 +144,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName, description: 'Community for all devs', privacy: 'Public', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName, description: 'Community for all devs', privacy: 'public', verbose: true }) });
     assert(patchRequestStub.called);
   });
 
@@ -158,7 +158,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, description: 'Community for all devs', privacy: 'Public', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, description: 'Community for all devs', privacy: 'public', verbose: true }) });
     assert(patchRequestStub.called);
   });
 

@@ -7,9 +7,9 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  body: z.string(),
-  repliedToId: z.coerce.number().optional(),
-  directToUserIds: z.string().optional(),
+  body: z.string().alias('b'),
+  repliedToId: z.coerce.number().optional().alias('r'),
+  directToUserIds: z.string().optional().alias('d'),
   groupId: z.coerce.number().optional(),
   networkId: z.coerce.number().optional()
 });
@@ -37,7 +37,10 @@ class VivaEngageMessageAddCommand extends VivaEngageCommand {
     return schema
       .refine(opts => opts.groupId !== undefined || opts.directToUserIds !== undefined || opts.repliedToId !== undefined, {
         message: 'You must either specify groupId, repliedToId or directToUserIds',
-        params: { customCode: 'required' }
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'repliedToId', 'directToUserIds']
+        }
       });
   }
 
