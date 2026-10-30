@@ -230,7 +230,12 @@ async function execute(rawArgs: string[]): Promise<void> {
             }
           }
 
-          await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          try {
+            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          }
+          catch (e: any) {
+            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
+          }
           continue;
         }
 
@@ -239,7 +244,12 @@ async function execute(rawArgs: string[]): Promise<void> {
             await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
           }
 
-          await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          try {
+            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          }
+          catch (e: any) {
+            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
+          }
           continue;
         }
       }
