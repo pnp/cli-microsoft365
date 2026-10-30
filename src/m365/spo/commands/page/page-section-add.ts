@@ -1,52 +1,76 @@
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { BackgroundControl, Control } from './canvasContent.js';
-import { CanvasColumnFactorType, CanvasSectionTemplate } from './clientsidepages.js';
+import { CanvasColumnFactorType } from './clientsidepages.js';
 import { Page } from './Page.js';
+
+const sectionTemplates = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical', 'Flexible'] as const;
+const zoneEmphasisValues = ['None', 'Neutral', 'Soft', 'Strong', 'Image', 'Gradient'] as const;
+const iconAlignmentValues = ['Left', 'Right'] as const;
+const fillModeValues = ['ScaleToFill', 'ScaleToFit', 'Tile', 'OriginalSize'] as const;
+const zoneReflowStrategyValues = ['TopToBottom', 'LeftToRight'] as const;
+const MINIMUM_ZONE_HEIGHT = 34;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  pageName: z.string().alias('n'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  sectionTemplate: z.enum(sectionTemplates).alias('t'),
+  order: z.number().int().min(1, { error: 'The value of parameter order must be 1 or higher' }).optional(),
+  zoneEmphasis: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return zoneEmphasisValues.find(v => v.toLowerCase() === target) ?? val;
+  }, z.enum(zoneEmphasisValues)).optional(),
+  isLayoutReflowOnTop: z.boolean().optional(),
+  isCollapsibleSection: z.boolean().optional(),
+  showDivider: z.boolean().optional(),
+  iconAlignment: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return iconAlignmentValues.find(v => v.toLowerCase() === target) ?? val;
+  }, z.enum(iconAlignmentValues)).optional(),
+  isExpanded: z.boolean().optional(),
+  gradientText: z.string().optional(),
+  imageUrl: z.string().optional(),
+  imageHeight: z.number().optional(),
+  imageWidth: z.number().optional(),
+  fillMode: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return fillModeValues.find(v => v.toLowerCase() === target) ?? val;
+  }, z.enum(fillModeValues)).optional(),
+  useLightText: z.boolean().optional(),
+  overlayColor: z.string().optional(),
+  overlayOpacity: z.number().optional(),
+  collapsibleTitle: z.string().optional(),
+  zoneReflowStrategy: z.preprocess(val => {
+    const target = String(val).toLowerCase();
+    return zoneReflowStrategyValues.find(v => v.toLowerCase() === target) ?? val;
+  }, z.enum(zoneReflowStrategyValues)).optional(),
+  zoneHeight: z.number().int().min(MINIMUM_ZONE_HEIGHT, { error: `The value of parameter zoneHeight must be ${MINIMUM_ZONE_HEIGHT} or higher` }).optional(),
+  headingLevel: z.number()
+    .refine(level => [2, 3, 4].includes(level), {
+      error: 'The value of parameter headingLevel must be 2, 3 or 4'
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  pageName: string;
-  webUrl: string;
-  sectionTemplate: string;
-  order?: number;
-  zoneEmphasis?: string;
-  isLayoutReflowOnTop?: boolean;
-  isCollapsibleSection?: boolean;
-  showDivider?: boolean;
-  iconAlignment?: string;
-  isExpanded?: boolean;
-  gradientText?: string;
-  imageUrl?: string;
-  imageHeight?: number;
-  imageWidth?: number;
-  fillMode?: string;
-  useLightText?: boolean;
-  overlayColor?: string;
-  overlayOpacity?: number;
-  collapsibleTitle?: string;
-  zoneReflowStrategy?: string;
-  zoneHeight?: number;
-  headingLevel?: number;
-}
-
 class SpoPageSectionAddCommand extends SpoCommand {
-  public readonly sectionTemplate: string[] = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical', 'Flexible'];
-  public readonly zoneEmphasis: string[] = ['None', 'Neutral', 'Soft', 'Strong', 'Image', 'Gradient'];
-  public readonly iconAlignment: string[] = ['Left', 'Right'];
-  public readonly fillMode: string[] = ['ScaleToFill', 'ScaleToFit', 'Tile', 'OriginalSize'];
-  public readonly zoneReflowStrategy: string[] = ['TopToBottom', 'LeftToRight'];
-  readonly MINIMUM_ZONE_HEIGHT: number = 34;
-
   public get name(): string {
     return commands.PAGE_SECTION_ADD;
   }
@@ -55,213 +79,39 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return 'Adds section to modern page';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        order: typeof args.options.order !== 'undefined',
-        zoneEmphasis: typeof args.options.zoneEmphasis !== 'undefined',
-        isLayoutReflowOnTop: !!args.options.isLayoutReflowOnTop,
-        isCollapsibleSection: !!args.options.isCollapsibleSection,
-        showDivider: !!typeof args.options.showDivider,
-        iconAlignment: typeof args.options.iconAlignment !== 'undefined',
-        isExpanded: !!args.options.isExpanded,
-        gradientText: typeof args.options.gradientText !== 'undefined',
-        imageUrl: typeof args.options.imageUrl !== 'undefined',
-        imageHeight: typeof args.options.imageHeight !== 'undefined',
-        imageWidth: typeof args.options.imageWidth !== 'undefined',
-        fillMode: typeof args.options.fillMode !== 'undefined',
-        useLightText: !!args.options.useLightText,
-        overlayColor: typeof args.options.overlayColor !== 'undefined',
-        overlayOpacity: typeof args.options.overlayOpacity !== 'undefined',
-        collapsibleTitle: typeof args.options.collapsibleTitle !== 'undefined',
-        zoneReflowStrategy: typeof args.options.zoneReflowStrategy !== 'undefined',
-        zoneHeight: typeof args.options.zoneHeight !== 'undefined',
-        headingLevel: typeof args.options.headingLevel !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.isLayoutReflowOnTop === undefined || opts.sectionTemplate === 'Vertical', {
+        error: 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.'
+      })
+      .refine(opts => opts.zoneEmphasis === 'Image' || !(opts.imageUrl || opts.imageWidth || opts.imageHeight || opts.fillMode), {
+        error: 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
+      })
+      .refine(opts => opts.zoneEmphasis !== 'Image' || !!opts.imageUrl, {
+        error: 'Specify imageUrl when zoneEmphasis is set to Image'
+      })
+      .refine(opts => opts.zoneEmphasis === 'Gradient' || !opts.gradientText, {
+        error: 'Specify gradientText only when zoneEmphasis is set to Gradient'
+      })
+      .refine(opts => opts.zoneEmphasis !== 'Gradient' || !!opts.gradientText, {
+        error: 'Specify gradientText when zoneEmphasis is set to Gradient'
+      })
+      .refine(opts => opts.overlayOpacity === undefined || (opts.overlayOpacity >= 0 && opts.overlayOpacity <= 100), {
+        error: 'The value of parameter overlayOpacity must be between 0 and 100'
+      })
+      .refine(opts => !opts.overlayColor || /^#[0-9a-f]{6}$/i.test(opts.overlayColor), {
+        error: 'The value of parameter overlayColor must be a valid hex color'
+      })
+      .refine(opts => ['Image', 'Gradient'].includes(opts.zoneEmphasis ?? '') || !(opts.overlayColor || opts.overlayOpacity || opts.useLightText), {
+        error: 'Specify overlayColor or overlayOpacity only when zoneEmphasis is set to Image or Gradient'
+      })
+      .refine(opts => opts.sectionTemplate === 'Flexible' || !(opts.zoneReflowStrategy || opts.zoneHeight), {
+        error: 'Specify zoneReflowStrategy or zoneHeight only when sectionTemplate is set to Flexible'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --sectionTemplate <sectionTemplate>',
-        autocomplete: this.sectionTemplate
-      },
-      {
-        option: '--order [order]'
-      },
-      {
-        option: '--zoneEmphasis [zoneEmphasis]',
-        autocomplete: this.zoneEmphasis
-      },
-      {
-        option: '--isLayoutReflowOnTop'
-      },
-      {
-        option: '--isCollapsibleSection'
-      },
-      {
-        option: '--showDivider'
-      },
-      {
-        option: '--iconAlignment [iconAlignment]',
-        autocomplete: this.iconAlignment
-      },
-      {
-        option: '--isExpanded'
-      },
-      {
-        option: '--gradientText [gradientText]'
-      },
-      {
-        option: '--imageUrl [imageUrl]'
-      },
-      {
-        option: '--imageHeight [imageHeight]'
-      },
-      {
-        option: '--imageWidth [imageWidth]'
-      },
-      {
-        option: '--fillMode [fillMode]',
-        autocomplete: this.fillMode
-      },
-      {
-        option: '--useLightText'
-      },
-      {
-        option: '--overlayColor [overlayColor]'
-      },
-      {
-        option: '--overlayOpacity [overlayOpacity]'
-      },
-      {
-        option: '--collapsibleTitle [collapsibleTitle]'
-      },
-      {
-        option: '--zoneReflowStrategy [zoneReflowStrategy]',
-        autocomplete: this.zoneReflowStrategy
-      },
-      {
-        option: '--zoneHeight [zoneHeight]'
-      },
-      {
-        option: '--headingLevel [headingLevel]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
-          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight|Vertical|Flexible`;
-        }
-
-        if (typeof args.options.order !== 'undefined') {
-          if (!Number.isInteger(args.options.order) || args.options.order < 1) {
-            return 'The value of parameter order must be 1 or higher';
-          }
-        }
-
-        if (typeof args.options.zoneEmphasis !== 'undefined') {
-          if (!this.zoneEmphasis.some(zoneEmphasisValue => zoneEmphasisValue.toLowerCase() === args.options.zoneEmphasis?.toLowerCase())) {
-            return `The value of parameter zoneEmphasis must be ${this.zoneEmphasis.join(', ')}`;
-          }
-        }
-
-        if (typeof args.options.isLayoutReflowOnTop !== 'undefined') {
-          if (args.options.sectionTemplate !== 'Vertical') {
-            return 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.';
-          }
-        }
-
-        if (typeof args.options.iconAlignment !== 'undefined') {
-          if (!this.iconAlignment.some(iconAlignmentValue => iconAlignmentValue.toLowerCase() === args.options.iconAlignment?.toLowerCase())) {
-            return `The value of parameter iconAlignment must be ${this.iconAlignment.join(', ')}`;
-          }
-        }
-
-        if (typeof args.options.fillMode !== 'undefined') {
-          if (!this.fillMode.some(fillModeValue => fillModeValue.toLowerCase() === args.options.fillMode?.toLowerCase())) {
-            return `The value of parameter fillMode must be ${this.fillMode.join(', ')}`;
-          }
-        }
-
-        if (typeof args.options.zoneReflowStrategy !== 'undefined') {
-          if (!this.zoneReflowStrategy.some(zoneReflowStrategyValue => zoneReflowStrategyValue.toLowerCase() === args.options.zoneReflowStrategy?.toLowerCase())) {
-            return `The value of parameter zoneReflowStrategy must be ${this.zoneReflowStrategy.join(', ')}`;
-          }
-        }
-
-        if (typeof args.options.headingLevel !== 'undefined') {
-          if (![2, 3, 4].some(headingLevelValue => headingLevelValue === args.options.headingLevel)) {
-            return `The value of parameter headingLevel must be 2, 3 or 4`;
-          }
-        }
-
-        if (args.options.zoneEmphasis?.toLowerCase() !== 'image' && (args.options.imageUrl || args.options.imageWidth ||
-          args.options.imageHeight || args.options.fillMode)) {
-          return 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image';
-        }
-
-        if (args.options.zoneEmphasis?.toLowerCase() === 'image' && !args.options.imageUrl) {
-          return 'Specify imageUrl when zoneEmphasis is set to Image';
-        }
-
-        if (args.options.zoneEmphasis?.toLowerCase() !== 'gradient' && args.options.gradientText) {
-          return 'Specify gradientText only when zoneEmphasis is set to Gradient';
-        }
-
-        if (args.options.zoneEmphasis?.toLowerCase() === 'gradient' && !args.options.gradientText) {
-          return 'Specify gradientText when zoneEmphasis is set to Gradient';
-        }
-
-        if (args.options.overlayOpacity && (args.options.overlayOpacity < 0 || args.options.overlayOpacity > 100)) {
-          return 'The value of parameter overlayOpacity must be between 0 and 100';
-        }
-
-        if (args.options.overlayColor && !/^#[0-9a-f]{6}$/i.test(args.options.overlayColor)) {
-          return 'The value of parameter overlayColor must be a valid hex color';
-        }
-
-        if (!(args.options.zoneEmphasis && ['image', 'gradient'].includes(args.options.zoneEmphasis.toLowerCase())) && (args.options.overlayColor || args.options.overlayOpacity || args.options.useLightText)) {
-          return 'Specify overlayColor or overlayOpacity only when zoneEmphasis is set to Image or Gradient';
-        }
-
-        if (args.options.sectionTemplate?.toLowerCase() !== 'flexible' && (args.options.zoneReflowStrategy || args.options.zoneHeight)) {
-          return 'Specify zoneReflowStrategy or zoneHeight only when sectionTemplate is set to Flexible';
-        }
-
-        if (typeof args.options.zoneHeight !== 'undefined') {
-          if (!Number.isInteger(args.options.zoneHeight) || args.options.zoneHeight < this.MINIMUM_ZONE_HEIGHT) {
-            return `The value of parameter zoneHeight must be ${this.MINIMUM_ZONE_HEIGHT} or higher`;
-          }
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string = ['pageName', 'webUrl', 'sectionTemplate', 'zoneEmphasis', 'iconAlignment', 'gradientText', 'imageUrl', 'fillMode', 'overlayColor', 'collapsibleTitle', 'zoneReflowStrategy'];
-    this.types.boolean = ['isLayoutReflowOnTop', 'isCollapsibleSection', 'showDivider', 'isExpanded', 'useLightText'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -460,7 +310,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
   private getFlexibleColumn(zoneIndex: number, sectionIndex: number, args: CommandArgs, zoneId?: string): Control {
     const columnValue: Control = this.getColumn(zoneIndex, sectionIndex, 100, args, zoneId);
-    columnValue.zoneReflowStrategy = { axis: args.options.zoneReflowStrategy ? this.zoneReflowStrategy.indexOf(args.options.zoneReflowStrategy) : 0 };
+    columnValue.zoneReflowStrategy = { axis: args.options.zoneReflowStrategy ? zoneReflowStrategyValues.indexOf(args.options.zoneReflowStrategy) : 0 };
     if (args.options.zoneHeight) {
       columnValue.zoneHeight = args.options.zoneHeight;
     }
@@ -523,7 +373,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
         height: imageHeight ? imageHeight : 955,
         width: imageWidth ? imageWidth : 555
       };
-      backgroundDetails.fillMode = fillMode ? this.fillMode.indexOf(fillMode) : 0;
+      backgroundDetails.fillMode = fillMode ? fillModeValues.indexOf(fillMode) : 0;
     }
 
     return backgroundDetails;

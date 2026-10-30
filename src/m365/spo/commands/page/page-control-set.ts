@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -10,17 +11,52 @@ import { ClientSidePageProperties } from './ClientSidePageProperties.js';
 import { Page } from './Page.js';
 import { PageControl } from './PageControl.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('i'),
+  pageName: z.string().alias('n'),
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  webPartData: z.string()
+    .refine(data => {
+      try {
+        JSON.parse(data);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      error: 'Specified webPartData is not a valid JSON string.'
+    })
+    .optional(),
+  webPartProperties: z.string()
+    .refine(properties => {
+      try {
+        JSON.parse(properties);
+        return true;
+      }
+      catch {
+        return false;
+      }
+    }, {
+      error: 'Specified webPartProperties is not a valid JSON string.'
+    })
+    .optional(),
+  innerHtml: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  pageName: string;
-  webUrl: string;
-  webPartData?: string;
-  webPartProperties?: string;
-  innerHtml?: string;
 }
 
 class SpoPageControlSetCommand extends SpoCommand {
@@ -32,79 +68,15 @@ class SpoPageControlSetCommand extends SpoCommand {
     return 'Updates web part data or properties of a control on a modern page';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webPartData: typeof args.options.webPartData !== 'undefined',
-        webPartProperties: typeof args.options.webPartProperties !== 'undefined',
-        innerHtml: typeof args.options.innerHtml !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.webPartData, opts.webPartProperties, opts.innerHtml].filter(Boolean).length <= 1, {
+        error: 'Specify webPartProperties, webPartData, or innerHtml but not more than one'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--webPartData [webPartData]'
-      },
-      {
-        option: '--webPartProperties [webPartProperties]'
-      },
-      {
-        option: '--innerHtml [innerHtml]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if ([args.options.webPartData, args.options.webPartProperties, args.options.innerHtml].filter(Boolean).length > 1) {
-          return 'Specify webPartProperties, webPartData, or innerHtml but not more than one';
-        }
-
-        if (args.options.webPartProperties) {
-          try {
-            JSON.parse(args.options.webPartProperties);
-          }
-          catch (e) {
-            return `Specified webPartProperties is not a valid JSON string. Input: ${args.options.webPartProperties}. Error: ${e}`;
-          }
-        }
-
-        if (args.options.webPartData) {
-          try {
-            JSON.parse(args.options.webPartData);
-          }
-          catch (e) {
-            return `Specified webPartData is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
-          }
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
