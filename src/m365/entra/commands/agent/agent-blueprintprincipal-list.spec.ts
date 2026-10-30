@@ -195,7 +195,7 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       assert.strictEqual(
         opts.url,
-        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id'
+        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,info'
       );
 
       return { value: result };
@@ -221,7 +221,7 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       assert.strictEqual(
         opts.url,
-        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,appDisplayName'
+        'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal?$select=id,info,appDisplayName'
       );
 
       return { value: limitedResponse };
