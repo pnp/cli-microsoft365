@@ -43,7 +43,11 @@ class VivaEngageCommunityRemoveCommand extends GraphCommand {
         }
       })
       .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length <= 1, {
-        message: 'Specify either id, displayName, or entraGroupId, but not multiple.'
+        message: 'Specify either id, displayName, or entraGroupId, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName', 'entraGroupId']
+        }
       });
   }
 

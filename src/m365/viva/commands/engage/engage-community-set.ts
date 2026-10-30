@@ -45,7 +45,11 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
         }
       })
       .refine(opts => [opts.id, opts.displayName, opts.entraGroupId].filter(x => x !== undefined).length <= 1, {
-        message: 'Specify either id, displayName, or entraGroupId, but not multiple.'
+        message: 'Specify either id, displayName, or entraGroupId, but not multiple.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName', 'entraGroupId']
+        }
       })
       .refine(opts => !opts.newDisplayName || opts.newDisplayName.length <= 255, {
         message: "The maximum amount of characters for 'newDisplayName' is 255."
