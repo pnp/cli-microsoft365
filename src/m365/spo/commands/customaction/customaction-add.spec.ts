@@ -512,7 +512,13 @@ describe(commands.CUSTOMACTION_ADD, () => {
       location: 'ScriptLink',
       group: 'SiteActions'
     });
+
     assert.strictEqual(actual.success, false);
+    assert.deepStrictEqual(actual.error.issues[0].path, ['scriptSrc']);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink'
+    );
   });
 
   it('fails if registrationType, but not registrationId', () => {
