@@ -34,17 +34,23 @@ m365 spe container permission set [options]
 : Comma separated list of permissions. Possible values are `reader`, `writer`, `manager`, `owner`.
 ```
 
+<Global />
+
 ## Permissions
 
 <Tabs>
   <TabItem value="Delegated">
 
-  | Resource        | Permissions                   |
-  |-----------------|-------------------------------|
-  | Microsoft Graph | FileStorageContainer.Selected |
+  | Resource        | Permissions                                                        |
+  |-----------------|--------------------------------------------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected, FileStorageContainerType.Manage.All |
+
+  `FileStorageContainerType.Manage.All` is required only when using `containerTypeName`.
 
   </TabItem>
   <TabItem value="Application">
+
+  This command only supports application permissions when **not** using the `containerTypeName` option.
 
   | Resource        | Permissions                   |
   |-----------------|-------------------------------|

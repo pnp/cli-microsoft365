@@ -14,7 +14,7 @@ export const options = z.strictObject({
   containerName: z.string().alias('n').optional(),
   containerTypeId: z.uuid().optional(),
   containerTypeName: z.string().optional(),
-  roles: z.string().alias('r').transform((value) => value.split(',')).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array())
+  roles: z.string().transform((value) => value.split(',').map(role => role.trim())).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()).alias('r')
 });
 declare type Options = z.infer<typeof options>;
 
@@ -57,7 +57,7 @@ class SpeContainerPermissionSetCommand extends GraphCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${args.options.id}`,
+        url: `${this.resource}/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(args.options.id)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

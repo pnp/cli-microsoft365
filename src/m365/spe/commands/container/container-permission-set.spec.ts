@@ -117,7 +117,7 @@ describe(commands.CONTAINER_PERMISSION_SET, () => {
 
   it('correctly updates permissions for a container by id', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -132,7 +132,7 @@ describe(commands.CONTAINER_PERMISSION_SET, () => {
 
   it('correctly updates permissions for a container by name and container type by id', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -147,7 +147,7 @@ describe(commands.CONTAINER_PERMISSION_SET, () => {
 
   it('correctly updates permissions for a container by name and container type by name', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -162,7 +162,7 @@ describe(commands.CONTAINER_PERMISSION_SET, () => {
 
   it('correctly updates multiple permissions for a container by id', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${permissionId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
         return;
       }
 
@@ -170,6 +170,21 @@ describe(commands.CONTAINER_PERMISSION_SET, () => {
     });
 
     await command.action(logger, { options: commandOptionsSchema.parse({ id: permissionId, containerId: containerId, roles: 'reader,writer', verbose: true }) });
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
+      roles: ['reader', 'writer']
+    });
+  });
+
+  it('correctly updates spaced comma-separated multiple permissions for a container by id', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/permissions/${formatting.encodeQueryParameter(permissionId)}`) {
+        return;
+      }
+
+      throw 'Invalid PATCH request: ' + opts.url;
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: permissionId, containerId: containerId, roles: 'reader, writer', verbose: true }) });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, {
       roles: ['reader', 'writer']
     });
