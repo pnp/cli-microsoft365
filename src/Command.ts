@@ -570,6 +570,7 @@ export default abstract class Command {
   private getTelemetryProperties(args: any): any {
     if (this.schema) {
       const telemetryProperties: any = {};
+
       this.optionsInfo.forEach(o => {
         if (o.required) {
           return;
@@ -581,23 +582,33 @@ export default abstract class Command {
 
         switch (o.type) {
           case 'string':
-            telemetryProperties[o.name] = o.autocomplete ? args.options[o.name] : typeof args.options[o.name] !== 'undefined';
+            telemetryProperties[o.name] = o.autocomplete ? args.options[o.name] : true;
             break;
           case 'boolean':
             telemetryProperties[o.name] = args.options[o.name];
             break;
           case 'number':
-            telemetryProperties[o.name] = typeof args.options[o.name] !== 'undefined';
+            telemetryProperties[o.name] = true;
             break;
-        };
+        }
       });
+
+      if (this.allowUnknownOptions()) {
+        const unknownOptions = optionsUtils.getUnknownOptions(
+          args.options,
+          zod.schemaToOptions(this.schema)
+        );
+
+        Object.keys(unknownOptions).forEach(optionName => {
+          telemetryProperties[optionName] = true;
+        });
+      }
 
       return telemetryProperties;
     }
-    else {
-      this.telemetry.forEach(t => t(args));
-      return this.telemetryProperties;
-    }
+
+    this.telemetry.forEach(t => t(args));
+    return this.telemetryProperties;
   }
 
   public async getTextOutput(logStatement: any[]): Promise<string> {
