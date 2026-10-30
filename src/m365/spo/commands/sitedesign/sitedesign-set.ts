@@ -78,7 +78,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         updateInfo.WebTemplate = args.options.webTemplate === 'TeamSite' ? '64' : '68';
       }
       if (args.options.version) {
-        updateInfo.Version = parseInt(args.options.version, 10);
+        updateInfo.Version = Number(args.options.version);
       }
       if (typeof args.options.isDefault !== 'undefined') {
         updateInfo.IsDefault = args.options.isDefault;

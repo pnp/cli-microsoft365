@@ -10,7 +10,7 @@ import commands from '../../commands.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   title: z.string().alias('t'),
-  webTemplate: z.enum(['TeamSite', 'CommunicationSite']).alias('w'),
+  webTemplate: z.string().pipe(z.enum(['TeamSite', 'CommunicationSite'])).alias('w'),
   siteScripts: z.string().superRefine((val, ctx) => {
     const items = val.split(',').map(s => s.trim());
     const invalid = items.filter(item => !validation.isValidGuid(item));
