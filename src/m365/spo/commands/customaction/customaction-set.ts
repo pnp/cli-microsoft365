@@ -9,6 +9,12 @@ import commands from '../../commands.js';
 import { CustomAction } from './customaction.js';
 import { z } from 'zod';
 
+const permissionKinds = Object.entries(PermissionKind)
+  .filter(([, value]) => typeof value === 'number')
+  .map(([key]) => key);
+
+const permissionKindSet = new Set(permissionKinds);
+
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
@@ -36,13 +42,13 @@ export const options = z.strictObject({
       : value;
   }, z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType'])).optional(),
   rights: z.string().refine(val => {
-    const items = val.split(',').map(s => s.trim());
-    return items.every(item => PermissionKind[(item as keyof typeof PermissionKind)] !== undefined);
+    const items = val.split(',').map(item => item.trim());
+    return items.every(item => permissionKindSet.has(item));
   }, {
     error: e => {
-      const items = (e.input as string).split(',').map((s: string) => s.trim());
-      const invalid = items.find((item: string) => PermissionKind[(item as keyof typeof PermissionKind)] === undefined);
-      return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`;
+      const items = (e.input as string).split(',').map(item => item.trim());
+      const invalid = items.find(item => !permissionKindSet.has(item));
+      return `Rights option '${invalid}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
     }
   }).optional(),
   scriptSrc: z.string().optional(),
@@ -88,19 +94,8 @@ class SpoCustomActionSetCommand extends SpoCommand {
       });
   }
 
-  /**
-   * Maps the base PermissionsKind enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
   protected get permissionsKindMap(): string[] {
-    const result: string[] = [];
-
-    for (const kind in PermissionKind) {
-      if (typeof PermissionKind[kind] === 'number') {
-        result.push(kind);
-      }
-    }
-    return result;
+    return permissionKinds;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

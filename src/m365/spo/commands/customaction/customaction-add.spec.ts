@@ -658,4 +658,41 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
     assert.strictEqual(actual.success, true);
   });
+
+  it('fails if numeric PermissionKind rights are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      rights: '2'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails if inherited object properties are specified as rights', () => {
+    for (const rights of ['constructor', 'toString', '__proto__']) {
+      const actual = commandOptionsSchema.safeParse({
+        ...defaultCommandOptions,
+        rights
+      });
+
+      assert.strictEqual(actual.success, false);
+    }
+  });
+
+  it('includes sequence when its value is zero', async () => {
+    const postRequestSpy = initDefaultPostStubs();
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        ...defaultCommandOptions,
+        sequence: 0
+      })
+    });
+
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: sinon.match({
+        Sequence: 0
+      })
+    })));
+  });
 });

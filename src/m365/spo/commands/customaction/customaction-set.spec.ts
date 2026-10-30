@@ -668,7 +668,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       rights: 'abc'
     });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`);
+    assert.strictEqual(actual.error.issues[0].message, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
   });
 
   it('has correct PermissionKind rights specified', () => {
@@ -848,6 +848,45 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
 
     assert(postRequestSpy.calledOnce);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Sequence: 0
+      }
+    })));
+  });
+
+  it('fails if numeric PermissionKind rights are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      rights: '2'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails if inherited object properties are specified as rights', () => {
+    for (const rights of ['constructor', 'toString', '__proto__']) {
+      const actual = commandOptionsSchema.safeParse({
+        ...defaultCommandOptions,
+        rights
+      });
+
+      assert.strictEqual(actual.success, false, `Expected '${rights}' to be rejected`);
+    }
+  });
+
+  it('includes sequence when its value is zero', async () => {
+    const postRequestSpy = initDefaultPostStubs();
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        webUrl: 'https://contoso.sharepoint.com',
+        id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
+        sequence: 0,
+        scope: 'Web'
+      })
+    });
+
     assert(postRequestSpy.calledWith(sinon.match({
       data: {
         Sequence: 0
