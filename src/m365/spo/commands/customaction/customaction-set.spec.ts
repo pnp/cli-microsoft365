@@ -733,6 +733,24 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails if registrationType is not a string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      registrationType: 1
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails if registrationType is not recognized', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      registrationType: 'Invalid'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
   it('success if location that requires group option is set, but group is also set', () => {
     const actual = commandOptionsSchema.safeParse({
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',

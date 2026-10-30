@@ -561,6 +561,15 @@ describe(commands.CUSTOMACTION_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails if registrationType is not a string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      ...defaultCommandOptions,
+      registrationType: 1
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
   it('success if location that requires group option is set, but group is also set', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: 'https://contoso.sharepoint.com',

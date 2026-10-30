@@ -29,7 +29,12 @@ export const options = z.strictObject({
   imageUrl: z.string().optional(),
   commandUIExtension: z.string().optional().alias('e'),
   registrationId: z.string().optional(),
-  registrationType: z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType']).optional(),
+  registrationType: z.preprocess(value => {
+    const values = ['None', 'List', 'ContentType', 'ProgId', 'FileType'];
+    return typeof value === 'string'
+      ? values.find(type => type.toLowerCase() === value.toLowerCase()) ?? value
+      : value;
+  }, z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType'])).optional(),
   rights: z.string().refine(val => {
     const items = val.split(',').map(s => s.trim());
     return items.every(item => PermissionKind[(item as keyof typeof PermissionKind)] !== undefined);
@@ -76,12 +81,10 @@ class SpoCustomActionSetCommand extends SpoCommand {
         opts.description || opts.registrationId || opts.registrationType ||
         opts.rights || opts.scriptBlock || opts.scriptSrc ||
         opts.sequence, {
-        message: 'Please specify option to be updated',
-        params: { customCode: 'required' }
+        message: 'Please specify option to be updated'
       })
       .refine(opts => !(opts.scriptSrc && opts.scriptBlock), {
-        message: 'Either option scriptSrc or scriptBlock can be specified, but not both',
-        params: { customCode: 'required' }
+        message: 'Either option scriptSrc or scriptBlock can be specified, but not both'
       });
   }
 

@@ -25,7 +25,12 @@ export const options = z.strictObject({
   imageUrl: z.string().optional(),
   commandUIExtension: z.string().optional().alias('e'),
   registrationId: z.string().optional(),
-  registrationType: z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType']).optional(),
+  registrationType: z.preprocess(value => {
+    const values = ['None', 'List', 'ContentType', 'ProgId', 'FileType'];
+    return typeof value === 'string'
+      ? values.find(type => type.toLowerCase() === value.toLowerCase()) ?? value
+      : value;
+  }, z.enum(['None', 'List', 'ContentType', 'ProgId', 'FileType'])).optional(),
   rights: z.string().refine(val => {
     const items = val.split(',').map(s => s.trim());
     return items.every(item => PermissionKind[(item as keyof typeof PermissionKind)] !== undefined);
@@ -68,10 +73,12 @@ class SpoCustomActionAddCommand extends SpoCommand {
     return schema
       .refine(opts => !opts.registrationId || opts.registrationType, {
         message: 'Option registrationId is specified, but registrationType is missing',
+        path: ['registrationType'],
         params: { customCode: 'required' }
       })
       .refine(opts => !opts.registrationType || opts.registrationId, {
         message: 'Option registrationType is specified, but registrationId is missing',
+        path: ['registrationId'],
         params: { customCode: 'required' }
       })
       .refine(opts => {
@@ -89,6 +96,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
         return !locationsRequireGroup.includes(location) || !!opts.group;
       }, {
         message: 'The location specified requires the group option to be specified as well',
+        path: ['group'],
         params: { customCode: 'required' }
       })
       .refine(opts => {
@@ -102,7 +110,10 @@ class SpoCustomActionAddCommand extends SpoCommand {
         return true;
       }, {
         message: 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink',
-        params: { customCode: 'required' }
+        params: {
+          customCode: 'required',
+          options: ['scriptSrc', 'scriptBlock']
+        }
       })
       .refine(opts => {
         if (!opts.location) {
@@ -114,15 +125,14 @@ class SpoCustomActionAddCommand extends SpoCommand {
         }
         return true;
       }, {
-        message: 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink',
-        params: { customCode: 'required' }
+        message: 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink'
       })
       .refine(opts => !(opts.scriptSrc && opts.scriptBlock), {
-        message: 'Either option scriptSrc or scriptBlock can be specified, but not both',
-        params: { customCode: 'required' }
+        message: 'Either option scriptSrc or scriptBlock can be specified, but not both'
       })
       .refine(opts => !opts.clientSideComponentProperties || opts.clientSideComponentId, {
         message: 'Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing',
+        path: ['clientSideComponentId'],
         params: { customCode: 'required' }
       });
   }
