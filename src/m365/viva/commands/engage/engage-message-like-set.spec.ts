@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-message-like-set.js';
+import command, { options } from './engage-message-like-set.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
@@ -20,6 +20,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
   let promptIssued: boolean = false;
   let requests: any[];
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +30,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,6 +76,16 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if messageId is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ messageId: 1, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('correctly handles error', async () => {
     sinon.stub(request, 'post').rejects({
       "error": {
@@ -81,31 +93,31 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ messageId: 1 }) }), new CommandError('An error has occurred.'));
   });
 
-  it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with parameters', () => {
+    const actual = commandOptionsSchema.safeParse({ messageId: 10123123 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('id must be a number', async () => {
-    const actual = await command.validate({ options: { messageId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if messageId is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ messageId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if enabled set to "true"', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123, enable: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if enabled set to "true"', () => {
+    const actual = commandOptionsSchema.safeParse({ messageId: 10123123, enable: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if enabled set to "false"', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123, enable: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if enabled set to "false"', () => {
+    const actual = commandOptionsSchema.safeParse({ messageId: 10123123, enable: false });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { messageId: 1231231, enable: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ messageId: 1231231, enable: false }) });
 
 
     assert(promptIssued);
@@ -119,7 +131,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, messageId: 1231231 }) });
     assert(requestPostedStub.called);
   });
 
@@ -131,7 +143,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, messageId: 1231231, force: true }) });
     assert(requestPostedStub.called);
   });
 
@@ -143,7 +155,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, messageId: 1231231, enable: true }) });
     assert(requestPostedStub.called);
   });
 
@@ -155,12 +167,12 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, messageId: 1231231, enable: false, force: true }) });
     assert(requestPostedStub.called);
   });
 
   it('prompts when disliking and confirmation parameter is denied', async () => {
-    await command.action(logger, { options: { messageId: 1231231, enable: false, force: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ messageId: 1231231, enable: false, force: false }) });
 
 
     assert(promptIssued);
@@ -177,7 +189,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, messageId: 1231231, enable: false }) });
     assert(requestDeleteStub.called);
   });
 
@@ -185,7 +197,7 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { messageId: 1231231, enable: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ messageId: 1231231, enable: false }) });
     assert(requests.length === 0);
   });
-}); 
+});
