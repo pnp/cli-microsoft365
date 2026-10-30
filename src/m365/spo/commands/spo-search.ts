@@ -67,10 +67,7 @@ class SpoSearchCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !(opts.startRow && opts.allResults), {
-        message: 'You cannot specify startRow when allResults is set',
-        params: {
-          customCode: 'required'
-        }
+        message: 'You cannot specify startRow when allResults is set'
       });
   }
 

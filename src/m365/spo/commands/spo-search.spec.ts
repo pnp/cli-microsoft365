@@ -894,9 +894,10 @@ describe(commands.SEARCH, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: commandOptionsSchema.safeParse({
+      options: commandOptionsSchema.parse({
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        queryText: '*'
       })
     }), new CommandError(err));
   });
