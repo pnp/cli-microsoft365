@@ -12,12 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-set.js';
+import command, { options } from './folder-set.js';
+import { FolderColorValues } from './FolderColor.js';
 
 describe(commands.FOLDER_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const folderRelSiteUrl = '/Shared Documents/Folder1';
@@ -34,6 +36,7 @@ describe(commands.FOLDER_SET, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,6 +74,10 @@ describe(commands.FOLDER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('renames folder correctly by using server relative URL', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderRelServerUrl)}')/ListItemAllFields`) {
@@ -81,13 +88,13 @@ describe(commands.FOLDER_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
-        verbose: true,
-        webUrl: webUrl,
-        url: folderRelServerUrl,
-        name: newFolderName
-      }
+      options: commandOptionsSchema.parse(
+        {
+          verbose: true,
+          webUrl: webUrl,
+          url: folderRelServerUrl,
+          name: newFolderName
+        })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { FileLeafRef: newFolderName, Title: newFolderName });
   });
@@ -102,12 +109,12 @@ describe(commands.FOLDER_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
-        webUrl: webUrl,
-        url: folderRelSiteUrl,
-        name: newFolderName
-      }
+      options: commandOptionsSchema.parse(
+        {
+          webUrl: webUrl,
+          url: folderRelSiteUrl,
+          name: newFolderName
+        })
     });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { FileLeafRef: newFolderName, Title: newFolderName });
   });
@@ -121,7 +128,7 @@ describe(commands.FOLDER_SET, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber }) });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
@@ -140,7 +147,7 @@ describe(commands.FOLDER_SET, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorName }) });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
@@ -159,7 +166,7 @@ describe(commands.FOLDER_SET, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorName, name: newFolderName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorName, name: newFolderName }) });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
@@ -178,7 +185,7 @@ describe(commands.FOLDER_SET, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber, name: newFolderName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber, name: newFolderName }) });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
@@ -209,7 +216,7 @@ describe(commands.FOLDER_SET, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: webUrl, url: folderRelServerUrl, color: colorName } } as any)
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, url: folderRelServerUrl, color: colorName }) })
       , new CommandError(error.error['odata.error'].message.value));
   });
 
@@ -217,50 +224,55 @@ describe(commands.FOLDER_SET, () => {
     sinon.stub(request, 'patch').resolves({ 'odata.null': true });
 
     await assert.rejects(command.action(logger, {
-      options:
+      options: commandOptionsSchema.parse(
+        {
+          debug: true,
+          webUrl: webUrl,
+          url: folderRelServerUrl,
+          name: newFolderName
+        })
+    }), new CommandError('Folder not found.'));
+  });
+
+  it('fails validation if the webUrl option is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'abc', url: folderRelSiteUrl, name: newFolderName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('passes validation when the url option specified', () => {
+    const actual = commandOptionsSchema.safeParse(
       {
-        debug: true,
         webUrl: webUrl,
         url: folderRelServerUrl,
         name: newFolderName
-      }
-    } as any), new CommandError('Folder not found.'));
+      });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the webUrl option is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'abc', url: folderRelSiteUrl, name: newFolderName } }, commandInfo);
-    assert.strictEqual(actual, "'abc' is not a valid SharePoint Online site URL.");
+  it('fails validation if color is passed as string and color is not a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, url: folderRelSiteUrl, color: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`);
   });
 
-  it('passes validation when the url option specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: webUrl,
-        url: folderRelServerUrl,
-        name: newFolderName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if color is passed as string and color is a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if color is passed as string and color is not a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, url: folderRelSiteUrl, color: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if color is passed as number and color is a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if color is passed as string and color is a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if neither name nor color is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, url: folderRelSiteUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if color is passed as number and color is a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, url: folderRelSiteUrl, color: colorNumber } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if neither name nor color is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, url: folderRelSiteUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, url: folderRelSiteUrl, name: newFolderName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

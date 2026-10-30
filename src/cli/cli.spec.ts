@@ -1436,21 +1436,23 @@ describe('cli', () => {
     assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optA, 42);
   });
 
-  it(`keeps string value as string when prompting for option set value`, async () => {
+  it(`preserves numeric-looking string when prompting for option set value`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
     sinon.stub(prompt, 'forSelection').resolves('optE');
-    sinon.stub(prompt, 'forInput').resolves('hello world');
+    sinon.stub(prompt, 'forInput').resolves('001');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return true;
       }
+
       return defaultValue;
     });
     const executeCommandSpy = sinon.spy(cli, 'executeCommand');
 
     await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+
     assert(executeCommandSpy.called);
-    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'hello world');
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, '001');
   });
 
   it(`executes command when validation passed`, async () => {
