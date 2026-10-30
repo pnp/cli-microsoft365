@@ -115,7 +115,12 @@ describe(commands.CONTAINER_LIST, () => {
   });
 
   it('passes validation if valid containerTypeId is specified', () => {
-    const result = commandOptionsSchema.safeParse({ containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082" });
+    const result = commandOptionsSchema.safeParse({ containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082' });
+    assert.strictEqual(result.success, true);
+  });
+
+  it('passes validation if valid containerTypeId is valid non-RFC GUID', () => {
+    const result = commandOptionsSchema.safeParse({ containerTypeId: 'dd2a4457-a9de-ea11-a812-000d3a8b9137' });
     assert.strictEqual(result.success, true);
   });
 
@@ -128,7 +133,7 @@ describe(commands.CONTAINER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeId: "e2756c4d-fa33-4452-9c36-2325686e1082", verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeId: 'e2756c4d-fa33-4452-9c36-2325686e1082', verbose: true }) });
     assert(loggerLogSpy.calledWith(containersList));
   });
 
@@ -141,7 +146,7 @@ describe(commands.CONTAINER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeName: "standard container", verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ containerTypeName: 'standard container', verbose: true }) });
     assert(loggerLogSpy.calledWith(containersList));
   });
 
@@ -152,7 +157,7 @@ describe(commands.CONTAINER_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
-        containerTypeName: "nonexisting container",
+        containerTypeName: 'nonexisting container',
         verbose: true
       })
     }), new CommandError('An error has occurred'));
