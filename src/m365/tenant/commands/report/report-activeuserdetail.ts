@@ -1,5 +1,7 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import DateAndPeriodBasedReport, { dateAndPeriodBasedReportOptions as options } from '../../../base/DateAndPeriodBasedReport.js';
 import commands from '../../commands.js';
+
+export { options };
 
 class TenantReportActiveUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
