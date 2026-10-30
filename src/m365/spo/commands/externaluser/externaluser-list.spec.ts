@@ -104,7 +104,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -140,7 +140,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -176,7 +176,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -212,7 +212,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -248,7 +248,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -284,7 +284,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -320,7 +320,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -356,7 +356,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -392,7 +392,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -428,7 +428,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -464,7 +464,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -500,7 +500,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -536,7 +536,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       InvitedAs: 'me@dearvesa.fi',
       UniqueId: '100300009BF10C95',
       AcceptedAs: 'me@dearvesa.fi',
-      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      WhenCreated: '2016-11-02T21:50:52.000Z',
       InvitedBy: null
     }]));
   });
@@ -558,7 +558,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
       ]);
     });
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWith([]));
   });
 
   it('correctly handles a generic error when retrieving external users', async () => {

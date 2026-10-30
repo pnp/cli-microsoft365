@@ -211,5 +211,23 @@ export const formatting = {
     const guidPattern = /\/Guid\(([0-9a-f-]+)\)\//i;
     const match = str.match(guidPattern);
     return match ? match[1] : str;
+  },
+
+  /**
+   * Converts a CSOM date string to an ISO 8601 date string.
+   * @param str The string to extract the date from
+   * @description The string should be in the format /Date(year,month,day,hours,minutes,seconds,milliseconds)/ where month is 0-based. Escaped slashes (\/Date(...)\/) are supported as well. The date parts are interpreted as UTC.
+   * @returns The date as an ISO 8601 string or the original string if no match is found
+   * @example /Date(2026,8,21,12,24,45,997)/ => 2026-09-21T12:24:45.997Z
+   */
+  extractCsomDate(str: string): string {
+    const datePattern = /^\\?\/Date\((\d+(?:,\d+){2,6})\)\\?\/$/i;
+    const match = str.trim().match(datePattern);
+    if (!match) {
+      return str;
+    }
+
+    const [year, month, day, hours = 0, minutes = 0, seconds = 0, milliseconds = 0] = match[1].split(',').map(Number);
+    return new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds)).toISOString();
   }
 };
