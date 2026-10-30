@@ -194,6 +194,40 @@ class MockCommandWithSchema extends Command {
   }
 }
 
+const mockLooseOptions = z.looseObject({
+  ...globalOptionsZod.shape,
+  knownOption: z.string().optional()
+});
+
+class MockCommandWithUnknownSchemaOptions extends Command {
+  public get name(): string {
+    return 'mock-command-with-unknown-options';
+  }
+
+  public get description(): string {
+    return 'Mock command with unknown schema options';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return mockLooseOptions;
+  }
+
+  public optionsInfo: CommandOptionInfo[] = [
+    {
+      name: 'knownOption',
+      required: false,
+      type: 'string'
+    }
+  ];
+
+  public allowUnknownOptions(): boolean {
+    return true;
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+}
+
 describe('Command', () => {
   let telemetryCommandName: any;
   let logger: Logger;
@@ -396,6 +430,23 @@ describe('Command', () => {
       optionalEnum: 'a',
       optionalNumber: true,
       optionalBoolean: false
+    });
+  });
+
+  it('tracks unknown properties for schemas that allow unknown options', () => {
+    const command = new MockCommandWithUnknownSchemaOptions();
+    const args = {
+      options: {
+        knownOption: 'value',
+        'displayName-nl-NL': 'Kostenplaats'
+      }
+    };
+
+    const telemetryProps = (command as any).getTelemetryProperties(args);
+
+    assert.deepStrictEqual(telemetryProps, {
+      knownOption: true,
+      'displayName-nl-NL': true
     });
   });
 
