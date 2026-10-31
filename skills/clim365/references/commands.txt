@@ -174,6 +174,7 @@ flow run cancel|Cancels a specific run of the specified Microsoft Flow
 flow run get|Gets information about a specific run of the specified Microsoft Flow
 flow run list|Lists runs of the specified Microsoft Flow
 flow run resubmit|Resubmits a specific flow run for the specified Microsoft Flow
+flow set|Sets the specified Power Automate flow
 graph changelog list|Gets an overview of specific API-level changes in Microsoft Graph v1.0 and beta
 graph directoryextension add|Creates a new directory extension
 graph directoryextension get|Retrieves the definition of a directory extension
