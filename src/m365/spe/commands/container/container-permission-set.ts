@@ -52,7 +52,7 @@ class SpeContainerPermissionSetCommand extends GraphCommand {
         }
       })
       .refine((options: Options) => options.containerName || [options.containerTypeId, options.containerTypeName].filter(o => o !== undefined).length === 0, {
-        error: 'Options containerTypeId and containerTypeName are only required when adding permissions to a container by name.'
+        error: 'Options containerTypeId and containerTypeName can only be used when specifying a container by name.'
       });
   }
 
@@ -61,7 +61,7 @@ class SpeContainerPermissionSetCommand extends GraphCommand {
       const containerId = await this.getContainerId(args.options, logger);
 
       if (this.verbose) {
-        await logger.logToStderr(`Adding permissions to container with ID '${containerId}'...`);
+        await logger.logToStderr(`Updating permission for container with ID '${containerId}'...`);
       }
 
       const requestOptions: CliRequestOptions = {
