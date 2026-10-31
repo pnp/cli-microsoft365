@@ -38,6 +38,7 @@ entra administrativeunit member list|Retrieves members (users, groups, or device
 entra administrativeunit member remove|Removes a member (user, group, or device) from an administrative unit
 entra administrativeunit remove|Removes an administrative unit
 entra administrativeunit roleassignment add|Assigns a Microsoft Entra role with administrative unit scope to a user
+entra agent blueprintprincipal list|Retrieves a list of agent blueprint principals
 entra agent list|Retrieves a list of agents
 entra app add|Creates new Entra app registration
 entra app get|Gets an Entra app registration
