@@ -21,7 +21,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   pageName: z.string().alias('n'),
-  id: z.uuid().alias('i'),
+  id: z.guid().alias('i'),
   draft: z.boolean().optional(),
   force: z.boolean().optional().alias('f')
 });

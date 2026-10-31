@@ -12,9 +12,9 @@ import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  roleId: z.uuid().optional(),
+  roleId: z.guid().optional(),
   roleName: z.string().optional(),
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
     error: e => `'${e.input}' is not a valid UPN.`
   }).optional(),

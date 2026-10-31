@@ -9,7 +9,7 @@ import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  name: z.uuid().alias('n'),
+  name: z.guid().alias('n'),
   environmentName: z.string().alias('e'),
   asAdmin: z.boolean().optional(),
   force: z.boolean().optional().alias('f')

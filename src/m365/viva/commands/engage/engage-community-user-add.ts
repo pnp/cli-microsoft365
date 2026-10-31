@@ -13,7 +13,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   communityId: z.string().optional(),
   communityDisplayName: z.string().optional().alias('n'),
-  entraGroupId: z.uuid().optional(),
+  entraGroupId: z.guid().optional(),
   ids: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
       error: e => `The following GUIDs are invalid: ${e.input}.`

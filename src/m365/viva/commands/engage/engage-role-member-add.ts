@@ -10,11 +10,11 @@ import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  roleId: z.uuid().optional().refine(id => validation.isValidGuid(id), {
+  roleId: z.guid().optional().refine(id => validation.isValidGuid(id), {
     error: e => `'${e.input}' is not a valid GUID.`
   }),
   roleName: z.string().optional(),
-  userId: z.uuid().optional().refine(id => validation.isValidGuid(id), {
+  userId: z.guid().optional().refine(id => validation.isValidGuid(id), {
     error: e => `'${e.input}' is not a valid GUID.`
   }),
   userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {

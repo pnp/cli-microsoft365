@@ -17,7 +17,7 @@ enum MemberType {
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  administrativeUnitId: z.uuid().optional().alias('i'),
+  administrativeUnitId: z.guid().optional().alias('i'),
   administrativeUnitName: z.string().optional().alias('n'),
   type: zod.coercedEnum(MemberType).optional().alias('t'),
   properties: z.string().optional().alias('p'),

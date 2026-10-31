@@ -9,7 +9,7 @@ import { odata } from '../../../../utils/odata.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string()
     .refine((val) => validation.isValidUserPrincipalName(val), {
       message: 'Invalid user principal name.'

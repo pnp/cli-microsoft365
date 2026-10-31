@@ -7,8 +7,8 @@ import commands from '../../commands.js';
 
 export const options = globalOptionsZod
   .extend({
-    clientId: z.uuid().alias('i'),
-    resourceId: z.uuid().alias('r'),
+    clientId: z.guid().alias('i'),
+    resourceId: z.guid().alias('r'),
     scope: z.string().alias('s')
   }).strict();
 declare type Options = z.infer<typeof options>;

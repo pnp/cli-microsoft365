@@ -11,7 +11,7 @@ import auth from '../../../../Auth.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional().alias('i'),
+  userId: z.guid().optional().alias('i'),
   userName: z.string()
     .refine(userName => validation.isValidUserPrincipalName(userName), {
       error: e => `'${e.input}' is not a valid UPN.`

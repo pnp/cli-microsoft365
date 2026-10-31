@@ -11,11 +11,11 @@ import { odata } from '../../../../utils/odata.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
     error: e => `'${e.input}' is not a valid user principal name for option 'userName'.`
   }).optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.guid().optional(),
   groupName: z.string().optional(),
   startDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
     error: e => `'${e.input}' is not a valid ISO 8601 date time string.`

@@ -11,7 +11,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   name: z.string().alias('n'),
   description: z.string().optional().alias('d'),
-  containerTypeId: z.uuid().optional(),
+  containerTypeId: z.guid().optional(),
   containerTypeName: z.string().optional(),
   ocrEnabled: z.boolean().optional(),
   itemMajorVersionLimit: z.number()

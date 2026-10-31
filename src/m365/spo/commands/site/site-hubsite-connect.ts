@@ -15,7 +15,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.uuid().alias('i'),
+  id: z.guid().alias('i'),
   asAdmin: z.boolean().optional()
 });
 declare type Options = z.infer<typeof options>;

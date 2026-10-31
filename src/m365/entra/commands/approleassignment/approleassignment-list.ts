@@ -9,9 +9,9 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional().alias('i'),
+  appId: z.guid().optional().alias('i'),
   appDisplayName: z.string().optional().alias('n'),
-  appObjectId: z.uuid().optional()
+  appObjectId: z.guid().optional()
 });
 
 declare type Options = z.infer<typeof options>;
