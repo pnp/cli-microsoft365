@@ -1,0 +1,140 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spe container permission add
+
+Adds permission to SharePoint Embedded container for a specified user
+
+## Usage
+
+```sh
+m365 spe container permission add [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --containerId [containerId]`
+: ID of a SharePoint Embedded container. Specify either `containerId` or `containerName` but not both.
+
+`-n, --containerName [containerName]`
+: Display name of the Container. Specify either `containerId` or `containerName` but not both.
+
+`--containerTypeId [containerTypeId]`
+: The ID of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`--containerTypeName [containerTypeName]`
+: The name of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
+
+`-r, --roles <roles>`
+: Comma-separated list of roles. Possible values are `reader`, `writer`, `manager`, `owner`.
+
+`--userId [userId]`	
+: The ID of the user to assign the role to. Use either `userId` or `userName` but not both.
+
+`--userName [userName]`
+: The UPN of user to assign the role to. Use either `userId` or `userName` but not both.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                   |
+  |-----------------|-------------------------------|
+  | Microsoft Graph | FileStorageContainer.Selected |
+
+  </TabItem>
+</Tabs>
+
+:::note
+
+When using `--userId`, Microsoft Graph also requires `User.ReadBasic.All` for delegated authentication or `User.Read.All` for application authentication to resolve the user's principal name.
+
+:::
+
+:::note
+
+When using `--containerTypeName`, resolving the container type requires delegated authentication, the `FileStorageContainerType.Manage.All` permission, and the **SharePoint Administrator** or **Global Administrator** role. For application authentication, use `--containerId`, or `--containerName` with `--containerTypeId`, instead.
+
+:::
+
+## Examples
+
+Adds a reader role for the specified user to the container
+
+```sh
+m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --roles "reader" --userName "jacob@fabrikam.com"
+```
+
+Adds multiple roles for the specified user to the container
+
+```sh
+m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --roles "reader,writer" --userName "jacob@fabrikam.com"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ",
+    "roles": ["reader"],
+    "grantedToV2": {
+      "user": {
+        "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
+        "userPrincipalName": "john.doe@contoso.com",
+        "displayName": "John Doe",
+        "email": "john.doe@contoso.com"
+      }
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  grantedToV2: {"user":{"id":"89ea5c94-7736-4e25-95ad-3fa95f62b66e","userPrincipalName":"john.doe@contoso.com","displayName":"John Doe","email":"john.doe@contoso.com"}}
+  id         : cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
+  roles      : ["reader"]
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id
+  cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --userId "89ea5c94-7736-4e25-95ad-3fa95f62b66e" --roles "reader"
+
+  Date: 8/5/2025
+
+  ## cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
+
+  Property | Value
+  ---------|-------
+  id | cJpbmNpcGFsT3duZAJfaLowIy5mfG1lbWJliZXJzaGlwfHJvcnlicjExMUBvdXRsb29rLmNvbQ
+  ```
+
+  </TabItem>
+</Tabs>
