@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import GlobalOptions from '../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../Command.js';
 import request from '../../../request.js';
 import { formatting } from '../../../utils/formatting.js';
 import { spo } from '../../../utils/spo.js';
@@ -10,35 +11,44 @@ import commands from '../commands.js';
 import { ResultTableRow } from './search/datatypes/ResultTableRow.js';
 import { SearchResult } from './search/datatypes/SearchResult.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  queryText: z.string().alias('q'),
+  selectProperties: z.string().optional().alias('p'),
+  webUrl: z.string().optional().alias('u'),
+  allResults: z.boolean().optional(),
+  rowLimit: z.number().int().optional(),
+  sourceId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional(),
+  trimDuplicates: z.boolean().optional(),
+  enableStemming: z.boolean().optional(),
+  culture: z.number().int().optional(),
+  refinementFilters: z.string().optional(),
+  queryTemplate: z.string().optional(),
+  sortList: z.string().refine(val => /^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/i.test(val), {
+    message: `sortlist parameter value does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`
+  }).optional(),
+  rankingModelId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional(),
+  startRow: z.number().int().optional(),
+  properties: z.string().optional(),
+  sourceName: z.string().optional(),
+  refiners: z.string().optional(),
+  hiddenConstraints: z.string().optional(),
+  clientType: z.string().optional(),
+  enablePhonetic: z.boolean().optional(),
+  processBestBets: z.boolean().optional(),
+  enableQueryRules: z.boolean().optional(),
+  processPersonalFavorites: z.boolean().optional(),
+  rawOutput: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  allResults?: boolean;
-  clientType?: string;
-  culture?: number;
-  enablePhonetic?: boolean;
-  enableQueryRules?: boolean;
-  enableStemming?: boolean;
-  hiddenConstraints?: string;
-  processBestBets?: boolean;
-  processPersonalFavorites?: boolean;
-  properties?: string;
-  queryText: string;
-  queryTemplate?: string;
-  rankingModelId?: string;
-  rawOutput?: boolean;
-  refinementFilters?: string;
-  refiners?: string;
-  rowLimit?: number;
-  selectProperties?: string;
-  startRow?: number;
-  sortList?: string;
-  sourceId?: string;
-  sourceName?: string;
-  trimDuplicates?: boolean;
-  webUrl?: string;
 }
 
 class SpoSearchCommand extends SpoCommand {
@@ -50,155 +60,15 @@ class SpoSearchCommand extends SpoCommand {
     return 'Executes a search query';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        selectproperties: typeof args.options.selectProperties !== 'undefined',
-        allResults: args.options.allResults,
-        rowLimit: args.options.rowLimit,
-        sourceId: typeof args.options.sourceId !== 'undefined',
-        trimDuplicates: args.options.trimDuplicates,
-        enableStemming: args.options.enableStemming,
-        culture: args.options.culture,
-        refinementFilters: typeof args.options.refinementFilters !== 'undefined',
-        queryTemplate: typeof args.options.queryTemplate !== 'undefined',
-        sortList: typeof args.options.sortList !== 'undefined',
-        rankingModelId: typeof args.options.rankingModelId !== 'undefined',
-        startRow: typeof args.options.startRow !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        sourceName: typeof args.options.sourceName !== 'undefined',
-        refiners: typeof args.options.refiners !== 'undefined',
-        webUrl: typeof args.options.webUrl !== 'undefined',
-        hiddenConstraints: typeof args.options.hiddenConstraints !== 'undefined',
-        clientType: typeof args.options.clientType !== 'undefined',
-        enablePhonetic: args.options.enablePhonetic,
-        processBestBets: args.options.processBestBets,
-        enableQueryRules: args.options.enableQueryRules,
-        processPersonalFavorites: args.options.processPersonalFavorites,
-        rawOutput: args.options.rawOutput
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !(opts.startRow && opts.allResults), {
+        message: 'You cannot specify startRow when allResults is set'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-q, --queryText <queryText>'
-      },
-      {
-        option: '-p, --selectProperties [selectProperties]'
-      },
-      {
-        option: '-u, --webUrl [webUrl]'
-      },
-      {
-        option: '--allResults'
-      },
-      {
-        option: '--rowLimit [rowLimit]'
-      },
-      {
-        option: '--sourceId [sourceId]'
-      },
-      {
-        option: '--trimDuplicates'
-      },
-      {
-        option: '--enableStemming'
-      },
-      {
-        option: '--culture [culture]'
-      },
-      {
-        option: '--refinementFilters [refinementFilters]'
-      },
-      {
-        option: '--queryTemplate [queryTemplate]'
-      },
-      {
-        option: '--sortList [sortList]'
-      },
-      {
-        option: '--rankingModelId [rankingModelId]'
-      },
-      {
-        option: '--startRow [startRow]'
-      },
-      {
-        option: '--properties [properties]'
-      },
-      {
-        option: '--sourceName [sourceName]'
-      },
-      {
-        option: '--refiners [refiners]'
-      },
-      {
-        option: '--hiddenConstraints [hiddenConstraints]'
-      },
-      {
-        option: '--clientType [clientType]'
-      },
-      {
-        option: '--enablePhonetic'
-      },
-      {
-        option: '--processBestBets'
-      },
-      {
-        option: '--enableQueryRules'
-      },
-      {
-        option: '--processPersonalFavorites'
-      },
-      {
-        option: '--rawOutput'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
-          return `${args.options.sourceId} is not a valid GUID`;
-        }
-
-        if (args.options.rankingModelId && !validation.isValidGuid(args.options.rankingModelId)) {
-          return `${args.options.rankingModelId} is not a valid GUID`;
-        }
-
-        if (args.options.sortList && !/^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/gi.test(args.options.sortList)) {
-          return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`;
-        }
-
-        if (args.options.rowLimit && !Number.isInteger(args.options.rowLimit)) {
-          return `${args.options.rowLimit} is not a valid number`;
-        }
-
-        if (args.options.startRow && !Number.isInteger(args.options.startRow)) {
-          return `${args.options.startRow} is not a valid number`;
-        }
-
-        if (args.options.startRow && args.options.allResults) {
-          return 'You cannot specify startRow when allResults is set';
-        }
-
-        if (args.options.culture && !Number.isInteger(args.options.culture)) {
-          return `${args.options.culture} is not a valid number`;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
