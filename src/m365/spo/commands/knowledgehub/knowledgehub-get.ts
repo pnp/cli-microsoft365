@@ -1,9 +1,13 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpoKnowledgehubGetCommand extends SpoCommand {
   public get name(): string {
@@ -12,6 +16,10 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Gets the Knowledge Hub Site URL for your tenant';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

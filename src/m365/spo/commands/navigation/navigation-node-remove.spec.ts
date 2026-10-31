@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './navigation-node-remove.js';
+import command, { options } from './navigation-node-remove.js';
 
 describe(commands.NAVIGATION_NODE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptIssued: boolean = false;
 
@@ -35,6 +36,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -90,7 +92,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003, force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -103,12 +105,12 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003, force: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before removing navigation node when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003 }) });
 
     assert(promptIssued);
   });
@@ -119,7 +121,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     });
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003 }) });
   });
 
   it('removes the navigation node when prompt confirmed', async () => {
@@ -133,7 +135,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -142,7 +144,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw { error: 'An error has occurred' };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003, force: true }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
@@ -150,31 +152,55 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003, force: true }) }), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', id: '2003' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', location: 'TopNavigationBar', id: 2003 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if specified location is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', id: '2003' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if specified location is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', id: 2003 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is TopNavigationBar and all required properties are present', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 2003 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when location is QuickLaunch and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', id: '2003' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when location is QuickLaunch and all required properties are present', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', id: 2003 });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+      location: 'TopNavigationBar',
+      id: 2003,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['abc', '', ' ', '\t', '\n', 0, -1, 1.5];
+
+    invalidIds.forEach(id => {
+      const actual = commandOptionsSchema.safeParse({
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+        location: 'TopNavigationBar',
+        id
+      });
+
+      assert.strictEqual(actual.success, false, `Expected '${id}' to fail validation`);
+    });
   });
 });
