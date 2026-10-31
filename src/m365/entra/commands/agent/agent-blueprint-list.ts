@@ -50,6 +50,10 @@ class EntraAgentBlueprintListCommand extends GraphCommand {
       : '';
 
     try {
+      if (this.verbose) {
+        await logger.logToStderr('Retrieving agent identity blueprints...');
+      }
+
       const results = await odata.getAllItems<any>(`${this.resource}/v1.0/applications/microsoft.graph.agentIdentityBlueprint${queryString}`);
       await logger.log(results);
     }

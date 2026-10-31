@@ -133,7 +133,7 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'appId']);
   });
 
-  it(`should get a list of agent identity blueprints`, async () => {
+  it('should get a list of agent identity blueprints (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint`) {
         return {
@@ -144,14 +144,14 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
 
     assert(
       loggerLogSpy.calledWith(response)
     );
   });
 
-  it(`should get a list of agent identity blueprints with specified properties`, async () => {
+  it('should get a list of agent identity blueprints with specified properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id%2CdisplayName`) {
         return {
