@@ -17,7 +17,7 @@ interface CommandArgs {
   options: Options;
 }
 
-class EntraAgentBlueprintprincipalListCommand extends GraphCommand {
+class EntraAgentBlueprintPrincipalListCommand extends GraphCommand {
   public get name(): string {
     return commands.AGENT_BLUEPRINTPRINCIPAL_LIST;
   }
@@ -69,4 +69,4 @@ class EntraAgentBlueprintprincipalListCommand extends GraphCommand {
   }
 }
 
-export default new EntraAgentBlueprintprincipalListCommand();
+export default new EntraAgentBlueprintPrincipalListCommand();
