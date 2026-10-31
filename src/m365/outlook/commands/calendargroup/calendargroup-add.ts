@@ -49,7 +49,11 @@ class OutlookCalendarGroupAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const token = auth.connection.accessTokens[auth.defaultResource].accessToken;
+      const token = await auth.ensureAccessToken(
+        auth.defaultResource,
+        logger,
+        this.debug
+      );
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(token);
 
       let userUrl: string;

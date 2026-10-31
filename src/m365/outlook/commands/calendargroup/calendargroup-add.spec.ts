@@ -27,6 +27,7 @@ describe(commands.CALENDARGROUP_ADD, () => {
     "classId": "c02d4ddf-4809-485f-9cd4-1ef0937e03be",
     "changeKey": "fJKVL07sbkmIfHqjbDnRgQADKqwfAA=="
   };
+  const refreshedToken = 'refreshed-access-token';
 
   let log: string[];
   let logger: Logger;
@@ -64,6 +65,7 @@ describe(commands.CALENDARGROUP_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(auth, 'ensureAccessToken').resolves(refreshedToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(accessToken, 'getScopesFromAccessToken').returns([]);
     sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(currentUserId);
@@ -72,6 +74,7 @@ describe(commands.CALENDARGROUP_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      auth.ensureAccessToken,
       accessToken.isAppOnlyAccessToken,
       accessToken.getScopesFromAccessToken,
       accessToken.getUserIdFromAccessToken,
@@ -322,5 +325,29 @@ describe(commands.CALENDARGROUP_ADD, () => {
       command.action(logger, { options: commandOptionsSchema.parse({ name: calendarGroupName }) }),
       new CommandError(errorMessage)
     );
+  });
+
+  it('uses the ensured access token to validate delegated permissions', async () => {
+    sinonUtil.restore(accessToken.getScopesFromAccessToken);
+    const getScopesStub = sinon.stub(accessToken, 'getScopesFromAccessToken')
+      .withArgs(refreshedToken)
+      .returns(['Calendars.ReadWrite.Shared']);
+
+    sinon.stub(request, 'post').resolves(response);
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        name: calendarGroupName,
+        userId
+      })
+    });
+
+    sinon.assert.calledOnceWithExactly(
+      auth.ensureAccessToken as sinon.SinonStub,
+      auth.defaultResource,
+      logger,
+      false
+    );
+    sinon.assert.calledOnceWithExactly(getScopesStub, refreshedToken);
   });
 });
