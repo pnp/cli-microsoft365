@@ -10,7 +10,7 @@ import { formatting } from '../../../../utils/formatting.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional().alias('i'),
+  userId: z.guid().optional().alias('i'),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid UPN.`
   }).optional().alias('n'),

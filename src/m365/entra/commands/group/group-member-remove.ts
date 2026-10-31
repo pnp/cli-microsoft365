@@ -18,7 +18,7 @@ const RoleEnum = {
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  groupId: z.uuid().optional().alias('i'),
+  groupId: z.guid().optional().alias('i'),
   groupName: z.string().optional().alias('n'),
   userIds: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {

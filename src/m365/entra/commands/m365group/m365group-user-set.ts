@@ -25,9 +25,9 @@ export const options = z.strictObject({
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
       error: e => `The following user principal names are invalid for the option 'userNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
     }).optional(),
-  groupId: z.uuid().optional().alias('i'),
+  groupId: z.guid().optional().alias('i'),
   groupName: z.string().optional(),
-  teamId: z.uuid().optional(),
+  teamId: z.guid().optional(),
   teamName: z.string().optional(),
   role: zod.coercedEnum(RoleEnum).alias('r')
 });

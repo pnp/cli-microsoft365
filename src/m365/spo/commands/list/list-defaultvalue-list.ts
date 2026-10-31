@@ -17,7 +17,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  listId: z.uuid().optional().alias('i'),
+  listId: z.guid().optional().alias('i'),
   listTitle: z.string().optional().alias('t'),
   listUrl: z.string().optional(),
   folderUrl: z.string().optional()

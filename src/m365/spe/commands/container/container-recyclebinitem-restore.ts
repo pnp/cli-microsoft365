@@ -11,7 +11,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  containerTypeId: z.uuid().optional(),
+  containerTypeId: z.guid().optional(),
   containerTypeName: z.string().optional(),
   id: z.string().optional(),
   name: z.string().optional()

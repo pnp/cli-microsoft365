@@ -11,7 +11,7 @@ import { SpeContainerType } from '../../../../utils/spe.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   name: z.string().optional().alias('n')
 });
 

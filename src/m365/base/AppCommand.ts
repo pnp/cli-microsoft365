@@ -8,7 +8,7 @@ import { M365RcJson, M365RcJsonApp } from './M365RcJson.js';
 
 export const appCommandOptions = z.object({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional()
+  appId: z.guid().optional()
 });
 type Options = z.infer<typeof appCommandOptions>;
 

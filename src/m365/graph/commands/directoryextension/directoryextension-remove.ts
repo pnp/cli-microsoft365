@@ -10,10 +10,10 @@ import { directoryExtension } from '../../../../utils/directoryExtension.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   name: z.string().optional().alias('n'),
-  appId: z.uuid().optional(),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  appObjectId: z.guid().optional(),
   appName: z.string().optional(),
   force: z.boolean().optional().alias('f')
 });

@@ -12,8 +12,8 @@ import { AppRole, AppRoleAssignment, ServicePrincipal } from '@microsoft/microso
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional(),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  appObjectId: z.guid().optional(),
   appDisplayName: z.string().optional(),
   resource: z.string().alias('r'),
   scopes: z.string().transform((value) => value.split(',').map(String)).alias('s'),

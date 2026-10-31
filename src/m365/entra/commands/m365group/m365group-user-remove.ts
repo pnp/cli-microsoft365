@@ -12,9 +12,9 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  teamId: z.uuid().optional(),
+  teamId: z.guid().optional(),
   teamName: z.string().optional(),
-  groupId: z.uuid().optional().alias('i'),
+  groupId: z.guid().optional().alias('i'),
   groupName: z.string().optional(),
   ids: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
