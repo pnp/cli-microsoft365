@@ -27,7 +27,7 @@ const dictionary = [
   'autofill',
   'azure',
   'bin',
-  'blueprintprincipal',
+  'blueprint',
   'brand',
   'builder',
   'calendar',
