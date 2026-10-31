@@ -1,22 +1,29 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'teamId must be a valid GUID'
+    })
+    .alias('i'),
+  allowUserEditMessages: z.boolean().optional(),
+  allowUserDeleteMessages: z.boolean().optional(),
+  allowOwnerDeleteMessages: z.boolean().optional(),
+  allowTeamMentions: z.boolean().optional(),
+  allowChannelMentions: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId: string;
-  allowUserEditMessages?: boolean;
-  allowUserDeleteMessages?: boolean;
-  allowOwnerDeleteMessages?: boolean;
-  allowTeamMentions?: boolean;
-  allowChannelMentions?: boolean;
 }
 
 class TeamsMessagingSettingsSetCommand extends GraphCommand {
@@ -36,77 +43,8 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     return 'Updates messaging settings of a Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      TeamsMessagingSettingsSetCommand.booleanProps.forEach((p: string) => {
-        this.telemetryProperties[p] = (args.options as any)[p];
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--allowUserEditMessages [allowUserEditMessages]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowUserDeleteMessages [allowUserDeleteMessages]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowTeamMentions [allowTeamMentions]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowChannelMentions [allowChannelMentions]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('allowUserEditMessages', 'allowUserDeleteMessages', 'allowOwnerDeleteMessages', 'allowTeamMentions', 'allowChannelMentions');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        let hasDuplicate: boolean = false;
-        let property: string = '';
-        TeamsMessagingSettingsSetCommand.booleanProps.forEach((prop: string) => {
-          if ((args.options as any)[prop] instanceof Array) {
-            property = prop;
-            hasDuplicate = true;
-          }
-        });
-        if (hasDuplicate) {
-          return `Duplicate option ${property} specified. Specify only one`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
