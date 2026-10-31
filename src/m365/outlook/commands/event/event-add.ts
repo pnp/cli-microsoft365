@@ -319,9 +319,7 @@ class OutlookEventAddCommand extends GraphCommand {
     if (args.options.recurrence) {
       if (args.options.recurrence.startsWith('@')) {
         const fileRecurrence: string = fs.readFileSync(args.options.recurrence.replace('@', ''), 'utf8');
-        if (fileRecurrence) {
-          body.recurrence = JSON.parse(fileRecurrence);
-        }
+        body.recurrence = JSON.parse(fileRecurrence);
       }
       else {
         body.recurrence = JSON.parse(args.options.recurrence);

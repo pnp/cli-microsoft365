@@ -1365,4 +1365,24 @@ describe(commands.EVENT_ADD, () => {
       'Locations cannot contain empty entries.'
     );
   });
+
+  it('throws an error when the recurrence file is empty', async () => {
+    sinon.stub(fs, 'readFileSync').returns('');
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      recurrence: '@empty-recurrence.json'
+    });
+
+    assert.strictEqual(parsedSchema.success, true);
+
+    await assert.rejects(
+      command.action(logger, { options: parsedSchema.data! })
+    );
+
+    assert.strictEqual(postStub.notCalled, true);
+  });
 });
