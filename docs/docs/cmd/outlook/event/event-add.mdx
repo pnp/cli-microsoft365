@@ -129,14 +129,15 @@ m365 outlook event add [options]
 
 :::note
 
-- `--timeZone` is used to set the `start.timeZone` and `end.timeZone` values in the request. If you pass only `start` and `end` without `timeZone`, the defaut is UTC.
+- `--timeZone` is used to set the `start.timeZone` and `end.timeZone` values in the request. If you pass only `start` and `end` without `timeZone`, the default is UTC.
 - For `--isAllDay true`, set `start` and `end` to midnight values and keep them in the same time zone.
+- When using application permissions, specify either `--userId` or `--userName`. 
 - After creating an online meeting by setting `isOnlineMeeting` and `onlineMeetingProvider`, you can’t change those values later.
 :::
 
 ## Examples
 
-Create an event in the default calendar of the current signed in user.
+Create an event in the default calendar of the current signed-in user.
 
 ```sh
 m365 outlook event add --subject "Weekly sync" --start "2026-02-10T09:00:00" --end "2026-02-10T09:30:00"
@@ -160,7 +161,7 @@ Create an event with required and optional attendees, categories, and a reminder
 m365 outlook event add --subject "Project kickoff" --start "2026-02-15T09:00:00" --end "2026-02-15T10:00:00" --requiredAttendees "alex@contoso.com,dana@contoso.com" --optionalAttendees "sam@contoso.com" --categories "Preset0,Preset6" --isReminderOn true --reminderMinutesBeforeStart 15
 ```
 
-Create an all day event with a physical location.
+Create an all-day event with a physical location.
 
 ```sh
 m365 outlook event add --subject "Company offsite" --start "2026-02-20T00:00:00" --end "2026-02-21T00:00:00" --isAllDay true --location "Head Office"
@@ -178,7 +179,7 @@ Create a recurring weekly event using a recurrence definition loaded from file.
 m365 outlook event add --subject "Weekly status meeting" --start "2026-02-16T10:00:00" --end "2026-02-16T10:30:00" --recurrence @recurrence.json
 ```
 
-Create an event with HTML body content loaded from a file and a custom transaction id.
+Create an event with HTML body content loaded from a file and a custom transaction ID.
 
 ```sh
 m365 outlook event add --subject "Town hall" --start "2026-02-25T16:00:00" --end "2026-02-25T17:30:00" --bodyContents @invite.html --bodyContentType HTML --transactionId "townhall-2026-02"

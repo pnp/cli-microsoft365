@@ -212,6 +212,7 @@ outlook calendargroup get|Retrieves a calendar group for a user
 outlook calendargroup list|Retrieves calendar groups for a user
 outlook calendargroup remove|Removes a calendar group
 outlook calendargroup set|Updates a calendar group for a user
+outlook event add|Create an event in the default calendar or a specific calendar of a user
 outlook event cancel|Cancels a calendar event
 outlook event get|Retrieve an event from a specific calendar of a user
 outlook event list|Retrieves a list of events from a specific calendar of a user.

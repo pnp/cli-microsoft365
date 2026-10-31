@@ -10,6 +10,7 @@ import { calendar } from '../../../../utils/calendar.js';
 import fs from 'fs';
 import { accessToken } from '../../../../utils/accessToken.js';
 import auth from '../../../../Auth.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 const bodyContentTypes = ['Text', 'HTML'] as const;
 const importances = ['low', 'normal', 'high'] as const;
@@ -39,7 +40,7 @@ export const options = z.strictObject({
   bodyContentType: z.preprocess(val => {
     const target = String(val).toLowerCase();
     return bodyContentTypes.find(t => t.toLowerCase() === target) ?? val;
-  }, z.enum(bodyContentTypes)).optional(),
+  }, z.enum(bodyContentTypes)).optional().default('HTML'),
   categories: z.string().transform((value) => value.split(',').map(String)).optional(),
   hideAttendees: z.boolean().optional().default(false),
   importance: z.preprocess(val => {
@@ -64,7 +65,7 @@ export const options = z.strictObject({
     }).transform((value) => value.split(',').map(String)).optional(),
   recurrence: z.string().optional(),
   reminderMinutesBeforeStart: z.number().refine(minutes => minutes >= 0, {
-    error: () => 'The number of reminder minutes must be a positive number or 0'
+    error: () => 'The number of reminder minutes must be a positive number or 0.'
   }).optional(),
   requiredAttendees: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
@@ -161,7 +162,7 @@ class OutlookEventAddCommand extends GraphCommand {
     let userIdentifier: string | undefined;
     if (args.options.userId || args.options.userName) {
       userIdentifier = args.options.userId ?? args.options.userName;
-      principalUrl += `users('${userIdentifier}')`;
+      principalUrl += `users('${formatting.encodeQueryParameter(userIdentifier!)}')`;
     }
     else {
       userIdentifier = accessToken.getUserNameFromAccessToken(token);
@@ -180,7 +181,7 @@ class OutlookEventAddCommand extends GraphCommand {
     let requestUrl: string = `${this.resource}/v1.0/${principalUrl}`;
 
     if (calendarId) {
-      requestUrl += `/calendars/${calendarId}/events`;
+      requestUrl += `/calendars/${formatting.encodeQueryParameter(calendarId)}/events`;
     }
     else {
       requestUrl += '/events';
@@ -195,24 +196,15 @@ class OutlookEventAddCommand extends GraphCommand {
       dateTime: args.options.end
     };
 
-    if (args.options.bodyContentType || args.options.bodyContents) {
-      body['body'] = {};
+    if (args.options.bodyContents !== undefined) {
+      const bodyContents = args.options.bodyContents.startsWith('@')
+        ? fs.readFileSync(args.options.bodyContents.substring(1), 'utf8')
+        : args.options.bodyContents;
 
-      if (args.options.bodyContentType) {
-        body['body']['contentType'] = args.options.bodyContentType;
-      }
-
-      if (args.options.bodyContents) {
-        if (args.options.bodyContents.startsWith('@')) {
-          const fileBodyContents: string = fs.readFileSync(args.options.bodyContents.replace('@', ''), 'utf8');
-          if (fileBodyContents) {
-            body['body']['content'] = fileBodyContents;
-          }
-        }
-        else {
-          body['body']['content'] = args.options.bodyContents;
-        }
-      }
+      body['body'] = {
+        contentType: args.options.bodyContentType,
+        content: bodyContents
+      };
     }
 
     if (!args.options.allowNewTimeProposals) {

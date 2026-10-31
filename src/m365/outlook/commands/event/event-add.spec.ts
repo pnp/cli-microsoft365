@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import command, { options } from './event-add.js';
 import { calendar } from '../../../../utils/calendar.js';
 import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 describe(commands.EVENT_ADD, () => {
   const subject = 'CLI sync';
@@ -288,112 +289,121 @@ describe(commands.EVENT_ADD, () => {
 
   it('fails validation if start date time is not a valid ISO 8601 date', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: 'foo', end: end });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid date.`);
   });
 
   it('fails validation if end date time is not a valid ISO 8601 date', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid date.`);
   });
 
   it('fails validation for incorrect body content type', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, bodyContentType: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation for incorrect importance', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, importance: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation for incorrect sensitivity', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, sensitivity: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation for incorrect online meeting provider', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation for incorrect status', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, showAs: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if user id is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, userId: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if user name is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, userName: 'foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, userId: userId, userName: userName });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if both calendarId and calendarName are specified', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, calendarId: calendarId, calendarName: calendarName });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if both location and locations are specified', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, location: 'Meeting Room 1', locations: 'Meeting Room 1,Meeting Room 2' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if locationEmailAddress is specified, but location is missing', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, locationEmailAddress: 'meetingRoom1@contoso.com' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if locationEmailAddress is not a valid email address', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, locationEmailAddress: 'foo', location: 'Meeting Room 1' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid email address.`);
   });
 
   it('fails validation if reminderMinutesBeforeStart is specified, but isReminderOn is false', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, reminderMinutesBeforeStart: 5, isReminderOn: false });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if isAllDay is true, but start is not set to midnight', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: '2026-08-08T00:00:00', isAllDay: true });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if isAllDay is true, but end is not set to midnight', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: '2026-08-05T00:00:00', end: end, isAllDay: true });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if end starts before start', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: '2026-01-01T00:00:00' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if reminderMinutesBeforeStart is negative', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, reminderMinutesBeforeStart: -5 });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The number of reminder minutes must be a positive number or 0.`);
   });
 
   it('fails validation if optionalAttendees contains invalid email address', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, optionalAttendees: 'john.doe@contoso.com,foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The following attendees names are invalid for the option 'optionalAttendees': foo.`);
   });
 
   it('fails validation if requiredAttendees contains invalid email address', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, requiredAttendees: 'john.doe@contoso.com,foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The following attendees names are invalid for the option 'requiredAttendees': foo.`);
   });
 
   it('fails validation if resources contains invalid email address', () => {
     const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, resources: 'john.doe@contoso.com,foo' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The following attendees names are invalid for the option 'resources': foo.`);
   });
 
   it('correctly creates an event if only subject, start and end are specified', async () => {
@@ -429,7 +439,7 @@ describe(commands.EVENT_ADD, () => {
   it('correctly creates an event for a user specified by id in a calendar specified by id', async () => {
     sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(userId);
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userId}')/calendars/${calendarId}/events`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userId)}')/calendars/${formatting.encodeQueryParameter(calendarId)}/events`) {
         return response;
       }
 
@@ -463,7 +473,7 @@ describe(commands.EVENT_ADD, () => {
     sinon.stub(accessToken, 'getUserNameFromAccessToken').returns(userName);
     sinon.stub(calendar, 'getUserCalendarByName').resolves({ id: calendarId }).calledWith(calendarName);
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userName}')/calendars/${calendarId}/events`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/calendars/${formatting.encodeQueryParameter(calendarId)}/events`) {
         return response;
       }
 
@@ -1033,7 +1043,7 @@ describe(commands.EVENT_ADD, () => {
       }
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/calendars/${calendarId}/events`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/calendars/${formatting.encodeQueryParameter(calendarId)}/events`) {
         throw error;
       }
 
@@ -1049,5 +1059,23 @@ describe(commands.EVENT_ADD, () => {
     });
     await assert.rejects(command.action(logger, { options: parsedSchema.data! }),
       new CommandError(error.error.message));
+  });
+
+  it('correctly creates an event with HTML body content by default', async () => {
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      bodyContents: '<p>Event details</p>'
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.body, {
+      contentType: 'HTML',
+      content: '<p>Event details</p>'
+    });
   });
 });
