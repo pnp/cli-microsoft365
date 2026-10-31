@@ -150,20 +150,11 @@ class SpoExternalUserListCommand extends SpoCommand {
       else {
         const results: GetExternalUsersResults = json.pop();
 
-        if (results.TotalUserCount > 0) {
-          await logger.log(results.ExternalUserCollection._Child_Items_.map(e => {
-            delete e._ObjectType_;
-            const dateChunks: number[] = (e.WhenCreated as string)
-              .replace('/Date(', '')
-              .replace(')/', '')
-              .split(',')
-              .map(c => {
-                return parseInt(c);
-              });
-            e.WhenCreated = new Date(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6]);
-            return e;
-          }));
-        }
+        await logger.log(results.ExternalUserCollection._Child_Items_.map(e => {
+          delete e._ObjectType_;
+          e.WhenCreated = formatting.extractCsomDate(e.WhenCreated as string);
+          return e;
+        }));
       }
     }
     catch (err: any) {
