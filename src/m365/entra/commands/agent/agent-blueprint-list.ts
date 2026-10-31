@@ -37,7 +37,11 @@ class EntraAgentBlueprintListCommand extends GraphCommand {
     const queryParameters: string[] = [];
 
     if (args.options.properties) {
-      const allProperties = args.options.properties.split(',');
+      const allProperties = args.options.properties
+        .split(',')
+        .map(prop => prop.trim())
+        .filter(prop => prop.length > 0);
+
       const selectProperties = allProperties.filter(prop => !prop.includes('/'));
 
       if (selectProperties.length > 0) {

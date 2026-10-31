@@ -236,4 +236,22 @@ describe(commands.AGENT_BLUEPRINT_LIST, () => {
       new CommandError('An error has occurred')
     );
   });
+
+  it('should trim properties and exclude empty values', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves({
+      value: limitedResponse
+    });
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: ' id, , displayName, '
+      })
+    });
+
+    assert.strictEqual(
+      requestStub.firstCall.args[0].url,
+      'https://graph.microsoft.com/v1.0/applications/microsoft.graph.agentIdentityBlueprint?$select=id%2CdisplayName'
+    );
+    assert(loggerLogSpy.calledWith(limitedResponse));
+  });
 });
