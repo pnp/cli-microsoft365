@@ -760,6 +760,7 @@ describe(commands.TERM_GROUP_LIST, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {

@@ -124,6 +124,24 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       sinonUtil.restore(request.get);
     }
   });
+
+  it('returns an empty array when no schema extensions are found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
+          "value": []
+        };
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({})
+    });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
+  });
+
   it('lists two schema extensions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {

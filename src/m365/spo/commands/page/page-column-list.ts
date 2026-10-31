@@ -65,14 +65,13 @@ class SpoPageColumnListCommand extends SpoCommand {
       const sections: CanvasSection[] = clientSidePage.sections
         .filter(section => section.order === args.options.section);
 
-      if (sections.length) {
-        const isJSONOutput = !cli.shouldTrimOutput(args.options.output);
-        await logger.log(sections[0].columns.map(c => {
-          const column = Page.getColumnsInformation(c, isJSONOutput);
-          column.controls = c.controls.length;
-          return column;
-        }));
-      }
+      const isJSONOutput = !cli.shouldTrimOutput(args.options.output);
+      const columns = sections[0]?.columns ?? [];
+      await logger.log(columns.map(c => {
+        const column = Page.getColumnsInformation(c, isJSONOutput);
+        column.controls = c.controls.length;
+        return column;
+      }));
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

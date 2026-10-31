@@ -33,6 +33,7 @@ ID | Area | Change | Change type | Affected commands
 [GEN-1](#GEN-1) | General | Removed items are moved to the recycle bin by default | Default behavior, options | 9 `remove` commands
 [GEN-2](#GEN-2) | General | `spo web alert` aliases removed | Removed alias | `spo web alert list`, `spo web alert remove`
 [GEN-3](#GEN-3) | General | `properties` option renamed to `fields` | Options | `spo listitem get`
+[GEN-4](#GEN-4) | General | `list` commands return an empty array instead of no output when no items are found | Output | `graph schemaextension list`, `spo externaluser list`, `spo orgassetslibrary list`, `spo page column list`, `spo page section list`, `spo term group list`, `spo term set list`
 
 ## Upgrade checklist
 
@@ -47,6 +48,7 @@ Change | Action required when | Action
 [GEN-1](#GEN-1) | You use an affected `remove` command | Remove `--recycle`, replace `--skipRecycleBin` with `--permanent`, add `--permanent` where items must be deleted permanently
 [GEN-2](#GEN-2) | You use `spo web alert list` or `spo web alert remove` | Use `spo web rule list` or `spo web rule remove`
 [GEN-3](#GEN-3) | You use `spo listitem get` with `--properties` | Use `--fields`
+[GEN-4](#GEN-4) | You use an affected `list` command and rely on it returning no output when no items are found | Update your scripts to handle an empty array (`[]`)
 
 ## Authentication
 
@@ -498,6 +500,43 @@ To make it consistent with other commands, the `properties` option of [spo listi
 
   ```sh
   m365 spo listitem get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 147 --fields "Title,Created"
+  ```
+
+  </TabItem>
+</Tabs>
+
+### GEN-4: `list` commands return an empty array when no items are found {/* #GEN-4 */}
+
+- **Affected commands**: [graph schemaextension list](./cmd/graph/schemaextension/schemaextension-list.mdx), [spo externaluser list](./cmd/spo/externaluser/externaluser-list.mdx), [spo orgassetslibrary list](./cmd/spo/orgassetslibrary/orgassetslibrary-list.mdx), [spo page column list](./cmd/spo/page/page-column-list.mdx), [spo page section list](./cmd/spo/page/page-section-list.mdx), [spo term group list](./cmd/spo/term/term-group-list.mdx), [spo term set list](./cmd/spo/term/term-set-list.mdx)
+- **Change type**: Output
+- **Action required when**: your scripts rely on an affected `list` command returning no output when no items are found.
+
+#### What changed
+
+To make the output of `list` commands consistent and predictable to use in scripts, the affected commands now return an empty array (`[]`) when no items are found. Previously, these commands returned no output at all.
+
+[spo orgassetslibrary list](./cmd/spo/orgassetslibrary/orgassetslibrary-list.mdx) returned the text `No libraries in Organization Assets` instead of no output. This command now also returns an empty array (`[]`) when no libraries are assigned as asset library.
+
+#### Action required
+
+1. Update your scripts to handle an empty array when no items are found.
+
+#### Example
+
+<Tabs>
+  <TabItem value="v11">
+
+  ```sh
+  m365 spo term group list
+  # no output when no term groups are found
+  ```
+
+  </TabItem>
+  <TabItem value="v12">
+
+  ```sh
+  m365 spo term group list
+  # [] when no term groups are found
   ```
 
   </TabItem>

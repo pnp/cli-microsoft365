@@ -219,7 +219,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } });
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('lists columns on the modern page (debug)', async () => {

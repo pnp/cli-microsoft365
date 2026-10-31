@@ -358,7 +358,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
         debug: true
       }
     } as any);
-    assert(loggerLogSpy.calledWith('No libraries in Organization Assets'));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('handles error getting request', async () => {
