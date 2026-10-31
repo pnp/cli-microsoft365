@@ -203,17 +203,17 @@ describe(commands.EVENT_ADD, () => {
   });
 
   it('passes validation with teamsForBusiness online meeting provider', () => {
-    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'teamsForBusiness' });
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, isOnlineMeeting: true, onlineMeetingProvider: 'teamsForBusiness' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with skypeForBusiness online meeting provider', () => {
-    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'skypeForBusiness' });
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, isOnlineMeeting: true, onlineMeetingProvider: 'skypeForBusiness' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation with skypeForConsumer online meeting provider', () => {
-    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, onlineMeetingProvider: 'skypeForConsumer' });
+    const actual = commandOptionsSchema.safeParse({ subject: subject, start: start, end: end, isOnlineMeeting: true, onlineMeetingProvider: 'skypeForConsumer' });
     assert.strictEqual(actual.success, true);
   });
 
@@ -1077,5 +1077,292 @@ describe(commands.EVENT_ADD, () => {
       contentType: 'html',
       content: '<p>Event details</p>'
     });
+  });
+
+  it('fails validation when an online meeting has no provider', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      isOnlineMeeting: true
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when a provider is specified for a non-online meeting', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      onlineMeetingProvider: 'teamsForBusiness'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('creates an online meeting with the specified provider', async () => {
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      isOnlineMeeting: true,
+      onlineMeetingProvider: 'teamsForBusiness'
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(postStub.lastCall.args[0].data.isOnlineMeeting, true);
+    assert.strictEqual(
+      postStub.lastCall.args[0].data.onlineMeetingProvider,
+      'teamsForBusiness'
+    );
+  });
+
+  it('creates an event for a user by ID using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userId
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(
+      postStub.lastCall.args[0].url,
+      `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userId)}')/events`
+    );
+  });
+
+  it('creates an event in a named calendar by UPN using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    sinon.stub(calendar, 'getUserCalendarByName')
+      .withArgs(userName, calendarName)
+      .resolves({ id: calendarId });
+
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userName,
+      calendarName
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(
+      postStub.lastCall.args[0].url,
+      `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/calendars/${formatting.encodeQueryParameter(calendarId)}/events`
+    );
+  });
+
+  it('fails validation when subject is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject: '   ',
+      start,
+      end
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Subject cannot be empty.');
+  });
+
+  it('fails validation when start and end are equal', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end: start
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error?.issues[0].message,
+      'Start date must be before end date.'
+    );
+  });
+
+  it('throws an error for invalid recurrence JSON', async () => {
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      recurrence: '{ invalid JSON'
+    });
+
+    assert.strictEqual(parsedSchema.success, true);
+
+    await assert.rejects(
+      command.action(logger, { options: parsedSchema.data! })
+    );
+
+    assert.strictEqual(postStub.notCalled, true);
+  });
+
+  it('throws an error when the recurrence file does not exist', async () => {
+    const fileError = new Error('ENOENT: recurrence file not found');
+    sinon.stub(fs, 'readFileSync').throws(fileError);
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      recurrence: '@missing-recurrence.json'
+    });
+
+    assert.strictEqual(parsedSchema.success, true);
+
+    await assert.rejects(
+      command.action(logger, { options: parsedSchema.data! })
+    );
+
+    assert.strictEqual(postStub.notCalled, true);
+  });
+
+  [
+    {
+      option: 'locations',
+      value: 'Room 1, ,Room 3'
+    },
+    {
+      option: 'categories',
+      value: 'Category 1,,Category 3'
+    },
+    {
+      option: 'optionalAttendees',
+      value: 'user1@contoso.com, ,user2@contoso.com'
+    },
+    {
+      option: 'requiredAttendees',
+      value: 'user1@contoso.com,,user2@contoso.com'
+    },
+    {
+      option: 'resources',
+      value: 'room1@contoso.com, ,room2@contoso.com'
+    }
+  ].forEach(testCase => {
+    it(`fails validation when ${testCase.option} contains an empty entry`, () => {
+      const actual = commandOptionsSchema.safeParse({
+        subject,
+        start,
+        end,
+        [testCase.option]: testCase.value
+      });
+
+      assert.strictEqual(actual.success, false);
+    });
+  });
+
+  it('creates an event by userId using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userId
+    });
+
+    assert.strictEqual(parsedSchema.success, true);
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(
+      postStub.lastCall.args[0].url,
+      `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userId)}')/events`
+    );
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      subject,
+      start: {
+        dateTime: start,
+        timeZone: 'UTC'
+      },
+      end: {
+        dateTime: end,
+        timeZone: 'UTC'
+      }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(response));
+  });
+
+  it('creates an event by userName using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userName
+    });
+
+    assert.strictEqual(parsedSchema.success, true);
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(
+      postStub.lastCall.args[0].url,
+      `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/events`
+    );
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      subject,
+      start: {
+        dateTime: start,
+        timeZone: 'UTC'
+      },
+      end: {
+        dateTime: end,
+        timeZone: 'UTC'
+      }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(response));
+  });
+
+  it('fails validation if categories contain an empty entry', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      categories: 'Category 1, ,Category 3'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error?.issues[0].message,
+      'Categories cannot contain empty entries.'
+    );
+  });
+
+  it('fails validation if locations contain an empty entry', () => {
+    const actual = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      locations: 'Room 1,,Room 3'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error?.issues[0].message,
+      'Locations cannot contain empty entries.'
+    );
   });
 });

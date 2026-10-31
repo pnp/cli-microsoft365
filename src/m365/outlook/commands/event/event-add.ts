@@ -20,7 +20,7 @@ const showAsStatuses = ['free', 'tentative', 'busy', 'oof', 'workingElsewhere', 
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  subject: z.string(),
+  subject: z.string().trim().min(1, 'Subject cannot be empty.'),
   start: z.string().refine(date => validation.isValidGraphDateTime(date), {
     error: e => `'${e.input}' is not a valid date.`
   }),
@@ -41,7 +41,12 @@ export const options = z.strictObject({
     const target = String(val).toLowerCase();
     return bodyContentTypes.find(t => t.toLowerCase() === target) ?? val;
   }, z.enum(bodyContentTypes)).optional().default('HTML'),
-  categories: z.string().transform((value) => value.split(',').map(category => category.trim())).optional(),
+  categories: z.string()
+    .transform(value => value.split(',').map(category => category.trim()))
+    .refine(values => values.every(Boolean), {
+      error: 'Categories cannot contain empty entries.'
+    })
+    .optional(),
   hideAttendees: z.boolean().optional().default(false),
   importance: z.preprocess(val => {
     const target = String(val).toLowerCase();
@@ -54,7 +59,12 @@ export const options = z.strictObject({
   locationEmailAddress: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid email address.`
   }).optional(),
-  locations: z.string().transform((value) => value.split(',').map(category => category.trim())).optional(),
+  locations: z.string()
+    .transform(value => value.split(',').map(location => location.trim()))
+    .refine(values => values.every(Boolean), {
+      error: 'Locations cannot contain empty entries.'
+    })
+    .optional(),
   onlineMeetingProvider: z.preprocess(val => {
     const target = String(val).toLowerCase();
     return onlineMeetingProviders.find(t => t.toLowerCase() === target) ?? val;
@@ -107,7 +117,7 @@ class OutlookEventAddCommand extends GraphCommand {
     return options;
   }
 
-  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+  public getRefinedSchema(schema: typeof options): z.ZodType<Options> | undefined {
     return schema
       .refine(options => !(options.calendarId && options.calendarName), {
         error: 'Specify either calendarId or calendarName, but not both.'
@@ -129,6 +139,14 @@ class OutlookEventAddCommand extends GraphCommand {
       })
       .refine(options => new Date(options.start).getTime() < new Date(options.end).getTime(), {
         error: 'Start date must be before end date.'
+      })
+      .refine(options =>
+        !options.isOnlineMeeting || options.onlineMeetingProvider !== 'unknown', {
+        error: 'Specify onlineMeetingProvider when isOnlineMeeting is true.'
+      })
+      .refine(options =>
+        options.isOnlineMeeting || options.onlineMeetingProvider === 'unknown', {
+        error: 'onlineMeetingProvider can only be specified when isOnlineMeeting is true.'
       });
   }
 
@@ -188,11 +206,11 @@ class OutlookEventAddCommand extends GraphCommand {
     }
 
     const body: Partial<Event> = {};
-    body['subject'] = args.options.subject;
-    body['start'] = {
+    body.subject = args.options.subject;
+    body.start = {
       dateTime: args.options.start
     };
-    body['end'] = {
+    body.end = {
       dateTime: args.options.end
     };
 
@@ -201,69 +219,69 @@ class OutlookEventAddCommand extends GraphCommand {
         ? fs.readFileSync(args.options.bodyContents.substring(1), 'utf8')
         : args.options.bodyContents;
 
-      body['body'] = {
+      body.body = {
         contentType: args.options.bodyContentType === 'Text' ? 'text' : 'html',
         content: bodyContents
       };
     }
 
     if (!args.options.allowNewTimeProposals) {
-      body['allowNewTimeProposals'] = args.options.allowNewTimeProposals;
+      body.allowNewTimeProposals = args.options.allowNewTimeProposals;
     }
 
     if (args.options.categories) {
-      body['categories'] = args.options.categories;
+      body.categories = args.options.categories;
     }
 
     if (args.options.hideAttendees) {
-      body['hideAttendees'] = args.options.hideAttendees;
+      body.hideAttendees = args.options.hideAttendees;
     }
 
     if (args.options.importance) {
-      body['importance'] = args.options.importance;
+      body.importance = args.options.importance;
     }
 
     if (args.options.isAllDay) {
-      body['isAllDay'] = args.options.isAllDay;
+      body.isAllDay = args.options.isAllDay;
     }
 
     if (args.options.isOnlineMeeting) {
-      body['isOnlineMeeting'] = args.options.isOnlineMeeting;
+      body.isOnlineMeeting = args.options.isOnlineMeeting;
     }
 
     if (!args.options.isReminderOn) {
-      body['isReminderOn'] = false;
+      body.isReminderOn = false;
     }
 
     if (args.options.location || args.options.locationEmailAddress) {
-      body['location'] = {};
+      const location: NonNullable<Event['location']> = {};
 
       if (args.options.location) {
-        body['location']['displayName'] = args.options.location;
+        location.displayName = args.options.location;
       }
 
       if (args.options.locationEmailAddress) {
-        body['location']['locationEmailAddress'] = args.options.locationEmailAddress;
+        location.locationEmailAddress = args.options.locationEmailAddress;
       }
+
+      body.location = location;
     }
 
     if (args.options.locations) {
-      const locations: Array<any> = [];
+      const locations: NonNullable<Event['locations']> =
+        args.options.locations.map(displayName => ({
+          displayName
+        }));
 
-      args.options.locations.forEach(displayName => locations.push({
-        displayName: displayName
-      }));
-
-      body['locations'] = locations;
+      body.locations = locations;
     }
 
     if (args.options.onlineMeetingProvider !== 'unknown') {
-      body['onlineMeetingProvider'] = args.options.onlineMeetingProvider;
+      body.onlineMeetingProvider = args.options.onlineMeetingProvider;
     }
 
     if (args.options.optionalAttendees || args.options.requiredAttendees || args.options.resources) {
-      body['attendees'] = [];
-      const attendees = body['attendees'] as Array<any>;
+      const attendees: NonNullable<Event['attendees']> = [];
 
       if (args.options.optionalAttendees) {
         args.options.optionalAttendees.forEach(value =>
@@ -294,43 +312,45 @@ class OutlookEventAddCommand extends GraphCommand {
             type: 'resource'
           }));
       }
+
+      body.attendees = attendees;
     }
 
     if (args.options.recurrence) {
       if (args.options.recurrence.startsWith('@')) {
         const fileRecurrence: string = fs.readFileSync(args.options.recurrence.replace('@', ''), 'utf8');
         if (fileRecurrence) {
-          body['recurrence'] = JSON.parse(fileRecurrence);
+          body.recurrence = JSON.parse(fileRecurrence);
         }
       }
       else {
-        body['recurrence'] = JSON.parse(args.options.recurrence);
+        body.recurrence = JSON.parse(args.options.recurrence);
       }
     }
 
     if (args.options.isReminderOn && args.options.reminderMinutesBeforeStart !== undefined) {
-      body['reminderMinutesBeforeStart'] = args.options.reminderMinutesBeforeStart;
+      body.reminderMinutesBeforeStart = args.options.reminderMinutesBeforeStart;
     }
 
     if (!args.options.responseRequested) {
-      body['responseRequested'] = false;
+      body.responseRequested = false;
     }
 
     if (args.options.sensitivity) {
-      body['sensitivity'] = args.options.sensitivity;
+      body.sensitivity = args.options.sensitivity;
     }
 
     if (args.options.showAs !== 'busy') {
-      body['showAs'] = args.options.showAs;
+      body.showAs = args.options.showAs;
     }
 
     if (args.options.timeZone) {
-      body['start']['timeZone'] = args.options.timeZone;
-      body['end']['timeZone'] = args.options.timeZone;
+      body.start.timeZone = args.options.timeZone;
+      body.end.timeZone = args.options.timeZone;
     }
 
     if (args.options.transactionId) {
-      body['transactionId'] = args.options.transactionId;
+      body.transactionId = args.options.transactionId;
     }
 
     const requestOptions: CliRequestOptions = {
@@ -347,7 +367,7 @@ class OutlookEventAddCommand extends GraphCommand {
       const result = await request.post<Event>(requestOptions);
       await logger.log(result);
     }
-    catch (err: any) {
+    catch (err: unknown) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
