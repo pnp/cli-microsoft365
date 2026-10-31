@@ -814,7 +814,7 @@ describe(commands.EVENT_ADD, () => {
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
-  it('correctly creates a reccuring event', async () => {
+  it('correctly creates a recurring event', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/events`) {
         return response;
@@ -857,8 +857,8 @@ describe(commands.EVENT_ADD, () => {
     assert(loggerLogSpy.calledOnceWithExactly(response));
   });
 
-  it('correctly creates an event and reads an occurence from a file', async () => {
-    const reccurence = {
+  it('correctly creates a recurring event using recurrence from a file', async () => {
+    const recurrence = {
       "pattern": {
         "type": "weekly",
         "interval": 1,
@@ -871,7 +871,7 @@ describe(commands.EVENT_ADD, () => {
         "endDate": "2026-08-24"
       }
     };
-    sinon.stub(fs, 'readFileSync').returns(JSON.stringify(reccurence));
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify(recurrence));
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/events`) {
         return response;
@@ -1016,7 +1016,7 @@ describe(commands.EVENT_ADD, () => {
       new CommandError(`You can only create your own events when using delegated permissions. The specified userName '${userName}' does not match the current user 'other.user@contoso.com'.`));
   });
 
-  it('throws an error when both userId and userName are not defined when creating an event using application permissions', async () => {
+  it('throws an error when neither userId nor userName is specified with application permissions', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
