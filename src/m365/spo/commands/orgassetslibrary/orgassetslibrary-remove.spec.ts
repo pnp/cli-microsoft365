@@ -2,6 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -12,11 +13,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './orgassetslibrary-remove.js';
+import command, { options } from './orgassetslibrary-remove.js';
 
 describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -32,6 +35,8 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,8 +81,21 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      libraryUrl: '/sites/branding/assets',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the Org Assets Library when force option is not passed', async () => {
-    await command.action(logger, { options: { debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets', debug: true }) });
 
     assert(promptIssued);
   });
@@ -88,7 +106,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets' }) });
     assert(postSpy.notCalled);
   });
 
@@ -116,7 +134,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets' }) });
     assert(orgAssetLibRemoveCallIssued);
   });
 
@@ -142,7 +160,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets', force: true }) });
     assert(orgAssetLibRemoveCallIssued);
   });
 
@@ -170,7 +188,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets', output: 'json' }) });
     assert(orgAssetLibRemoveCallIssued);
   });
 
@@ -192,7 +210,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ libraryUrl: '/sites/branding/assets', debug: true, force: true }) }),
       new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`));
   });
 
@@ -200,9 +218,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
+        libraryUrl: '/sites/branding/assets',
         force: true
-      }
-    } as any), new CommandError(`An error has occurred`));
+      })
+    }), new CommandError(`An error has occurred`));
   });
 });

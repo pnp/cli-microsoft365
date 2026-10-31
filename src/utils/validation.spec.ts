@@ -697,4 +697,10 @@ describe('validation/validation', () => {
     const expected = true;
     assert.strictEqual(actual, expected);
   });
+
+  it('isValidSharePointUrl returns an error message if url is not a string', () => {
+    const actual = validation.isValidSharePointUrl(undefined as unknown as string);
+
+    assert.strictEqual(actual, 'SharePoint Online site URL must be a string.');
+  });
 });

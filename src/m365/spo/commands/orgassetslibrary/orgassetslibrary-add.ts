@@ -1,21 +1,29 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  libraryUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    message: 'The value of the libraryUrl is not a valid SharePoint Online site URL.'
+  }),
+  thumbnailUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    message: 'The value of the thumbnailUrl is not a valid SharePoint Online site URL.'
+  }).optional(),
+  cdnType: z.enum(['Public', 'Private']).optional(),
+  orgAssetType: z.enum(['ImageDocumentLibrary', 'OfficeTemplateLibrary', 'OfficeFontLibrary']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  libraryUrl: string;
-  thumbnailUrl?: string;
-  cdnType?: string;
-  orgAssetType?: string;
 }
 
 enum OrgAssetType {
@@ -25,9 +33,6 @@ enum OrgAssetType {
 }
 
 class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
-  private static readonly orgAssetTypes: string[] = ['ImageDocumentLibrary', 'OfficeTemplateLibrary', 'OfficeFontLibrary'];
-  private static readonly cdnTypes: string[] = ['Public', 'Private'];
-
   public get name(): string {
     return commands.ORGASSETSLIBRARY_ADD;
   }
@@ -36,62 +41,8 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
     return 'Promotes an existing library to become an organization assets library';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        cdnType: args.options.cdnType || 'Private',
-        thumbnailUrl: typeof args.options.thumbnailUrl !== 'undefined',
-        orgAssetType: args.options.orgAssetType
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--libraryUrl <libraryUrl>'
-      },
-      {
-        option: '--thumbnailUrl [thumbnailUrl]'
-      },
-      {
-        option: '--cdnType [cdnType]',
-        autocomplete: SpoOrgAssetsLibraryAddCommand.cdnTypes
-      },
-      {
-        option: '--orgAssetType [orgAssetType]',
-        autocomplete: SpoOrgAssetsLibraryAddCommand.orgAssetTypes
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
-        if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
-          return isValidThumbnailUrl;
-        }
-
-        if (args.options.cdnType && SpoOrgAssetsLibraryAddCommand.cdnTypes.indexOf(args.options.cdnType) < 0) {
-          return `${args.options.cdnType} is not a valid value for cdnType. Valid values are ${SpoOrgAssetsLibraryAddCommand.cdnTypes.join(', ')}`;
-        }
-
-        if (args.options.orgAssetType && SpoOrgAssetsLibraryAddCommand.orgAssetTypes.indexOf(args.options.orgAssetType) < 0) {
-          return `${args.options.orgAssetType} is not a valid value for orgAssetType. Valid values are ${SpoOrgAssetsLibraryAddCommand.orgAssetTypes.join(', ')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.libraryUrl);
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

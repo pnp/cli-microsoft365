@@ -279,6 +279,30 @@ class MockCommandWithSchemaAndRequiredOptions extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchemaAndProcessedRequiredOptions extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema processed required';
+  }
+  public get description(): string {
+    return 'Mock command with schema and processed required options';
+  }
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string().refine(value => value.startsWith('https://'), {
+        message: 'The value of url must be an absolute URL.'
+      })
+    });
+  }
+  public async processOptions(options: any): Promise < void> {
+    if (options.url?.startsWith('/')) {
+      options.url = `https://contoso.sharepoint.com${options.url}`;
+    }
+  }
+  public async commandAction(): Promise < void> {
+  }
+}
+
 class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
   public get name(): string {
     return 'cli mock schema bool required';
@@ -448,6 +472,7 @@ describe('cli', () => {
   let mockCommandWithValidation: Command;
   let mockCommandWithSchema: Command;
   let mockCommandWithSchemaAndRequiredOptions: Command;
+  let mockCommandWithSchemaAndProcessedRequiredOptions: Command;
   let mockCommandWithSchemaAndBoolRequiredOption: Command;
   let mockCommandWithRefinedSchema: Command;
   let mockCommandWithRefinedSchemaCoercion: Command;
@@ -474,6 +499,7 @@ describe('cli', () => {
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithSchema = new MockCommandWithSchema();
     mockCommandWithSchemaAndRequiredOptions = new MockCommandWithSchemaAndRequiredOptions();
+    mockCommandWithSchemaAndProcessedRequiredOptions = new MockCommandWithSchemaAndProcessedRequiredOptions();
     mockCommandWithSchemaAndBoolRequiredOption = new MockCommandWithSchemaAndBoolRequiredOption();
     mockCommandWithRefinedSchema = new MockCommandWithRefinedSchema();
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
@@ -498,6 +524,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchema, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndProcessedRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndBoolRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
@@ -530,6 +557,8 @@ describe('cli', () => {
       mockCommandWithSchema.action,
       mockCommand.commandAction,
       mockCommand.processOptions,
+      mockCommandWithSchemaAndProcessedRequiredOptions.processOptions,
+      mockCommandWithRefinedSchema.processOptions,
       prompt.forInput,
       prompt.forSelection,
       prompt.forConfirmation,
@@ -1232,6 +1261,95 @@ describe('cli', () => {
           done(e);
         }
       }, e => done(e));
+  });
+
+  it(`processes prompted required options before rerunning schema validation`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed required');
+    sinon.stub(prompt, 'forInput').resolves('/sites/branding/assets');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'processed', 'required']);
+
+    assert(executeCommandSpy.calledOnce);
+    assert.strictEqual(
+      executeCommandSpy.firstCall.args[1].options.url,
+      'https://contoso.sharepoint.com/sites/branding/assets'
+    );
+  });
+
+  it(`shows an error when processing prompted required options fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed required');
+    sinon.stub(prompt, 'forInput').resolves('/sites/branding/assets');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithSchemaAndProcessedRequiredOptions, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted options'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute(['cli', 'mock', 'schema', 'processed', 'required']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted options')
+      ));
+    }
+  });
+
+  it(`shows an error when processing prompted option set values fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined');
+    sinon.stub(prompt, 'forSelection').resolves('certificateFile');
+    sinon.stub(prompt, 'forInput').resolves('/path/to/cert.pem');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithRefinedSchema, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted option set'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute([
+        'cli',
+        'mock',
+        'schema',
+        'refined',
+        '--authType',
+        'certificate'
+      ]);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted option set')
+      ));
+    }
   });
 
   it(`shows validation error for missing required options when validating schema and prompting disabled`, (done) => {
@@ -2024,7 +2142,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  14 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2037,7 +2155,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        10 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        11 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2050,7 +2168,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  14 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
