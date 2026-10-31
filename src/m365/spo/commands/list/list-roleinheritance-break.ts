@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,17 +9,29 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('i')
+    .optional(),
+  listTitle: z.string().alias('t').optional(),
+  listUrl: z.string().optional(),
+  clearExistingPermissions: z.boolean().alias('c').optional(),
+  force: z.boolean().alias('f').optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  clearExistingPermissions?: boolean;
-  force?: boolean;
 }
 
 class SpoListRoleInheritanceBreakCommand extends SpoCommand {
@@ -30,69 +43,19 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
     return 'Breaks role inheritance on list or library';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        clearExistingPermissions: args.options.clearExistingPermissions === true,
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-c, --clearExistingPermissions'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

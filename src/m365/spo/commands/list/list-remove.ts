@@ -1,22 +1,30 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} is not a valid GUID`
+  }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  permanent: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  title?: string;
-  permanent?: boolean;
-  force?: boolean;
 }
 
 class SpoListRemoveCommand extends SpoCommand {
@@ -28,72 +36,19 @@ class SpoListRemoveCommand extends SpoCommand {
     return 'Removes the specified list';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        force: !!args.options.force,
-        permanent: !!args.options.permanent
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: id, title.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--permanent'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id &&
-          !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'title', 'webUrl');
-    this.types.boolean.push('force', 'permanent');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

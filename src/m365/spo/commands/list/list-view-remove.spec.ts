@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './list-view-remove.js';
+import command, { options } from './list-view-remove.js';
 
 describe(commands.LIST_VIEW_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/ninja';
@@ -26,6 +26,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -72,24 +74,27 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: viewId, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: viewId, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: '12345', id: viewId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: '12345', id: viewId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, id: '12345' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('passes validation if valid options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listTitle: listTitle, title: viewTitle } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle, title: viewTitle });
+    assert.strictEqual(actual.success, true);
   });
 
   it('prompts before removing the specified view from list by id and listTitle when force option not passed', async () => {
@@ -97,11 +102,11 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         id: viewId
-      }
+      })
     });
 
     assert(confirmationStub.calledOnce);
@@ -112,11 +117,11 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listId: listId,
         title: listTitle
-      }
+      })
     });
 
     assert(confirmationStub.calledOnce);
@@ -127,11 +132,11 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listUrl: listUrl,
         title: listTitle
-      }
+      })
     });
 
     assert(confirmationStub.calledOnce);
@@ -141,11 +146,11 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         id: viewId
-      }
+      })
     });
 
     assert(postSpy.notCalled);
@@ -165,12 +170,12 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listUrl: listUrl,
         id: viewId
-      }
+      })
     });
   });
 
@@ -187,13 +192,13 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listId: listId,
         id: viewId,
         force: true
-      }
+      })
     });
   });
 
@@ -210,12 +215,12 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         id: viewId,
         force: true
-      }
+      })
     });
   });
 
@@ -233,12 +238,12 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listUrl: listUrl,
         title: viewTitle,
         force: true
-      }
+      })
     });
   });
 
@@ -255,13 +260,13 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listId: listId,
         title: viewTitle,
         force: true
-      }
+      })
     });
   });
 
@@ -278,12 +283,12 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle,
         force: true
-      }
+      })
     });
   });
 
@@ -302,13 +307,20 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle, title: viewTitle,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -7,17 +8,34 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string().alias('n').optional(),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('i')
+    .optional(),
+  listTitle: z.string().alias('t').optional(),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('l')
+    .optional(),
+  listUrl: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name?: string;
-  id?: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
 }
 
 class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
@@ -29,71 +47,26 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
     return 'Applies a default sensitivity label to the specified document library';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.name, opts.id].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: name, id.',
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'id']
+        }
+      })
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['name', 'id'] },
-      { options: ['listId', 'listTitle', 'listUrl'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -12,13 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './list-webhook-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './list-webhook-set.js';
 
 describe(commands.LIST_WEBHOOK_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -46,8 +47,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.patch,
-      cli.getSettingWithDefaultValue
+      request.patch
     ]);
   });
 
@@ -74,13 +74,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
-      }
+      })
     });
   });
 
@@ -94,13 +94,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
-      }
+      })
     });
   });
 
@@ -120,15 +120,14 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -149,15 +148,14 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e77',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -178,14 +176,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -205,13 +202,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -231,13 +227,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listUrl: '/sites/ninja/lists/Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -258,13 +253,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listUrl: '/sites/ninja/lists/Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         clientState: clientState
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -284,13 +278,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -310,14 +303,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
 
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listUrl: '/sites/ninja/lists/Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
-      }
+      })
     });
     assert.strictEqual(actual, expected);
   });
@@ -336,183 +328,157 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     sinon.stub(request, 'patch').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
-      }
-    } as any), new CommandError(error.error['odata.error'].message.value));
+      })
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
-  it('fails validation if webhook id option is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if webhook id option is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
     });
-
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo',
-        listTitle: 'Documents',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      listTitle: 'Documents',
+      id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '12345',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '12345',
+      id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('fails validation if the listid option is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        id: '12345',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      id: '12345',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the listid option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if notificationUrl, expirationDateTime or clientState options are not passed', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if notificationUrl, expirationDateTime or clientState options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the notificationUrl option is passed, but expirationDateTime is not', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the notificationUrl option is passed, but expirationDateTime is not', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the expirationDateTime option is passed, but notificationUrl is not', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the expirationDateTime option is passed, but notificationUrl is not', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      expirationDateTime: '2018-10-09'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        expirationDateTime: '2018-X-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the expirationDateTime option is not a valid date string', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      expirationDateTime: '2018-X-09'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Provide the date in one of the following formats:
+          'YYYY-MM-DD'
+          'YYYY-MM-DDThh:mm'
+          'YYYY-MM-DDThh:mmZ'
+          'YYYY-MM-DDThh:mm±hh:mm'`);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string (json output)', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'Documents',
-        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        expirationDateTime: '2018-X-09',
-        output: 'json'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      expirationDateTime: '2018-X-09',
+      output: 'json'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      id: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      expirationDateTime: '2018-10-09',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './list-view-set.js';
+import command, { options } from './list-view-set.js';
 
 describe(commands.LIST_VIEW_SET, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -28,6 +28,7 @@ describe(commands.LIST_VIEW_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,6 +43,7 @@ describe(commands.LIST_VIEW_SET, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -84,24 +86,27 @@ describe(commands.LIST_VIEW_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', listTitle: listTitle, title: viewTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listTitle: listTitle, title: viewTitle });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
   });
 
-  it('fails validation if listId is not a GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: 'invalid', title: viewTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: 'invalid', title: viewTitle });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option listId is not a valid GUID');
   });
 
-  it('fails validation if id is not a GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listTitle: 'List 1', id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: 'List 1', id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option id is not a valid GUID');
   });
 
-  it('passes validation when id and listId specified as valid GUIDs', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: viewId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when id and listId specified as valid GUIDs', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, id: viewId });
+    assert.strictEqual(actual.success, true);
   });
 
   it('ignores global options when creating request data', async () => {
@@ -119,7 +124,7 @@ describe(commands.LIST_VIEW_SET, () => {
       return 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: false, output: "text", webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: false, output: "text", webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' }) });
     assert.deepEqual(patchRequest.lastCall.args[0].data, { Title: 'All events' });
   });
 
@@ -138,7 +143,7 @@ describe(commands.LIST_VIEW_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -157,7 +162,7 @@ describe(commands.LIST_VIEW_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, listId: listId, id: viewId, Title: 'All events', CustomFormatter: 'abc' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, listId: listId, id: viewId, Title: 'All events', CustomFormatter: 'abc' }) });
   });
 
   it('updates the Title and CustomFormatter of the list view specified using its Url', async () => {
@@ -177,7 +182,7 @@ describe(commands.LIST_VIEW_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, listUrl: listUrl, id: viewId, Title: 'All events', CustomFormatter: 'abc' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, listUrl: listUrl, id: viewId, Title: 'All events', CustomFormatter: 'abc' }) });
   });
 
   it('correctly handles error when updating existing list view', async () => {
@@ -195,11 +200,11 @@ describe(commands.LIST_VIEW_SET, () => {
     sinon.stub(request, 'patch').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

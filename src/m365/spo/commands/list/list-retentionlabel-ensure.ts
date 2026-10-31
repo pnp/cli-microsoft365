@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -9,17 +10,29 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListInstance } from './ListInstance.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string(),
+  listTitle: z.string().alias('t').optional(),
+  listId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('l')
+    .optional(),
+  listUrl: z.string().optional(),
+  syncToItems: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  syncToItems?: boolean;
 }
 
 class SpoListRetentionLabelEnsureCommand extends SpoCommand {
@@ -31,63 +44,19 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
     return 'Sets a default retention label on the specified list or library.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        listUrl: (!(!args.options.listUrl)).toString(),
-        syncToItems: args.options.syncToItems || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--name <name>'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--syncToItems'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
         }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -95,7 +64,7 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
       const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args, logger);
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
 
-      await spo.applyDefaultRetentionLabelToList(args.options.webUrl, args.options.name!, listAbsoluteUrl, args.options.syncToItems, logger, args.options.verbose);
+      await spo.applyDefaultRetentionLabelToList(args.options.webUrl, args.options.name, listAbsoluteUrl, args.options.syncToItems, logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
