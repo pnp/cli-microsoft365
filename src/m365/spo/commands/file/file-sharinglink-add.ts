@@ -1,28 +1,48 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+
+enum SharingLinkType {
+  view = 'view',
+  edit = 'edit'
+}
+
+enum SharingLinkScope {
+  anonymous = 'anonymous',
+  organization = 'organization'
+}
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  fileId: z.uuid().optional(),
+  fileUrl: z.string().optional(),
+  type: zod.coercedEnum(SharingLinkType),
+  expirationDateTime: z.string()
+    .refine(date => validation.isValidISODateTime(date) === true, {
+      error: e => `'${e.input}' is not a valid ISO date string.`
+    })
+    .optional(),
+  scope: zod.coercedEnum(SharingLinkScope).optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  fileId?: string;
-  fileUrl?: string;
-  type: string;
-  expirationDateTime?: string;
-  scope?: string;
-}
-
 class SpoFileSharingLinkAddCommand extends SpoCommand {
-  private static readonly types: string[] = ['view', 'edit'];
-  private static readonly scopes: string[] = ['anonymous', 'organization'];
-
   public get name(): string {
     return commands.FILE_SHARINGLINK_ADD;
   }
@@ -31,92 +51,23 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
     return 'Creates a new sharing link for a file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        fileId: typeof args.options.fileId !== 'undefined',
-        fileUrl: typeof args.options.fileUrl !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.fileId, opts.fileUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'fileId' or 'fileUrl', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['fileId', 'fileUrl']
+        }
+      })
+      .refine(opts => !opts.scope || opts.scope === 'anonymous' || !opts.expirationDateTime, {
+        error: `Option expirationDateTime can only be used for links with scope 'anonymous'.`,
+        path: ['expirationDateTime']
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--fileId [fileId]'
-      },
-      {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
-        option: '--type <type>',
-        autocomplete: SpoFileSharingLinkAddCommand.types
-      },
-      {
-        option: '--expirationDateTime [expirationDateTime]'
-      },
-      {
-        option: '--scope [scope]',
-        autocomplete: SpoFileSharingLinkAddCommand.scopes
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
-          return `${args.options.fileId} is not a valid GUID`;
-        }
-
-        if (SpoFileSharingLinkAddCommand.types.indexOf(args.options.type) < 0) {
-          return `'${args.options.type}' is not a valid type. Allowed types are ${SpoFileSharingLinkAddCommand.types.join(', ')}`;
-        }
-
-        if (args.options.scope &&
-          SpoFileSharingLinkAddCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `'${args.options.scope}' is not a valid scope. Allowed scopes are ${SpoFileSharingLinkAddCommand.scopes.join(', ')}`;
-        }
-
-        if (args.options.scope && args.options.scope !== 'anonymous' && args.options.expirationDateTime) {
-          return `Option expirationDateTime can only be used for links with scope 'anonymous'.`;
-        }
-
-        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
-          return `${args.options.expirationDateTime} is not a valid ISO date string.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'fileId', 'fileUrl', 'type', 'expirationDateTime', 'scope');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

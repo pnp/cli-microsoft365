@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './file-add.js';
+import command, { options } from './file-add.js';
 
 describe(commands.FILE_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let ensureFolderStub: sinon.SinonStub;
 
@@ -241,6 +242,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
 
     localFolderPath = process.platform === 'win32' ? 'C:\\Users\\Velin\\Desktop\\' : '/Users/Velin/Desktop/';
   });
@@ -260,6 +262,7 @@ describe(commands.FILE_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(fs, 'existsSync').returns(true);
   });
 
   afterEach(() => {
@@ -289,6 +292,16 @@ describe(commands.FILE_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: 'abc',
+      path: 'abc',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
@@ -301,12 +314,12 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses(expectedError);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     });
     assert.strictEqual(ensureFolderStub.called, true);
   });
@@ -318,12 +331,12 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses(null, expectedError);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true
-      }
+      })
     }));
     assert.strictEqual(loggerLogSpy.notCalled, true);
   });
@@ -335,13 +348,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true,
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -353,13 +366,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true,
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -371,13 +384,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses(null, null, expectedError);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -389,13 +402,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses(null, null, null, expectedError);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -406,13 +419,13 @@ describe(commands.FILE_ADD, () => {
     const folderServerRelativePath: string = '/sites/project-x/Shared%20Documents/t1';
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
         verbose: true
-      }
+      })
     }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
   });
@@ -423,13 +436,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared\'Documents/t1',
         path: localFolderPath + 'TEST\'FILE.txt',
         overwrite: true,
         verbose: true
-      }
+      })
     });
 
     assert.strictEqual(postRequests.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared''Documents%2Ft1')/Files/Add(url='TEST''FILE.txt', overwrite=true)`);
@@ -441,14 +454,14 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared\'Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         fileName: 'TEST\'FILE.txt',
         overwrite: true,
         verbose: true
-      }
+      })
     });
 
     assert.strictEqual(postRequests.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared''Documents%2Ft1')/Files/Add(url='TEST''FILE.txt', overwrite=true)`);
@@ -460,13 +473,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'abc',
         verbose: true
-      }
+      })
     }), new CommandError('Specified content type \'abc\' doesn\'t exist on the target list'));
   });
 
@@ -478,13 +491,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -496,13 +509,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         verbose: true
-      }
+      })
     }), new CommandError(`Update field value error: ${JSON.stringify(expectedResult.value)}`));
   });
 
@@ -514,14 +527,14 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true,
         checkInComment: 'abc',
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -533,13 +546,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         approve: true,
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -551,13 +564,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         publish: true,
         verbose: true
-      }
+      })
     }), new CommandError(expectedError));
   });
 
@@ -569,12 +582,12 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses(null, null, null, null, listSettingsResp);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         publish: true
-      }
+      })
     }), new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file'));
   });
 
@@ -584,7 +597,7 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
@@ -594,7 +607,7 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         output: "text",
         query: 'UniqueId'
-      }
+      })
     });
     assert.deepEqual(postRequests.secondCall.args[0].data, {
       bNewDocumentUpdate: true,
@@ -612,12 +625,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     });
     assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
@@ -631,13 +644,13 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'Icon.jpg',
         fileName: 'MS365.jpg',
         verbose: true
-      }
+      })
     });
     assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
@@ -658,12 +671,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     }), new CommandError("File 'MS365.jpg' already exists in folder '/sites/project-x/Shared%20Documents/t1'. To overwrite the file, use the --overwrite option."));
   });
 
@@ -676,12 +689,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     });
     assert.notStrictEqual(postRequests.firstCall.args[0].url.indexOf('/StartUpload'), -1);
     assert.notStrictEqual(postRequests.getCalls()[2].args[0].url.indexOf('/ContinueUpload'), -1);
@@ -716,12 +729,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     } as any), new CommandError('123'));
   });
 
@@ -734,12 +747,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'openSync').throws(new Error('openSync error'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     } as any), new CommandError('openSync error'));
   });
 
@@ -754,12 +767,12 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'closeSync').throws(new Error('failed to closeSync'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         verbose: true
-      }
+      })
     } as any), new CommandError('readSync error'));
   });
 
@@ -769,14 +782,14 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         contentType: 'Picture',
         Title: 'abc',
         publish: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWith(fileResponse));
@@ -818,7 +831,7 @@ describe(commands.FILE_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
@@ -826,7 +839,7 @@ describe(commands.FILE_ADD, () => {
         Title: 'abc',
         Folder: 'Folder',
         publish: true
-      }
+      })
     } as any);
   });
 
@@ -836,12 +849,12 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         approve: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWith(fileResponse));
@@ -853,12 +866,12 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWith(fileResponse));
@@ -873,13 +886,13 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true,
         verbose: true
-      }
+      })
     }), new CommandError(expectedFileAddError));
   });
 
@@ -892,67 +905,60 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: localFolderPath + 'MS365.jpg',
         checkOut: true
-      }
+      })
     }), new CommandError(expectedFileAddError));
   });
 
-  it('fails validation if the webUrl option not valid url', async () => {
-    const actual = await command.validate({ options: { webUrl: 'abc', folder: 'abc', path: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option not valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'abc', folder: 'abc', path: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the wrong path option specified', async () => {
+  it('fails validation if the wrong path option specified', () => {
+    sinonUtil.restore(fs.existsSync);
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        folder: 'abc',
-        path: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: 'abc',
+      path: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if --approveComment specified, but not --approve', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        folder: 'abc',
-        path: 'abc',
-        approveComment: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on --approve if --approveComment specified, but not --approve', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: 'abc',
+      path: 'abc',
+      approveComment: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.deepStrictEqual(actual.error?.issues[0].path, ['approve']);
   });
 
-  it('fails validation if --publishComment specified, but not --publish', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        folder: 'abc',
-        path: 'abc',
-        publishComment: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on --publish if --publishComment specified, but not --publish', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: 'abc',
+      path: 'abc',
+      publishComment: 'abc'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.deepStrictEqual(actual.error?.issues[0].path, ['publish']);
   });
 
-  it('passed validation if options correct', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        folder: 'abc',
-        path: 'abc'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passed validation if options correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      folder: 'abc',
+      path: 'abc'
+    });
+    assert.strictEqual(actual.success, true);
   });
 });

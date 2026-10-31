@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-move.js';
+import command, { options } from './file-move.js';
 import { CreateFileCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
@@ -81,6 +81,7 @@ describe(commands.FILE_MOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
 
   let spoUtilCreateCopyJobStub: sinon.SinonStub;
@@ -94,6 +95,7 @@ describe(commands.FILE_MOVE, () => {
 
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => settingName === settingsNames.prompt ? false : defaultValue);
     spoUtilCreateCopyJobStub = sinon.stub(spo, 'createFileCopyJob').resolves(copyJobInfo);
   });
@@ -137,39 +139,49 @@ describe(commands.FILE_MOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl', 'sourceUrl']);
   });
 
-  it('fails validation if sourceId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceId: 'invalid', targetUrl: destServerRelUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if nameConflictBehavior is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if sourceId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceId: 'invalid', targetUrl: destServerRelUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the sourceId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceId: sourceDocId, targetUrl: destServerRelUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if nameConflictBehavior is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl, nameConflictBehavior: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the sourceId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceId: sourceDocId, targetUrl: destServerRelUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if site-relative sourceUrl is provided', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceSiteRelUrl, targetUrl: destServerRelUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceUrl: sourceServerRelUrl, targetUrl: destServerRelUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the sourceUrl is an absolute URL', async () => {
-    const actual = await command.validate({ options: { webUrl: sourceWebUrl, sourceUrl: sourceAbsoluteUrl, targetUrl: destAbsoluteTargetUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if site-relative sourceUrl is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceUrl: sourceSiteRelUrl, targetUrl: destServerRelUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if the sourceUrl is an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceUrl: sourceAbsoluteUrl, targetUrl: destAbsoluteTargetUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: sourceWebUrl, sourceUrl: sourceAbsoluteUrl, targetUrl: destAbsoluteTargetUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly outputs exactly one result when file is moved when using sourceId', async () => {
@@ -188,12 +200,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: sourceWebUrl,
         sourceId: sourceDocId,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnce);
@@ -215,12 +227,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: sourceWebUrl,
         sourceId: sourceDocId,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], destFileResponse);
@@ -236,12 +248,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnce);
@@ -257,12 +269,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], destFileResponse);
@@ -284,11 +296,11 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceId: sourceDocId,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -315,12 +327,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'fail'
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -347,12 +359,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceSiteRelUrl,
         targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'fail'
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -379,12 +391,12 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceAbsoluteUrl,
         targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'replace'
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -411,7 +423,7 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl,
@@ -419,7 +431,7 @@ describe(commands.FILE_MOVE, () => {
         bypassSharedLock: true,
         withItemPermissions: true,
         newName: 'Document-renamed.pdf'
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -446,13 +458,13 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl,
         nameConflictBehavior: 'replace',
         newName: 'Document-renamed'
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilCreateCopyJobStub.lastCall.args, [
@@ -479,11 +491,11 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     });
 
     assert.deepStrictEqual(spoUtilGetCopyJobResultStub.lastCall.args, [
@@ -494,12 +506,12 @@ describe(commands.FILE_MOVE, () => {
 
   it('outputs no result when skipWait is specified', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl,
         skipWait: true
-      }
+      })
     });
 
     assert(loggerLogSpy.notCalled);
@@ -507,12 +519,12 @@ describe(commands.FILE_MOVE, () => {
 
   it('correctly skips polling when skipWait is specified', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl,
         skipWait: true
-      }
+      })
     });
 
     assert(spoUtilGetCopyJobResultStub.notCalled);
@@ -532,11 +544,11 @@ describe(commands.FILE_MOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceId: sourceDocId,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     }), new CommandError('File Not Found.'));
   });
 
@@ -545,11 +557,11 @@ describe(commands.FILE_MOVE, () => {
     spoUtilGetCopyJobResultStub = sinon.stub(spo, 'getCopyJobResult').rejects(new Error('Target file already exists.'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: sourceWebUrl,
         sourceUrl: sourceServerRelUrl,
         targetUrl: destAbsoluteTargetUrl
-      }
+      })
     }), new CommandError('Target file already exists.'));
   });
 });

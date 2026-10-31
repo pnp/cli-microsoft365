@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-sharinginfo-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './file-sharinginfo-get.js';
 
 describe(commands.FILE_SHARINGINFO_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const JSONOuput = {
@@ -471,6 +471,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -535,11 +536,11 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
@@ -569,11 +570,11 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileId: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'json'
-      }
+      })
     } as any);
     assert(loggerLogSpy.calledWith(JSONOuput));
   });
@@ -604,12 +605,12 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileUrl: '/sites/project-x/documents/SharedFile.docx',
         output: 'json'
-      }
+      })
     } as any);
     assert(loggerLogToStderrSpy.called);
   });
@@ -640,59 +641,49 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileId: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'text',
         debug: true
-      }
+      })
     } as any);
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: '12345' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the fileId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the fileId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the fileId or fileUrl option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both fileId and fileUrl options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if the fileId or fileUrl option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents/SharedFile.docx' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both fileId and fileUrl options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents/SharedFile.docx' });
+    assert.strictEqual(actual.success, false);
   });
 });

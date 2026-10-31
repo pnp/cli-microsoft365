@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { CreateFileCopyJobsNameConflictBehavior, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -7,25 +8,30 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  sourceUrl: z.string().optional().alias('s'),
+  sourceId: z.uuid().optional().alias('i'),
+  targetUrl: z.string().alias('t'),
+  newName: z.string().optional(),
+  nameConflictBehavior: z.enum(['fail', 'replace', 'rename']).optional(),
+  withItemPermissions: z.boolean().optional(),
+  bypassSharedLock: z.boolean().optional(),
+  skipWait: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  sourceUrl?: string;
-  sourceId?: string;
-  targetUrl: string;
-  newName?: string;
-  nameConflictBehavior?: string;
-  withItemPermissions?: boolean;
-  bypassSharedLock?: boolean;
-  skipWait?: boolean;
-}
-
 class SpoFileMoveCommand extends SpoCommand {
-  private readonly nameConflictBehaviorOptions = ['fail', 'replace', 'rename'];
-
   public get name(): string {
     return commands.FILE_MOVE;
   }
@@ -34,91 +40,19 @@ class SpoFileMoveCommand extends SpoCommand {
     return 'Moves a file to another location';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        sourceUrl: typeof args.options.sourceUrl !== 'undefined',
-        sourceId: typeof args.options.sourceId !== 'undefined',
-        newName: typeof args.options.newName !== 'undefined',
-        nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
-        withItemPermissions: !!args.options.withItemPermissions,
-        bypassSharedLock: !!args.options.bypassSharedLock,
-        skipWait: !!args.options.skipWait
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.sourceUrl, opts.sourceId].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'sourceUrl' or 'sourceId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['sourceUrl', 'sourceId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --sourceUrl [sourceUrl]'
-      },
-      {
-        option: '-i, --sourceId [sourceId]'
-      },
-      {
-        option: '-t, --targetUrl <targetUrl>'
-      },
-      {
-        option: '--newName [newName]'
-      },
-      {
-        option: '--nameConflictBehavior [nameConflictBehavior]',
-        autocomplete: this.nameConflictBehaviorOptions
-      },
-      {
-        option: '--withItemPermissions'
-      },
-      {
-        option: '--bypassSharedLock'
-      },
-      {
-        option: '--skipWait'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
-          return `'${args.options.sourceId}' is not a valid GUID for sourceId.`;
-        }
-
-        if (args.options.nameConflictBehavior && this.nameConflictBehaviorOptions.indexOf(args.options.nameConflictBehavior) === -1) {
-          return `'${args.options.nameConflictBehavior}' is not a valid value for nameConflictBehavior. Allowed values are: ${this.nameConflictBehaviorOptions.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['sourceUrl', 'sourceId'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'sourceUrl', 'sourceId', 'targetUrl', 'newName', 'nameConflictBehavior');
-    this.types.boolean.push('withItemPermissions', 'bypassSharedLock', 'skipWait');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

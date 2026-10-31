@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { GraphFileDetails } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './file-sharinglink-get.js';
+import command, { options } from './file-sharinglink-get.js';
 
 describe(commands.FILE_SHARINGLINK_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/demo';
@@ -26,6 +26,7 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const fileInformationResponse: GraphFileDetails = {
     SiteId: '9798e615-a586-455e-8486-84913f492c49',
@@ -60,6 +61,7 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -97,19 +99,25 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, id: id });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '12345', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '12345', id: id });
+    assert.strictEqual(actual.success, false);
   });
 
   it('gets a specific sharing link of a file by id', async () => {
@@ -126,12 +134,12 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         fileId: fileId,
         id: id
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(fileSharingLinkResponse));
@@ -152,12 +160,12 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         id: id
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith(fileSharingLinkResponse));
@@ -172,7 +180,7 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, id: id, verbose: true }) } as any),
       new CommandError(`File Not Found.`));
   });
 });

@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-list.js';
+import command, { options } from './file-list.js';
 
 describe(commands.FILE_LIST, () => {
   const folderUrl = 'Shared Documents';
@@ -86,6 +86,7 @@ describe(commands.FILE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -94,6 +95,7 @@ describe(commands.FILE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -141,11 +143,11 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: folderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileShortArrayResponse.value));
   });
@@ -160,11 +162,11 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: folderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([]));
   });
@@ -198,13 +200,13 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: folderUrl,
         filter: `name eq 'Test.docx'`,
         fields: 'ListItemAllFields/Id,Name'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{ ListItemAllFields: { Id: 1 }, Name: "Test.docx" }, { ListItemAllFields: { Id: 2 }, Name: "Test.docx" }, { Name: "Test.docx" }]));
   });
@@ -227,13 +229,13 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: folderUrl,
         filter: `name eq 'Test.docx'`,
         fields: 'ListItemAllFields/Title'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{ ListItemAllFields: { Title: 'Test title' } }]));
   });
@@ -252,12 +254,12 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: folderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([...fileFullPageResponse.value, ...fileShortArrayResponse.value]));
   });
@@ -292,13 +294,13 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         recursive: true,
         folderUrl: folderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileShortArrayResponse.value));
   });
@@ -312,11 +314,11 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: 'Shared Documents'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileTextResponse.value));
   });
@@ -346,12 +348,12 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: 'Shared Documents',
         recursive: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([...fileShortArrayResponse.value, ...fileShortArrayResponse.value]));
   });
@@ -380,12 +382,12 @@ describe(commands.FILE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folderUrl: 'Shared Documents',
         recursive: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([...fileTextResponse.value, ...fileTextResponse.value]));
   });
@@ -410,21 +412,27 @@ describe(commands.FILE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: `Shared Documents/Folder`
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderUrl: '/' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

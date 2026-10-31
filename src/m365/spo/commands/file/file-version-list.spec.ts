@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-version-list.js';
+import command, { options } from './file-version-list.js';
 
 describe(commands.FILE_VERSION_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const validWebUrl = "https://contoso.sharepoint.com";
   const validFileUrl = "/Shared Documents/Document.docx";
   const validFileId = "7a9b8bb6-d5c4-4de9-ab76-5210a7879e89";
@@ -57,6 +58,7 @@ describe(commands.FILE_VERSION_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -98,29 +100,33 @@ describe(commands.FILE_VERSION_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel', 'ExpirationDate']);
   });
 
-  it('fails validation if fileId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        fileId: 'Invalid GUID'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if fileId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      fileId: 'Invalid GUID'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileUrl: validFileUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if required options specified (fileUrl)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, fileUrl: validFileUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileUrl)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileUrl: validFileUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (fileId)', async () => {
-    const actual = await command.validate({ options: { webUrl: validWebUrl, fileId: validFileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (fileId)', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: validFileId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, fileId: validFileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves versions from a file with the fileUrl option', async () => {
@@ -132,11 +138,11 @@ describe(commands.FILE_VERSION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileUrl: validFileUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileVersionResponse.value));
   });
@@ -150,11 +156,11 @@ describe(commands.FILE_VERSION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileId: validFileId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(fileVersionResponse.value));
   });
@@ -170,11 +176,11 @@ describe(commands.FILE_VERSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: validWebUrl,
         fileId: validFileId
-      }
+      })
     }), new CommandError(err));
   });
 });

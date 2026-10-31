@@ -1,28 +1,45 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-
-interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  url?: string;
-  id?: string;
-  type?: string;
-  comment?: string;
-}
 
 enum CheckinType {
   Minor = 0,
   Major = 1,
   Overwrite = 2
+}
+
+enum CheckinTypeOption {
+  Minor = 'Minor',
+  Major = 'Major',
+  Overwrite = 'Overwrite'
+}
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  url: z.string().optional(),
+  id: z.uuid().optional().alias('i'),
+  type: zod.coercedEnum(CheckinTypeOption).optional().alias('t'),
+  comment: z.string()
+    .max(1023, { error: 'The length of the comment must be less than 1024 letters' })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class SpoFileCheckinCommand extends SpoCommand {
@@ -34,85 +51,19 @@ class SpoFileCheckinCommand extends SpoCommand {
     return 'Checks in specified file';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        type: args.options.type || 'Major',
-        comment: typeof args.options.comment !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.url, opts.id].filter(o => o !== undefined).length === 1, {
+        error: `Specify 'url' or 'id', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['url', 'id']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['Minor', 'Major', 'Overwrite']
-      },
-      {
-        option: '--comment [comment]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.comment && args.options.comment.length > 1023) {
-          return 'The length of the comment must be less than 1024 letters';
-        }
-
-        if (args.options.type) {
-          const allowedValues: string[] = ['minor', 'major', 'overwrite'];
-          const type: string = args.options.type.toLowerCase();
-          if (allowedValues.indexOf(type) === -1) {
-            return 'Wrong type specified. Available values are Minor|Major|Overwrite';
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['url', 'id'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'url', 'id', 'type', 'comment');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

@@ -12,13 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './file-remove.js';
 
 describe(commands.FILE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
 
@@ -29,6 +29,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -88,13 +89,13 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   it('prompts before removing file when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing file when confirmation argument not passed (title)', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' }) });
 
     assert(promptIssued);
   });
@@ -103,7 +104,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' }) });
     assert(requests.length === 0);
   });
 
@@ -125,7 +126,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/GetFileById(guid'`) > -1 &&
@@ -157,7 +158,7 @@ describe(commands.FILE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
@@ -189,7 +190,7 @@ describe(commands.FILE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
@@ -221,7 +222,7 @@ describe(commands.FILE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -253,7 +254,7 @@ describe(commands.FILE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -286,7 +287,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -318,7 +319,7 @@ describe(commands.FILE_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -351,7 +352,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -384,7 +385,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -417,7 +418,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -450,7 +451,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl, permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, url: fileUrl, permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -480,7 +481,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/recycle()`) > -1 &&
@@ -510,7 +511,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='`) > -1 &&
@@ -540,7 +541,7 @@ describe(commands.FILE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/recycle()`) > -1 &&
@@ -561,7 +562,7 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true, force: true, bypassSharedLock: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', permanent: true, force: true, bypassSharedLock: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].headers?.Prefer, 'bypass-shared-lock');
   });
 
@@ -589,12 +590,12 @@ describe(commands.FILE_REMOVE, () => {
     const actionId: string = '0cd891ef-afce-4e55-b836-fce03286cccf';
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -610,11 +611,11 @@ describe(commands.FILE_REMOVE, () => {
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
   });
 
@@ -630,11 +631,11 @@ describe(commands.FILE_REMOVE, () => {
     const actionUrl: string = 'SharedDocuments/Test.docx';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: actionUrl,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
   });
 
@@ -650,57 +651,47 @@ describe(commands.FILE_REMOVE, () => {
     const actionId: string = '0cd891ef-afce-4e55-b836-fce03286cccf';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
   });
 
-  it('fails validation if both id and title options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and title options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: '0cd891ef-afce-4e55-b836-fce03286cccf' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '12345' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and url options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', url: 'Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and url options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', url: 'Documents' });
+    assert.strictEqual(actual.success, false);
   });
 });
