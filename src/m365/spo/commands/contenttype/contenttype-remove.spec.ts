@@ -235,7 +235,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
   it('correctly handles site content type not found by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B721F6A489A499DB361E1AE2F')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
         return {
           "odata.null": true
         };
@@ -244,7 +244,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B721F6A489A499DB361E1AE2F', force: true }) }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true }) }),
       new CommandError('Content type not found'));
   });
 
