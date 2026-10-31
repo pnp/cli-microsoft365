@@ -38,7 +38,7 @@ export const spe = {
    * @returns ID of the container type
    */
   async getContainerTypeIdByName(name: string): Promise<string> {
-    const containerTypes = await odata.getAllItems<SpeContainerType>(`${graphResource}/beta/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter(name)}'`);
+    const containerTypes = await odata.getAllItems<SpeContainerType>(`${graphResource}/v1.0/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter(name)}'`);
 
     if (containerTypes.length === 0) {
       throw new Error(`The specified container type '${name}' does not exist.`);

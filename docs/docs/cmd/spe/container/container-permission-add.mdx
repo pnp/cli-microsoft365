@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spe container permission add
 
-Adds permission to SharePoint Embedded Container for a specified user
+Adds permission to SharePoint Embedded container for a specified user
 
 ## Usage
 
@@ -27,14 +27,14 @@ m365 spe container permission add [options]
 `--containerTypeName [containerTypeName]`
 : The name of the container type. Specify either `containerTypeId` or `containerTypeName` when using `containerName` but not both.
 
-`-r, --roles <roles>`:
-: Comma separated list of permissions. Possible values are `reader`, `writer`, `manager`, `owner`.
+`-r, --roles <roles>`
+: Comma-separated list of roles. Possible values are `reader`, `writer`, `manager`, `owner`.
 
 `--userId [userId]`	
-: The id of user to assign role to. Use either `userId` or `userName` but not both.
+: The ID of the user to assign the role to. Use either `userId` or `userName` but not both.
 
 `--userName [userName]`
-: The upn/email of user to assign role to. Use either `userId` or `userName` but not both.
+: The UPN of user to assign the role to. Use either `userId` or `userName` but not both.
 ```
 
 <Global />
@@ -75,13 +75,13 @@ When using `--containerTypeName`, resolving the container type requires delegate
 Adds a reader role for the specified user to the container
 
 ```sh
-m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --roles "reader" --userName "jacob@fabrikam.com"
+m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --roles "reader" --userName "jacob@fabrikam.com"
 ```
 
-Adds a multiple roles for the specified user to the container
+Adds multiple roles for the specified user to the container
 
 ```sh
-m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z"  --roles "reader,writer" --userName "jacob@fabrikam.com"
+m365 spe container permission add --containerId "b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z" --roles "reader,writer" --userName "jacob@fabrikam.com"
 ```
 
 ## Response
