@@ -1,0 +1,126 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# outlook calendargroup add
+
+Creates a new calendar group for a user.
+
+## Usage
+
+```sh
+m365 outlook calendargroup add [options]
+```
+
+## Options
+
+```md definition-list
+`--userId [userId]`
+: ID of the user. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: UPN of the user. Specify either `userId` or `userName`, but not both.
+
+`--name <name>`
+: Name of the calendar group.
+```
+
+<Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                            |
+  |-----------------|----------------------------------------|
+  | Microsoft Graph | Calendars.ReadWrite, Calendars.ReadWrite.Shared |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions          |
+  |-----------------|----------------------|
+  | Microsoft Graph | Calendars.ReadWrite  |
+
+  </TabItem>
+</Tabs>
+
+:::note
+
+When using delegated permissions, specifying `userId` or `userName` for a different user requires the `Calendars.ReadWrite.Shared` scope. When the specified user matches the signed-in user, no shared scope is needed.
+
+:::
+
+## Examples
+
+Create a new calendar group for the current user
+
+```sh
+m365 outlook calendargroup add --name "Personal Events" --userId "@meId"
+```
+
+Create a new calendar group for a user
+
+```sh
+m365 outlook calendargroup add --name "Personal Events" --userId "44288f7d-7710-4293-8c8e-36f310ed2e6a"
+```
+
+Create a new calendar group for a user specified by email
+
+```sh
+m365 outlook calendargroup add --name "Personal Events" --userName "john.doe@contoso.com"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAADSG3wPE27kUeySjmT5eRT8QcAfJKVL07sbkmIfHqjbDnRgQAAAgEGAAAAfJKVL07sbkmIfHqjbDnRgQADK5c4ngAAAA==",
+    "name": "My Work Calendars",
+    "classId": "c02d4ddf-4809-485f-9cd4-1ef0937e03be",
+    "changeKey": "fJKVL07sbkmIfHqjbDnRgQADKqwfAA=="
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  changeKey: fJKVL07sbkmIfHqjbDnRgQADKqwfAA==
+  classId  : c02d4ddf-4809-485f-9cd4-1ef0937e03be
+  id       : AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAADSG3wPE27kUeySjmT5eRT8QcAfJKVL07sbkmIfHqjbDnRgQAAAgEGAAAAfJKVL07sbkmIfHqjbDnRgQADK5c4ngAAAA==
+  name     : My Work Calendars
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,name,classId,changeKey
+  AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAADSG3wPE27kUeySjmT5eRT8QcAfJKVL07sbkmIfHqjbDnRgQAAAgEGAAAAfJKVL07sbkmIfHqjbDnRgQADK5c4ngAAAA==,My Work Calendars,c02d4ddf-4809-485f-9cd4-1ef0937e03be,fJKVL07sbkmIfHqjbDnRgQADKqwfAA==
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # outlook calendargroup add --debug "false" --verbose "false" --name "My Work Calendars"
+
+  Date: 7/9/2026
+
+  ## My Work Calendars (AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAADSG3wPE27kUeySjmT5eRT8QcAfJKVL07sbkmIfHqjbDnRgQAAAgEGAAAAfJKVL07sbkmIfHqjbDnRgQADK5c4ngAAAA==)
+
+  Property | Value
+  ---------|-------
+  id | AQMkAGRlM2Y5YTkzLWI2NzAtNDczOS05YWMyLTJhZGY2MGExMGU0MgBGAAADSG3wPE27kUeySjmT5eRT8QcAfJKVL07sbkmIfHqjbDnRgQAAAgEGAAAAfJKVL07sbkmIfHqjbDnRgQADK5c4ngAAAA==
+  name | My Work Calendars
+  classId | c02d4ddf-4809-485f-9cd4-1ef0937e03be
+  changeKey | fJKVL07sbkmIfHqjbDnRgQADKqwfAA==
+  ```
+
+  </TabItem>
+</Tabs>
