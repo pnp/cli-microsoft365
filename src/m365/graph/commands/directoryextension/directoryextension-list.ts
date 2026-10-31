@@ -10,8 +10,8 @@ import { ExtensionProperty } from '@microsoft/microsoft-graph-types';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional(),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  appObjectId: z.guid().optional(),
   appName: z.string().optional()
 });
 

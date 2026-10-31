@@ -11,7 +11,7 @@ import { formatting } from '../../../../utils/formatting.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid userName.`
   }).optional().alias('n'),

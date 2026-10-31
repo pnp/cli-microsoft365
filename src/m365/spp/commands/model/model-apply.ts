@@ -22,10 +22,10 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   title: z.string().optional().alias('t'),
   listTitle: z.string().optional(),
-  listId: z.uuid().optional(),
+  listId: z.guid().optional(),
   listUrl: z.string().optional(),
   viewOption: z.enum(['NewViewAsDefault', 'DoNotChangeDefault', 'TileViewAsDefault']).optional()
 });

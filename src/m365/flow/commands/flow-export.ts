@@ -12,7 +12,7 @@ import PowerAutomateCommand from '../../base/PowerAutomateCommand.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   environmentName: z.string().alias('e'),
-  name: z.uuid().alias('n'),
+  name: z.guid().alias('n'),
   packageDisplayName: z.string().optional().alias('d'),
   packageDescription: z.string().optional(),
   packageCreatedBy: z.string().optional().alias('c'),

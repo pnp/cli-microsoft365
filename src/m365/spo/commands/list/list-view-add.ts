@@ -15,7 +15,7 @@ export const options = z.strictObject({
       error: 'webUrl is not a valid SharePoint site URL.'
     })
     .alias('u'),
-  listId: z.uuid().optional(),
+  listId: z.guid().optional(),
   listTitle: z.string().optional(),
   listUrl: z.string().optional(),
   title: z.string().min(1, 'Cannot be empty.'),

@@ -17,7 +17,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   listTitle: z.string().optional().alias('t'),
-  listId: z.uuid().optional().alias('l'),
+  listId: z.guid().optional().alias('l'),
   listUrl: z.string().optional(),
   force: z.boolean().optional().alias('f')
 });

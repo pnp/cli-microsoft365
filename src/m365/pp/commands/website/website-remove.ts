@@ -15,7 +15,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid Power Pages URL.`
     })
     .alias('u'),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   name: z.string().optional().alias('n'),
   environmentName: z.string().alias('e'),
   force: z.boolean().optional().alias('f')

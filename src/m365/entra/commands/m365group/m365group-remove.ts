@@ -13,7 +13,7 @@ import { setTimeout } from 'timers/promises';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   force: z.boolean().optional().alias('f'),
   permanent: z.boolean().optional()

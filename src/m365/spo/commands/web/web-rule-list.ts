@@ -16,13 +16,13 @@ export const options = z.strictObject({
     .refine(url => validation.isValidSharePointUrl(url) === true, {
       error: e => `'${e.input}' is not a valid SharePoint site URL.`
     }),
-  listId: z.uuid().optional(),
+  listId: z.guid().optional(),
   listUrl: z.string().optional(),
   listTitle: z.string().optional(),
   userName: z.string().optional().refine(upn => typeof upn === 'undefined' || validation.isValidUserPrincipalName(upn as string), {
     error: e => `'${e.input}' is not a valid UPN.`
   }),
-  userId: z.uuid().optional()
+  userId: z.guid().optional()
 });
 
 declare type Options = z.infer<typeof options>;

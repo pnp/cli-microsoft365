@@ -13,7 +13,7 @@ export const options = z.strictObject({
   id: z.string().alias('i'),
   containerId: z.string().optional(),
   containerName: z.string().alias('n').optional(),
-  containerTypeId: z.uuid().optional(),
+  containerTypeId: z.guid().optional(),
   containerTypeName: z.string().optional(),
   force: z.boolean().alias('f').optional()
 });
