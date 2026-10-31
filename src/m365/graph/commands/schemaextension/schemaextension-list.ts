@@ -68,22 +68,20 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
 
     try {
       const res = await request.get<any>(requestOptions);
-      if (res.value && res.value.length > 0) {
-        const size = args.options.pageSize ? parseInt(args.options.pageSize) : parseInt(res.value.length);
-        const result = res.value.slice(-size);
-        if (args.options.output !== 'json' && result.length > 1) {
-          await logger.log(result.map((x: any) => ({
-            id: x.id,
-            description: x.description,
-            targetTypes: x.targetTypes,
-            status: x.status,
-            owner: x.owner,
-            properties: JSON.stringify(x.properties)
-          })));
-        }
-        else {
-          await logger.log(result);
-        }
+      const size = args.options.pageSize ? parseInt(args.options.pageSize) : res.value.length;
+      const result = res.value.slice(-size);
+      if (args.options.output !== 'json' && result.length > 1) {
+        await logger.log(result.map((x: any) => ({
+          id: x.id,
+          description: x.description,
+          targetTypes: x.targetTypes,
+          status: x.status,
+          owner: x.owner,
+          properties: JSON.stringify(x.properties)
+        })));
+      }
+      else {
+        await logger.log(result);
       }
     }
     catch (err: any) {

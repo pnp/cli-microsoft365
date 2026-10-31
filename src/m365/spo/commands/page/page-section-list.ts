@@ -56,24 +56,22 @@ class SpoPageSectionListCommand extends SpoCommand {
       const sections: CanvasSection[] = clientSidePage.sections;
 
       const isJSONOutput = !cli.shouldTrimOutput(args.options.output);
-      if (sections.length) {
-        const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
-        if (isJSONOutput) {
-          await logger.log(output);
-        }
-        else {
-          await logger.log(output.map(s => {
-            const sectionOutput: any = {
-              order: s.order,
-              columns: s.columns.length
-            };
+      const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
+      if (isJSONOutput) {
+        await logger.log(output);
+      }
+      else {
+        await logger.log(output.map(s => {
+          const sectionOutput: any = {
+            order: s.order,
+            columns: s.columns.length
+          };
 
-            if (s.isVertical) {
-              sectionOutput.isVertical = s.isVertical;
-            }
-            return sectionOutput;
-          }));
-        }
+          if (s.isVertical) {
+            sectionOutput.isVertical = s.isVertical;
+          }
+          return sectionOutput;
+        }));
       }
     }
     catch (err: any) {

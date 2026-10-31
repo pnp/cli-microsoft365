@@ -40,7 +40,7 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
         const orgAssetsResponse: OrgAssetsResponse = json[json.length - 1];
 
         if (orgAssetsResponse === null || orgAssetsResponse.OrgAssetsLibraries === undefined) {
-          await logger.log("No libraries in Organization Assets");
+          await logger.log([]);
         }
         else {
           const orgAssets: OrgAssets = {

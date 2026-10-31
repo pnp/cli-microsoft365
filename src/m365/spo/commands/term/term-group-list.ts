@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -92,14 +93,12 @@ class SpoTermGroupListCommand extends SpoCommand {
       }
 
       const result: TermGroupCollection = json[json.length - 1];
-      if (result._Child_Items_ && result._Child_Items_.length > 0) {
-        result._Child_Items_.forEach(t => {
-          t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-          t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
-          t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-        });
-        await logger.log(result._Child_Items_);
-      }
+      result._Child_Items_.forEach(t => {
+        t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+        t.Id = formatting.extractCsomGuid(t.Id);
+        t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+      });
+      await logger.log(result._Child_Items_);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

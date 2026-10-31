@@ -116,15 +116,12 @@ class SpoTermSetListCommand extends SpoCommand {
       }
 
       const result: TermSetCollection = json[json.length - 1];
-      if (result._Child_Items_ && result._Child_Items_.length > 0) {
-        result._Child_Items_.map(t => {
-          t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-          t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
-          t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-          return t;
-        });
-        await logger.log(result._Child_Items_);
-      }
+      result._Child_Items_.forEach(t => {
+        t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+        t.Id = formatting.extractCsomGuid(t.Id);
+        t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+      });
+      await logger.log(result._Child_Items_);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
