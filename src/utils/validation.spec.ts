@@ -697,4 +697,49 @@ describe('validation/validation', () => {
     const expected = true;
     assert.strictEqual(actual, expected);
   });
+
+  it('isValidGraphDateTime returns true for a valid Graph API date time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00:00');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGraphDateTime returns false when the seconds component is missing', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for a UTC date time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T09:00:00Z');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for an invalid time', () => {
+    const result = validation.isValidGraphDateTime('2019-04-16T24:00:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for February 29 in a non-leap year', () => {
+    const result = validation.isValidGraphDateTime('2025-02-29T09:00:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns true for February 29 in a leap year', () => {
+    const result = validation.isValidGraphDateTime('2024-02-29T09:00:00');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGraphDateTime returns false for April 31', () => {
+    const result = validation.isValidGraphDateTime('2026-04-31T09:00:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns false for February 29 in a century non-leap year', () => {
+    const result = validation.isValidGraphDateTime('1900-02-29T09:00:00');
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidGraphDateTime returns true for February 29 in a century leap year', () => {
+    const result = validation.isValidGraphDateTime('2000-02-29T09:00:00');
+    assert.strictEqual(result, true);
+  });
 });

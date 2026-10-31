@@ -9,6 +9,7 @@ import { settingsNames } from '../settingsNames.js';
 
 describe('utils/calendar', () => {
   const userId = '729827e3-9c14-49f7-bb1b-9608f156bbb8';
+  const userNameWithApostrophe = "o'connor@contoso.com";
   const calendarId = 'AAMkAGI2TGuLAAA';
   const calendarName = 'My Calendar';
   const invalidCalendarName = 'M Calnedar';
@@ -185,5 +186,23 @@ describe('utils/calendar', () => {
 
     const actual = await calendar.getUserCalendarById(userId, calendarId, calendarGroupId, 'id,displayName');
     assert.deepStrictEqual(actual, calendarLimitedResponse);
+  });
+
+  it('correctly gets a calendar by name for a user name containing an apostrophe', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userNameWithApostrophe)}')/calendars?$filter=name eq '${formatting.encodeQueryParameter(calendarName)}'`) {
+        return {
+          value: [
+            calendarResponse
+          ]
+        };
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const actual = await calendar.getUserCalendarByName(userNameWithApostrophe, calendarName);
+
+    assert.deepStrictEqual(actual, calendarResponse);
   });
 });
