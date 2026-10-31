@@ -373,16 +373,16 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  // it('passes validation when audienceIds is empty', () => {
-  //   const actual = commandOptionsSchema.safeParse({
-  //     webUrl: webUrl,
-  //     location: 'TopNavigationBar',
-  //     title: title,
-  //     audienceIds: ''
-  //   });
+  it('fails validation when audienceIds is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      location: 'TopNavigationBar',
+      title: title,
+      audienceIds: ''
+    });
 
-  //   assert.strictEqual(actual.success, true);
-  // });
+    assert.strictEqual(actual.success, false);
+  });
 
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
