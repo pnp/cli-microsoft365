@@ -1,26 +1,39 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), { message: 'The value must be a valid GUID.' }).alias('i'),
+  title: z.string().optional().alias('t'),
+  webTemplate: z.enum(['TeamSite', 'CommunicationSite']).optional().alias('w'),
+  siteScripts: z.string().superRefine((val, ctx) => {
+    const items = val.split(',').map(s => s.trim());
+    const invalid = items.filter(item => !validation.isValidGuid(item));
+    if (invalid.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The following values are not valid GUIDs: ${invalid.join(', ')}`
+      });
+    }
+  }).optional().alias('s'),
+  description: z.string().optional().alias('d'),
+  previewImageUrl: z.string().optional().alias('m'),
+  previewImageAltText: z.string().optional().alias('a'),
+  thumbnailUrl: z.string().optional(),
+  version: z.string().refine(val => !isNaN(Number(val)), { message: 'Version must be a number' }).optional().alias('v'),
+  isDefault: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  title?: string;
-  webTemplate?: string;
-  siteScripts?: string;
-  description?: string;
-  previewImageUrl?: string;
-  previewImageAltText?: string;
-  thumbnailUrl?: string;
-  version?: number | string;
-  isDefault?: boolean;
 }
 
 class SpoSiteDesignSetCommand extends SpoCommand {
@@ -32,103 +45,8 @@ class SpoSiteDesignSetCommand extends SpoCommand {
     return 'Updates a site design with new values';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        title: typeof args.options.title !== 'undefined',
-        webTemplate: args.options.webTemplate,
-        siteScripts: typeof args.options.siteScripts !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        previewImageUrl: typeof args.options.previewImageUrl !== 'undefined',
-        previewImageAltText: typeof args.options.previewImageAltText !== 'undefined',
-        thumbnailUrl: typeof args.options.thumbnailUrl !== 'undefined',
-        version: typeof args.options.version !== 'undefined',
-        isDefault: typeof args.options.isDefault
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]',
-        autocomplete: ['TeamSite', 'CommunicationSite']
-      },
-      {
-        option: '-s, --siteScripts [siteScripts]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-m, --previewImageUrl [previewImageUrl]'
-      },
-      {
-        option: '-a, --previewImageAltText [previewImageAltText]'
-      },
-      {
-        option: '--thumbnailUrl [thumbnailUrl]'
-      },
-      {
-        option: '-v, --version [version]'
-      },
-      {
-        option: '--isDefault [isDefault]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('isDefault');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.webTemplate &&
-          args.options.webTemplate !== 'TeamSite' &&
-          args.options.webTemplate !== 'CommunicationSite') {
-          return `${args.options.webTemplate} is not a valid web template type. Allowed values TeamSite|CommunicationSite`;
-        }
-
-        if (args.options.siteScripts) {
-          const siteScripts = args.options.siteScripts.split(',');
-          for (let i: number = 0; i < siteScripts.length; i++) {
-            const trimmedId: string = siteScripts[i].trim();
-            if (!validation.isValidGuid(trimmedId)) {
-              return `${trimmedId} is not a valid GUID`;
-            }
-          }
-        }
-
-        if (args.options.version &&
-          typeof args.options.version !== 'number') {
-          return `${args.options.version} is not a number`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -160,7 +78,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         updateInfo.WebTemplate = args.options.webTemplate === 'TeamSite' ? '64' : '68';
       }
       if (args.options.version) {
-        updateInfo.Version = args.options.version;
+        updateInfo.Version = Number(args.options.version);
       }
       if (typeof args.options.isDefault !== 'undefined') {
         updateInfo.IsDefault = args.options.isDefault;

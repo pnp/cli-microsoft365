@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitedesign-rights-list.js';
+import command, { options } from './sitedesign-rights-list.js';
 
 describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,7 +99,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.calledWith([
       {
         "DisplayName": "MOD Administrator",
@@ -137,7 +139,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.calledWith([
       {
         "DisplayName": "MOD Administrator",
@@ -177,7 +179,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.calledWith([
       {
         "DisplayName": "MOD Administrator",
@@ -195,27 +197,21 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) }), new CommandError('File Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--siteDesignId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteDesignId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteDesignId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

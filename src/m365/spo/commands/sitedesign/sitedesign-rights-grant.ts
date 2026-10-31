@@ -1,19 +1,23 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteDesignId: z.string().refine(val => validation.isValidGuid(val), { message: 'The value must be a valid GUID.' }).alias('i'),
+  principals: z.string().alias('p'),
+  rights: z.string().pipe(z.enum(['View'])).alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteDesignId: string;
-  principals: string;
-  rights: string;
 }
 
 class SpoSiteDesignRightsGrantCommand extends SpoCommand {
@@ -25,42 +29,8 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
     return 'Grants access to a site design for one or more principals';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --siteDesignId <siteDesignId>'
-      },
-      {
-        option: '-p, --principals <principals>'
-      },
-      {
-        option: '-r, --rights <rights>',
-        autocomplete: ['View']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.siteDesignId)) {
-          return `${args.options.siteDesignId} is not a valid GUID`;
-        }
-
-        if (args.options.rights !== 'View') {
-          return `${args.options.rights} is not a valid rights value. Allowed values View`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
