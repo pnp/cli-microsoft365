@@ -1385,4 +1385,72 @@ describe(commands.EVENT_ADD, () => {
 
     assert.strictEqual(postStub.notCalled, true);
   });
+
+  it('accepts a userId with different casing when using delegated permissions', async () => {
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(userId.toLowerCase());
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userId: userId.toUpperCase()
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.strictEqual(postStub.calledOnce, true);
+  });
+
+  it('resolves @meusername in attendee options', async () => {
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns(userName);
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      requiredAttendees: '@meusername',
+      optionalAttendees: '@meusername',
+      resources: '@meusername'
+    });
+
+    await command.action(logger, { options: parsedSchema.data! });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.attendees, [
+      {
+        emailAddress: { address: userName },
+        type: 'optional'
+      },
+      {
+        emailAddress: { address: userName },
+        type: 'required'
+      },
+      {
+        emailAddress: { address: userName },
+        type: 'resource'
+      }
+    ]);
+  });
+
+  it('rejects @meusername attendees when using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    const postStub = sinon.stub(request, 'post').resolves(response);
+
+    const parsedSchema = commandOptionsSchema.safeParse({
+      subject,
+      start,
+      end,
+      userId,
+      requiredAttendees: '@meusername'
+    });
+
+    await assert.rejects(
+      command.action(logger, { options: parsedSchema.data! }),
+      new CommandError(`It's not possible to use @meusername with application permissions`)
+    );
+
+    assert.strictEqual(postStub.notCalled, true);
+  });
 });

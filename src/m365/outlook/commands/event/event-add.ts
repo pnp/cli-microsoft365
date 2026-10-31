@@ -164,7 +164,7 @@ class OutlookEventAddCommand extends GraphCommand {
     else {
       if (args.options.userId) {
         const currentUserId = accessToken.getUserIdFromAccessToken(token);
-        if (args.options.userId !== currentUserId) {
+        if (args.options.userId.toLowerCase() !== currentUserId.toLowerCase()) {
           throw `You can only create your own events when using delegated permissions. The specified userId '${args.options.userId}' does not match the current user '${currentUserId}'.`;
         }
       }
@@ -283,11 +283,25 @@ class OutlookEventAddCommand extends GraphCommand {
     if (args.options.optionalAttendees || args.options.requiredAttendees || args.options.resources) {
       const attendees: NonNullable<Event['attendees']> = [];
 
+      const resolveAttendee = (value: string): string => {
+        const attendee = value.trim();
+
+        if (attendee.toLowerCase() !== '@meusername') {
+          return attendee;
+        }
+
+        if (isAppOnlyAccessToken) {
+          throw `It's not possible to use ${attendee} with application permissions`;
+        }
+
+        return accessToken.getUserNameFromAccessToken(token);
+      };
+
       if (args.options.optionalAttendees) {
         args.options.optionalAttendees.forEach(value =>
           attendees.push({
             emailAddress: {
-              address: value.trim()
+              address: resolveAttendee(value)
             },
             type: 'optional'
           }));
@@ -297,7 +311,7 @@ class OutlookEventAddCommand extends GraphCommand {
         args.options.requiredAttendees.forEach(value =>
           attendees.push({
             emailAddress: {
-              address: value.trim()
+              address: resolveAttendee(value)
             },
             type: 'required'
           }));
@@ -307,7 +321,7 @@ class OutlookEventAddCommand extends GraphCommand {
         args.options.resources.forEach(value =>
           attendees.push({
             emailAddress: {
-              address: value.trim()
+              address: resolveAttendee(value)
             },
             type: 'resource'
           }));
