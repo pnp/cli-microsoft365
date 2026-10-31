@@ -1,30 +1,37 @@
+import { z } from 'zod';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import entraUserGetCommand, { Options as EntraUserGetCommandOptions } from '../../../entra/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  id: z.number().optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  newName: z.string().optional(),
+  description: z.string().optional(),
+  allowMembersEditMembership: z.boolean().optional(),
+  onlyAllowMembersViewMembership: z.boolean().optional(),
+  allowRequestToJoinLeave: z.boolean().optional(),
+  autoAcceptRequestToJoinLeave: z.boolean().optional(),
+  requestToJoinLeaveEmailSetting: z.string().optional(),
+  ownerEmail: z.string().optional(),
+  ownerUserName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: number;
-  name?: string;
-  newName?: string;
-  description?: string;
-  allowMembersEditMembership?: boolean;
-  onlyAllowMembersViewMembership?: boolean;
-  allowRequestToJoinLeave?: boolean;
-  autoAcceptRequestToJoinLeave?: boolean;
-  requestToJoinLeaveEmailSetting?: string;
-  ownerEmail?: string;
-  ownerUserName?: string;
 }
 
 class SpoGroupSetCommand extends SpoCommand {
@@ -36,106 +43,26 @@ class SpoGroupSetCommand extends SpoCommand {
     return 'Updates a group in the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        newName: typeof args.options.newName !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        allowMembersEditMembership: args.options.allowMembersEditMembership,
-        onlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
-        allowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
-        autoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
-        requestToJoinLeaveEmailSetting: typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined',
-        ownerEmail: typeof args.options.ownerEmail !== 'undefined',
-        ownerUserName: typeof args.options.ownerUserName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => [o.id, o.name].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'id' or 'name', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
+      })
+      .refine(o => [o.ownerEmail, o.ownerUserName].filter(x => x !== undefined).length <= 1, {
+        error: `Specify either 'ownerEmail' or 'ownerUserName', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerEmail', 'ownerUserName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--newName [newName]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--allowMembersEditMembership [allowMembersEditMembership]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
-      },
-      {
-        option: '--ownerEmail [ownerEmail]'
-      },
-      {
-        option: '--ownerUserName [ownerUserName]'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('allowMembersEditMembership', 'onlyAllowMembersViewMembership', 'allowRequestToJoinLeave', 'autoAcceptRequestToJoinLeave');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id && isNaN(args.options.id)) {
-          return `Specified id ${args.options.id} is not a number`;
-        }
-
-        if (args.options.ownerEmail && args.options.ownerUserName) {
-          return 'Specify either ownerEmail or ownerUserName but not both';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

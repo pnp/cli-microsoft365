@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-member-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './group-member-list.js';
 
 describe(commands.GROUP_MEMBER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const JSONSPGroupMembersList =
     [
@@ -69,6 +69,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -90,8 +91,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.executeCommandWithOutput,
-      cli.getSettingWithDefaultValue
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -121,10 +121,10 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
@@ -138,11 +138,11 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
@@ -156,11 +156,11 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Contoso Site Owners"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
@@ -185,52 +185,46 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
-  it('fails validation if webURL is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 3 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webURL is Invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "InvalidWEBURL", groupId: 3 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'InvalidWEBURL' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if groupid and groupName is entered', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if groupid and groupName is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 4, groupName: "Contoso Site Owners" });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation if neither groupId nor groupName is entered', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if groupId is Invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "INVALIDGROUP" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+      groupId: 3,
+      unknownOption: 'value'
     });
-
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Contoso Site Owners" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither groupId nor groupName is entered', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if groupId is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "INVALIDGROUP" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if all the required options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all the required options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3 });
+    assert.strictEqual(actual.success, true);
   });
 });
