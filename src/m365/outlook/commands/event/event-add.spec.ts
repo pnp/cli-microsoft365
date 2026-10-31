@@ -637,7 +637,7 @@ describe(commands.EVENT_ADD, () => {
       allowNewTimeProposals: false,
       isReminderOn: false,
       responseRequested: false,
-      categories: 'category1,category2',
+      categories: 'category1, category2',
       sensitivity: 'private',
       importance: 'high',
       showAs: 'oof',
@@ -719,7 +719,7 @@ describe(commands.EVENT_ADD, () => {
       subject: subject,
       start: start,
       end: end,
-      locations: 'Room 1,Room 2',
+      locations: 'Room 1, Room 2',
       verbose: true
     });
     await command.action(logger, { options: parsedSchema.data! });
@@ -944,7 +944,7 @@ describe(commands.EVENT_ADD, () => {
       },
       body: {
         content: `Let's go for lunch`,
-        contentType: 'Text'
+        contentType: 'text'
       }
     });
     assert(loggerLogSpy.calledOnceWithExactly(response));
@@ -982,7 +982,7 @@ describe(commands.EVENT_ADD, () => {
       },
       body: {
         content: `<html><h1>Let's go for lunch</h1></html>`,
-        contentType: 'HTML'
+        contentType: 'html'
       }
     });
     assert(loggerLogSpy.calledOnceWithExactly(response));
@@ -1074,7 +1074,7 @@ describe(commands.EVENT_ADD, () => {
     await command.action(logger, { options: parsedSchema.data! });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.body, {
-      contentType: 'HTML',
+      contentType: 'html',
       content: '<p>Event details</p>'
     });
   });

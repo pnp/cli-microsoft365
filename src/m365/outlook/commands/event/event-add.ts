@@ -41,7 +41,7 @@ export const options = z.strictObject({
     const target = String(val).toLowerCase();
     return bodyContentTypes.find(t => t.toLowerCase() === target) ?? val;
   }, z.enum(bodyContentTypes)).optional().default('HTML'),
-  categories: z.string().transform((value) => value.split(',').map(String)).optional(),
+  categories: z.string().transform((value) => value.split(',').map(category => category.trim())).optional(),
   hideAttendees: z.boolean().optional().default(false),
   importance: z.preprocess(val => {
     const target = String(val).toLowerCase();
@@ -54,7 +54,7 @@ export const options = z.strictObject({
   locationEmailAddress: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid email address.`
   }).optional(),
-  locations: z.string().transform((value) => value.split(',').map(String)).optional(),
+  locations: z.string().transform((value) => value.split(',').map(category => category.trim())).optional(),
   onlineMeetingProvider: z.preprocess(val => {
     const target = String(val).toLowerCase();
     return onlineMeetingProviders.find(t => t.toLowerCase() === target) ?? val;
@@ -64,7 +64,7 @@ export const options = z.strictObject({
       error: e => `The following attendees names are invalid for the option 'optionalAttendees': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
     }).transform((value) => value.split(',').map(String)).optional(),
   recurrence: z.string().optional(),
-  reminderMinutesBeforeStart: z.number().refine(minutes => minutes >= 0, {
+  reminderMinutesBeforeStart: z.number().refine(minutes => Number.isInteger(minutes) && minutes >= 0, {
     error: () => 'The number of reminder minutes must be a positive number or 0.'
   }).optional(),
   requiredAttendees: z.string()
@@ -187,7 +187,7 @@ class OutlookEventAddCommand extends GraphCommand {
       requestUrl += '/events';
     }
 
-    const body : any = {};
+    const body: Partial<Event> = {};
     body['subject'] = args.options.subject;
     body['start'] = {
       dateTime: args.options.start
@@ -202,7 +202,7 @@ class OutlookEventAddCommand extends GraphCommand {
         : args.options.bodyContents;
 
       body['body'] = {
-        contentType: args.options.bodyContentType,
+        contentType: args.options.bodyContentType === 'Text' ? 'text' : 'html',
         content: bodyContents
       };
     }
@@ -308,7 +308,7 @@ class OutlookEventAddCommand extends GraphCommand {
       }
     }
 
-    if (args.options.isReminderOn && args.options.reminderMinutesBeforeStart) {
+    if (args.options.isReminderOn && args.options.reminderMinutesBeforeStart !== undefined) {
       body['reminderMinutesBeforeStart'] = args.options.reminderMinutesBeforeStart;
     }
 
