@@ -1,18 +1,33 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-interface CommandArgs {
-  options: Options;
+enum Role {
+  Owner = 'Owner',
+  Member = 'Member',
+  Visitor = 'Visitor'
 }
 
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  role?: string;
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  role: zod.coercedEnum(Role).optional().alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 interface IMembershipResult {
@@ -34,8 +49,6 @@ interface IUserInfo {
 }
 
 class SpoSiteMembershipListCommand extends SpoCommand {
-  public static readonly RoleNames: string[] = ['Owner', 'Member', 'Visitor'];
-
   public get name(): string {
     return commands.SITE_MEMBERSHIP_LIST;
   }
@@ -48,50 +61,9 @@ class SpoSiteMembershipListCommand extends SpoCommand {
     return ['email', 'name', 'userPrincipalName', 'associatedGroupType'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        role: typeof args.options.role !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-r, --role [role]',
-        autocomplete: SpoSiteMembershipListCommand.RoleNames
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.role && !SpoSiteMembershipListCommand.RoleNames.some(roleName => roleName.toLocaleLowerCase() === args.options.role!.toLocaleLowerCase())) {
-          return `'${args.options.role}' is not a valid value for option 'role'. Valid values are: ${SpoSiteMembershipListCommand.RoleNames.join(', ')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('role', 'siteUrl');
-  };
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {

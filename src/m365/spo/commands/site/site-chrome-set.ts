@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -30,20 +31,27 @@ enum Emphasis {
   Darkest
 }
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  headerLayout: z.enum(['Standard', 'Compact', 'Minimal', 'Extended']).optional(),
+  headerEmphasis: z.enum(['Lightest', 'Light', 'Dark', 'Darkest']).optional(),
+  logoAlignment: z.enum(['Left', 'Center', 'Right']).optional(),
+  footerLayout: z.enum(['Simple', 'Extended']).optional(),
+  footerEmphasis: z.enum(['Lightest', 'Light', 'Dark', 'Darkest']).optional(),
+  disableMegaMenu: z.boolean().optional(),
+  hideTitleInHeader: z.boolean().optional(),
+  disableFooter: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  headerLayout?: HeaderLayout;
-  headerEmphasis?: Emphasis;
-  logoAlignment?: Alignment;
-  footerLayout?: FooterLayout;
-  footerEmphasis?: Emphasis;
-  disableMegaMenu?: boolean;
-  hideTitleInHeader?: boolean;
-  disableFooter?: boolean;
 }
 
 class SpoSiteChromeSetCommand extends SpoCommand {
@@ -55,105 +63,8 @@ class SpoSiteChromeSetCommand extends SpoCommand {
     return 'Sets the chrome header and footer for the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        headerLayout: args.options.headerLayout,
-        headerEmphasis: args.options.headerEmphasis,
-        disableMegaMenu: args.options.disableMegaMenu,
-        hideTitleInHeader: args.options.hideTitleInHeader,
-        logoAlignment: args.options.logoAlignment,
-        disableFooter: args.options.disableFooter,
-        footerLayout: args.options.footerLayout,
-        footerEmphasis: args.options.footerEmphasis
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--headerLayout [headerLayout]',
-        autocomplete: ['Standard', 'Compact', 'Minimal', 'Extended']
-      },
-      {
-        option: '--headerEmphasis [headerEmphasis]',
-        autocomplete: ['Lightest', 'Light', 'Dark', 'Darkest']
-      },
-      {
-        option: '--logoAlignment [logoAlignment]',
-        autocomplete: ['Left', 'Center', 'Right']
-      },
-      {
-        option: '--footerLayout [footerLayout]',
-        autocomplete: ['Simple', 'Extended']
-      },
-      {
-        option: '--footerEmphasis [footerEmphasis]',
-        autocomplete: ['Lightest', 'Light', 'Dark', 'Darkest']
-      },
-      {
-        option: '--disableMegaMenu [disableMegaMenu]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hideTitleInHeader [hideTitleInHeader]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--disableFooter [disableFooter]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('disableMegaMenu', 'hideTitleInHeader', 'disableFooter');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (typeof args.options.footerEmphasis !== "undefined" && !(args.options.footerEmphasis in Emphasis)) {
-          return `${args.options.footerEmphasis} is not a valid option for footerEmphasis. Allowed values Lightest|Light|Dark|Darkest`;
-        }
-
-        if (typeof args.options.footerLayout !== "undefined" && !(args.options.footerLayout in FooterLayout)) {
-          return `${args.options.footerLayout} is not a valid option for footerLayout. Allowed values Simple|Extended`;
-        }
-
-        if (typeof args.options.headerEmphasis !== "undefined" && !(args.options.headerEmphasis in Emphasis)) {
-          return `${args.options.headerEmphasis} is not a valid option for headerEmphasis. Allowed values Lightest|Light|Dark|Darkest`;
-        }
-
-        if (typeof args.options.headerLayout !== "undefined" && !(args.options.headerLayout in HeaderLayout)) {
-          return `${args.options.headerLayout} is not a valid option for headerLayout. Allowed values Standard|Compact|Minimal|Extended`;
-        }
-
-        if (typeof args.options.logoAlignment !== "undefined" && !(args.options.logoAlignment in Alignment)) {
-          return `${args.options.logoAlignment} is not a valid option for logoAlignment. Allowed values Left|Center|Right`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -180,7 +91,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
       body["footerLayout"] = footerLayout;
     }
     if (footerEmphasis !== null) {
-      body["footerEmphasis"] = 3 - parseInt(footerEmphasis); // Footer is inverted
+      body["footerEmphasis"] = 3 - footerEmphasis; // Footer is inverted
     }
     if (hideTitleInHeader !== null) {
       body["hideTitleInHeader"] = hideTitleInHeader;

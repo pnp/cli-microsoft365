@@ -11,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-recyclebinitem-restore.js';
+import command, { options } from './site-recyclebinitem-restore.js';
+import { validation } from '../../../../utils/validation.js';
 
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +27,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,59 +65,109 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the siteUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if ids option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '9526' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '9526' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The following GUIDs are invalid for the option 'ids': ${validation.isValidGuidArray('9526')}.`);
   });
 
-  it('fails validation if the second id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the second id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `The following GUIDs are invalid for the option 'ids': ${validation.isValidGuidArray('5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526')}.`);
   });
 
-  it('fails validation if no options are specified', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if no options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if ids and allPrimary options are specified together', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allPrimary: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids and allPrimary options are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allPrimary: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if ids and allSecondary options are specified together', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids and allSecondary options are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526', allSecondary: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if allPrimary and allSecondary options are specified together', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if allPrimary and allSecondary options are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', allPrimary: true, allSecondary: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the siteUrl and ids options are valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the siteUrl and ids options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if siteUrl and id are defined', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if siteUrl and id are defined', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when multiple IDs are specified', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when multiple IDs are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when multiple IDs with a space after the comma are specified', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when multiple IDs with a space after the comma are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if allPrimary is false and no ids are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      allPrimary: false
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if allSecondary is false and no ids are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      allSecondary: false
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if valid ids and allPrimary false are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526',
+      allPrimary: false
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if valid ids and allSecondary false are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526',
+      allSecondary: false
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('restores specified items from the recycle bin', async () => {
@@ -127,12 +180,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     const result = await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
-      }
+      })
     });
 
     assert.equal(result, undefined);
@@ -148,10 +201,10 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com',
         allPrimary: true
-      }
+      })
     });
 
     assert(postRequestStub.calledOnce);
@@ -167,10 +220,10 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com',
         allSecondary: true
-      }
+      })
     });
 
     assert(postRequestStub.calledOnce);
@@ -186,11 +239,11 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com',
         allPrimary: true,
         allSecondary: true
-      }
+      })
     });
 
     assert(postRequestStub.calledOnce);
@@ -202,13 +255,13 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
-      }
-    } as any), new CommandError('Invalid request'));
+      })
+    }), new CommandError('Invalid request'));
   });
 
   it('verifies that the command will fail when one of the promises fails', async () => {
@@ -240,12 +293,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
 
     const result = await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9412, 1adcf0d6-3733-4c13-b883-c84a27905af4, 641e5c65-a981-4910-b094-c212115b6d54, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 1adcf0d6-3733-4c13-b883-c84a27905cfd, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322'
-      }
+      })
     });
 
     assert.equal(result, undefined);

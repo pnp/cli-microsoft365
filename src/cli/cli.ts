@@ -229,17 +229,27 @@ async function execute(rawArgs: string[]): Promise<void> {
               return cli.closeWithError(e.message, cli.optionsFromArgs, true);
             }
           }
-
-          continue;
         }
-
-        if (optionSetErrors.length > 0) {
+        else if (optionSetErrors.length > 0) {
           for (const error of optionSetErrors) {
             await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
           }
-
-          continue;
         }
+
+        const startProcessing = process.hrtime.bigint();
+        try {
+          await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          const endProcessing = process.hrtime.bigint();
+          timings.options.push(Number(endProcessing - startProcessing));
+        }
+        catch (e: any) {
+          const endProcessing = process.hrtime.bigint();
+          timings.options.push(Number(endProcessing - startProcessing));
+
+          return cli.closeWithError(e.message, cli.optionsFromArgs, false);
+        }
+
+        continue;
       }
     }
   }

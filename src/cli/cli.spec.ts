@@ -297,6 +297,32 @@ class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
   }
 }
 
+class MockCommandWithProcessedPromptedOption extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema processed prompt';
+  }
+
+  public get description(): string {
+    return 'Mock command with a prompted option requiring processing';
+  }
+
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string().refine(value => value.startsWith('https://'))
+    });
+  }
+
+  public async processOptions(options: any): Promise<void> {
+    if (options.url?.startsWith('/')) {
+      options.url = `https://contoso.sharepoint.com${options.url}`;
+    }
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+}
+
 const refinedSchemaOptions = z.strictObject({
   ...globalOptionsZod.shape,
   authType: z.string().optional(),
@@ -453,6 +479,8 @@ describe('cli', () => {
   let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
+  let mockCommandWithProcessedPromptedOption: Command;
+  let mockCommandWithProcessedPromptedOptionActionSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -479,6 +507,8 @@ describe('cli', () => {
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
+    mockCommandWithProcessedPromptedOption = new MockCommandWithProcessedPromptedOption();
+    mockCommandWithProcessedPromptedOptionActionSpy = sinon.spy(mockCommandWithProcessedPromptedOption, 'action');
 
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
@@ -502,7 +532,8 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
-      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
+      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithProcessedPromptedOption, 'cli-schema-processed-prompt-mock.js', 'help.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -515,6 +546,7 @@ describe('cli', () => {
     processExitStub.reset();
     md2plainSpy.resetHistory();
     mockCommandActionSpy.resetHistory();
+    mockCommandWithProcessedPromptedOptionActionSpy.resetHistory();
     sinonUtil.restore([
       cli.executeCommand,
       fs.existsSync,
@@ -530,6 +562,7 @@ describe('cli', () => {
       mockCommandWithSchema.action,
       mockCommand.commandAction,
       mockCommand.processOptions,
+      mockCommandWithProcessedPromptedOption.processOptions,
       prompt.forInput,
       prompt.forSelection,
       prompt.forConfirmation,
@@ -2024,7 +2057,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  14 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2037,7 +2070,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        10 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        11 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2050,7 +2083,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  14 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
@@ -2337,5 +2370,50 @@ describe('cli', () => {
       executeCommandSpy.firstCall.args[1].options.certificateBase64Encoded,
       undefined
     );
+  });
+
+  it('processes prompted options before retrying schema validation', async () => {
+    sinon.stub(prompt, 'forInput').resolves('/sites/Sales');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed prompt');
+
+    await cli.execute(['cli', 'mock', 'schema', 'processed', 'prompt']);
+
+    assert(mockCommandWithProcessedPromptedOptionActionSpy.calledOnce);
+    assert.strictEqual(
+      mockCommandWithProcessedPromptedOptionActionSpy.firstCall.args[1].options.url,
+      'https://contoso.sharepoint.com/sites/Sales'
+    );
+  });
+
+  it(`handles errors when processing prompted options`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed prompt');
+    sinon.stub(prompt, 'forInput').resolves('/sites/Sales');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(mockCommandWithProcessedPromptedOption, 'processOptions')
+      .onFirstCall().resolves()
+      .onSecondCall().rejects(new Error('Failed to process prompted options'));
+
+    await assert.rejects(
+      cli.execute(['cli', 'mock', 'schema', 'processed', 'prompt']),
+      /Failed to process prompted options/
+    );
+
+    assert(processExitStub.calledWith(1));
+    assert(mockCommandWithProcessedPromptedOptionActionSpy.notCalled);
   });
 });

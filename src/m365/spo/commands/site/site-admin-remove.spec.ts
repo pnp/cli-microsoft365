@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-admin-remove.js';
+import command, { options } from './site-admin-remove.js';
 import { spo } from '../../../../utils/spo.js';
 import { CommandError } from '../../../../Command.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -20,6 +20,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const listOfAdminsFromAdminSource = [
@@ -62,6 +63,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,34 +101,53 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
     auth.connection.spoUrl = undefined;
   });
 
-  it('fails validation if siteUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', userId: adminToRemoveId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'foo', userId: adminToRemoveId } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid GUID`);
   });
 
-  it('fails validation if userName is not a valid UPN', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userName is not a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userName: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid userName`);
   });
 
-  it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, groupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if groupId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, groupId: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `invalid is not a valid GUID`);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userId: adminToRemoveId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the siteUrl is a valid SharePoint URL and userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToRemoveId } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { siteUrl: siteUrl, userName: adminToRemoveUPN } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the siteUrl is a valid SharePoint URL and userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userName: adminToRemoveUPN } );
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when no user or group option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when multiple user or group options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToRemoveId, groupId: groupId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: siteUrl, userId: adminToRemoveId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts for confirmation before removing site admin if --force option is not passed for user option', async () => {
@@ -165,7 +186,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true }) });
     assert(promptStub.calledOnce);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
@@ -221,7 +242,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, asAdmin: true }) });
     assert(promptStub.calledOnce);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
@@ -237,7 +258,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
   it('aborts removing site admin when confirmation is not given', async () => {
     const promptStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToRemoveUPN } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToRemoveUPN }) });
     assert(promptStub.calledOnce);
   });
 
@@ -269,7 +290,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, force: true, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, force: true, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId,
@@ -308,7 +329,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, force: true, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, force: true, asAdmin: true, verbose: true }) });
     assert(loggerLogToStderrSpy.calledWith(`Removing site administrator as an administrator...`));
   });
 
@@ -343,7 +364,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToRemoveUPN, force: true, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToRemoveUPN, force: true, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId,
@@ -369,7 +390,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: primaryAdminId, force: true, asAdmin: true } }), new CommandError('You cannot remove the primary site collection administrator.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: primaryAdminId, force: true, asAdmin: true }) }), new CommandError('You cannot remove the primary site collection administrator.'));
   });
 
   it('correctly handles an error if trying to remove primary site collection administrator as admin by userName', async () => {
@@ -390,7 +411,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userName: primaryAdminUPN, force: true, asAdmin: true } }), new CommandError('You cannot remove the primary site collection administrator.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: primaryAdminUPN, force: true, asAdmin: true }) }), new CommandError('You cannot remove the primary site collection administrator.'));
   });
 
   it('removes a group from site collection admin by groupId as admin - for M365 Group', async () => {
@@ -429,7 +450,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, force: true, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, force: true, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId,
@@ -477,7 +498,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, force: true, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, force: true, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId,
@@ -525,7 +546,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupName: groupName, force: true, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupName: groupName, force: true, asAdmin: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       secondaryAdministratorsFieldsData: {
         siteId: siteId,
@@ -554,7 +575,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, force: true }) });
   });
 
   it('removes a user from site collection admins by userName', async () => {
@@ -577,7 +598,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToRemoveUPN, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToRemoveUPN, force: true }) });
   });
 
   it('removes a user from site collection admins by userName with verbose parameter', async () => {
@@ -600,7 +621,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, userName: adminToRemoveUPN, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userName: adminToRemoveUPN, force: true, verbose: true }) });
     assert(loggerLogToStderrSpy.calledWith(`Removing site administrator...`));
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       IsSiteAdmin: false
@@ -624,7 +645,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: primaryAdminId, force: true } }), new CommandError('You cannot remove the primary site collection administrator.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: primaryAdminId, force: true }) }), new CommandError('You cannot remove the primary site collection administrator.'));
   });
 
   it('removes a group from site collection admin by groupId', async () => {
@@ -644,7 +665,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupId: groupId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupId: groupId, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       IsSiteAdmin: false
     });
@@ -667,7 +688,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, groupName: groupName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, groupName: groupName, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       IsSiteAdmin: false
     });
@@ -677,7 +698,7 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
     sinon.stub(entraUser, 'getUpnByUserId').resolves(adminToRemoveUPN);
     sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true } }), new CommandError(`Cannot get site ${siteUrl}`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true }) }), new CommandError(`Cannot get site ${siteUrl}`));
   });
 
   it('correctly handles error when user is not found userId admin mode', async () => {
@@ -690,6 +711,6 @@ describe(commands.SITE_ADMIN_REMOVE, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true } }), new CommandError(`User not found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, userId: adminToRemoveId, asAdmin: true, force: true }) }), new CommandError(`User not found.`));
   });
 });

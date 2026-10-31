@@ -9,7 +9,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-remove.js';
+import command, { options } from './site-remove.js';
 import { odata } from '../../../../utils/odata.js';
 import { settingsNames } from '../../../../settingsNames.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
@@ -21,6 +21,7 @@ describe(commands.SITE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const siteUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -46,6 +47,7 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(spo, 'getSpoAdminUrl').resolves(adminUrl);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     (command as any).pollingInterval = 0;
   });
 
@@ -121,7 +123,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, permanent: true, force: true, verbose: true }) });
     assert(postStub.calledTwice);
     assert.strictEqual(postStub.firstCall.args[0].data.siteUrl, siteUrl);
     assert.strictEqual(postStub.secondCall.args[0].data.siteUrl, siteUrl);
@@ -153,7 +155,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, force: true, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -202,7 +204,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, permanent: true, force: true, verbose: true }) });
     assert(postStub.calledTwice);
     assert(deleteStub.calledOnce);
   });
@@ -238,7 +240,7 @@ describe(commands.SITE_REMOVE, () => {
 
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { url: siteUrl, permanent: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, permanent: true, force: true, verbose: true }) });
     assert(postStub.calledTwice);
     assert(deleteStub.notCalled);
   });
@@ -272,7 +274,7 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, fromRecycleBin: true, force: true, verbose: true }) });
     assert(deleteStub.calledOnce);
   });
 
@@ -307,7 +309,7 @@ describe(commands.SITE_REMOVE, () => {
 
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { url: `${siteUrl}/`, fromRecycleBin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: `${siteUrl}/`, fromRecycleBin: true, verbose: true }) });
     assert(postStub.calledOnce);
     assert(deleteStub.notCalled);
   });
@@ -315,7 +317,7 @@ describe(commands.SITE_REMOVE, () => {
   it('throws error if site is not found', async () => {
     sinon.stub(odata, 'getAllItems').resolves([]);
 
-    await assert.rejects(command.action(logger, { options: { url: siteUrl, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, verbose: true, force: true }) }),
       new CommandError('Site not found in the tenant.'));
   });
 
@@ -336,14 +338,14 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, fromRecycleBin: true, verbose: true, force: true }) }),
       new CommandError(errorMessage));
   });
 
   it('throws error if site has already been deleted when trying to remove it', async () => {
     sinon.stub(odata, 'getAllItems').resolves([{ ...siteDetailsNonGroup, TimeDeleted: new Date().toISOString() }]);
 
-    await assert.rejects(command.action(logger, { options: { url: siteUrl, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, verbose: true, force: true }) }),
       new CommandError('Site is already in the recycle bin. Use --fromRecycleBin to permanently delete it.'));
   });
 
@@ -356,12 +358,12 @@ describe(commands.SITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, verbose: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, fromRecycleBin: true, verbose: true, force: true }) }),
       new CommandError('Site is currently not in the recycle bin. Remove --fromRecycleBin if you want to remove it as active site.'));
   });
 
   it('prompts before removing the site when force option not passed', async () => {
-    await command.action(logger, { options: { url: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, verbose: true }) });
     assert(promptIssued);
   });
 
@@ -369,38 +371,44 @@ describe(commands.SITE_REMOVE, () => {
     const postStub = sinon.stub(request, 'post').resolves();
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { url: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, verbose: true }) });
     assert(postStub.notCalled);
     assert(deleteStub.notCalled);
   });
 
-  it('passes validation if siteUrl is a valid url', async () => {
-    const actual = await command.validate({ options: { url: siteUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if siteUrl is a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if only fromRecycleBin is specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only fromRecycleBin is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl, fromRecycleBin: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if only permanent is specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, permanent: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only permanent is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl, permanent: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if siteUrl is an invalid url', async () => {
-    const actual = await command.validate({ options: { url: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteUrl is an invalid url', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation when trying to remove the root site collection', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when trying to remove the root site collection', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' } );
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if both fromRecycleBin and permanent are specified', async () => {
-    const actual = await command.validate({ options: { url: siteUrl, fromRecycleBin: true, permanent: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both fromRecycleBin and permanent are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl, fromRecycleBin: true, permanent: true } );
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

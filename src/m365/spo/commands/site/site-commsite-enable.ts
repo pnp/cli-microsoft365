@@ -1,18 +1,31 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  designPackageId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID.`
+    })
+    .optional()
+    .alias('i'),
+  designPackage: z.enum(['Topic', 'Showcase', 'Blank']).optional().alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  designPackageId?: string;
-  designPackage?: string;
-  url: string;
 }
 
 class SpoSiteCommSiteEnableCommand extends SpoCommand {
@@ -24,65 +37,19 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     return 'Enables communication site features on the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        designPackageId: typeof args.options.designPackageId !== 'undefined',
-        designPackage: typeof args.options.designPackage !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => !(o.designPackageId && o.designPackage), {
+        error: `Specify either 'designPackageId' or 'designPackage', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['designPackageId', 'designPackage']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-i, --designPackageId [designPackageId]'
-      },
-      {
-        option: '-p, --designPackage [designPackage]',
-        autocomplete: ["Topic", "Showcase", "Blank"]
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['designPackageId', 'designPackage'],
-        runsWhen: (args) => args.options.designPackageId || args.options.designPackage
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.designPackageId &&
-          !validation.isValidGuid(args.options.designPackageId)) {
-          return `${args.options.designPackageId} is not a valid GUID.`;
-        }
-
-        if (args.options.designPackage) {
-          if (['Topic', 'Showcase', 'Blank'].indexOf(args.options.designPackage) === -1) {
-            return `${args.options.designPackage} is not a valid designPackage. Allowed values are Topic|Showcase|Blank`;
-          }
-        }
-
-        return validation.isValidSharePointUrl(args.options.url);
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

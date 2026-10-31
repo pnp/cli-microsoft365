@@ -9,7 +9,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-unarchive.js';
+import command, { options } from './site-unarchive.js';
 import request from '../../../../request.js';
 import config from '../../../../config.js';
 import { spo } from '../../../../utils/spo.js';
@@ -38,6 +38,7 @@ describe(commands.SITE_UNARCHIVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -54,6 +55,7 @@ describe(commands.SITE_UNARCHIVE, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,25 +99,31 @@ describe(commands.SITE_UNARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when a valid url is specified', async () => {
-    const actual = await command.validate({ options: { url: url } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when a valid url is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: url });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: url, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('aborts unarchiving site when prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { url: url } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: url }) });
     assert(postStub.notCalled);
   });
 
   it('prompts before unarchiving the site when force option is not passed', async () => {
-    await command.action(logger, { options: { url: url } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: url }) });
     assert(promptIssued);
   });
 
@@ -131,7 +139,7 @@ describe(commands.SITE_UNARCHIVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: url, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: url, verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, requestBody);
   });
 
@@ -144,7 +152,7 @@ describe(commands.SITE_UNARCHIVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: url, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: url, force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, requestBody);
   });
 
@@ -152,7 +160,7 @@ describe(commands.SITE_UNARCHIVE, () => {
     const errorMessage = 'File Not Found.';
 
     sinon.stub(request, 'post').resolves(`[{"SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.24817.12008","ErrorInfo":{"ErrorMessage":"${errorMessage}","ErrorValue":null,"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49","ErrorCode":-2147024894,"ErrorTypeName":"System.IO.FileNotFoundException"},"TraceCorrelationId":"731127a1-9041-8000-99fd-2865e0d78b49"}]`);
-    await assert.rejects(command.action(logger, { options: { url: url, force: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: url, force: true, verbose: true }) }),
       new CommandError(errorMessage));
   });
 });

@@ -1,22 +1,30 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  alias: z.string().alias('a'),
+  displayName: z.string().alias('n'),
+  description: z.string().optional().alias('d'),
+  classification: z.string().optional().alias('c'),
+  isPublic: z.boolean().optional(),
+  keepOldHomepage: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
-  alias: string;
-  displayName: string;
-  description?: string;
-  classification?: string;
-  isPublic?: boolean;
-  keepOldHomepage?: boolean;
 }
 
 class SpoSiteGroupifyCommand extends SpoCommand {
@@ -28,55 +36,8 @@ class SpoSiteGroupifyCommand extends SpoCommand {
     return 'Connects site collection to an Microsoft 365 Group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.description !== 'undefined',
-        classification: typeof args.options.classification !== 'undefined',
-        isPublic: args.options.isPublic === true,
-        keepOldHomepage: args.options.keepOldHomepage === true
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-a, --alias <alias>'
-      },
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '--isPublic'
-      },
-      {
-        option: '--keepOldHomepage'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

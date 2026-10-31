@@ -1,8 +1,9 @@
 import { setTimeout } from 'timers/promises';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
@@ -13,33 +14,36 @@ import { DeletedSiteProperties } from './DeletedSiteProperties.js';
 import { SiteProperties } from './SiteProperties.js';
 import { brandCenter } from '../../../../utils/brandCenter.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  type: z.enum(['TeamSite', 'CommunicationSite', 'ClassicSite', 'BrandCenter']).optional(),
+  title: z.string().optional().alias('t'),
+  alias: z.string().optional().alias('a'),
+  url: z.string().optional().alias('u'),
+  timeZone: z.coerce.number().optional().alias('z'),
+  description: z.string().optional().alias('d'),
+  lcid: z.coerce.number().optional().alias('l'),
+  owners: z.string().optional(),
+  isPublic: z.boolean().optional(),
+  classification: z.string().optional().alias('c'),
+  siteDesign: z.enum(['Topic', 'Showcase', 'Blank']).optional(),
+  siteDesignId: z.string().optional(),
+  shareByEmailEnabled: z.boolean().optional(),
+  webTemplate: z.string().optional().alias('w'),
+  resourceQuota: z.coerce.number().optional(),
+  resourceQuotaWarningLevel: z.coerce.number().optional(),
+  storageQuota: z.coerce.number().optional(),
+  storageQuotaWarningLevel: z.coerce.number().optional(),
+  removeDeletedSite: z.boolean().optional(),
+  withAppCatalog: z.boolean().optional(),
+  wait: z.boolean().optional(),
+  force: z.boolean().optional()
+});
+
+export declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  type?: string;
-  title?: string;
-  alias?: string;
-  description?: string;
-  classification?: string;
-  isPublic?: boolean;
-  lcid?: number;
-  url?: string;
-  owners: string;
-  shareByEmailEnabled?: boolean;
-  siteDesign?: string;
-  siteDesignId?: string;
-  timeZone?: string | number;
-  webTemplate?: string;
-  resourceQuota?: string | number;
-  resourceQuotaWarningLevel?: string | number;
-  storageQuota?: string | number;
-  storageQuotaWarningLevel?: string | number;
-  removeDeletedSite: boolean;
-  withAppCatalog?: boolean;
-  wait: boolean;
-  force?: boolean;
 }
 
 interface CreateGroupExResponse {
@@ -69,267 +73,107 @@ class SpoSiteAddCommand extends SpoCommand {
     return 'Creates new SharePoint Online site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      const telemetryProps: any = {};
-      const isClassicSite: boolean = args.options.type === 'ClassicSite';
-      const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
-      telemetryProps.siteType = args.options.type || 'TeamSite';
-      telemetryProps.description = (!(!args.options.description)).toString();
-      telemetryProps.classification = (!(!args.options.classification)).toString();
-      telemetryProps.isPublic = args.options.isPublic || false;
-      telemetryProps.lcid = args.options.lcid;
-      telemetryProps.owners = typeof args.options.owners !== 'undefined';
-      telemetryProps.withAppCatalog = args.options.withAppCatalog || false;
-      telemetryProps.force = args.options.force || false;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    const isTeamSite = (o: Options): boolean => o.type === undefined || o.type === 'TeamSite';
+    const isCommunicationSite = (o: Options): boolean => o.type === 'CommunicationSite' || o.type === 'BrandCenter';
+    const isClassicSite = (o: Options): boolean => o.type === 'ClassicSite';
 
-      if (isCommunicationSite) {
-        telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
-        telemetryProps.siteDesign = args.options.siteDesign;
-        telemetryProps.siteDesignId = (!(!args.options.siteDesignId)).toString();
-      }
-      else if (isClassicSite) {
-        telemetryProps.webTemplate = typeof args.options.webTemplate !== 'undefined';
-        telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
-        telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
-        telemetryProps.storageQuota = typeof args.options.storageQuota !== 'undefined';
-        telemetryProps.storageQuotaWarningLevel = typeof args.options.storageQuotaWarningLevel !== 'undefined';
-        telemetryProps.removeDeletedSite = args.options.removeDeletedSite;
-        telemetryProps.wait = args.options.wait;
-      }
-
-      Object.assign(this.telemetryProperties, telemetryProps);
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite', 'BrandCenter']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-a, --alias [alias]'
-      },
-      {
-        option: '-u, --url [url]'
-      },
-      {
-        option: '-z, --timeZone [timeZone]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --lcid [lcid]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--isPublic'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '--siteDesign [siteDesign]',
-        autocomplete: ['Topic', 'Showcase', 'Blank']
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--shareByEmailEnabled'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--removeDeletedSite'
-      },
-      {
-        option: '--withAppCatalog'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isClassicSite: boolean = args.options.type === 'ClassicSite';
-        const isCommunicationSite: boolean = args.options.type === 'CommunicationSite' || args.options.type === 'BrandCenter';
-        const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
-
-        if (args.options.type) {
-          if (args.options.type !== 'TeamSite' &&
-            args.options.type !== 'CommunicationSite' &&
-            args.options.type !== 'ClassicSite' &&
-            args.options.type !== 'BrandCenter') {
-            return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, ClassicSite, and BrandCenter`;
-          }
+    return schema
+      .refine(o => !isTeamSite(o) || o.alias !== undefined, {
+        error: 'Required option alias missing',
+        path: ['alias'],
+        params: {
+          customCode: 'required'
         }
-
-        if (isTeamSite) {
-          if (!args.options.alias) {
-            return 'Required option alias missing';
-          }
-
-          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate || args.options.force) {
-            return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
-          }
+      })
+      .refine(o => !isTeamSite(o) || !(o.url || o.siteDesign || o.removeDeletedSite || o.wait || o.shareByEmailEnabled || o.siteDesignId || o.timeZone || o.resourceQuota || o.resourceQuotaWarningLevel || o.storageQuota || o.storageQuotaWarningLevel || o.webTemplate || o.force), {
+        error: 'Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description'
+      })
+      .refine(o => !isCommunicationSite(o) || o.url !== undefined, {
+        error: 'Required option url missing',
+        path: ['url'],
+        params: {
+          customCode: 'required'
         }
-        else if (isCommunicationSite) {
-          if (!args.options.url) {
-            return 'Required option url missing';
-          }
-
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-
-          if (args.options.siteDesign) {
-            if (args.options.siteDesign !== 'Topic' &&
-              args.options.siteDesign !== 'Showcase' &&
-              args.options.siteDesign !== 'Blank') {
-              return `${args.options.siteDesign} is not a valid communication site type. Allowed types are Topic, Showcase and Blank`;
-            }
-          }
-
-          if (args.options.owners && args.options.owners.indexOf(",") > -1) {
-            return 'The CommunicationSite supports only one owner in the owners option';
-          }
-
-          if (args.options.siteDesignId) {
-            if (!validation.isValidGuid(args.options.siteDesignId)) {
-              return `${args.options.siteDesignId} is not a valid GUID`;
-            }
-          }
-
-          if (args.options.siteDesign && args.options.siteDesignId) {
-            return 'Specify siteDesign or siteDesignId but not both';
-          }
-
-          if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, siteDesignId, owners, description, and force";
-          }
+      })
+      .refine(o => !isCommunicationSite(o) || o.url === undefined || validation.isValidSharePointUrl(o.url) === true, {
+        error: e => `'${(e.input as Options).url}' is not a valid SharePoint Online site URL.`,
+        path: ['url']
+      })
+      .refine(o => !isCommunicationSite(o) || o.owners === undefined || o.owners.indexOf(',') === -1, {
+        error: 'The CommunicationSite supports only one owner in the owners option',
+        path: ['owners']
+      })
+      .refine(o => !isCommunicationSite(o) || o.siteDesignId === undefined || validation.isValidGuid(o.siteDesignId) === true, {
+        error: e => `${(e.input as Options).siteDesignId} is not a valid GUID`,
+        path: ['siteDesignId']
+      })
+      .refine(o => !isCommunicationSite(o) || !(o.siteDesign && o.siteDesignId), {
+        error: 'Specify siteDesign or siteDesignId but not both'
+      })
+      .refine(o => !isCommunicationSite(o) || !(o.timeZone || o.isPublic || o.removeDeletedSite || o.wait || o.alias || o.resourceQuota || o.resourceQuotaWarningLevel || o.storageQuota || o.storageQuotaWarningLevel || o.webTemplate), {
+        error: 'Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, siteDesignId, owners, description, and force'
+      })
+      .refine(o => !isClassicSite(o) || o.url !== undefined, {
+        error: 'Required option url missing',
+        path: ['url'],
+        params: {
+          customCode: 'required'
         }
-        else {
-          if (!args.options.url) {
-            return 'Required option url missing';
-          }
-
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
-
-          if (!args.options.owners) {
-            return 'Required option owner missing';
-          }
-
-          if (args.options.owners.indexOf(",") > -1) {
-            return 'The ClassicSite supports only one owner in the owners options';
-          }
-
-          if (!args.options.timeZone) {
-            return 'Required option timeZone missing';
-          }
-
-          if (typeof args.options.timeZone !== 'number') {
-            return `${args.options.timeZone} is not a number`;
-          }
-
-          if (args.options.resourceQuota &&
-            typeof args.options.resourceQuota !== 'number') {
-            return `${args.options.resourceQuota} is not a number`;
-          }
-
-          if (args.options.resourceQuotaWarningLevel &&
-            typeof args.options.resourceQuotaWarningLevel !== 'number') {
-            return `${args.options.resourceQuotaWarningLevel} is not a number`;
-          }
-
-          if (args.options.resourceQuotaWarningLevel &&
-            !args.options.resourceQuota) {
-            return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
-          }
-
-          if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
-            return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
-          }
-
-          if (args.options.storageQuota &&
-            typeof args.options.storageQuota !== 'number') {
-            return `${args.options.storageQuota} is not a number`;
-          }
-
-          if (args.options.storageQuotaWarningLevel &&
-            typeof args.options.storageQuotaWarningLevel !== 'number') {
-            return `${args.options.storageQuotaWarningLevel} is not a number`;
-          }
-
-          if (args.options.storageQuotaWarningLevel &&
-            !args.options.storageQuota) {
-            return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
-          }
-
-          if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
-            return `storageQuotaWarningLevel cannot exceed storageQuota`;
-          }
-
-          if (args.options.classification || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic || args.options.force) {
-            return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
-          }
+      })
+      .refine(o => !isClassicSite(o) || o.url === undefined || validation.isValidSharePointUrl(o.url) === true, {
+        error: e => `'${(e.input as Options).url}' is not a valid SharePoint Online site URL.`,
+        path: ['url']
+      })
+      .refine(o => !isClassicSite(o) || o.owners !== undefined, {
+        error: 'Required option owner missing',
+        path: ['owners'],
+        params: {
+          customCode: 'required'
         }
-
-        if (args.options.lcid) {
-          if (isNaN(args.options.lcid)) {
-            return `${args.options.lcid} is not a number`;
-          }
-
-          if (args.options.lcid < 0) {
-            return `LCID must be greater than 0 (${args.options.lcid})`;
-          }
-
-          if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
-            return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
-          }
+      })
+      .refine(o => !isClassicSite(o) || o.owners === undefined || o.owners.indexOf(',') === -1, {
+        error: 'The ClassicSite supports only one owner in the owners options',
+        path: ['owners']
+      })
+      .refine(o => !isClassicSite(o) || o.timeZone !== undefined, {
+        error: 'Required option timeZone missing',
+        path: ['timeZone'],
+        params: {
+          customCode: 'required'
         }
-
-        return true;
-      }
-    );
+      })
+      .refine(o => !isClassicSite(o) || o.resourceQuotaWarningLevel === undefined || o.resourceQuota !== undefined, {
+        error: 'You cannot specify resourceQuotaWarningLevel without specifying resourceQuota',
+        path: ['resourceQuotaWarningLevel']
+      })
+      .refine(o => !isClassicSite(o) || o.resourceQuotaWarningLevel === undefined || o.resourceQuota === undefined || o.resourceQuotaWarningLevel <= o.resourceQuota, {
+        error: 'resourceQuotaWarningLevel cannot exceed resourceQuota',
+        path: ['resourceQuotaWarningLevel']
+      })
+      .refine(o => !isClassicSite(o) || o.storageQuotaWarningLevel === undefined || o.storageQuota !== undefined, {
+        error: 'You cannot specify storageQuotaWarningLevel without specifying storageQuota',
+        path: ['storageQuotaWarningLevel']
+      })
+      .refine(o => !isClassicSite(o) || o.storageQuotaWarningLevel === undefined || o.storageQuota === undefined || o.storageQuotaWarningLevel <= o.storageQuota, {
+        error: 'storageQuotaWarningLevel cannot exceed storageQuota',
+        path: ['storageQuotaWarningLevel']
+      })
+      .refine(o => !isClassicSite(o) || !(o.classification || o.shareByEmailEnabled || o.siteDesignId || o.alias || o.isPublic || o.force), {
+        error: 'Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description'
+      })
+      .refine(o => o.lcid === undefined || o.lcid >= 0, {
+        error: e => `LCID must be greater than 0 (${(e.input as Options).lcid})`,
+        path: ['lcid']
+      })
+      .refine(o => o.lcid === undefined || this.supportedLcids.indexOf(o.lcid) >= 0, {
+        error: e => `LCID ${(e.input as Options).lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`,
+        path: ['lcid']
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -616,7 +460,7 @@ class SpoSiteAddCommand extends SpoCommand {
     return site.Status === 'Recycled';
   }
 
-  private async deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
+  private async deleteSiteFromTheRecycleBin(url: string, wait: boolean | undefined, logger: Logger): Promise<void> {
     this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
     if (this.verbose) {

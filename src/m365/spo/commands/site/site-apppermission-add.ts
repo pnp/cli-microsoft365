@@ -1,6 +1,7 @@
 import { Permission } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -13,20 +14,31 @@ interface AppInfo {
   displayName: string;
 }
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  permission: z.string().pipe(z.enum(['read', 'write', 'manage', 'fullcontrol']).alias('p')),
+  appId: z.string()
+    .refine(appId => validation.isValidGuid(appId) === true, {
+      error: e => `'${e.input}' is not a valid GUID.`
+    })
+    .optional()
+    .alias('i'),
+  appDisplayName: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  permission: string;
-  appId?: string;
-  appDisplayName?: string;
-}
-
 class SpoSiteAppPermissionAddCommand extends GraphCommand {
   private siteId: string = '';
-  private roles: string[] = ['read', 'write', 'manage', 'fullcontrol'];
 
   public get name(): string {
     return commands.SITE_APPPERMISSION_ADD;
@@ -36,61 +48,19 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     return 'Adds an application permissions to the site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appId: typeof args.options.appId !== 'undefined',
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
-        permissions: args.options.permissions
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => o.appId !== undefined || o.appDisplayName !== undefined, {
+        error: `Specify either 'appId' or 'appDisplayName'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['appId', 'appDisplayName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-p, --permission <permission>',
-        autocomplete: this.roles
-      },
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '-n, --appDisplayName [appDisplayName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
-        }
-
-        if (this.roles.indexOf(args.options.permission) === -1) {
-          return `${args.options.permission} is not a valid permission value. Allowed values are ${this.roles.join('|')}`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appDisplayName'], runsWhen: (args) => !args.options.appId && !args.options.appDisplayName });
   }
 
   private async getAppInfo(args: CommandArgs): Promise<AppInfo> {

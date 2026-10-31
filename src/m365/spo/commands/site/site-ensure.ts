@@ -1,42 +1,47 @@
 import chalk from 'chalk';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { WebProperties } from '../web/WebProperties.js';
-import { SharingCapabilities } from './SharingCapabilities.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  type: z.enum(['TeamSite', 'CommunicationSite', 'ClassicSite']).optional(),
+  title: z.string().alias('t'),
+  alias: z.string().optional().alias('a'),
+  timeZone: z.number().optional().alias('z'),
+  description: z.string().optional().alias('d'),
+  lcid: z.number().optional().alias('l'),
+  owners: z.string().optional(),
+  isPublic: z.boolean().optional(),
+  classification: z.string().optional().alias('c'),
+  siteDesign: z.enum(['Topic', 'Showcase', 'Blank']).optional(),
+  siteDesignId: z.string().optional(),
+  shareByEmailEnabled: z.boolean().optional(),
+  webTemplate: z.string().optional().alias('w'),
+  resourceQuota: z.number().optional(),
+  resourceQuotaWarningLevel: z.number().optional(),
+  storageQuota: z.number().optional(),
+  storageQuotaWarningLevel: z.number().optional(),
+  removeDeletedSite: z.boolean().optional(),
+  disableFlows: z.boolean().optional(),
+  sharingCapability: z.enum(['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']).optional(),
+  wait: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
-  // add
-  type?: string;
-  title: string;
-  alias?: string;
-  description?: string;
-  classification?: string;
-  isPublic?: boolean;
-  lcid?: number;
-  owners: string;
-  shareByEmailEnabled?: boolean;
-  siteDesign?: string;
-  siteDesignId?: string;
-  timeZone?: string | number;
-  webTemplate?: string;
-  resourceQuota?: string | number;
-  resourceQuotaWarningLevel?: string | number;
-  storageQuota?: string | number;
-  storageQuotaWarningLevel?: string | number;
-  removeDeletedSite: boolean;
-  wait: boolean;
-  // set
-  disableFlows?: boolean;
-  sharingCapability?: string;
 }
 
 class SpoSiteEnsureCommand extends SpoCommand {
@@ -48,97 +53,8 @@ class SpoSiteEnsureCommand extends SpoCommand {
     return 'Ensures that the particular site collection exists and updates its properties if necessary';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-a, --alias [alias]'
-      },
-      {
-        option: '-z, --timeZone [timeZone]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --lcid [lcid]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--isPublic'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '--siteDesign [siteDesign]',
-        autocomplete: ['Topic', 'Showcase', 'Blank']
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--shareByEmailEnabled'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--removeDeletedSite'
-      },
-      {
-        option: '--disableFlows [disableFlows]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
-      },
-      {
-        option: '--wait'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('disableFlows');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -208,8 +124,6 @@ class SpoSiteEnsureCommand extends SpoCommand {
         case 'ClassicSite':
           expectedWebTemplate = args.options.webTemplate || 'STS#0';
           break;
-        default:
-          throw `${args.options.type} is not a valid site type. Allowed types are TeamSite,CommunicationSite,ClassicSite`;
       }
 
       if (expectedWebTemplate) {
@@ -286,22 +200,6 @@ class SpoSiteEnsureCommand extends SpoCommand {
       args.options.siteDesignId,
       args.options.sharingCapability
     );
-  }
-
-  /**
-   * Maps the base sharingCapability enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  private get sharingCapabilities(): string[] {
-    const result: string[] = [];
-
-    for (const sharingCapability in SharingCapabilities) {
-      if (typeof SharingCapabilities[sharingCapability] === 'number') {
-        result.push(sharingCapability);
-      }
-    }
-
-    return result;
   }
 }
 
