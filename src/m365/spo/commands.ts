@@ -251,6 +251,7 @@ export default {
   REPORT_SITEUSAGEPAGES: `${prefix} report siteusagepages`,
   REPORT_SITEUSAGESITECOUNTS: `${prefix} report siteusagesitecounts`,
   REPORT_SITEUSAGESTORAGE: `${prefix} report siteusagestorage`,
+  REPORT_SITEVERSIONSTORAGEUSAGE_STATUS_GET: `${prefix} report siteversionstorageusage status get`,
   ROLEDEFINITION_ADD: `${prefix} roledefinition add`,
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,

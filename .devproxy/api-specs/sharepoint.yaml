@@ -153,6 +153,22 @@ paths:
       responses:
         200:
           description: OK
+  /_api/site/GetProgressForFileVersionExpirationReport(reportFileUrl={reportFileUrl}):
+    post:
+      parameters:
+        - name: reportFileUrl
+          in: path
+          required: true
+          description: URL-encoded server-relative path to the report file
+          schema:
+            type: string
+          example: "'%2Fsites%2Fmarketing%2Fshared%20documents%2FFileUsage.csv'"
+      security:
+        - delegated:
+          - AllSites.FullControl
+      responses:
+        200:
+          description: OK
   /_api/site/VersionPolicyForNewLibrariesTemplate:
     get:
       parameters:
