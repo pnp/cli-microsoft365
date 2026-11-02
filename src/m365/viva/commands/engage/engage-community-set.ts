@@ -52,10 +52,10 @@ class VivaEngageCommunitySetCommand extends GraphCommand {
         }
       })
       .refine(opts => !opts.newDisplayName || opts.newDisplayName.length <= 255, {
-        message: "The maximum amount of characters for 'newDisplayName' is 255."
+        message: `The maximum amount of characters for 'newDisplayName' is 255.`
       })
       .refine(opts => !opts.description || opts.description.length <= 1024, {
-        message: "The maximum amount of characters for 'description' is 1024."
+        message: `The maximum amount of characters for 'description' is 1024.`
       })
       .refine(opts => opts.newDisplayName || opts.description || opts.privacy, {
         message: 'Specify at least newDisplayName, description, or privacy.',

@@ -45,10 +45,10 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => opts.displayName.length <= 255, {
-        message: "The maximum amount of characters for 'displayName' is 255."
+        message: `The maximum amount of characters for 'displayName' is 255.`
       })
       .refine(opts => opts.description.length <= 1024, {
-        message: "The maximum amount of characters for 'description' is 1024."
+        message: `The maximum amount of characters for 'description' is 1024.`
       })
       .superRefine((opts, ctx) => {
         if (opts.adminEntraIds) {
@@ -91,7 +91,11 @@ class VivaEngageCommunityAddCommand extends GraphCommand {
         message: 'Maximum of 20 admins allowed. Please reduce the number of users and try again.'
       })
       .refine(opts => !opts.adminEntraIds || !opts.adminEntraUserNames, {
-        message: 'Specify either adminEntraIds or adminEntraUserNames, but not both.'
+        message: 'Specify either adminEntraIds or adminEntraUserNames, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['adminEntraIds', 'adminEntraUserNames']
+        }
       });
   }
 

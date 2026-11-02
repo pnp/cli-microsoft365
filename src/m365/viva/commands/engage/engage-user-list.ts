@@ -42,10 +42,10 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !opts.letter || /^(?!\d)[a-zA-Z]+$/i.test(opts.letter), {
-        message: "Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed."
+        message: `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`
       })
       .refine(opts => !opts.letter || opts.letter.length === 1, {
-        message: "Only one char as value of 'letter' accepted."
+        message: `Only one char as value of 'letter' accepted.`
       });
   }
 
