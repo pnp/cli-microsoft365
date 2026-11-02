@@ -360,4 +360,24 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
     assert.strictEqual(actual.success, true);
   });
+
+  it('rejects empty and non-finite values for all numeric options', () => {
+    const numericOptions = [
+      'MinCompatibilityLevel',
+      'MaxCompatibilityLevel',
+      'RequireAnonymousLinksExpireInDays',
+      'OneDriveStorageQuota',
+      'IPAddressWACTokenLifetime',
+      'OrphanedPersonalSitesRetentionPeriod',
+      'EmailAttestationReAuthDays'
+    ];
+    const invalidValues = ['', '   ', 'Infinity', '-Infinity', 'NaN'];
+
+    numericOptions.forEach(option => {
+      invalidValues.forEach(value => {
+        const actual = commandOptionsSchema.safeParse({ [option]: value });
+        assert.strictEqual(actual.success, false, `${option} should reject '${value}'`);
+      });
+    });
+  });
 });
