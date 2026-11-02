@@ -257,4 +257,25 @@ describe(commands.AGENT_BLUEPRINTPRINCIPAL_LIST, () => {
 
     assert(loggerLogSpy.calledWith(limitedResponse));
   });
+
+  it('preserves default properties when properties contains no property names', async () => {
+    sinon.stub(request, 'get').resolves({
+      value: response
+    });
+
+    cli.commandToExecute = commandInfo;
+    cli.commandToExecute.defaultProperties = command.defaultProperties();
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        properties: ' , ',
+        output: 'text'
+      })
+    });
+
+    assert.deepStrictEqual(
+      cli.commandToExecute.defaultProperties,
+      ['id', 'appDisplayName', 'appId']
+    );
+  });
 });
