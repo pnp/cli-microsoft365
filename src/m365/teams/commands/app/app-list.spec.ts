@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-list.js';
+import command, { options } from './app-list.js';
 
 describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.APP_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -68,14 +70,19 @@ describe(commands.APP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'distributionMethod']);
   });
 
-  it('fails validation if invalid distribution method specified', async () => {
-    const actual = await command.validate({ options: { distributionMethod: 'invalid distribution method' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid distribution method specified', () => {
+    const actual = commandOptionsSchema.safeParse({ distributionMethod: 'invalid distribution method' });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation if valid distribution method specified', async () => {
-    const actual = await command.validate({ options: { distributionMethod: 'store' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid distribution method specified', () => {
+    const actual = commandOptionsSchema.safeParse({ distributionMethod: 'store' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('lists Microsoft Teams apps in the organization app catalog', async () => {
@@ -96,7 +103,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { distributionMethod: 'organization' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ distributionMethod: 'organization' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
@@ -137,7 +144,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { all: true, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "012be6ac-6f34-4ffa-9344-b857f7bc74e1",
@@ -173,6 +180,14 @@ describe(commands.APP_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) } as any), new CommandError('An error has occurred'));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      distributionMethod: 'organization',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
