@@ -410,4 +410,30 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
       HostProperties: hostProperties
     });
   });
+
+  it('should clear the application customizer title when newTitle is empty', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions(guid'${id}')`) {
+        return singleResponse.value[0];
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        id,
+        webUrl,
+        scope: 'Web',
+        newTitle: ''
+      })
+    });
+
+    assert(updateCallsSpy.calledOnce);
+    assert.deepStrictEqual(updateCallsSpy.firstCall.args[0].data, {
+      Title: '',
+      HostProperties: undefined
+    });
+  });
 });

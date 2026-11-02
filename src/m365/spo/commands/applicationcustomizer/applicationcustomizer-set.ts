@@ -99,7 +99,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
       HostProperties: hostProperties
     };
 
-    if (newTitle) {
+    if (newTitle !== undefined) {
       requestBody.Title = newTitle;
     }
 
