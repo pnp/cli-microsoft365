@@ -14,7 +14,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l')
+  location: z.string().pipe(z.enum(['QuickLaunch', 'TopNavigationBar'])).alias('l')
 });
 declare type Options = z.infer<typeof options>;
 

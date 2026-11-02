@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import { z } from 'zod';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -13,7 +13,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l'),
+  location: z.string().pipe(z.enum(['QuickLaunch', 'TopNavigationBar'])).alias('l'),
   id: z.int().positive(),
   title: z.string().min(1, 'Cannot be empty.').optional(),
   url: z.string().optional(),
