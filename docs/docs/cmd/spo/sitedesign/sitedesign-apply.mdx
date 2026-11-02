@@ -15,17 +15,27 @@ m365 spo sitedesign apply [options]
 ## Options
 
 ```md definition-list
-`-i, --id <id>`
-: The ID of the site design to apply
+`-i, --id [id]`
+: The ID of the site design to apply. Specify either `id` or `template` but not both.
+
+`--template [template]`
+: The name of a built-in Microsoft site design to apply (e.g. `Event`, `Department`, `HumanResources`). Specify either `id` or `template` but not both.
 
 `-u, --webUrl <webUrl>`
 : The URL of the site to apply the site design to
 
 `--asTask`
-: Apply site design as task. Required for large site designs
+: Apply site design as task. Required for large site designs. Not supported when applying a built-in site design (`builtIn` or `template`)
+
+`-b, --builtIn`
+: Apply the site design specified through `id` from the built-in Microsoft site designs store instead of the site designs registered on the tenant. Automatically implied when using `template`
 ```
 
 <Global />
+
+## Remarks
+
+Use [spo sitedesign list --builtIn](./sitedesign-list.mdx) to discover the available values for `template`, along with the matching `id` that can be used together with `builtIn`.
 
 ## Examples
 
@@ -39,6 +49,18 @@ Apply large site design to the specified site
 
 ```sh
 m365 spo sitedesign apply --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
+```
+
+Apply the built-in Microsoft _Event_ site design to the specified site
+
+```sh
+m365 spo sitedesign apply --template Event --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Apply a built-in Microsoft site design by ID to the specified site
+
+```sh
+m365 spo sitedesign apply --id 3d5ef50b-88a0-42a7-9fb2-8036009f6f42 --builtIn --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## Response
