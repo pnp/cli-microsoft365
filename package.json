@@ -288,9 +288,9 @@
   "dependencies": {
     "@azure/msal-common": "^16.14.2",
     "@azure/msal-node": "^7.1.0",
-    "@inquirer/confirm": "^6.3.3",
-    "@inquirer/input": "^5.1.7",
-    "@inquirer/select": "^5.2.6",
+    "@inquirer/confirm": "^6.3.4",
+    "@inquirer/input": "^5.1.8",
+    "@inquirer/select": "^5.2.7",
     "@xmldom/xmldom": "^0.9.12",
     "adaptive-expressions": "^4.23.3",
     "adaptivecards": "^3.0.6",
