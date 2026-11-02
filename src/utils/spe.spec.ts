@@ -71,7 +71,7 @@ describe('utils/spe', () => {
 
   it('correctly retrieves the container type ID by name when using getContainerTypeIdByName', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 1')}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 1')}'`) {
         return [
           containerTypeResponse[0]
         ];
@@ -86,7 +86,7 @@ describe('utils/spe', () => {
 
   it('correctly throws error when name not found when using getContainerTypeIdByName', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 5')}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 5')}'`) {
         return [];
       }
 
@@ -99,7 +99,7 @@ describe('utils/spe', () => {
 
   it('correctly handles multiple results when using getContainerTypeIdByName', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `https://graph.microsoft.com/beta/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 1')}'`) {
+      if (url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containerTypes?$select=id,name&$filter=name eq '${formatting.encodeQueryParameter('Container Type 1')}'`) {
         return containerTypeResponse;
       }
 

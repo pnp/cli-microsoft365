@@ -339,6 +339,7 @@ spe container activate|Activates a container
 spe container add|Creates a new container
 spe container get|Gets a container of a specific container type
 spe container list|Lists all Container Types
+spe container permission add|Adds permission to SharePoint Embedded Container for a specified user
 spe container permission list|Lists permissions of a SharePoint Embedded Container
 spe container permission remove|Removes SharePoint Embedded Container permission
 spe container recyclebinitem list|Lists deleted containers of a specific container type
