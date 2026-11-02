@@ -196,7 +196,7 @@ describe(commands.CALENDAR_GET, () => {
 
   it('correctly retrieves a calendar by name for a user specified by name from a calendar group specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userName}')/calendarGroups/${calendarGroupId}/calendars?$filter=name eq '${formatting.encodeQueryParameter(calendarName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/calendarGroups/${calendarGroupId}/calendars?$filter=name eq '${ formatting.encodeQueryParameter(calendarName) }'`) {
         return {
           value: [response]
         };
