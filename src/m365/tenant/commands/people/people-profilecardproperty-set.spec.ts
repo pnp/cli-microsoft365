@@ -233,7 +233,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName }) } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName, displayName: displayName }) }),
       new CommandError(errorMessage));
   });
 });

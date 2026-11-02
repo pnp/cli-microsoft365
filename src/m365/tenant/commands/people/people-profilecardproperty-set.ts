@@ -14,7 +14,7 @@ export const options = z.looseObject({
     .transform(value => customAttributePropertyNames.find(p => p.toLowerCase() === value.toLowerCase()) ?? value)
     .pipe(z.enum(customAttributePropertyNames))
     .alias('n'),
-  displayName: z.string().optional().alias('d')
+  displayName: z.string().alias('d')
 });
 
 declare type Options = z.infer<typeof options>;
