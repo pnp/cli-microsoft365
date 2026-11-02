@@ -29,6 +29,7 @@ function parseObject(schema: JSONSchema.JSONSchema, options: CommandOptionInfo[]
       name: key,
       long: key,
       short: (property as any)['x-alias'],
+      autocomplete: (property as any)['x-autocomplete'],
       required: schema.required?.includes(key) && (property as any).default === undefined || false,
       type: 'string'
     };

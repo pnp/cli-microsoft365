@@ -10,7 +10,11 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  enabled: z.enum(['true', 'false']).transform(v => v === 'true').alias('e'),
+  enabled: z.string()
+    .pipe(z.enum(['true', 'false']))
+    .transform(v => v === 'true')
+    .autocomplete(['true', 'false'])
+    .alias('e'),
   force: z.boolean().optional().alias('f')
 });
 

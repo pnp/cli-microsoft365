@@ -83,6 +83,12 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('has autocomplete values for the enabled option', () => {
+    const enabledOption = commandInfo.options.find(option => option.name === 'enabled');
+
+    assert.deepStrictEqual(enabledOption?.autocomplete, ['true', 'false']);
+  });
+
   it('enables the service principal (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -259,5 +265,18 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   it('passes validation when the enabled option is false', () => {
     const actual = commandOptionsSchema.safeParse({ enabled: 'false' });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('returns a promptable validation issue when the enabled option is missing', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+    if (actual.success) {
+      assert.fail('Expected validation to fail');
+    }
+
+    const enabledIssue = actual.error.issues.find(issue => issue.path[0] === 'enabled');
+    assert.strictEqual(enabledIssue?.code, 'invalid_type');
+    assert.strictEqual(enabledIssue?.input, undefined);
   });
 });
