@@ -225,6 +225,11 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('passes validation if the hostProperties option is empty', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, hostProperties: '' });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('handles error when tenant app catalog doesn\'t exist', async () => {
     const errorMessage = 'No app catalog URL found';
 

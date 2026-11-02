@@ -105,7 +105,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, title: customizerTitle, verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, title: customizerTitle, verbose: true, output: 'none' }) });
     assert.strictEqual(executeCommandCalled, true);
   });
 

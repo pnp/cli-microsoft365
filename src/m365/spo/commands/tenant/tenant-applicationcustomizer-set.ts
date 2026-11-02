@@ -27,6 +27,9 @@ export const options = z.strictObject({
     catch { return false; }
   }, { message: 'clientSideComponentProperties is not valid JSON' }).optional().alias('p'),
   hostProperties: z.string().refine(val => {
+    if (val === '') {
+      return true;
+    }
     try { JSON.parse(val); return true; }
     catch { return false; }
   }, { message: 'hostProperties is not valid JSON' }).optional(),
