@@ -1126,4 +1126,24 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/apps', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation if timeZone is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/apps',
+      owner: 'user@contoso.com',
+      timeZone: ''
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if timeZone is not finite', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/apps',
+      owner: 'user@contoso.com',
+      timeZone: 'Infinity'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
 });

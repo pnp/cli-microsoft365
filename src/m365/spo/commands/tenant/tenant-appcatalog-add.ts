@@ -10,11 +10,14 @@ import spoSiteGetCommand from '../site/site-get.js';
 import spoSiteRemoveCommand from '../site/site-remove.js';
 import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
 
+const isNonEmptyFiniteNumber = (value: string): boolean =>
+  value.trim().length > 0 && Number.isFinite(Number(value));
+
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   url: z.string().refine(val => validation.isValidSharePointUrl(val) === true, { message: 'The value is not a valid SharePoint site URL.' }).alias('u'),
   owner: z.string(),
-  timeZone: z.string().refine(val => !isNaN(Number(val)), { message: 'timeZone is not a number' }).alias('z'),
+  timeZone: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'timeZone is not a number' }).alias('z'),
   wait: z.boolean().optional(),
   force: z.boolean().optional()
 });

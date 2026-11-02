@@ -532,4 +532,21 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError(`The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.`));
   });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['', ' ', 'foo', 'NaN', 'Infinity', '-1', '0', '1.5'];
+
+    for (const invalidId of invalidIds) {
+      const actual = commandOptionsSchema.safeParse({
+        id: invalidId,
+        newTitle
+      });
+
+      assert.strictEqual(
+        actual.success,
+        false,
+        `Expected id '${invalidId}' to be rejected`
+      );
+    }
+  });
 });

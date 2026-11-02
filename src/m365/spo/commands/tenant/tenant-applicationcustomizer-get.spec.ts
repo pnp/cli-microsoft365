@@ -453,4 +453,18 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       })
     }), new CommandError(errorMessage));
   });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['', ' ', 'foo', 'NaN', 'Infinity', '-1', '0', '1.5'];
+
+    for (const invalidId of invalidIds) {
+      const actual = commandOptionsSchema.safeParse({ id: invalidId });
+
+      assert.strictEqual(
+        actual.success,
+        false,
+        `Expected id '${invalidId}' to be rejected`
+      );
+    }
+  });
 });

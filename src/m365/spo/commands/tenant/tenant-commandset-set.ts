@@ -14,7 +14,11 @@ const locations = ['ContextMenu', 'CommandBar', 'Both'] as const;
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().alias('i'),
+  id: z.string()
+    .refine(val => validation.isValidPositiveInteger(val), {
+      message: 'id is not a valid list item ID'
+    })
+    .alias('i'),
   newTitle: z.string().optional().alias('t'),
   listType: z.enum(listTypes).optional().alias('l'),
   clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
@@ -43,7 +47,13 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
   }
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
-    return schema.refine(opts => opts.newTitle || opts.listType || opts.clientSideComponentId || opts.clientSideComponentProperties || opts.webTemplate || opts.location, {
+    return schema.refine(opts =>
+      opts.newTitle !== undefined ||
+      opts.listType !== undefined ||
+      opts.clientSideComponentId !== undefined ||
+      opts.clientSideComponentProperties !== undefined ||
+      opts.webTemplate !== undefined ||
+      opts.location !== undefined, {
       error: 'Specify at least one property to update'
     });
   }

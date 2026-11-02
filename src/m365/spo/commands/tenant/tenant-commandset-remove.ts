@@ -15,7 +15,12 @@ import { ListItemInstance } from '../listitem/ListItemInstance.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   title: z.string().optional().alias('t'),
-  id: z.string().refine(val => Number.isFinite(Number(val)), { message: 'id is not a valid list item ID' }).optional().alias('i'),
+  id: z.string()
+    .refine(val => validation.isValidPositiveInteger(val), {
+      message: 'id is not a valid list item ID'
+    })
+    .optional()
+    .alias('i'),
   clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
   force: z.boolean().optional().alias('f')
 });

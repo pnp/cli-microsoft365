@@ -364,4 +364,39 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
     const actual = commandOptionsSchema.safeParse({ id: id, newTitle: title, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties });
     assert.strictEqual(actual.success, true);
   });
+
+  it('passes validation when clearing clientSideComponentProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      clientSideComponentProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when clearing webTemplate', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      webTemplate: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['', ' ', 'foo', 'NaN', 'Infinity', '-1', '0', '1.5'];
+
+    for (const invalidId of invalidIds) {
+      const actual = commandOptionsSchema.safeParse({
+        id: invalidId,
+        newTitle: title
+      });
+
+      assert.strictEqual(
+        actual.success,
+        false,
+        `Expected id '${invalidId}' to be rejected`
+      );
+    }
+  });
 });
