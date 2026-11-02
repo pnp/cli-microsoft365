@@ -1,9 +1,13 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpoContentTypeHubGetCommand extends SpoCommand {
   public get name(): string {
@@ -12,6 +16,10 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Returns the URL of the SharePoint Content Type Hub of the Tenant';
+  }
+
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {
