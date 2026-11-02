@@ -13,7 +13,7 @@ import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import { ResultTableRow } from './search/datatypes/ResultTableRow.js';
 import { SearchResult } from './search/datatypes/SearchResult.js';
-import command from './spo-search.js';
+import command, { options } from './spo-search.js';
 
 enum TestID {
   None,
@@ -53,6 +53,7 @@ describe(commands.SEARCH, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let returnArrayLength = 0;
   let executedTest: TestID = TestID.None;
   const urlContains = (opts: any, substring: string): boolean => {
@@ -331,6 +332,7 @@ describe(commands.SEARCH, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -372,11 +374,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         queryText: '*'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
@@ -386,10 +388,10 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: 'IsDocument:1'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
@@ -399,12 +401,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: 'IsDocument:1',
         allResults: true,
         rowLimit: 1
-      }
+      })
     });
     assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocId2Test);
   });
@@ -413,11 +415,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         trimDuplicates: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryAll_WithTrimDuplicatesTest);
@@ -427,11 +429,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         sortList: 'Rank:ascending'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_SortListTest);
@@ -441,11 +443,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         enableStemming: false
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryAll_WithEnableStemmingTest);
@@ -455,11 +457,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         enableStemming: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
@@ -469,11 +471,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         culture: 1043
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 1);
     assert.strictEqual(executedTest, TestID.QueryAll_WithCultureTest);
@@ -483,13 +485,13 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         queryText: 'IsDocument:1',
         allResults: true,
         verbose: true,
         rowLimit: 1
-      }
+      })
     });
     assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocId2Test);
   });
@@ -498,12 +500,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         queryText: 'IsDocument:1',
         allResults: true,
         verbose: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryDocuments_WithDocIdAllTest);
@@ -513,11 +515,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: 'IsDocument:1',
         selectProperties: 'Path'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
@@ -527,11 +529,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         refinementFilters: 'fileExtension:equals("docx")'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryAll_WithRefinementFiltersTest);
@@ -541,11 +543,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         queryTemplate: '{searchterms} fileType:docx'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 2);
     assert.strictEqual(executedTest, TestID.QueryAll_WithQueryTemplateTest);
@@ -555,11 +557,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         sourceId: '6e71030e-5e16-4406-9bff-9c1829843083'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 1);
     assert.strictEqual(executedTest, TestID.QueryAll_WithSourceIdTest);
@@ -569,11 +571,11 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         queryText: '*',
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithRankingModelIdTest);
@@ -583,12 +585,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         rowLimit: 1
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 1);
     assert.strictEqual(executedTest, TestID.QueryAll_WithRowLimitTest);
@@ -598,12 +600,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         startRow: 1
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 3);
     assert.strictEqual(executedTest, TestID.QueryAll_WithStartRowTest);
@@ -613,12 +615,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         properties: 'termid:guid'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithPropertiesTest);
@@ -628,12 +630,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         sourceName: 'Local SharePoint Results'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
@@ -643,13 +645,13 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         properties: 'some:property,',
         sourceName: 'Local SharePoint Results'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
@@ -659,13 +661,13 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         properties: 'some:property',
         sourceName: 'Local SharePoint Results'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
@@ -675,12 +677,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         refiners: 'author,size'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithRefinersTest);
@@ -690,12 +692,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         webUrl: 'https://contoso.sharepoint.com/sites/subsite'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithWebTest);
@@ -705,12 +707,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         hiddenConstraints: 'developer'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithHiddenConstraintsTest);
@@ -720,12 +722,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         clientType: 'custom'
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithClientTypeTest);
@@ -735,12 +737,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         enablePhonetic: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithEnablePhoneticTest);
@@ -750,12 +752,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         processBestBets: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithProcessBestBetsTest);
@@ -765,12 +767,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         enableQueryRules: false
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithEnableQueryRulesTest);
@@ -780,12 +782,12 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'text',
         debug: true,
         queryText: '*',
         processPersonalFavorites: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_WithProcessPersonalFavoritesTest);
@@ -795,96 +797,80 @@ describe(commands.SEARCH, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         debug: true,
         queryText: '*',
         rawOutput: true
-      }
+      })
     });
     assert.strictEqual(returnArrayLength, 4);
     assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
   });
 
-  it('fails validation if the sourceId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        sourceId: '123',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the sourceId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      sourceId: '123',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the sourceId is a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the sourceId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the rankingModelId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        rankingModelId: '123',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the rankingModelId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rankingModelId: '123',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the rankingModelId is a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the rankingModelId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the rowLimit is not a valid number', async () => {
-    const actual = await command.validate({
-      options: {
-        rowLimit: '1X',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the rowLimit is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      rowLimit: '1X',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the startRow is not a valid number', async () => {
-    const actual = await command.validate({
-      options: {
-        startRow: '1X',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the startRow is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      startRow: '1X',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if startRow is set together with allResults', async () => {
-    const actual = await command.validate({
-      options: {
-        startRow: 1,
-        allResults: true,
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if startRow is set together with allResults', () => {
+    const actual = commandOptionsSchema.safeParse({
+      startRow: 1,
+      allResults: true,
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the culture is not a valid number', async () => {
-    const actual = await command.validate({
-      options: {
-        culture: '1X',
-        queryText: '*'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the culture is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      culture: '1X',
+      queryText: '*'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('command correctly handles reject request', async () => {
@@ -908,36 +894,34 @@ describe(commands.SEARCH, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    } as any), new CommandError(err));
+        webUrl: 'https://contoso.sharepoint.com',
+        queryText: '*'
+      })
+    }), new CommandError(err));
   });
 
-  it('supports specifying queryText', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<queryText>') > -1) {
-        containsTypeOption = true;
-      }
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      queryText: '*',
+      unknownOption: 'value'
     });
-    assert(containsTypeOption);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if all options are provided', async () => {
-    const actual = await command.validate({ options: { queryText: '*' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '*' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if sortList is in an invalid format', async () => {
-    const actual = await command.validate({ options: { queryText: '*', sortList: 'property1:wrongvalue' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if sortList is in an invalid format', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '*', sortList: 'property1:wrongvalue' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if sortList is in a valid format', async () => {
-    const actual = await command.validate({ options: { queryText: '*', sortList: 'property1:ascending,property2:descending' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if sortList is in a valid format', () => {
+    const actual = commandOptionsSchema.safeParse({ queryText: '*', sortList: 'property1:ascending,property2:descending' });
+    assert.strictEqual(actual.success, true);
   });
-}); 
+});
