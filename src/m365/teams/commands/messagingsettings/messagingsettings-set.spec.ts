@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './messagingsettings-set.js';
+import command, { options } from './messagingsettings-set.js';
 
 describe(commands.MESSAGINGSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -62,13 +64,35 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with only the required teamId', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if the teamId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the teamId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if allowUserEditMessages is false', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+      allowUserEditMessages: false
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '26be5f98-e66b-4e0a-bc37-1e6b1b8e5b7b',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('sets the allowUserEditMessages setting to true', async () => {
@@ -86,8 +110,8 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: true }
-    } as any);
+      options: commandOptionsSchema.parse({ teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: true })
+    });
   });
 
   it('sets allowOwnerDeleteMessages, allowTeamMentions and allowChannelMentions to true', async () => {
@@ -107,8 +131,8 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: true, allowTeamMentions: true, allowChannelMentions: true }
-    } as any);
+      options: commandOptionsSchema.parse({ teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: true, allowTeamMentions: true, allowChannelMentions: true })
+    });
   });
 
   it('should handle Microsoft graph error response', async () => {
@@ -130,42 +154,12 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         allowOwnerDeleteMessages: true,
         allowTeamMentions: true,
         allowChannelMentions: true
-      }
-    } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
-  });
-
-  it('fails validation if the teamId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the teamId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if allowUserEditMessages is doublicated', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        allowUserEditMessages: [true, false]
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if allowUserEditMessages is false', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        allowUserEditMessages: false
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+      })
+    }), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 });
