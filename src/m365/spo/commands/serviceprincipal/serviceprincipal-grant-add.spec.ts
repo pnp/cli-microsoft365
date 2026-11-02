@@ -194,4 +194,18 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
   });
+
+  it('fails validation when resource is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      scope: 'Mail.Read'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when scope is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      resource: 'Microsoft Graph'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });

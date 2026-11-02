@@ -567,7 +567,7 @@ export default abstract class Command {
     return '';
   }
 
-  private getTelemetryProperties(args: any): any {
+  protected getTelemetryProperties(args: any): any {
     if (this.schema) {
       const telemetryProperties: any = {};
       this.optionsInfo.forEach(o => {

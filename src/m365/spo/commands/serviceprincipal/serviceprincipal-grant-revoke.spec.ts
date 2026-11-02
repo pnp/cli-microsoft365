@@ -265,4 +265,10 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
   });
+
+  it('fails validation when id is missing', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+  });
 });

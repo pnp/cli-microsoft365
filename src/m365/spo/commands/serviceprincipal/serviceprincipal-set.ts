@@ -88,6 +88,13 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
       this.handleRejectedPromise(err);
     }
   }
+
+  protected getTelemetryProperties(args: CommandArgs): any {
+    return {
+      ...super.getTelemetryProperties(args),
+      enabled: args.options.enabled
+    };
+  }
 }
 
 export default new SpoServicePrincipalSetCommand();
