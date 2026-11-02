@@ -276,7 +276,7 @@
     },
     "mocha": {
       "diff": "8.0.4",
-      "serialize-javascript": "7.1.2"
+      "serialize-javascript": "7.1.4"
     },
     "jsonwebtoken": {
       "jws": "3.2.3"
