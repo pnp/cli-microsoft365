@@ -62,7 +62,7 @@
         "@types/omelette": "^0.4.5",
         "@types/proper-lockfile": "^4.1.4",
         "@types/semver": "^7.8.0",
-        "@types/sinon": "^22.0.0",
+        "@types/sinon": "^22.0.2",
         "@types/update-notifier": "^6.0.8",
         "@types/uuid": "^10.0.0",
         "@types/yargs-parser": "^21.0.3",
@@ -864,19 +864,14 @@
       "license": "MIT"
     },
     "node_modules/@types/sinon": {
-      "version": "22.0.0",
-      "resolved": "https://registry.npmjs.org/@types/sinon/-/sinon-22.0.0.tgz",
-      "integrity": "sha512-TDbVpbccc2HfiqHR09Argj3mHV1KMW7sCCKj52fsl8lbRLkEn7fB1966EWhOKWUBcqfBueZuPoA7/OK1CKiy3g==",
+      "version": "22.0.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/sinon/-/sinon-22.0.2.tgz",
+      "integrity": "sha512-2qLRFlluKkn6mci189eKhlOsHcdFpsn/9+29S4VmwKCpfb+vseKrZSSOSy5259yzIpP/y4gLfqQfIIR/lZn4Ng==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@types/sinonjs__fake-timers": "*"
+        "@sinonjs/fake-timers": "^15.4.0"
       }
-    },
-    "node_modules/@types/sinonjs__fake-timers": {
-      "version": "15.0.1",
-      "dev": true,
-      "license": "MIT"
     },
     "node_modules/@types/update-notifier": {
       "version": "6.0.8",
