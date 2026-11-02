@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './customaction-remove.js';
+import command, { options } from './customaction-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_REMOVE, () => {
@@ -19,6 +19,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptIssued: boolean = false;
 
@@ -45,6 +46,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -160,11 +162,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     }), new CommandError("Multiple user custom actions with title 'YourAppCustomizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
@@ -253,7 +255,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     try {
-      await command.action(logger, { options: { title: 'Places', webUrl: 'https://contoso.sharepoint.com' } } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Places', webUrl: 'https://contoso.sharepoint.com' }) });
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(sinon.match(
         {
@@ -276,11 +278,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     }), new CommandError(`No user custom action with title 'YourAppCustomizer' found`));
   });
 
@@ -288,18 +290,18 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     defaultPostCallsStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('should prompt before removing custom action when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' }) });
 
     assert(promptIssued);
   });
@@ -310,7 +312,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' }) });
     assert(postCallsSpy.notCalled);
   });
 
@@ -322,7 +324,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     try {
-      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' }) });
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(sinon.match(
         {
@@ -374,7 +376,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     try {
-      await command.action(logger, { options: { title: 'Places', webUrl: 'https://contoso.sharepoint.com' } } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Places', webUrl: 'https://contoso.sharepoint.com' }) });
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(sinon.match(
         {
@@ -399,9 +401,9 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(postCallsSpy.calledOnce);
-      assert(removeScopedCustomActionSpy.calledWith({
+      assert(removeScopedCustomActionSpy.calledWithMatch({
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
@@ -426,9 +428,9 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(postCallsSpy.calledOnce);
-      assert(removeScopedCustomActionSpy.calledWith(
+      assert(removeScopedCustomActionSpy.calledWithMatch(
         {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
@@ -449,12 +451,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     try {
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           force: true,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
-        }
+        })
       });
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledOnce);
@@ -483,12 +485,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     try {
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           force: true
-        }
+        })
       });
       assert(removeScopedCustomActionSpy.calledTwice);
     }
@@ -508,7 +510,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -540,13 +542,13 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
@@ -569,13 +571,13 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     });
     assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
   });
@@ -595,12 +597,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -623,177 +625,127 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[scope]') > -1) {
-        containsScopeOption = true;
-      }
+  it('should fail validation if the id option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('should fail validation if the url option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: "BC448D63-484F-49C5-AB8C-96B14AA68D50" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('should fail validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: 'foo'
     });
-    assert(containsScopeOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('should fail validation if the id option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('should fail validation if the id option is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "foo",
+      webUrl: 'https://contoso.sharepoint.com'
     });
-
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not valid. Custom action Id (GUID) expected.');
   });
 
-  it('should fail validation if the url option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('should pass validation when the id and url options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com"
     });
-
-    const actual = await command.validate({ options: { id: "BC448D63-484F-49C5-AB8C-96B14AA68D50" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should pass validation when the id, url and scope options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: "Site"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should fail validation if the id option is not a valid guid', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "foo",
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should pass validation when the id and url option specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should pass validation when the id and url options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be All', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'All'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should pass validation when the id, url and scope options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: "Site"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be Site', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Site'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should pass validation when the id and url option specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be Web', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Web'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should accept scope to be All', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'All'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should reject invalid string scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('should accept scope to be Site', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should reject invalid scope value specified as number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 123
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('should accept scope to be Web', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Web'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('doesn\'t fail validation if the optional scope option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should reject invalid string scope', async () => {
-    const scope = 'foo';
-    const actual = await command.validate({
-      options: {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
-  });
-
-  it('should reject invalid scope value specified as number', async () => {
-    const scope = 123;
-    const actual = await command.validate({
-      options: {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
-  });
-
-  it('doesn\'t fail validation if the optional scope option not specified', async () => {
-    const actual = await command.validate(
-      {
-        options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com"
-        }
-      }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+      webUrl: "https://contoso.sharepoint.com",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

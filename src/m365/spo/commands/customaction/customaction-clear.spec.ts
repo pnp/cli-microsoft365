@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './customaction-clear.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './customaction-clear.js';
 
 describe(commands.CUSTOMACTION_CLEAR, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -43,6 +43,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -91,17 +92,17 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     defaultPostCallsStub();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         force: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('should prompt before clearing custom actions when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com' }) });
 
     assert(promptIssued);
   });
@@ -111,7 +112,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com' }) });
     assert(postCallsSpy.notCalled);
   });
 
@@ -123,7 +124,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     try {
-      await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com' }) });
       assert(postCallsSpy.calledTwice);
       assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
         {
@@ -146,9 +147,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(postCallsSpy.calledOnce);
-      assert(clearScopedCustomActionsSpy.calledWith({
+      assert(clearScopedCustomActionsSpy.calledWithMatch({
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
         force: true
@@ -171,9 +172,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(postCallsSpy.calledOnce === true);
-      assert(clearScopedCustomActionsSpy.calledWith(
+      assert(clearScopedCustomActionsSpy.calledWithMatch(
         {
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'Site',
@@ -193,11 +194,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     try {
       await command.action(logger, {
-        options: {
+        options: commandOptionsSchema.parse({
           debug: true,
           webUrl: 'https://contoso.sharepoint.com',
           force: true
-        }
+        })
       });
       assert(clearScopedCustomActionsSpy.calledTwice);
     }
@@ -217,7 +218,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
 
     try {
-      await command.action(logger, { options: options } as any);
+      await command.action(logger, { options: commandOptionsSchema.parse(options) });
       assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
     }
     finally {
@@ -233,7 +234,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       force: true
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(postCallsSpy.calledWith(sinon.match({
       url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions/clear'
     })));
@@ -255,11 +256,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -280,121 +281,87 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[scope]') > -1) {
-        containsScopeOption = true;
-      }
+  it('should fail validation if the url option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ scope: "Web" });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('should fail validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo'
     });
-    assert(containsScopeOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('should fail validation if the url option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('should pass validation when the url options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com"
     });
-
-    const actual = await command.validate({ options: { scope: "Web" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should pass validation when the url and scope options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: "Site"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should pass validation when the url options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be All', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'All'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should pass validation when the url and scope options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: "Site"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be Site', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Site'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should accept scope to be All', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'All'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should accept scope to be Web', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Web'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('should accept scope to be Site', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should reject invalid string scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('should accept scope to be Web', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Web'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('should reject invalid scope value specified as number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 123
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('should reject invalid string scope', async () => {
-    const scope = 'foo';
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
-  });
-
-  it('should reject invalid scope value specified as number', async () => {
-    const scope = 123;
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

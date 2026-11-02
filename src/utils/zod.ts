@@ -7,11 +7,17 @@ declare module 'zod' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ZodType<out Output = unknown, out Input = unknown, out Internals extends z.core.$ZodTypeInternals<Output, Input> = z.core.$ZodTypeInternals<Output, Input>> {
     alias(name: string): this & { alias?: string };
+    autocomplete(values: string[]): this & { autocomplete?: string[] };
   }
 }
 
 z.ZodType.prototype.alias = function (name: string) {
   (this.def as any).alias = name;
+  return this;
+};
+
+z.ZodType.prototype.autocomplete = function (values: string[]) {
+  (this.def as any).autocomplete = values;
   return this;
 };
 
@@ -40,6 +46,9 @@ function parseString(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo[
 
     if (schema.enum) {
       currentOption.autocomplete = schema.enum.map(e => String(e));
+    }
+    else if (schema['x-autocomplete']) {
+      currentOption.autocomplete = schema['x-autocomplete'] as string[];
     }
   }
 
@@ -122,9 +131,14 @@ export const zod = {
   schemaToOptionInfo(schema: z.ZodSchema<any>): CommandOptionInfo[] {
     const jsonSchema = z.toJSONSchema(schema, {
       override: s => {
-        const alias = ((s.zodSchema as unknown as z.core.$ZodTypeInternals).def as any).alias;
-        if (alias) {
-          s.jsonSchema['x-alias'] = alias;
+        const definition = ((s.zodSchema as unknown as z.core.$ZodTypeInternals).def as any);
+
+        if (definition.alias) {
+          s.jsonSchema['x-alias'] = definition.alias;
+        }
+
+        if (definition.autocomplete) {
+          s.jsonSchema['x-autocomplete'] = definition.autocomplete;
         }
       },
       unrepresentable: 'any'

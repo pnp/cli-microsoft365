@@ -1,6 +1,6 @@
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -8,17 +8,25 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CustomAction } from './customaction.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    error: e => `${e.input} is not valid. Custom action Id (GUID) expected.`
+  }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    error: e => `${e.input} is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  scope: z.enum(['Site', 'Web', 'All']).optional().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  webUrl: string;
-  scope?: string;
-  force?: boolean;
 }
 
 class SpoCustomActionRemoveCommand extends SpoCommand {
@@ -30,72 +38,19 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     return 'Removes the specified custom action';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        scope: args.options.scope || 'All',
-        force: (!(!args.options.force)).toString()
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title].filter(x => x !== undefined).length === 1, {
+        message: 'Specify one of id or title',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web', 'All']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && validation.isValidGuid(args.options.id) === false) {
-          return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
-        }
-
-        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (typeof isValidUrl === 'string') {
-          return isValidUrl;
-        }
-
-        if (args.options.scope) {
-          if (args.options.scope !== 'Site' &&
-            args.options.scope !== 'Web' &&
-            args.options.scope !== 'All') {
-            return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
