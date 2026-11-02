@@ -3,12 +3,10 @@ import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { Localization, ProfileCardProperty, profileCardPropertyNames } from './profileCardProperties.js';
+import { customAttributePropertyNames, Localization, ProfileCardProperty } from './profileCardProperties.js';
 import commands from '../../commands.js';
 import { optionsUtils } from '../../../../utils/optionsUtils.js';
 import { zod } from '../../../../utils/zod.js';
-
-const customAttributePropertyNames = profileCardPropertyNames.filter(p => p.toLowerCase().startsWith('customattribute'));
 
 export const options = z.looseObject({
   ...globalOptionsZod.shape,
