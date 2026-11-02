@@ -27,17 +27,8 @@ export const options = z.strictObject({
   clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
   newTitle: z.string().optional(),
   newClientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'newClientSideComponentId is not a valid GUID' }).optional(),
-  clientSideComponentProperties: z.string().refine(val => {
-    try { JSON.parse(val); return true; }
-    catch { return false; }
-  }, { message: 'clientSideComponentProperties is not valid JSON' }).optional().alias('p'),
-  hostProperties: z.string().refine(val => {
-    if (val === '') {
-      return true;
-    }
-    try { JSON.parse(val); return true; }
-    catch { return false; }
-  }, { message: 'hostProperties is not valid JSON' }).optional(),
+  clientSideComponentProperties: z.string().refine(val => validation.isValidJsonOrEmpty(val), { message: 'clientSideComponentProperties is not valid JSON' }).optional().alias('p'),
+  hostProperties: z.string().refine(val => validation.isValidJsonOrEmpty(val), { message: 'hostProperties is not valid JSON' }).optional(),
   webTemplate: z.string().optional().alias('w')
 });
 
@@ -74,7 +65,12 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
           options: ['title', 'id', 'clientSideComponentId']
         }
       })
-      .refine(opts => opts.newTitle || opts.newClientSideComponentId || opts.clientSideComponentProperties || opts.hostProperties !== undefined || opts.webTemplate, {
+      .refine(opts =>
+        opts.newTitle !== undefined ||
+        opts.newClientSideComponentId !== undefined ||
+        opts.clientSideComponentProperties !== undefined ||
+        opts.hostProperties !== undefined ||
+        opts.webTemplate !== undefined, {
         error: 'Please specify an option to be updated'
       });
   }

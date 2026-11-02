@@ -16,24 +16,8 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   title: z.string().alias('t'),
   clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).alias('i'),
-  clientSideComponentProperties: z.string().refine(val => {
-    try {
-      JSON.parse(val);
-      return true;
-    }
-    catch {
-      return false;
-    }
-  }, { message: 'clientSideComponentProperties is not a valid JSON string' }).optional().alias('p'),
-  hostProperties: z.string().refine(val => {
-    try {
-      JSON.parse(val);
-      return true;
-    }
-    catch {
-      return false;
-    }
-  }, { message: 'hostProperties is not a valid JSON string' }).optional(),
+  clientSideComponentProperties: z.string().refine(validation.isValidJsonOrEmpty, { message: 'clientSideComponentProperties is not a valid JSON string' }).optional().alias('p'),
+  hostProperties: z.string().refine(validation.isValidJsonOrEmpty, { message: 'hostProperties is not a valid JSON string' }).optional(),
   webTemplate: z.string().optional().alias('w')
 });
 

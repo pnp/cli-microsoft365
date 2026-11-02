@@ -549,4 +549,22 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       );
     }
   });
+
+  it('passes validation when clearing clientSideComponentProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      clientSideComponentProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when clearing hostProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      hostProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
 });

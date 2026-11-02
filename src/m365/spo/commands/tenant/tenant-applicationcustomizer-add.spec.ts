@@ -304,4 +304,24 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
     const actual = commandOptionsSchema.safeParse({ title: customizerTitle, clientSideComponentId: clientSideComponentId, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
+
+  it('passes validation if clientSideComponentProperties is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: customizerTitle,
+      clientSideComponentId,
+      clientSideComponentProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if hostProperties is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: customizerTitle,
+      clientSideComponentId,
+      hostProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
 });
