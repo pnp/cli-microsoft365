@@ -12,10 +12,12 @@ import { cli } from '../../../../cli/cli.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  webUrl: z.string().alias('u'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    error: e => `${e.input} is not a valid SharePoint URL`
+  }).alias('u'),
   title: z.string().optional().alias('t'),
-  id: z.string().optional().alias('i'),
-  clientSideComponentId: z.string().optional().alias('c'),
+  id: z.guid().optional().alias('i'),
+  clientSideComponentId: z.guid().optional().alias('c'),
   newTitle: z.string().optional(),
   description: z.string().optional(),
   clientSideComponentProperties: z.string().refine(val => {
@@ -64,18 +66,6 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
 
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
-      .refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
-        error: e => validation.isValidSharePointUrl((e.input as Options).webUrl) as string,
-        path: ['webUrl']
-      })
-      .refine(args => !args.id || validation.isValidGuid(args.id), {
-        error: () => 'id is not a valid GUID',
-        path: ['id']
-      })
-      .refine(args => !args.clientSideComponentId || validation.isValidGuid(args.clientSideComponentId), {
-        error: () => 'clientSideComponentId is not a valid GUID',
-        path: ['clientSideComponentId']
-      })
       .refine(args => [args.id, args.title, args.clientSideComponentId].filter(value => value !== undefined).length === 1, {
         error: `Specify either 'id', 'title', or 'clientSideComponentId'.`,
         params: {

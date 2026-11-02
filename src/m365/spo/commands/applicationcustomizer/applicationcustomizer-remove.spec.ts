@@ -179,6 +179,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: id });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint URL');
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {

@@ -171,6 +171,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: id });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint URL');
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
@@ -211,11 +212,13 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   it('fails validation if the clientSideComponentProperties option is not a valid json string', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, clientSideComponentProperties: 'invalid json string' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specified clientSideComponentProperties is not a valid JSON string.');
   });
 
   it('fails validation if the hostProperties option is not a valid json string', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: id, hostProperties: 'invalid json string' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specified hostProperties is not a valid JSON string.');
   });
 
   it('fails validation with unknown options', () => {

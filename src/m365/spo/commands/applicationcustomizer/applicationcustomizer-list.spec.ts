@@ -107,6 +107,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
       webUrl: 'foo'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint URL');
   });
 
   it('fails validation if the scope is not a valid scope', () => {

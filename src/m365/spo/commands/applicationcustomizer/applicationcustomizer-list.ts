@@ -8,7 +8,9 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  webUrl: z.string().alias('u'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    error: e => `${e.input} is not a valid SharePoint URL`
+  }).alias('u'),
   scope: z.enum(['All', 'Site', 'Web']).optional().alias('s')
 });
 
@@ -33,13 +35,6 @@ class SpoApplicationCustomizerListCommand extends SpoCommand {
 
   public get schema(): z.ZodType | undefined {
     return options;
-  }
-
-  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
-    return schema.refine(args => validation.isValidSharePointUrl(args.webUrl) === true, {
-      error: e => validation.isValidSharePointUrl((e.input as Options).webUrl) as string,
-      path: ['webUrl']
-    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

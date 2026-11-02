@@ -163,11 +163,13 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', title: title, clientSideComponentId: clientSideComponentId });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint URL');
   });
 
   it('fails validation if the clientSideComponentId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, title: title, clientSideComponentId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID');
   });
 
   it('fails validation if the scope option is not a valid scope', () => {

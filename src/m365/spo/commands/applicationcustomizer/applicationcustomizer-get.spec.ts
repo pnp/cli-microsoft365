@@ -140,6 +140,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       webUrl: 'foo'
     });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint URL');
   });
 
   it('fails validation when all options are specified', () => {
