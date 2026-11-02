@@ -8,10 +8,13 @@ import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../u
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const isNonEmptyFiniteNumber = (value: string): boolean =>
+  value.trim().length > 0 && Number.isFinite(Number(value));
+
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  MinCompatibilityLevel: z.string().refine(val => !isNaN(Number(val)), { message: 'MinCompatibilityLevel is not a number' }).optional(),
-  MaxCompatibilityLevel: z.string().refine(val => !isNaN(Number(val)), { message: 'MaxCompatibilityLevel is not a number' }).optional(),
+  MinCompatibilityLevel: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'MinCompatibilityLevel is not a number' }).optional(),
+  MaxCompatibilityLevel: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'MaxCompatibilityLevel is not a number' }).optional(),
   ExternalServicesEnabled: z.boolean().optional(),
   NoAccessRedirectUrl: z.string().optional(),
   SharingCapability: z.enum(['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']).optional(),
@@ -33,15 +36,15 @@ export const options = z.strictObject({
   UserVoiceForFeedbackEnabled: z.boolean().optional(),
   PublicCdnEnabled: z.boolean().optional(),
   PublicCdnAllowedFileTypes: z.string().optional(),
-  RequireAnonymousLinksExpireInDays: z.string().refine(val => !isNaN(Number(val)), { message: 'RequireAnonymousLinksExpireInDays is not a number' }).optional(),
+  RequireAnonymousLinksExpireInDays: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'RequireAnonymousLinksExpireInDays is not a number' }).optional(),
   SharingAllowedDomainList: z.string().optional(),
   SharingBlockedDomainList: z.string().optional(),
   SharingDomainRestrictionMode: z.enum(['None', 'AllowList', 'BlockList']).optional(),
-  OneDriveStorageQuota: z.string().refine(val => !isNaN(Number(val)), { message: 'OneDriveStorageQuota is not a number' }).optional(),
+  OneDriveStorageQuota: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'OneDriveStorageQuota is not a number' }).optional(),
   OneDriveForGuestsEnabled: z.boolean().optional(),
   IPAddressEnforcement: z.boolean().optional(),
   IPAddressAllowList: z.string().optional(),
-  IPAddressWACTokenLifetime: z.string().refine(val => !isNaN(Number(val)), { message: 'IPAddressWACTokenLifetime is not a number' }).optional(),
+  IPAddressWACTokenLifetime: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'IPAddressWACTokenLifetime is not a number' }).optional(),
   UseFindPeopleInPeoplePicker: z.boolean().optional(),
   DefaultSharingLinkType: z.enum(['None', 'Direct', 'Internal', 'AnonymousAccess']).optional(),
   ODBMembersCanShare: z.enum(['Unspecified', 'On', 'Off']).optional(),
@@ -57,7 +60,7 @@ export const options = z.strictObject({
   OwnerAnonymousNotification: z.boolean().optional(),
   CommentsOnSitePagesDisabled: z.boolean().optional(),
   SocialBarOnSitePagesDisabled: z.boolean().optional(),
-  OrphanedPersonalSitesRetentionPeriod: z.string().refine(val => !isNaN(Number(val)), { message: 'OrphanedPersonalSitesRetentionPeriod is not a number' }).optional(),
+  OrphanedPersonalSitesRetentionPeriod: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'OrphanedPersonalSitesRetentionPeriod is not a number' }).optional(),
   DisallowInfectedFileDownload: z.boolean().optional(),
   DefaultLinkPermission: z.enum(['None', 'View', 'Edit']).optional(),
   ConditionalAccessPolicy: z.enum(['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess']).optional(),
@@ -66,7 +69,7 @@ export const options = z.strictObject({
   ApplyAppEnforcedRestrictionsToAdHocRecipients: z.boolean().optional(),
   FilePickerExternalImageSearchEnabled: z.boolean().optional(),
   EmailAttestationRequired: z.boolean().optional(),
-  EmailAttestationReAuthDays: z.string().refine(val => !isNaN(Number(val)), { message: 'EmailAttestationReAuthDays is not a number' }).optional(),
+  EmailAttestationReAuthDays: z.string().refine(val => isNonEmptyFiniteNumber(val), { message: 'EmailAttestationReAuthDays is not a number' }).optional(),
   HideDefaultThemes: z.boolean().optional(),
   BlockAccessOnUnmanagedDevices: z.boolean().optional(),
   AllowLimitedAccessOnUnmanagedDevices: z.boolean().optional(),

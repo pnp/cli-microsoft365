@@ -17,7 +17,7 @@ import { Solution } from './Solution.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.string().refine(val => !isNaN(Number(val)), { message: 'id is not a number' }).optional().alias('i'),
+  id: z.string().refine(val => Number.isFinite(Number(val)), { message: 'id is not a number' }).optional().alias('i'),
   title: z.string().optional().alias('t'),
   clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).optional().alias('c'),
   newTitle: z.string().optional(),
