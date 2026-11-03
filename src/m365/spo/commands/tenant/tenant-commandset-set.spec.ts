@@ -336,7 +336,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ id: id, unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ id: id, newTitle: title, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 

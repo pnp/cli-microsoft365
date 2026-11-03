@@ -334,8 +334,35 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('passes validation with no options', () => {
+  it('fails validation when required options are missing', () => {
     const actual = commandOptionsSchema.safeParse({});
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when title is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      listType: 'List',
+      clientSideComponentId
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when listType is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: customizerTitle,
+      clientSideComponentId
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when clientSideComponentId is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: customizerTitle,
+      listType: 'List'
+    });
+
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1123,7 +1123,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/apps', unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/apps', owner: 'user@contoso.com', timeZone: '4', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 
@@ -1142,6 +1142,24 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       url: 'https://contoso.sharepoint.com/sites/apps',
       owner: 'user@contoso.com',
       timeZone: 'Infinity'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when owner is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/apps',
+      timeZone: '4'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when timeZone is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/apps',
+      owner: 'user@contoso.com'
     });
 
     assert.strictEqual(actual.success, false);
