@@ -13,14 +13,15 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
-import command from './tenant-applicationcustomizer-set.js';
+import command, { options } from './tenant-applicationcustomizer-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import z from 'zod';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'Some customizer';
   const newTitle = 'New customizer';
   const newClientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed8c0bc';
-  const id = 3;
+  const id = '3';
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const clientSideComponentProperties = '{ "someProperty": "Some value" }';
   const hostProperties = '{"preAllocatedApplicationCustomizerTopHeight":"50","preAllocatedApplicationCustomizerBottomHeight":"50"}';
@@ -70,6 +71,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const defaultGetCallStub = (filter: string): sinon.SinonStub => {
     return sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -127,6 +129,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -169,63 +172,64 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newTitle: newTitle, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc', newTitle: newTitle } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the newClientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: id, newClientSideComponentId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: 'abc', newTitle: newTitle });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when all options are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if the newClientSideComponentId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newClientSideComponentId: 'abc' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation when multiple selector options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      title: title,
+      id: id,
+      newTitle: newTitle,
+      clientSideComponentId: clientSideComponentId
     });
-
-    const actual = await command.validate({
-      options: {
-        title: title,
-        id: id,
-        clientSideComponentId: clientSideComponentId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when all options are empty', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when all options are empty', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { id: id, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, clientSideComponentProperties: 'invalid json string' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the hostProperties option is not a valid json string', async () => {
-    const actual = await command.validate({ options: { id: id, hostProperties: 'invalid json string' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the hostProperties option is not a valid json string', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, hostProperties: 'invalid json string' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if clientSideComponentId is valid', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId, newTitle: newTitle } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if clientSideComponentId is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ clientSideComponentId: clientSideComponentId, newTitle: newTitle });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if newClientSideComponentId is valid', async () => {
-    const actual = await command.validate({ options: { id: id, newClientSideComponentId: newClientSideComponentId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if newClientSideComponentId is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newClientSideComponentId: newClientSideComponentId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if the hostProperties option is empty', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, hostProperties: '' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('handles error when tenant app catalog doesn\'t exist', async () => {
@@ -239,12 +243,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        newTitle: newTitle
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) }), new CommandError(errorMessage));
   });
 
   it('handles error when no application customizer with the specified title found', async () => {
@@ -261,11 +260,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title, newTitle: newTitle
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) }), new CommandError(errorMessage));
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
@@ -289,11 +284,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title, newTitle: newTitle
-      }
-    }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: 3, 4."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: 3, 4."));
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
@@ -317,11 +308,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId, newTitle: newTitle
-      }
-    }), new CommandError("Multiple application customizers with ClientSideComponentId '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: 3, 4."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, newTitle: newTitle }) }), new CommandError("Multiple application customizers with ClientSideComponentId '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: 3, 4."));
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
@@ -340,11 +327,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
 
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
-    await command.action(logger, {
-      options: {
-        title: title, newTitle: newTitle
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) });
     assert(executeCallsStub.calledOnce);
   });
 
@@ -362,11 +345,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title, newTitle: newTitle
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) }), new CommandError(errorMessage));
   });
 
   it('handles error when executing command', async () => {
@@ -383,21 +362,13 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId, newTitle: newTitle
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, newTitle: newTitle }) }), new CommandError(errorMessage));
   });
 
   it('updates title of an application customizer by title', async () => {
     defaultGetCallStub("Title eq 'Some customizer'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
-    await command.action(logger, {
-      options: {
-        title: title, newTitle: newTitle
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: title, newTitle: newTitle }) });
 
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'New customizer' }] });
   });
@@ -419,12 +390,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        id: id,
-        hostProperties: hostProperties
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id, hostProperties: hostProperties }) });
 
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'TenantWideExtensionHostProperties', FieldValue: hostProperties }] });
   });
@@ -445,33 +411,21 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
     defaultGetCallStub("Title eq 'Some customizer'");
     const executeCallsStub: sinon.SinonStub = postCallsStubClientSideComponentId();
-    await command.action(logger, {
-      options: {
-        title: title, newClientSideComponentId: newClientSideComponentId
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: title, newClientSideComponentId: newClientSideComponentId }) });
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'TenantWideExtensionComponentId', FieldValue: '7096cded-b83d-4eab-96f0-df477ed8c0bc' }] });
   });
 
   it('updates properties of an application customizer by id', async () => {
     defaultGetCallStub("Id eq '3'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
-    await command.action(logger, {
-      options: {
-        id: id, clientSideComponentProperties: clientSideComponentProperties, verbose: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id, clientSideComponentProperties: clientSideComponentProperties, verbose: true }) });
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'TenantWideExtensionComponentProperties', FieldValue: '{ "someProperty": "Some value" }' }] });
   });
 
   it('updates an application customizer by clientSideComponentId', async () => {
     defaultGetCallStub("TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
-    await command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId, webTemplate: webTemplate, verbose: true
-      }
-    });
+    await command.action(logger, { options: commandOptionsSchema.parse({ clientSideComponentId: clientSideComponentId, webTemplate: webTemplate, verbose: true }) });
     assert.deepEqual(executeCallsStub.firstCall.args[0].data, { formValues: [{ FieldName: 'TenantWideExtensionWebTemplate', FieldValue: 'GROUP#0' }] });
   });
 
@@ -489,7 +443,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
-    await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError('No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog'));
   });
 
@@ -510,7 +464,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
-    await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError(`The extension type of this component is not of type 'ApplicationCustomizer' but of type 'FormCustomizer'`));
   });
 
@@ -531,7 +485,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
-    await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError(`No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`));
   });
 
@@ -554,7 +508,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
-    await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError(`The solution does not contain an extension that can be deployed to all sites. Make sure that you've entered the correct component Id.`));
   });
 
@@ -577,7 +531,70 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     defaultGetCallStub("Id eq '3'");
     postCallsStubClientSideComponentId();
 
-    await assert.rejects(command.action(logger, { options: { id: id, newClientSideComponentId: newClientSideComponentId, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newClientSideComponentId: newClientSideComponentId, verbose: true }) }),
       new CommandError(`The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.`));
+  });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['', ' ', 'foo', 'NaN', 'Infinity', '-1', '0', '1.5'];
+
+    for (const invalidId of invalidIds) {
+      const actual = commandOptionsSchema.safeParse({
+        id: invalidId,
+        newTitle
+      });
+
+      assert.strictEqual(
+        actual.success,
+        false,
+        `Expected id '${invalidId}' to be rejected`
+      );
+    }
+  });
+
+  it('passes validation when clearing clientSideComponentProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      clientSideComponentProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when clearing hostProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      hostProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('returns option-set validation issues when selector and update options are omitted', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+
+    if (!actual.success) {
+      const optionSetIssues = actual.error.issues.filter(
+        (issue): issue is z.core.$ZodIssueCustom =>
+          issue.code === 'custom' &&
+          issue.params?.customCode === 'optionSet'
+      );
+
+      assert.deepEqual(
+        optionSetIssues.map(issue => issue.params?.options),
+        [
+          ['title', 'id', 'clientSideComponentId'],
+          [
+            'newTitle',
+            'newClientSideComponentId',
+            'clientSideComponentProperties',
+            'hostProperties',
+            'webTemplate'
+          ]
+        ]
+      );
+    }
   });
 });

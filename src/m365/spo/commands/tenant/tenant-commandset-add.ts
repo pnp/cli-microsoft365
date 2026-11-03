@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandOutput, cli } from '../../../../cli/cli.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -11,23 +12,26 @@ import spoListItemListCommand, { Options as spoListItemListCommandOptions } from
 import { Solution } from './Solution.js';
 import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
 
+const listTypes = ['List', 'Library', 'SitePages'] as const;
+const locations = ['ContextMenu', 'CommandBar', 'Both'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  listType: z.enum(listTypes).alias('l'),
+  clientSideComponentId: z.string().refine(val => validation.isValidGuid(val), { message: 'clientSideComponentId is not a valid GUID' }).alias('i'),
+  clientSideComponentProperties: z.string().optional().alias('p'),
+  webTemplate: z.string().optional().alias('w'),
+  location: z.enum(locations).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  title: string;
-  listType: string;
-  clientSideComponentId: string;
-  clientSideComponentProperties?: string;
-  webTemplate?: string;
-  location?: string;
-}
-
 class SpoTenantCommandSetAddCommand extends SpoCommand {
-  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
-  private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
-
   public get name(): string {
     return commands.TENANT_COMMANDSET_ADD;
   }
@@ -36,68 +40,8 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
     return 'Adds a ListView Command Set as a tenant-wide extension.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listType: args.options.listType,
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        webTemplate: typeof args.options.webTemplate !== 'undefined',
-        location: args.options.location
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-l, --listType <listType>',
-        autocomplete: SpoTenantCommandSetAddCommand.listTypes
-      },
-      {
-        option: '-i, --clientSideComponentId <clientSideComponentId>'
-      },
-      {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--location [location]',
-        autocomplete: SpoTenantCommandSetAddCommand.locations
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.clientSideComponentId)) {
-          return `${args.options.clientSideComponentId} is not a valid GUID`;
-        }
-
-        if (SpoTenantCommandSetAddCommand.listTypes.indexOf(args.options.listType) < 0) {
-          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoTenantCommandSetAddCommand.listTypes.join(', ')}`;
-        }
-
-        if (args.options.location && SpoTenantCommandSetAddCommand.locations.indexOf(args.options.location) < 0) {
-          return `${args.options.location} is not a valid location. Allowed values are ${SpoTenantCommandSetAddCommand.locations.join(', ')}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

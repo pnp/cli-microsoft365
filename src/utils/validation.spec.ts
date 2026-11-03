@@ -748,4 +748,22 @@ describe('validation/validation', () => {
     const result = validation.isValidGraphDateTime('2000-02-29T09:00:00');
     assert.strictEqual(result, true);
   });
+
+  it('isValidJsonOrEmpty returns true for an empty string', () => {
+    const result = validation.isValidJsonOrEmpty('');
+
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidJsonOrEmpty returns true for valid JSON', () => {
+    const result = validation.isValidJsonOrEmpty('{"property":"value"}');
+
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidJsonOrEmpty returns false for invalid JSON', () => {
+    const result = validation.isValidJsonOrEmpty('invalid JSON');
+
+    assert.strictEqual(result, false);
+  });
 });
