@@ -16,7 +16,10 @@ export const options = z.strictObject({
     .alias('u'),
   name: z.string().alias('n'),
   description: z.string().optional().alias('d'),
-  rights: z.string().optional()
+  rights: z.string()
+    .optional()
+    .autocomplete(Object.keys(PermissionKind)
+      .filter(kind => typeof PermissionKind[kind as keyof typeof PermissionKind] === 'number'))
 });
 declare type Options = z.infer<typeof options>;
 
