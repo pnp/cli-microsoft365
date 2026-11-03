@@ -8,6 +8,16 @@ sidebar_position: 4
 
 ### New commands
 
+**Entra ID:**
+
+- [entra agent blueprint list](../cmd/entra/agent/agent-blueprint-list.mdx) - retrieves a list of templates defining the agent identity type [#7252](https://github.com/pnp/cli-microsoft365/issues/7252)
+- [entra agent blueprintprincipal list](../cmd/entra/agent/agent-blueprintprincipal-list.mdx) - retrieves a list of agent blueprint principals [#7253](https://github.com/pnp/cli-microsoft365/issues/7253)
+
+**Outlook:**
+
+- [outlook calendargroup add](../cmd/outlook/calendargroup/calendargroup-add.mdx) - creates a new calendar group for a user [#7103](https://github.com/pnp/cli-microsoft365/issues/7103)
+- [outlook event add](../cmd/outlook/event/event-add.mdx) - creates an event in the default calendar or a specific calendar of a user [#7123](https://github.com/pnp/cli-microsoft365/issues/7123)
+
 **SharePoint:**
 
 - [spo folder unarchive](../cmd/spo/folder/folder-unarchive.mdx) - unarchives a folder [#7182](https://github.com/pnp/cli-microsoft365/issues/7182)
@@ -16,7 +26,9 @@ sidebar_position: 4
 
 **SharePoint Embedded:**
 
+- [spe container permission add](../cmd/spe/container/container-permission-add.mdx) - adds permission to a SharePoint Embedded container for a specified user [#6159](https://github.com/pnp/cli-microsoft365/issues/6159)
 - [spe container permission remove](../cmd/spe/container/container-permission-remove.mdx) - removes permissions from a SharePoint Embedded container [#6161](https://github.com/pnp/cli-microsoft365/issues/6161)
+- [spe container permission set](../cmd/spe/container/container-permission-set.mdx) - updates SharePoint Embedded container permission [#6160](https://github.com/pnp/cli-microsoft365/issues/6160)
 
 ### Changes
 
@@ -77,6 +89,21 @@ sidebar_position: 4
 - migrated `entra m365group` commands to Zod [#6849](https://github.com/pnp/cli-microsoft365/issues/6849)
 - migrated `spo listitem` commands to Zod [#7334](https://github.com/pnp/cli-microsoft365/issues/7334)
 - migrated `tenant report` and `tenant serviceannouncement` commands to Zod [#7355](https://github.com/pnp/cli-microsoft365/issues/7355)
+- added support for SPFx v1.24.1 [#7685](https://github.com/pnp/cli-microsoft365/pull/7685)
+- migrated `spe` commands to Zod [#7317](https://github.com/pnp/cli-microsoft365/issues/7317)
+- migrated `spo applicationcustomizer` and `spo apppage` commands to Zod [#7320](https://github.com/pnp/cli-microsoft365/issues/7320)
+- migrated `tenant people` and `tenant info` commands to Zod [#7354](https://github.com/pnp/cli-microsoft365/issues/7354)
+- migrated `spo serviceprincipal` commands to Zod [#7339](https://github.com/pnp/cli-microsoft365/issues/7339)
+- migrated `spo tenant` commands to Zod [#7343](https://github.com/pnp/cli-microsoft365/issues/7343)
+- migrated `spo term` and `spo theme` commands to Zod [#7344](https://github.com/pnp/cli-microsoft365/issues/7344)
+- migrated `spo sitedesign` commands to Zod [#7341](https://github.com/pnp/cli-microsoft365/issues/7341)
+- migrated `spo orgassetslibrary` and `spo orgnewssite` commands to Zod [#7335](https://github.com/pnp/cli-microsoft365/issues/7335)
+- migrated `teams app` commands to Zod [#7347](https://github.com/pnp/cli-microsoft365/issues/7347)
+- migrated `spo customaction` commands to Zod [#7324](https://github.com/pnp/cli-microsoft365/issues/7324)
+- migrated `spo knowledgehub` and `spo navigation` commands to Zod [#7332](https://github.com/pnp/cli-microsoft365/issues/7332)
+- migrated `spo report` and `spo search` commands to Zod [#7338](https://github.com/pnp/cli-microsoft365/issues/7338)
+- migrated `teams settings` commands to Zod [#7352](https://github.com/pnp/cli-microsoft365/issues/7352)
+- migrated `spo contenttype` commands to Zod [#7323](https://github.com/pnp/cli-microsoft365/issues/7323)
 
 ### ⚠️ Breaking changes
 
