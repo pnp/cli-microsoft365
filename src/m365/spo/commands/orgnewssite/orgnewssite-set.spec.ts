@@ -12,12 +12,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './orgnewssite-set.js';
+import command, { options } from './orgnewssite-set.js';
 
 describe(commands.ORGNEWSSITE_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +34,7 @@ describe(commands.ORGNEWSSITE_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,12 +86,7 @@ describe(commands.ORGNEWSSITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
-      options: {
-        verbose: true,
-        url: "http://contoso.sharepoint.com/sites/site1"
-      }
-    } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, url: "https://contoso.sharepoint.com/sites/site1" }) });
     assert(svcListRequest.called);
   });
 
@@ -112,27 +109,36 @@ describe(commands.ORGNEWSSITE_SET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
+        url: 'https://contoso.sharepoint.com/sites/site1',
         debug: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
     assert(svcListRequest.called);
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/site1' }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'foo' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
