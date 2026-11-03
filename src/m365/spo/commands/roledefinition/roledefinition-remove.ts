@@ -16,7 +16,7 @@ export const options = z.strictObject({
     .alias('u'),
   id: z.coerce.number()
     .alias('i'),
-  force: z.boolean().optional()
+  force: z.boolean().optional().alias('f')
 });
 declare type Options = z.infer<typeof options>;
 

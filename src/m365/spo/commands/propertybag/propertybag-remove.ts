@@ -19,7 +19,7 @@ export const options = z.strictObject({
     .alias('u'),
   key: z.string().alias('k'),
   folder: z.string().optional(),
-  force: z.boolean().optional()
+  force: z.boolean().optional().alias('f')
 });
 declare type Options = z.infer<typeof options>;
 
