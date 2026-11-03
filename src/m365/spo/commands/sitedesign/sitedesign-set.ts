@@ -26,7 +26,7 @@ export const options = z.strictObject({
   previewImageUrl: z.string().optional().alias('m'),
   previewImageAltText: z.string().optional().alias('a'),
   thumbnailUrl: z.string().optional(),
-  version: z.string().refine(val => !isNaN(Number(val)), { message: 'Version must be a number' }).optional().alias('v'),
+  version: z.string().refine(val => val.trim() !== '' && Number.isFinite(Number(val)), { message: 'Version must be a number' }).optional().alias('v'),
   isDefault: z.boolean().optional()
 });
 
