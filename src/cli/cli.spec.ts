@@ -21,6 +21,7 @@ import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { cli, CommandOutput } from './cli.js';
 import { Logger } from './Logger.js';
+import spoEventreceiverGetCommand from '../m365/spo/commands/eventreceiver/eventreceiver-get.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -502,7 +503,8 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
-      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
+      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
+      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -516,6 +518,7 @@ describe('cli', () => {
     md2plainSpy.resetHistory();
     mockCommandActionSpy.resetHistory();
     sinonUtil.restore([
+      cli.closeWithError,
       cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
@@ -2337,5 +2340,77 @@ describe('cli', () => {
       executeCommandSpy.firstCall.args[1].options.certificateBase64Encoded,
       undefined
     );
+  });
+
+  it('returns a validation error instead of prompting when multiple event receiver list selectors are specified', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === spoEventreceiverGetCommand.name);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw error;
+    });
+
+    await assert.rejects(
+      cli.execute([
+        'spo',
+        'eventreceiver',
+        'get',
+        '--webUrl',
+        'https://contoso.sharepoint.com/sites/sales',
+        '--name',
+        'PnP Test Receiver',
+        '--listTitle',
+        'Documents',
+        '--listUrl',
+        'Lists/Documents'
+      ]),
+      /Specify either list id or title or list url/
+    );
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
+  });
+
+  it('returns a validation error instead of prompting when site scope is combined with a list selector', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === spoEventreceiverGetCommand.name);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw error;
+    });
+
+    await assert.rejects(
+      cli.execute([
+        'spo',
+        'eventreceiver',
+        'get',
+        '--webUrl',
+        'https://contoso.sharepoint.com/sites/sales',
+        '--name',
+        'PnP Test Receiver',
+        '--scope',
+        'site',
+        '--listTitle',
+        'Documents'
+      ]),
+      /Scope cannot be set to site when retrieving list event receivers\./
+    );
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
   });
 });
