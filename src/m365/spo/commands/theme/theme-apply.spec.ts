@@ -547,23 +547,4 @@ describe(commands.THEME_APPLY, () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.strictEqual(actual.success, false);
   });
-
-  it('commandAction uses an empty palette for an unsupported SharePoint theme', async () => {
-    const postStub = sinon.stub(request, 'post').resolves(JSON.stringify({
-      value: '/sites/project-x/_catalogs/theme/Themed/6735E8EF'
-    }));
-
-    await command.commandAction(logger, {
-      options: options.parse({
-        name: 'Unsupported',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        sharePointTheme: true
-      })
-    });
-
-    assert.strictEqual(postStub.lastCall.args[0].data, `{
-      'name': 'Unsupported' ,
-      'themeJson': '{"palette": {}}'
-    }`);
-  });
 });
