@@ -1,9 +1,15 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SiteDesign } from './SiteDesign.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape
+});
 
 class SpoSiteDesignListCommand extends SpoCommand {
   public get name(): string {
@@ -12,6 +18,10 @@ class SpoSiteDesignListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists available site designs for creating modern sites';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {

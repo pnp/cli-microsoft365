@@ -571,7 +571,7 @@ export default abstract class Command {
     if (this.schema) {
       const telemetryProperties: any = {};
       this.optionsInfo.forEach(o => {
-        if (o.required) {
+        if (o.required && !o.autocomplete) {
           return;
         }
 
