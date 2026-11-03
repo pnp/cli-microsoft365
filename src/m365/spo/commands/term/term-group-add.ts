@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -11,15 +12,18 @@ import commands from '../../commands.js';
 import { TermGroup } from './TermGroup.js';
 import { TermStore } from './TermStore.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  id: z.string().optional().alias('i').refine(val => val === undefined || validation.isValidGuid(val), { error: e => `${e.input} is not a valid GUID` }),
+  description: z.string().optional().alias('d'),
+  webUrl: z.string().optional().alias('u').refine(val => val === undefined || validation.isValidSharePointUrl(val) === true, { message: 'Invalid SharePoint URL' })
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  description?: string;
-  id?: string;
-  name: string;
-  webUrl?: string;
 }
 
 class SpoTermGroupAddCommand extends SpoCommand {
@@ -31,55 +35,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
     return 'Adds taxonomy term group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        description: typeof args.options.id !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        webUrl: typeof args.options.webUrl !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-u, --webUrl [webUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.webUrl) {
-          return validation.isValidSharePointUrl(args.options.webUrl);
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

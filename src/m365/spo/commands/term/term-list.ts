@@ -1,8 +1,9 @@
 import { AxiosRequestConfig } from 'axios';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -12,17 +13,20 @@ import commands from '../../commands.js';
 import { Term } from './Term.js';
 import { TermCollection } from './TermCollection.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().optional().alias('u'),
+  termGroupId: z.string().optional(),
+  termGroupName: z.string().optional(),
+  termSetId: z.string().optional(),
+  termSetName: z.string().optional(),
+  withChildTerms: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl?: string;
-  termGroupId?: string;
-  termGroupName?: string;
-  termSetId?: string;
-  termSetName?: string;
-  withChildTerms?: boolean;
 }
 
 class SpoTermListCommand extends SpoCommand {
@@ -38,79 +42,38 @@ class SpoTermListCommand extends SpoCommand {
     return ['Id', 'Name', 'ParentTermId'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined',
-        termGroupId: typeof args.options.termGroupId !== 'undefined',
-        termGroupName: typeof args.options.termGroupName !== 'undefined',
-        termSetId: typeof args.options.termSetId !== 'undefined',
-        termSetName: typeof args.options.termSetName !== 'undefined',
-        withChildTerms: !!args.options.withChildTerms
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl [webUrl]'
-      },
-      {
-        option: '--termGroupId [termGroupId]'
-      },
-      {
-        option: '--termGroupName [termGroupName]'
-      },
-      {
-        option: '--termSetId [termSetId]'
-      },
-      {
-        option: '--termSetName [termSetName]'
-      },
-      {
-        option: '--withChildTerms'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.webUrl) {
-          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-          if (isValidSharePointUrl !== true) {
-            return isValidSharePointUrl;
-          }
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => {
+        if (opts.webUrl) {
+          return validation.isValidSharePointUrl(opts.webUrl) === true;
         }
-
-        if (args.options.termGroupId && !validation.isValidGuid(args.options.termGroupId)) {
-          return `${args.options.termGroupId} is not a valid GUID`;
-        }
-
-        if (args.options.termSetId && !validation.isValidGuid(args.options.termSetId)) {
-          return `${args.options.termSetId} is not a valid GUID`;
-        }
-
         return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['termGroupId', 'termGroupName'] },
-      { options: ['termSetId', 'termSetName'] }
-    );
+      }, { message: 'Invalid SharePoint URL' })
+      .refine(opts => {
+        if (opts.termGroupId && !validation.isValidGuid(opts.termGroupId)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).termGroupId} is not a valid GUID` })
+      .refine(opts => {
+        if (opts.termSetId && !validation.isValidGuid(opts.termSetId)) {
+          return false;
+        }
+        return true;
+      }, { error: e => `${(e.input as any).termSetId} is not a valid GUID` })
+      .refine(opts => [opts.termGroupId, opts.termGroupName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either termGroupId or termGroupName, but not both.',
+        params: { customCode: 'optionSet', options: ['termGroupId', 'termGroupName'] }
+      })
+      .refine(opts => [opts.termSetId, opts.termSetName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either termSetId or termSetName, but not both.',
+        params: { customCode: 'optionSet', options: ['termSetId', 'termSetName'] }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

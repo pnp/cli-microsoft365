@@ -1,6 +1,7 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
@@ -8,26 +9,33 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().alias('n'),
+  webUrl: z.string().refine(val => validation.isValidSharePointUrl(val) === true, {
+    message: 'The value of the webUrl is not a valid SharePoint URL.'
+  }).alias('u'),
+  sharePointTheme: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  name: string;
-  webUrl: string;
-  sharePointTheme?: boolean;
-}
-
 const SharePointThemes = {
-  Blue: "Blue",
-  Orange: "Orange",
-  Red: "Red",
-  Purple: "Purple",
-  Green: "Green",
-  Gray: "Gray",
-  "Dark Yellow": "Dark Yellow",
-  "Dark Blue": "Dark Blue"
-};
+  Blue: 'Blue',
+  Orange: 'Orange',
+  Red: 'Red',
+  Purple: 'Purple',
+  Green: 'Green',
+  Gray: 'Gray',
+  'Dark Yellow': 'Dark Yellow',
+  'Dark Blue': 'Dark Blue'
+} as const;
+
+type SharePointTheme = typeof SharePointThemes[keyof typeof SharePointThemes];
 
 class SpoThemeApplyCommand extends SpoCommand {
   public get name(): string {
@@ -38,42 +46,15 @@ class SpoThemeApplyCommand extends SpoCommand {
     return 'Applies theme to the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--sharePointTheme'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.sharePointTheme && !(args.options.name in SharePointThemes)) {
-          return 'Please check if the theme name is entered correctly.';
-        }
-
-        return true;
-      }
-    );
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema
+      .refine(opts => !opts.sharePointTheme || (Object.prototype.hasOwnProperty.call(SharePointThemes, opts.name)), {
+        message: 'Please check if the theme name is entered correctly.'
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -94,7 +75,7 @@ class SpoThemeApplyCommand extends SpoCommand {
       let requestOptions: any = {};
 
       if (isSharePointTheme) {
-        const requestBody: any = this.getSharePointTheme(args.options.name);
+        const requestBody: any = this.getSharePointTheme(args.options.name as SharePointTheme);
 
         requestOptions = {
           url: `${args.options.webUrl}/_api/ThemeManager/ApplyTheme`,
@@ -146,7 +127,7 @@ class SpoThemeApplyCommand extends SpoCommand {
   }
 
   private getSharePointTheme(themeName: string): any {
-    let palette: string;
+    let palette: string = '';
 
     switch (themeName) {
       case SharePointThemes.Blue:
@@ -172,9 +153,6 @@ class SpoThemeApplyCommand extends SpoCommand {
         break;
       case SharePointThemes["Dark Blue"]:
         palette = "\"themePrimary\":{\"R\":58,\"G\":150,\"B\":221,\"A\":255},\"themeLighterAlt\":{\"R\":2,\"G\":6,\"B\":9,\"A\":255},\"themeLighter\":{\"R\":9,\"G\":24,\"B\":35,\"A\":255},\"themeLight\":{\"R\":17,\"G\":45,\"B\":67,\"A\":255},\"themeTertiary\":{\"R\":35,\"G\":90,\"B\":133,\"A\":255},\"themeSecondary\":{\"R\":51,\"G\":133,\"B\":195,\"A\":255},\"themeDarkAlt\":{\"R\":75,\"G\":160,\"B\":225,\"A\":255},\"themeDark\":{\"R\":101,\"G\":174,\"B\":230,\"A\":255},\"themeDarker\":{\"R\":138,\"G\":194,\"B\":236,\"A\":255},\"accent\":{\"R\":58,\"G\":150,\"B\":221,\"A\":255},\"neutralLighterAlt\":{\"R\":29,\"G\":43,\"B\":60,\"A\":255},\"neutralLighter\":{\"R\":34,\"G\":50,\"B\":68,\"A\":255},\"neutralLight\":{\"R\":43,\"G\":61,\"B\":81,\"A\":255},\"neutralQuaternaryAlt\":{\"R\":50,\"G\":68,\"B\":89,\"A\":255},\"neutralQuaternary\":{\"R\":55,\"G\":74,\"B\":95,\"A\":255},\"neutralTertiaryAlt\":{\"R\":79,\"G\":99,\"B\":122,\"A\":255},\"neutralTertiary\":{\"R\":200,\"G\":200,\"B\":200,\"A\":255},\"neutralSecondary\":{\"R\":208,\"G\":208,\"B\":208,\"A\":255},\"neutralPrimaryAlt\":{\"R\":218,\"G\":218,\"B\":218,\"A\":255},\"neutralPrimary\":{\"R\":255,\"G\":255,\"B\":255,\"A\":255},\"neutralDark\":{\"R\":244,\"G\":244,\"B\":244,\"A\":255},\"black\":{\"R\":248,\"G\":248,\"B\":248,\"A\":255},\"white\":{\"R\":24,\"G\":37,\"B\":52,\"A\":255},\"primaryBackground\":{\"R\":24,\"G\":37,\"B\":52,\"A\":255},\"primaryText\":{\"R\":255,\"G\":255,\"B\":255,\"A\":255}";
-        break;
-      default:
-        palette = "";
         break;
     }
 
