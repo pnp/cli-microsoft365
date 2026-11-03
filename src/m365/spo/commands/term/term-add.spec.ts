@@ -688,7 +688,7 @@ describe(commands.TERM_ADD, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ name: 'Test', unknown: 'value' });
+    const actual = commandOptionsSchema.safeParse({ name: 'Test', termGroupName: termGroupName, termSetName: termSetName, unknown: 'value' });
     assert.strictEqual(actual.success, false);
   });
 });

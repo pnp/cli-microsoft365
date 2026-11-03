@@ -758,7 +758,7 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ termSetId: '9e54299e-208a-4000-8546-cc4139091b26', unknown: 'value' });
+    const actual = commandOptionsSchema.safeParse({ termSetId: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'PnPTermSets', unknown: 'value' });
     assert.strictEqual(actual.success, false);
   });
 

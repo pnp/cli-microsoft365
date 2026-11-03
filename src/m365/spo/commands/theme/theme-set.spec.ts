@@ -196,6 +196,7 @@ describe(commands.THEME_SET, () => {
   });
 
   it('fails validation with unknown options', () => {
+    sinon.stub(validation, 'isValidTheme').returns(true);
     const actual = commandOptionsSchema.safeParse({ name: 'Contoso', theme: '{}', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
