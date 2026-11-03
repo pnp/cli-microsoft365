@@ -650,6 +650,27 @@ describe(commands.PROJECT_DOCTOR, () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('e2e: shows a finding for a 1.24.1 project with a mismatched dependency', async () => {
+    const projectPath = path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1241-webpart-react');
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => projectPath);
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      const fileContents = originalReadFileSync(filePath, options);
+
+      if (filePath.toString() !== path.join(projectPath, 'package.json')) {
+        return fileContents;
+      }
+
+      const packageJson = JSON.parse(fileContents.toString());
+      packageJson.devDependencies.typescript = '~5.7.0';
+      return JSON.stringify(packageJson);
+    });
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.filter(f => f.id === 'FN002022').length, 1);
+  });
+
   it('passes validation when package manager not specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);

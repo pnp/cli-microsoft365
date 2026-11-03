@@ -1,6 +1,6 @@
 import { Project } from '../../project-model/index.js';
 import { Finding } from '../../report-model/index.js';
-import { DependencyRule } from "./DependencyRule.js";
+import { DependencyRule } from './DependencyRule.js';
 
 export class FN027004_OVERRIDES_serialize_javascript extends DependencyRule {
   constructor(options: { version: string }) {
@@ -12,11 +12,13 @@ export class FN027004_OVERRIDES_serialize_javascript extends DependencyRule {
   }
 
   visit(project: Project, findings: Finding[]): void {
+    const updateFindings: Finding[] = [];
+    super.visit(project, updateFindings);
+
     // If an override entry for the package already exists in package.json,
     // emit an extra finding to remove the existing override first. This avoids
     // having to use a separate remove-override rule (e.g. FN027003) in the upgrade scripts.
-    if (project.packageJson?.overrides?.[this.packageName] &&
-      project.packageJson.overrides[this.packageName] !== this.packageVersion) {
+    if (project.packageJson?.overrides?.[this.packageName] && updateFindings.length > 0) {
       const node = this.getAstNodeFromFile(project.packageJson, `overrides.${this.packageName}`);
       findings.push({
         id: `${this.id}_REMOVE`,
@@ -33,6 +35,6 @@ export class FN027004_OVERRIDES_serialize_javascript extends DependencyRule {
       });
     }
 
-    super.visit(project, findings);
+    findings.push(...updateFindings);
   }
 }

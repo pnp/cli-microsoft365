@@ -69,6 +69,19 @@ describe('FN027004_OVERRIDES_serialize_javascript', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it(`returns no notification when overrides.serialize-javascript is a compliant exact version`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        overrides: {
+          'serialize-javascript': '7.1.4'
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 0);
+  });
+
   it(`returns correct node when overrides.serialize-javascript is set to a string`, () => {
     const project: Project = {
       path: '/usr/tmp',
