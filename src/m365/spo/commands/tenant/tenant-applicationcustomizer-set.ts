@@ -71,7 +71,17 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
         opts.clientSideComponentProperties !== undefined ||
         opts.hostProperties !== undefined ||
         opts.webTemplate !== undefined, {
-        error: 'Please specify an option to be updated'
+        error: 'Please specify an option to be updated',
+        params: {
+          customCode: 'optionSet',
+          options: [
+            'newTitle',
+            'newClientSideComponentId',
+            'clientSideComponentProperties',
+            'hostProperties',
+            'webTemplate'
+          ]
+        }
       });
   }
 

@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
 import command, { options } from './tenant-applicationcustomizer-set.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import z from 'zod';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'Some customizer';
@@ -172,12 +173,12 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ id: id, unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ id: id, newTitle: newTitle, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if the id is not a number', () => {
-    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    const actual = commandOptionsSchema.safeParse({ id: 'abc', newTitle: newTitle });
     assert.strictEqual(actual.success, false);
   });
 
@@ -191,10 +192,11 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when all options are specified', () => {
+  it('fails validation when multiple selector options are specified', () => {
     const actual = commandOptionsSchema.safeParse({
       title: title,
       id: id,
+      newTitle: newTitle,
       clientSideComponentId: clientSideComponentId
     });
     assert.strictEqual(actual.success, false);
@@ -566,5 +568,33 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     });
 
     assert.strictEqual(actual.success, true);
+  });
+
+  it('returns option-set validation issues when selector and update options are omitted', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+
+    if (!actual.success) {
+      const optionSetIssues = actual.error.issues.filter(
+        (issue): issue is z.core.$ZodIssueCustom =>
+          issue.code === 'custom' &&
+          issue.params?.customCode === 'optionSet'
+      );
+
+      assert.deepEqual(
+        optionSetIssues.map(issue => issue.params?.options),
+        [
+          ['title', 'id', 'clientSideComponentId'],
+          [
+            'newTitle',
+            'newClientSideComponentId',
+            'clientSideComponentProperties',
+            'hostProperties',
+            'webTemplate'
+          ]
+        ]
+      );
+    }
   });
 });

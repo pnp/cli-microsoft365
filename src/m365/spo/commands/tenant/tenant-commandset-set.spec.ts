@@ -399,4 +399,36 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       );
     }
   });
+
+  it('returns a required validation issue when id is omitted', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues.some(issue =>
+          issue.code === 'invalid_type' &&
+          issue.path.join('.') === 'id'
+        ),
+        true
+      );
+    }
+  });
+
+  it('returns an option-set validation issue when update options are omitted', () => {
+    const actual = commandOptionsSchema.safeParse({ id });
+
+    assert.strictEqual(actual.success, false);
+
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues.some(issue =>
+          issue.code === 'custom' &&
+          issue.params?.customCode === 'optionSet'
+        ),
+        true
+      );
+    }
+  });
 });

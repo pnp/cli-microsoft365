@@ -54,7 +54,18 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
       opts.clientSideComponentProperties !== undefined ||
       opts.webTemplate !== undefined ||
       opts.location !== undefined, {
-      error: 'Specify at least one property to update'
+      error: 'Specify at least one property to update',
+      params: {
+        customCode: 'optionSet',
+        options: [
+          'newTitle',
+          'listType',
+          'clientSideComponentId',
+          'clientSideComponentProperties',
+          'webTemplate',
+          'location'
+        ]
+      }
     });
   }
 
