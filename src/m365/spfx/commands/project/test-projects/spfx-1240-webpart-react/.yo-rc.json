@@ -11,11 +11,11 @@
     "componentDescription": "HelloWorld",
     "plusBeta": false,
     "isCreatingSolution": true,
-    "nodeVersion": "24.15.0",
+    "nodeVersion": "26.13.0",
     "sdksVersions": {},
     "version": "1.24.0",
     "libraryName": "spfx",
-    "libraryId": "a3be1ed6-3565-4da8-857a-3ece97d30153",
+    "libraryId": "e2c12155-09c3-4b83-9d79-03aadb53d084",
     "packageManager": "npm",
     "solutionShortDescription": "spfx description"
   }

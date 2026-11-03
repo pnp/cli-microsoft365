@@ -638,7 +638,37 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     await command.action(logger, { options: {} } as any);
     const findings: FindingToReport[] = log[0];
+    // 10 because SPFx v1.24.0 scaffolds a broken project
+    assert.strictEqual(findings.length, 10);
+  });
+
+  it('e2e: shows correct number of findings for a valid 1.24.1 project', async () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1241-webpart-react'));
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
+  });
+
+  it('e2e: shows a finding for a 1.24.1 project with a mismatched dependency', async () => {
+    const projectPath = path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1241-webpart-react');
+    const originalReadFileSync = fs.readFileSync;
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => projectPath);
+    sinon.stub(fs, 'readFileSync').callsFake((filePath, options) => {
+      const fileContents = originalReadFileSync(filePath, options);
+
+      if (filePath.toString() !== path.join(projectPath, 'package.json')) {
+        return fileContents;
+      }
+
+      const packageJson = JSON.parse(fileContents.toString());
+      packageJson.devDependencies.typescript = '~5.7.0';
+      return JSON.stringify(packageJson);
+    });
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.filter(f => f.id === 'FN002022').length, 1);
   });
 
   it('passes validation when package manager not specified', async () => {
