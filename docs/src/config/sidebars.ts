@@ -261,6 +261,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'agent blueprint list',
               id: 'cmd/entra/agent/agent-blueprint-list'
+            },
+            {
+              type: 'doc',
+              label: 'agent blueprintprincipal list',
+              id: 'cmd/entra/agent/agent-blueprintprincipal-list'
             }
           ]
         },
