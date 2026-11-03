@@ -638,7 +638,8 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     await command.action(logger, { options: {} } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 0);
+    // 10 because SPFx v1.24.0 scaffolds a broken project
+    assert.strictEqual(findings.length, 10);
   });
 
   it('passes validation when package manager not specified', async () => {
