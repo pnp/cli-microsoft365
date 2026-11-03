@@ -39,6 +39,8 @@ describe(commands.SITEDESIGN_ADD, () => {
   });
 
   beforeEach(() => {
+    (telemetry.trackEvent as sinon.SinonStub).resetHistory();
+
     log = [];
     logger = {
       log: async (msg: string) => {
@@ -533,5 +535,27 @@ describe(commands.SITEDESIGN_ADD, () => {
   it('passes validation if all required parameters are valid (multiple siteScripts)', () => {
     const actual = commandOptionsSchema.safeParse({ title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,449c0c6d-5380-4df2-b84b-622e0ac8ec25" });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('tracks the required webTemplate enum in telemetry', async () => {
+    sinon.stub(request, 'post').resolves({});
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        title: 'Contoso',
+        webTemplate: 'TeamSite',
+        siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24'
+      })
+    });
+
+    sinon.assert.calledWith(
+      telemetry.trackEvent as sinon.SinonStub,
+      commands.SITEDESIGN_ADD,
+      {
+        debug: false,
+        verbose: false,
+        webTemplate: 'TeamSite'
+      }
+    );
   });
 });

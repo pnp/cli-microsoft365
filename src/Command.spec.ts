@@ -166,6 +166,12 @@ class MockCommandWithSchema extends Command {
       type: 'string'
     },
     {
+      name: 'requiredEnum',
+      required: true,
+      type: 'string',
+      autocomplete: ['a', 'b', 'c']
+    },
+    {
       name: 'optionalString',
       required: false,
       type: 'string'
@@ -384,14 +390,18 @@ describe('Command', () => {
     const args = {
       options: {
         requiredOption: 'abc',
+        requiredEnum: 'b',
         optionalString: 'def',
         optionalEnum: 'a',
         optionalNumber: 1,
         optionalBoolean: false
       }
     };
+
     const telemetryProps = (command as any).getTelemetryProperties(args);
+
     assert.deepStrictEqual(telemetryProps, {
+      requiredEnum: 'b',
       optionalString: true,
       optionalEnum: 'a',
       optionalNumber: true,
