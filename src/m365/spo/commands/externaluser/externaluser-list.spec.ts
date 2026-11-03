@@ -588,7 +588,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -624,7 +624,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com' }) });
     assert(loggerLogSpy.calledOnceWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',

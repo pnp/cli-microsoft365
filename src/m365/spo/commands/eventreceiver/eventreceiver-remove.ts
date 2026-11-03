@@ -62,16 +62,10 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
         const listOptions = [opts.listId, opts.listTitle, opts.listUrl];
         return !(listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1);
       }, {
-        message: `Specify either list id or title or list url`,
-        params: {
-          customCode: 'required'
-        }
+        message: `Specify either list id or title or list url`
       })
       .refine(opts => !(opts.scope === 'site' && (opts.listId || opts.listUrl || opts.listTitle)), {
-        message: 'Scope cannot be set to site when retrieving list event receivers.',
-        params: {
-          customCode: 'required'
-        }
+        message: 'Scope cannot be set to site when retrieving list event receivers.'
       });
   }
 
