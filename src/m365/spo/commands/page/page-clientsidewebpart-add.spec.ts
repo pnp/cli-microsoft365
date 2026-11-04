@@ -3304,4 +3304,26 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       'Specify one of the following options: standardWebPart, webPartId.'
     );
   });
+
+  it('fails validation if section is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      section: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if column is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
+      column: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
 });

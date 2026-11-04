@@ -1806,4 +1806,37 @@ describe(commands.PAGE_TEXT_ADD, () => {
     assert.strictEqual(actual.success, false);
     assert.strictEqual(actual.error.issues[0].message, 'The value of parameter order must be 1 or higher');
   });
+
+  it('fails validation if section is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      text: 'Hello world',
+      section: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if column is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      text: 'Hello world',
+      column: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if order is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      text: 'Hello world',
+      order: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
 });

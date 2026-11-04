@@ -1548,4 +1548,26 @@ describe(commands.PAGE_SECTION_ADD, () => {
 
     assert.strictEqual(actual.success, true);
   });
+
+  it('fails validation if order is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      order: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if zoneHeight is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'Flexible',
+      zoneHeight: 34.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
 });
