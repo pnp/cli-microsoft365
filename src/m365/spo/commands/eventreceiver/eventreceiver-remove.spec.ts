@@ -12,12 +12,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './eventreceiver-remove.js';
+import command, { options } from './eventreceiver-remove.js';
 
 describe(commands.EVENTRECEIVER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const eventReceiverResponse = JSON.stringify(
@@ -40,6 +41,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -86,75 +88,88 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Event Receiver' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Event Receiver' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all required parameters are valid and list id and eventreceiver name is set', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Test Receiver' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid and list id and eventreceiver name is set', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Test Receiver' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all required parameters are valid and list title', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', name: 'PnP Test Receiver' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid and list title', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', name: 'PnP Test Receiver' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when all required parameters are valid and list url and event receiver name', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Test Receiver' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when all required parameters are valid and list url and event receiver name', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Test Receiver' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if list title and id are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Event Receiver' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if list title and id are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Event Receiver' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if list id is invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: 'invalid', name: 'PnP Event Receiver' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if list id is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: 'invalid', name: 'PnP Event Receiver' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid GUID.');
   });
 
-  it('fails validation if list id is filled in and scope is set to site', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Event Receiver', scope: 'site' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if list id is filled in and scope is set to site', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', name: 'PnP Event Receiver', scope: 'site' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if list title is filled in and scope is set to site', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo list', name: 'PnP Event Receiver', scope: 'site' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if list title is filled in and scope is set to site', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo list', name: 'PnP Event Receiver', scope: 'site' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if list url is filled in and scope is set to site', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Event Receiver', scope: 'site' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if list url is filled in and scope is set to site', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Event Receiver', scope: 'site' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if title and id and url are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Event Receiver' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if title and id and url are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Event Receiver' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if scope is invalid value', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', scope: 'abc', name: 'PnP Event Receiver' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if scope is invalid value', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', scope: 'abc', name: 'PnP Event Receiver' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if webUrl is an invalid webUrl', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', name: 'PnP Event Receiver' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc', listTitle: 'Demo List', name: 'PnP Test Receiver' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'abc is not a valid GUID.');
+  });
+
+  it('fails validation if webUrl is an invalid webUrl', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', name: 'PnP Event Receiver' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the event receiver when force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' }) });
 
     assert(promptIssued);
   });
 
   it('aborts removing the event receiver when prompt not confirmed', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete');
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' }) });
     assert(requestDeleteStub.notCalled);
   });
 
@@ -172,7 +187,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', force: true }) });
     assert(requestDeleteStub.called);
   });
 
@@ -192,7 +207,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' }) });
     assert(requestDeleteStub.called);
   });
 
@@ -213,7 +228,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: '/sites/portal/Lists/rerlist' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: '/sites/portal/Lists/rerlist' }) });
     assert(requestDeleteStub.called);
   });
 
@@ -234,7 +249,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listId: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listId: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' }) });
     assert(requestDeleteStub.called);
   });
 
@@ -255,7 +270,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: '625b1f4c-2869-457f-8b41-bed72059bb2b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: '625b1f4c-2869-457f-8b41-bed72059bb2b' }) });
     assert(requestDeleteStub.called);
   });
 
@@ -276,7 +291,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' }) });
     assert(requestDeleteStub.called);
   });
 
@@ -291,13 +306,13 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinon.stub(request, 'delete').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         scope: 'site',
         name: 'PnP Test Receiver',
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });
