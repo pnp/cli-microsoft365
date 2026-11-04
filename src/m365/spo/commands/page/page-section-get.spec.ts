@@ -437,7 +437,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', sectipn: 1 } }),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
