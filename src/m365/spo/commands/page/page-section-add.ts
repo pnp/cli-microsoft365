@@ -28,34 +28,48 @@ export const options = z.strictObject({
     .alias('u'),
   sectionTemplate: z.string().pipe(z.enum(sectionTemplates)).alias('t'),
   order: z.number().int().min(1, { error: 'The value of parameter order must be 1 or higher' }).optional(),
-  zoneEmphasis: z.preprocess(val => {
-    const target = String(val).toLowerCase();
-    return zoneEmphasisValues.find(v => v.toLowerCase() === target) ?? val;
-  }, z.enum(zoneEmphasisValues)).optional(),
+  zoneEmphasis: z.string().pipe(
+    z.preprocess(val => {
+      const target = String(val).toLowerCase();
+      return zoneEmphasisValues.find(v => v.toLowerCase() === target) ?? val;
+    }, z.enum(zoneEmphasisValues))
+  ).optional().autocomplete([...zoneEmphasisValues]),
   isLayoutReflowOnTop: z.boolean().optional(),
   isCollapsibleSection: z.boolean().optional(),
   showDivider: z.boolean().optional(),
-  iconAlignment: z.preprocess(val => {
-    const target = String(val).toLowerCase();
-    return iconAlignmentValues.find(v => v.toLowerCase() === target) ?? val;
-  }, z.enum(iconAlignmentValues)).optional(),
+  iconAlignment: z.string().pipe(
+    z.preprocess(val => {
+      const target = String(val).toLowerCase();
+      return iconAlignmentValues.find(v => v.toLowerCase() === target) ?? val;
+    }, z.enum(iconAlignmentValues))
+  ).optional().autocomplete([...iconAlignmentValues]),
   isExpanded: z.boolean().optional(),
   gradientText: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageHeight: z.number().optional(),
-  imageWidth: z.number().optional(),
-  fillMode: z.preprocess(val => {
-    const target = String(val).toLowerCase();
-    return fillModeValues.find(v => v.toLowerCase() === target) ?? val;
-  }, z.enum(fillModeValues)).optional(),
+  imageHeight: z.number()
+    .int()
+    .min(1, { error: 'The value of parameter imageHeight must be 1 or higher' })
+    .optional(),
+  imageWidth: z.number()
+    .int()
+    .min(1, { error: 'The value of parameter imageWidth must be 1 or higher' })
+    .optional(),
+  fillMode: z.string().pipe(
+    z.preprocess(val => {
+      const target = String(val).toLowerCase();
+      return fillModeValues.find(v => v.toLowerCase() === target) ?? val;
+    }, z.enum(fillModeValues))
+  ).optional().autocomplete([...fillModeValues]),
   useLightText: z.boolean().optional(),
   overlayColor: z.string().optional(),
   overlayOpacity: z.number().optional(),
   collapsibleTitle: z.string().optional(),
-  zoneReflowStrategy: z.preprocess(val => {
-    const target = String(val).toLowerCase();
-    return zoneReflowStrategyValues.find(v => v.toLowerCase() === target) ?? val;
-  }, z.enum(zoneReflowStrategyValues)).optional(),
+  zoneReflowStrategy: z.string().pipe(
+    z.preprocess(val => {
+      const target = String(val).toLowerCase();
+      return zoneReflowStrategyValues.find(v => v.toLowerCase() === target) ?? val;
+    }, z.enum(zoneReflowStrategyValues))
+  ).optional().autocomplete([...zoneReflowStrategyValues]),
   zoneHeight: z.number().int().min(MINIMUM_ZONE_HEIGHT, { error: `The value of parameter zoneHeight must be ${MINIMUM_ZONE_HEIGHT} or higher` }).optional(),
   headingLevel: z.number()
     .refine(level => [2, 3, 4].includes(level), {
@@ -88,9 +102,19 @@ class SpoPageSectionAddCommand extends SpoCommand {
       .refine(opts => opts.isLayoutReflowOnTop === undefined || opts.sectionTemplate === 'Vertical', {
         error: 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.'
       })
-      .refine(opts => opts.zoneEmphasis === 'Image' || !(opts.imageUrl || opts.imageWidth || opts.imageHeight || opts.fillMode), {
-        error: 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
-      })
+      .refine(
+        opts =>
+          opts.zoneEmphasis === 'Image' ||
+          (
+            opts.imageUrl === undefined &&
+            opts.imageWidth === undefined &&
+            opts.imageHeight === undefined &&
+            opts.fillMode === undefined
+          ),
+        {
+          error: 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
+        }
+      )
       .refine(opts => opts.zoneEmphasis !== 'Image' || !!opts.imageUrl, {
         error: 'Specify imageUrl when zoneEmphasis is set to Image',
         path: ['imageUrl'],
@@ -114,9 +138,18 @@ class SpoPageSectionAddCommand extends SpoCommand {
       .refine(opts => !opts.overlayColor || /^#[0-9a-f]{6}$/i.test(opts.overlayColor), {
         error: 'The value of parameter overlayColor must be a valid hex color'
       })
-      .refine(opts => ['Image', 'Gradient'].includes(opts.zoneEmphasis ?? '') || !(opts.overlayColor || opts.overlayOpacity || opts.useLightText), {
-        error: 'Specify overlayColor or overlayOpacity only when zoneEmphasis is set to Image or Gradient'
-      })
+      .refine(
+        opts =>
+          ['Image', 'Gradient'].includes(opts.zoneEmphasis ?? '') ||
+          (
+            opts.overlayColor === undefined &&
+            opts.overlayOpacity === undefined &&
+            opts.useLightText === undefined
+          ),
+        {
+          error: 'Specify overlayColor, overlayOpacity or useLightText only when zoneEmphasis is set to Image or Gradient'
+        }
+      )
       .refine(opts => opts.sectionTemplate === 'Flexible' || !(opts.zoneReflowStrategy || opts.zoneHeight), {
         error: 'Specify zoneReflowStrategy or zoneHeight only when sectionTemplate is set to Flexible'
       });

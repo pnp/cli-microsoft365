@@ -1380,4 +1380,172 @@ describe(commands.PAGE_SECTION_ADD, () => {
     });
     assert.strictEqual(actual.success, false);
   });
+
+  it('defines autocomplete values for enum options', () => {
+    const getAutocomplete = (optionName: string): string[] | undefined =>
+      commandInfo.options.find(option => option.name === optionName)?.autocomplete;
+
+    assert.deepStrictEqual(
+      getAutocomplete('zoneEmphasis'),
+      ['None', 'Neutral', 'Soft', 'Strong', 'Image', 'Gradient']
+    );
+    assert.deepStrictEqual(
+      getAutocomplete('iconAlignment'),
+      ['Left', 'Right']
+    );
+    assert.deepStrictEqual(
+      getAutocomplete('fillMode'),
+      ['ScaleToFill', 'ScaleToFit', 'Tile', 'OriginalSize']
+    );
+    assert.deepStrictEqual(
+      getAutocomplete('zoneReflowStrategy'),
+      ['TopToBottom', 'LeftToRight']
+    );
+  });
+
+  it('normalizes case-insensitive enum options', () => {
+    const actual = commandOptionsSchema.parse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'Flexible',
+      zoneEmphasis: 'neutral',
+      iconAlignment: 'right',
+      zoneReflowStrategy: 'lefttoright'
+    });
+
+    assert.strictEqual(actual.zoneEmphasis, 'Neutral');
+    assert.strictEqual(actual.iconAlignment, 'Right');
+    assert.strictEqual(actual.zoneReflowStrategy, 'LeftToRight');
+  });
+
+  it('fails validation if overlayOpacity is specified without Image or Gradient zoneEmphasis', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Strong',
+      overlayOpacity: 0
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if overlayOpacity is 0 for Image emphasis', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      overlayOpacity: 0
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if imageHeight is less than 1', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      imageHeight: 0
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'The value of parameter imageHeight must be 1 or higher'
+    );
+  });
+
+  it('fails validation if imageWidth is less than 1', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      imageWidth: 0
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'The value of parameter imageWidth must be 1 or higher'
+    );
+  });
+
+  it('fails validation if imageHeight is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      imageHeight: 100.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if imageWidth is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      imageWidth: 100.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if imageHeight is specified without Image zoneEmphasis', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Strong',
+      imageHeight: 955
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
+    );
+  });
+
+  it('fails validation if imageWidth is specified without Image zoneEmphasis', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Strong',
+      imageWidth: 555
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
+    );
+  });
+
+  it('passes validation with valid image dimensions for Image zoneEmphasis', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      sectionTemplate: 'OneColumn',
+      zoneEmphasis: 'Image',
+      imageUrl: 'https://contoso.com/image.jpg',
+      imageHeight: 955,
+      imageWidth: 555
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
 });
