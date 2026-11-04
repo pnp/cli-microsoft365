@@ -31,7 +31,7 @@ export const options = z.strictObject({
     .int()
     .min(1, { error: 'The value of parameter column must be 1 or higher' })
     .optional(),
-  order: z.number().int().optional()
+  order: z.number().int().min(1, { error: 'The value of parameter order must be 1 or higher' }).optional()
 });
 
 declare type Options = z.infer<typeof options>;

@@ -1800,4 +1800,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
     const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', column: 'foobar' });
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation if order has invalid (negative) value', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', text: 'Hello world', order: -1 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The value of parameter order must be 1 or higher');
+  });
 });
