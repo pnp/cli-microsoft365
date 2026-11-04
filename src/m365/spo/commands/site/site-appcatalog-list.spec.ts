@@ -1,6 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,7 +11,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-appcatalog-list.js';
+import command, { options } from './site-appcatalog-list.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 describe(commands.SITE_APPCATALOG_LIST, () => {
   const appCatalogResponseValue = [
@@ -34,6 +36,8 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,6 +46,8 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,7 +100,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledWith(appCatalogResponseValue));
   });
 
@@ -109,7 +115,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
 
     sinon.stub(spo, 'getWeb').resolves();
 
-    await command.action(logger, { options: { verbose: true, excludeDeletedSites: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, excludeDeletedSites: true }) });
     assert(loggerLogSpy.calledWith(appCatalogResponseValue));
   });
 
@@ -122,7 +128,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Something went wrong'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Something went wrong'));
   });
 
   it('correctly handles error when retrieving site collection app catalogs and excluding inaccessible sites with 404 status', async () => {
@@ -136,7 +142,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
 
     sinon.stub(spo, 'getWeb').rejects({ status: 404, statusText: 'Not Found' });
 
-    await command.action(logger, { options: { excludeDeletedSites: true, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ excludeDeletedSites: true, debug: true }) });
 
     assert(loggerLogSpy.calledWith([]));
   });
@@ -152,7 +158,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
 
     sinon.stub(spo, 'getWeb').rejects({ status: 403, statusText: 'Forbidden' });
 
-    await command.action(logger, { options: { excludeDeletedSites: true, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ excludeDeletedSites: true, debug: true }) });
 
     assert(loggerLogSpy.calledWith([]));
   });
@@ -168,6 +174,6 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
 
     sinon.stub(spo, 'getWeb').rejects({ status: 500, statusText: 'Internal Server Error' });
 
-    await assert.rejects(command.action(logger, { options: { excludeDeletedSites: true, debug: true } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ excludeDeletedSites: true, debug: true }) }));
   });
 });

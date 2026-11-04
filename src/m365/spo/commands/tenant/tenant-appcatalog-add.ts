@@ -128,7 +128,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       title: 'App catalog',
       type: 'ClassicSite',
       url: options.url,
-      timeZone: options.timeZone,
+      timeZone: Number(options.timeZone),
       owners: options.owner,
       wait: options.wait,
       verbose: this.verbose,

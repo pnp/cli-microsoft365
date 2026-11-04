@@ -88,7 +88,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -103,7 +103,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -118,14 +118,14 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', asAdmin: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', asAdmin: true, force: true }) });
     assert(postStub.calledOnce);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { siteUrl: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '00000000-0000-0000-0000-000000000000' });
   });
 
   it('prompts before disconnecting the specified site from its hub site when force option not passed', async () => {
     sinon.stub(request, 'post').resolves();
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/Sales' }) });
 
     assert(promptIssued);
   });
@@ -134,7 +134,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(postSpy.notCalled);
   });
 
@@ -146,7 +146,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     });
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(postStub.called);
   });
 
@@ -165,7 +165,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', force: true }) }),
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 

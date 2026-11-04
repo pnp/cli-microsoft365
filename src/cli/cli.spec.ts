@@ -565,6 +565,7 @@ describe('cli', () => {
   });
 
   beforeEach(() => {
+    cliErrorStub = sinon.stub(cli, 'error').resolves();
     log = [];
     cli.commands = [
       cli.getCommandInfo(mockCommand, 'cli-mock.js', 'help.mdx'),
@@ -581,7 +582,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
-      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx')
+      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithProcessedPromptedOption, 'cli-schema-processed-prompt-mock.js', 'help.mdx')
     ];
@@ -590,6 +591,7 @@ describe('cli', () => {
   });
 
   afterEach(() => {
+    cliErrorStub.restore();
     cliLogStub.resetHistory();
     cliErrorStub.resetHistory();
     cliFormatOutputSpy.resetHistory();
@@ -2270,7 +2272,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  15 commands'));
+    assert(cliLogStub.calledWith('  cli *  17 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2283,7 +2285,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        12 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        14 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2296,7 +2298,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  15 commands'));
+    assert(cliLogStub.calledWith('  cli *  17 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {

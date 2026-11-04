@@ -247,14 +247,6 @@ async function execute(rawArgs: string[]): Promise<void> {
               return cli.closeWithError(e.message, cli.optionsFromArgs, true);
             }
           }
-
-          try {
-            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
-          }
-          catch (e: any) {
-            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
-          }
-          continue;
         }
         else if (optionSetErrors.length > 0) {
           for (const error of optionSetErrors) {
@@ -262,13 +254,6 @@ async function execute(rawArgs: string[]): Promise<void> {
           }
         }
 
-          try {
-            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
-          }
-          catch (e: any) {
-            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
-          }
-          continue;
         const startProcessing = process.hrtime.bigint();
         try {
           await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
