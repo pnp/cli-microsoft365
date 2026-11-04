@@ -216,7 +216,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } as any }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' }) }),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -225,7 +225,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } as any }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' }) }),
       new CommandError('An error has occurred'));
   });
 

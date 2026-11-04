@@ -3276,4 +3276,32 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation when neither standardWebPart nor webPartId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify one of the following options: standardWebPart, webPartId.'
+    );
+  });
+
+  it('fails validation when both standardWebPart and webPartId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      pageName: 'page.aspx',
+      webUrl: 'https://contoso.sharepoint.com',
+      standardWebPart: 'BingMap',
+      webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify one of the following options: standardWebPart, webPartId.'
+    );
+  });
 });

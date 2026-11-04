@@ -108,11 +108,11 @@ describe(commands.PAGE_UNPUBLISH, () => {
   it('correctly unpublishes a page when extension is not specified', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName.substring(0, pageName.lastIndexOf('.')),
           verbose: true
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -132,10 +132,10 @@ describe(commands.PAGE_UNPUBLISH, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageUrl
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -156,7 +156,7 @@ describe(commands.PAGE_UNPUBLISH, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: pageName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: pageName }) }),
       new CommandError(errorMessage));
   });
 
