@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-accessrequest-setting-set.js';
+import command, { options } from './site-accessrequest-setting-set.js';
 import { z } from 'zod';
 
 describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
@@ -21,7 +21,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let baseSchema: z.ZodTypeAny;
-  let refinedSchema: z.ZodTypeAny;
+  let refinedSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,7 +32,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
 
     commandInfo = cli.getCommandInfo(command);
     baseSchema = commandInfo.command.getSchemaToParse()!;
-    refinedSchema = commandInfo.command.getRefinedSchema!(baseSchema as any)!;
+    refinedSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -144,7 +144,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, disabled: true, verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, disabled: true, verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -165,7 +165,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, ownerGroup: true, verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -186,7 +186,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, email: 'john.doe@contoso.com', verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -210,7 +210,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, email: 'john.doe@contoso.com', message: 'Motivate why you need access.', verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: 'Motivate why you need access.', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -234,7 +234,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, email: 'john.doe@contoso.com', message: '', verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: '', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -258,7 +258,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl, ownerGroup: true, message: 'Hello', verbose: true } });
+    await command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, message: 'Hello', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -285,7 +285,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl, email: 'john.doe@contoso.com', verbose: true } }), new CommandError('Access is denied.'));
+    await assert.rejects(command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) }), new CommandError('Access is denied.'));
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.called, false);
@@ -315,6 +315,6 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl, ownerGroup: true, verbose: true } }), new CommandError('Failed to set default.'));
+    await assert.rejects(command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) }), new CommandError('Failed to set default.'));
   });
 });
