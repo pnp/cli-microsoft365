@@ -144,7 +144,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
           (
             opts.overlayColor === undefined &&
             opts.overlayOpacity === undefined &&
-            opts.useLightText === undefined
+            !opts.useLightText
           ),
         {
           error: 'Specify overlayColor, overlayOpacity or useLightText only when zoneEmphasis is set to Image or Gradient'
