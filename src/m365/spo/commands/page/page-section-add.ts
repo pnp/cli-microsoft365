@@ -26,7 +26,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  sectionTemplate: z.enum(sectionTemplates).alias('t'),
+  sectionTemplate: z.string().pipe(z.enum(sectionTemplates)).alias('t'),
   order: z.number().int().min(1, { error: 'The value of parameter order must be 1 or higher' }).optional(),
   zoneEmphasis: z.preprocess(val => {
     const target = String(val).toLowerCase();
@@ -92,13 +92,21 @@ class SpoPageSectionAddCommand extends SpoCommand {
         error: 'Specify imageUrl, imageWidth, imageHeight or fillMode only when zoneEmphasis is set to Image'
       })
       .refine(opts => opts.zoneEmphasis !== 'Image' || !!opts.imageUrl, {
-        error: 'Specify imageUrl when zoneEmphasis is set to Image'
+        error: 'Specify imageUrl when zoneEmphasis is set to Image',
+        path: ['imageUrl'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(opts => opts.zoneEmphasis === 'Gradient' || !opts.gradientText, {
         error: 'Specify gradientText only when zoneEmphasis is set to Gradient'
       })
       .refine(opts => opts.zoneEmphasis !== 'Gradient' || !!opts.gradientText, {
-        error: 'Specify gradientText when zoneEmphasis is set to Gradient'
+        error: 'Specify gradientText when zoneEmphasis is set to Gradient',
+        path: ['gradientText'],
+        params: {
+          customCode: 'required'
+        }
       })
       .refine(opts => opts.overlayOpacity === undefined || (opts.overlayOpacity >= 0 && opts.overlayOpacity <= 100), {
         error: 'The value of parameter overlayOpacity must be between 0 and 100'
