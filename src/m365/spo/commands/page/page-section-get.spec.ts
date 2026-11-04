@@ -437,7 +437,7 @@ describe(commands.PAGE_SECTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
@@ -493,5 +493,29 @@ describe(commands.PAGE_SECTION_GET, () => {
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1 });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if section is less than 1', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 0
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'The value of parameter section must be 1 or higher'
+    );
+  });
+
+  it('fails validation if section is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
   });
 });

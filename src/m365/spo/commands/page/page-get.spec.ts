@@ -79,7 +79,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' }) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].numControls, sectionMock.numControls);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].numSections, sectionMock.numSections);
   });
@@ -97,7 +97,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' }) });
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -118,7 +118,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', output: 'json' }) });
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -139,7 +139,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' }) });
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -162,7 +162,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', default: true, metadataOnly: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', default: true, metadataOnly: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith(pageListItemMock));
   });
 
@@ -175,7 +175,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', metadataOnly: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', metadataOnly: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith(pageListItemMock));
   });
 
@@ -188,7 +188,7 @@ describe(commands.PAGE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' }) }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
@@ -207,7 +207,7 @@ describe(commands.PAGE_GET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' }) }),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -216,7 +216,7 @@ describe(commands.PAGE_GET, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -233,6 +233,41 @@ describe(commands.PAGE_GET, () => {
 
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when neither name nor default is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify either name or default, but not both.'
+    );
+  });
+
+  it('fails validation when both name and default are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      name: 'home.aspx',
+      default: true
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'Specify either name or default, but not both.'
+    );
+  });
+
+  it('passes validation when default is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      default: true
+    });
+
     assert.strictEqual(actual.success, true);
   });
 });

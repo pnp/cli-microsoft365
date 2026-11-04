@@ -439,7 +439,7 @@ describe(commands.PAGE_SECTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' }) }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
@@ -485,5 +485,15 @@ describe(commands.PAGE_SECTION_LIST, () => {
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with the section option', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+      pageName: 'home.aspx',
+      section: 1
+    });
+
+    assert.strictEqual(actual.success, false);
   });
 });
