@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './group-remove.js';
 
 describe(commands.GROUP_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -27,6 +27,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -53,8 +54,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       request.get,
-      cli.promptForConfirmation,
-      cli.getSettingWithDefaultValue
+      cli.promptForConfirmation
     ]);
   });
 
@@ -79,7 +79,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true }) });
     assert(requestPostSpy.called);
   });
 
@@ -100,7 +100,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, force: true }) });
     assert(requestPostSpy.called);
   });
 
@@ -112,7 +112,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true }) });
     assert(requestPostSpy.notCalled);
   });
 
@@ -127,7 +127,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true }) });
     assert(requestPostSpy.called);
   });
 
@@ -149,65 +149,59 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true }) }),
       new CommandError(error.error['odata.error'].message.value));
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing group when confirmation argument not passed (name)', async () => {
-    await command.action(logger, { options: { name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' }) });
 
     assert(promptIssued);
   });
 
-  it('fails validation if both id and name options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if both id and name options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/mysite' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: 7 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if the id option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 'Hi' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the id option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if both id and name options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, name: 'Team Site Members' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com/mysite',
+      id: 7,
+      unknownOption: 'value'
     });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 7 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the id option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 'Hi' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the id option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if both id and name options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, name: 'Team Site Members' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 });

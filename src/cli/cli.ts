@@ -1099,28 +1099,16 @@ async function promptForOptionSetNameAndValue(args: CommandArgs, options: string
   const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: options.map((choice: any) => { return { name: choice, value: choice }; }) });
   const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
-  let coercedValue: unknown = optionValue;
-
-  // Basic type coercion to align with how CLI arguments are typically parsed
-  if (typeof optionValue === 'string') {
-    const trimmed = optionValue.trim();
-
-    if (trimmed === 'true') {
-      coercedValue = true;
-    }
-    else if (trimmed === 'false') {
-      coercedValue = false;
-    }
-    else if (trimmed !== '' && !isNaN(Number(trimmed))) {
-      coercedValue = Number(trimmed);
-    }
-  }
+  const parsedOptions = getCommandOptionsFromArgs(
+    [`--${selectedOptionName}`, optionValue],
+    cli.commandToExecute
+  );
 
   options
     .filter(optionName => optionName !== selectedOptionName)
     .forEach(optionName => args.options[optionName] = undefined);
 
-  args.options[selectedOptionName] = coercedValue as any;
+  args.options[selectedOptionName] = parsedOptions[selectedOptionName];
   await cli.error('');
 }
 
