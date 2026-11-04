@@ -14,7 +14,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  groupId: z.number().optional(),
+  groupId: z.coerce.number().int().positive().optional(),
   groupName: z.string().optional()
 });
 

@@ -21,7 +21,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.number().optional().alias('i'),
+  id: z.coerce.number().int().positive().optional().alias('i'),
   name: z.string().optional(),
   associatedGroup: zod.coercedEnum(AssociatedGroup).optional()
 });

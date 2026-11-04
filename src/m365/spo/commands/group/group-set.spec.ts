@@ -88,6 +88,14 @@ describe(commands.GROUP_SET, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when group id is negative', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validWebUrl,
+      id: -1
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation when both ownerEmail and ownerUserName are specified', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: validWebUrl,

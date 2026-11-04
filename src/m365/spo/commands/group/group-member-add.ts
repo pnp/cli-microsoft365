@@ -16,7 +16,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  groupId: z.number().int().positive().optional(),
+  groupId: z.coerce.number().int().positive().optional(),
   groupName: z.string().optional(),
   userNames: z.string()
     .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {

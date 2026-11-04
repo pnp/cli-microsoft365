@@ -288,6 +288,11 @@ describe(commands.GROUP_GET, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if the specified ID is not a positive number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: -1 });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: 'https://contoso.sharepoint.com',

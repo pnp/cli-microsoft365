@@ -214,6 +214,11 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if groupId is negative', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: -1 });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: "https://contoso.sharepoint.com/sites/SiteA",

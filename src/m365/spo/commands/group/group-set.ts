@@ -15,7 +15,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.number().optional().alias('i'),
+  id: z.coerce.number().int().positive().optional().alias('i'),
   name: z.string().optional().alias('n'),
   newName: z.string().optional(),
   description: z.string().optional(),
@@ -57,11 +57,7 @@ class SpoGroupSetCommand extends SpoCommand {
         }
       })
       .refine(o => [o.ownerEmail, o.ownerUserName].filter(x => x !== undefined).length <= 1, {
-        error: `Specify either 'ownerEmail' or 'ownerUserName', but not both.`,
-        params: {
-          customCode: 'optionSet',
-          options: ['ownerEmail', 'ownerUserName']
-        }
+        error: `Specify either 'ownerEmail' or 'ownerUserName', but not both.`
       });
   }
 

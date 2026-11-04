@@ -390,6 +390,15 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if groupId is not a positive number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      groupId: -1,
+      userName: userName
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if userId is Invalid', () => {
     const actual = commandOptionsSchema.safeParse({
       webUrl: webUrl,

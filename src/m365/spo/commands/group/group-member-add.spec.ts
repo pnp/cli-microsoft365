@@ -315,6 +315,11 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if groupID is negative', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: -1, userNames: "Alex.Wilber@contoso.com" });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if userIds is Invalid', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userIds: "9,invalidUserId" });
     assert.strictEqual(actual.success, false);

@@ -1554,21 +1554,42 @@ describe('cli', () => {
     assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optA, 42);
   });
 
-  it(`keeps string value as string when prompting for option set value`, async () => {
+  it(`keeps numeric-looking value as string when prompting for a string option set value`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
     sinon.stub(prompt, 'forSelection').resolves('optE');
-    sinon.stub(prompt, 'forInput').resolves('hello world');
+    sinon.stub(prompt, 'forInput').resolves('5');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return true;
       }
+
       return defaultValue;
     });
     const executeCommandSpy = sinon.spy(cli, 'executeCommand');
 
     await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+
     assert(executeCommandSpy.called);
-    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'hello world');
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, '5');
+  });
+
+  it(`keeps boolean-looking value as string when prompting for a string option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optE');
+    sinon.stub(prompt, 'forInput').resolves('true');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'true');
   });
 
   it(`executes command when validation passed`, async () => {
