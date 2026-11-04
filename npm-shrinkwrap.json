@@ -9,17 +9,18 @@
       "version": "12.0.0",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "^16.14.2",
-        "@azure/msal-node": "^7.1.0",
-        "@inquirer/confirm": "^6.3.4",
-        "@inquirer/input": "^5.1.8",
-        "@inquirer/select": "^5.2.7",
+        "@azure/msal-common": "^16.15.0",
+        "@azure/msal-node": "^7.1.2",
+        "@azure/msal-node-extensions": "5.5.4",
+        "@inquirer/confirm": "^6.3.5",
+        "@inquirer/input": "^5.1.9",
+        "@inquirer/select": "^5.2.8",
         "@xmldom/xmldom": "^0.9.12",
         "adaptive-expressions": "^4.23.3",
         "adaptivecards": "^3.0.6",
         "adaptivecards-templating": "^2.3.1",
         "adm-zip": "^0.6.1",
-        "axios": "^1.20.0",
+        "axios": "^1.21.0",
         "chalk": "^6.0.1",
         "clipboardy": "^5.3.2",
         "configstore": "^8.0.0",
@@ -28,7 +29,7 @@
         "easy-table": "^1.2.0",
         "jmespath": "^0.16.0",
         "json-to-ast": "^2.1.0",
-        "node-forge": "^1.4.0",
+        "node-forge": "^1.4.2",
         "omelette": "^0.4.17",
         "open": "^11.0.4",
         "proper-lockfile": "^4.1.2",
@@ -66,8 +67,8 @@
         "@types/update-notifier": "^6.0.8",
         "@types/uuid": "^10.0.0",
         "@types/yargs-parser": "^21.0.3",
-        "@typescript-eslint/eslint-plugin": "^8.72.0",
-        "@typescript-eslint/parser": "^8.72.0",
+        "@typescript-eslint/eslint-plugin": "^8.72.1",
+        "@typescript-eslint/parser": "^8.72.1",
         "c8": "^12.0.0",
         "eslint": "^10.13.0",
         "eslint-plugin-mocha": "^11.3.0",
@@ -79,7 +80,7 @@
         "typescript-native": "npm:typescript@^7.0.2"
       },
       "optionalDependencies": {
-        "@azure/msal-node-extensions": "^5.5.2"
+        "@azure/msal-node-extensions": "^5.5.4"
       }
     },
     "node_modules/@actions/core": {
@@ -114,21 +115,21 @@
       "license": "MIT"
     },
     "node_modules/@azure/msal-common": {
-      "version": "16.14.2",
-      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-16.14.2.tgz",
-      "integrity": "sha512-HOBR0Gfo39TMrkxNG8k6cfjRkrRjXZc3JQs3ebMWQc9S4cihuknMYra3sgmzbZB752oQBqBN9+WF7c826p2vIQ==",
+      "version": "16.15.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-16.15.0.tgz",
+      "integrity": "sha512-lwdLb1B9Q5nEhPLVIKe78XH5wFMN15fCiDkY7ylPDSWZuWcD93G3jpJajrKhO3CQld8SLKz0sHiOi24mxdvtsg==",
       "license": "MIT",
       "engines": {
         "node": ">=0.8.0"
       }
     },
     "node_modules/@azure/msal-node": {
-      "version": "7.1.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node/-/msal-node-7.1.0.tgz",
-      "integrity": "sha512-s1O6hSY/C/dmqykTmmeHY6GhSkDuY8N1gxyhuLyaCwbY7N+UBvU2Wu4flas7+NxZiAPcXNPVpgt3n/HP/5yL+w==",
+      "version": "7.1.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node/-/msal-node-7.1.2.tgz",
+      "integrity": "sha512-52hKQLGpEQzwNufIXG1SPVU+wQ3RIe7Rp2+g+VdAmZojCAZ6yCdGEffzQEQ6RnBZGBEs40nl14rWBmfJpCoHsg==",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "16.14.2",
+        "@azure/msal-common": "16.15.0",
         "jsonwebtoken": "^9.0.0"
       },
       "engines": {
@@ -136,14 +137,14 @@
       }
     },
     "node_modules/@azure/msal-node-extensions": {
-      "version": "5.5.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-extensions/-/msal-node-extensions-5.5.2.tgz",
-      "integrity": "sha512-vPSHT6nque5wl/AVEh4PqLpKtTD3jtYJ1V7gHJwci0q+itMDIzG1h9DsQErs8Hbg41da/k2xYZoKvzZEC9IOOw==",
+      "version": "5.5.4",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-extensions/-/msal-node-extensions-5.5.4.tgz",
+      "integrity": "sha512-dTnQNoldF3Dw8SxLDTodkii4q43EZvO1yuWncVHi5qQ8xsuo71GlTGpQMIlWNLgw5jJW0KQ0XQoGDzyHX6wb7Q==",
       "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
       "dependencies": {
-        "@azure/msal-common": "16.14.2",
+        "@azure/msal-common": "16.15.0",
         "@azure/msal-node-runtime": "^0.20.0",
         "keytar": "^7.8.0"
       },
@@ -402,22 +403,22 @@
       }
     },
     "node_modules/@inquirer/ansi": {
-      "version": "2.0.9",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/ansi/-/ansi-2.0.9.tgz",
-      "integrity": "sha512-0Ywt3S8tqM6TWUcsRlBFQ1x+X3/o8kktX0ZiKAnByYb9GFDknnOhse1PVtfiD2BXPI8ar+BWx9PV9R0lQIcygw==",
+      "version": "2.0.10",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/ansi/-/ansi-2.0.10.tgz",
+      "integrity": "sha512-dwrc+1aqVZpHNkNDswXGtn1typ+Pxpo5FHZRyBw1le7onEJUkPUkYOY1FIFC1LvFMYUqqLuWBwElhAmencL7MQ==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
       }
     },
     "node_modules/@inquirer/confirm": {
-      "version": "6.3.4",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/confirm/-/confirm-6.3.4.tgz",
-      "integrity": "sha512-ZwnaZZDa1zxsyVrN32s447ydMnKcw7e8WWNT+R+Qsu0zAn8Rs6yi9d1B80Kob1Ul2cfUi7t8JD2t4/K7uEZpqA==",
+      "version": "6.3.5",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/confirm/-/confirm-6.3.5.tgz",
+      "integrity": "sha512-BJ59BOyURiZiAxdr9AuRu38/k+rV+DcTIM2fUF/c/BXrab6H8zMZTTOl3LgkSJH96Xob2vOJxDiBkHiz32Xx2w==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^12.0.5",
-        "@inquirer/type": "4.2.0"
+        "@inquirer/core": "^12.0.6",
+        "@inquirer/type": "4.2.1"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
@@ -432,14 +433,14 @@
       }
     },
     "node_modules/@inquirer/core": {
-      "version": "12.0.5",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/core/-/core-12.0.5.tgz",
-      "integrity": "sha512-c0ZSnO9oVk/IlEGoZK3u8b3IZQeu9I6jUkXJSQnQEVRXsjKvtAq3AGqFL2LgfJhlzMZne08pZHWRWasIcI3Rew==",
+      "version": "12.0.6",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/core/-/core-12.0.6.tgz",
+      "integrity": "sha512-5yxn2LsJ8Tu4ei2a+yNkmFRhM/cb+JMEsEs/AW6CCOnBnpMy4IjYiPMFyHtYq8weOmlTyqqCx40y0DsD7OsEPw==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/ansi": "^2.0.9",
-        "@inquirer/figures": "^2.0.9",
-        "@inquirer/type": "4.2.0",
+        "@inquirer/ansi": "^2.0.10",
+        "@inquirer/figures": "^2.0.10",
+        "@inquirer/type": "4.2.1",
         "cli-width": "^4.1.0",
         "fast-wrap-ansi": "^0.2.0",
         "mute-stream": "^3.0.0",
@@ -458,22 +459,22 @@
       }
     },
     "node_modules/@inquirer/figures": {
-      "version": "2.0.9",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/figures/-/figures-2.0.9.tgz",
-      "integrity": "sha1-jAT9ujp4rw5XwLMSfL0xnOYEscE=",
+      "version": "2.0.10",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/figures/-/figures-2.0.10.tgz",
+      "integrity": "sha512-51elrUJV3jZpvD0ygz8+U10Kc6+Lzqln+/tYmnbhy6jo5oXpE6hMCcv+OTBC0enwJXsb3JIuT3VtEinRNCSK2A==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
       }
     },
     "node_modules/@inquirer/input": {
-      "version": "5.1.8",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/input/-/input-5.1.8.tgz",
-      "integrity": "sha512-psOSTgkL8y/OtgJJYbqJ0oISr2QBE0U1Ro/qQdA/EKjeJiwiUTQgQmq8o4ESNzVOWthIeh3YLD7BCUR9dKnR5g==",
+      "version": "5.1.9",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/input/-/input-5.1.9.tgz",
+      "integrity": "sha512-2Vd5T7lTxfgJMpAd3aOu6bQpbUnCU7tBgvTQIZkP/7juJzmRmTM2t5XfOCuirFduWLTSJI/WZp32Cq1E01TVeg==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/core": "^12.0.5",
-        "@inquirer/type": "4.2.0"
+        "@inquirer/core": "^12.0.6",
+        "@inquirer/type": "4.2.1"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
@@ -488,15 +489,15 @@
       }
     },
     "node_modules/@inquirer/select": {
-      "version": "5.2.7",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/select/-/select-5.2.7.tgz",
-      "integrity": "sha512-pRDWO4dTqSAvFQdO8yclKMtXNDm9K9HmvWB5UZmT3clw2OlOBNXveHzhyFmO/0d0yJMqlPcNITus1Jtpm6t8VQ==",
+      "version": "5.2.8",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/select/-/select-5.2.8.tgz",
+      "integrity": "sha512-BklkkAAOpjdCfuQw5fVGcDuhKxA7T1iBpn6b2JUvDDdkIsO3Ftlg+WnWUCVpkUBFagL2o036OFW+xL4lC9wIPw==",
       "license": "MIT",
       "dependencies": {
-        "@inquirer/ansi": "^2.0.9",
-        "@inquirer/core": "^12.0.5",
-        "@inquirer/figures": "^2.0.9",
-        "@inquirer/type": "4.2.0"
+        "@inquirer/ansi": "^2.0.10",
+        "@inquirer/core": "^12.0.6",
+        "@inquirer/figures": "^2.0.10",
+        "@inquirer/type": "4.2.1"
       },
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
@@ -511,9 +512,9 @@
       }
     },
     "node_modules/@inquirer/type": {
-      "version": "4.2.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/type/-/type-4.2.0.tgz",
-      "integrity": "sha512-2rnHX8RPo4glJYqnFc/v3nQeIhDcjyRRyaT7MGcfL/8xv/8K03SXYoA2tX06WVSKywWOE/ncbG3dtuzLjR5TCQ==",
+      "version": "4.2.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@inquirer/type/-/type-4.2.1.tgz",
+      "integrity": "sha512-lDkPsnv5M5CcYB2T1qTc3dobNTPkVr4DU3Ic2Q6SW8/qVRHgvzdRdmVZ6YqG9Ag1aJTeMsLU0s0WPRh3CZWDQQ==",
       "license": "MIT",
       "engines": {
         "node": ">=23.5.0 || ^22.13.0 || ^20.17.0"
@@ -897,17 +898,17 @@
       "license": "MIT"
     },
     "node_modules/@typescript-eslint/eslint-plugin": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.72.0.tgz",
-      "integrity": "sha512-aysKgysPX9XOv/dk95UkvUDe++Q3n3dJPG9CEWT3RUccxfkPJ+Qn6nhKPDhZXU6Ofo9kgwGWwKyQCnZIXTgngg==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.72.1.tgz",
+      "integrity": "sha512-5CokTWXpmbylfFabsbvHC0CAw3XLaGnoa+nFJX5FR592h/LoZsENUE6p/rg5xvkKrFEXz6pYmgI29AgXc2N3BQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
         "@eslint-community/regexpp": "^4.12.2",
-        "@typescript-eslint/scope-manager": "8.72.0",
-        "@typescript-eslint/type-utils": "8.72.0",
-        "@typescript-eslint/utils": "8.72.0",
-        "@typescript-eslint/visitor-keys": "8.72.0",
+        "@typescript-eslint/scope-manager": "8.72.1",
+        "@typescript-eslint/type-utils": "8.72.1",
+        "@typescript-eslint/utils": "8.72.1",
+        "@typescript-eslint/visitor-keys": "8.72.1",
         "ignore": "^7.0.5",
         "natural-compare": "^1.4.0",
         "ts-api-utils": "^2.5.0"
@@ -920,22 +921,22 @@
         "url": "https://opencollective.com/typescript-eslint"
       },
       "peerDependencies": {
-        "@typescript-eslint/parser": "^8.72.0",
+        "@typescript-eslint/parser": "^8.72.1",
         "eslint": "^8.57.0 || ^9.0.0 || ^10.0.0",
         "typescript": ">=4.8.4 <6.1.0"
       }
     },
     "node_modules/@typescript-eslint/parser": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/parser/-/parser-8.72.0.tgz",
-      "integrity": "sha512-0O+x3ynciD6zuXb1CKSu165haQV6ey53DKhHHUnujP7U+XlltJG+/keT0Xhd1HXCze+IHf7Tvt39ovyepX/LNw==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/parser/-/parser-8.72.1.tgz",
+      "integrity": "sha512-ZGwZP4OCfyA0AQTpEAMWz+rtX01DRhQWW5hB0ucKDEIX5U7jdmPSaMx94rQfaPAQzIYz2BimOgKOJtjfpRFQ9g==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/scope-manager": "8.72.0",
-        "@typescript-eslint/types": "8.72.0",
-        "@typescript-eslint/typescript-estree": "8.72.0",
-        "@typescript-eslint/visitor-keys": "8.72.0",
+        "@typescript-eslint/scope-manager": "8.72.1",
+        "@typescript-eslint/types": "8.72.1",
+        "@typescript-eslint/typescript-estree": "8.72.1",
+        "@typescript-eslint/visitor-keys": "8.72.1",
         "debug": "^4.4.3"
       },
       "engines": {
@@ -951,14 +952,14 @@
       }
     },
     "node_modules/@typescript-eslint/project-service": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/project-service/-/project-service-8.72.0.tgz",
-      "integrity": "sha512-bzHngBbmIgzj6TsTjVUCntGx6FFLgE7mPjpO0PzHycOaZHXqS43XnrkFIHRS16LLr/xO6FHSXG3GJFo/F4bSBQ==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/project-service/-/project-service-8.72.1.tgz",
+      "integrity": "sha512-fAuVMkwdO/huI8nyo/WKnNKf6Gag93S56Rh3Ts5mGcavwSdaN8tRg1gCeIGX8PF+nzp1BjGfO4gHhGzW1J6jTg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/tsconfig-utils": "^8.72.0",
-        "@typescript-eslint/types": "^8.72.0",
+        "@typescript-eslint/tsconfig-utils": "^8.72.1",
+        "@typescript-eslint/types": "^8.72.1",
         "debug": "^4.4.3"
       },
       "engines": {
@@ -973,14 +974,14 @@
       }
     },
     "node_modules/@typescript-eslint/scope-manager": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/scope-manager/-/scope-manager-8.72.0.tgz",
-      "integrity": "sha512-JewPyJOYcXBSAS7PIgufscHOwZqhTGyBRiQJhhuDln66tMchxvvt7nJ90JKKIoOelmdHA3kAQbm9cEUHc4JSEA==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/scope-manager/-/scope-manager-8.72.1.tgz",
+      "integrity": "sha512-lC/t6eMCZZQAAKZEYGL6RDVSuFehpdmMT6h+nJIjIa6oylN/PwDgDVtEIbB7O9xFfZYtZAYLoLlDNWKJhtF+uQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.72.0",
-        "@typescript-eslint/visitor-keys": "8.72.0"
+        "@typescript-eslint/types": "8.72.1",
+        "@typescript-eslint/visitor-keys": "8.72.1"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -991,9 +992,9 @@
       }
     },
     "node_modules/@typescript-eslint/tsconfig-utils": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.72.0.tgz",
-      "integrity": "sha512-0vbxCf7xLVPSjcOdm6eQbgViH8EDJ8xnl1laLT9yoqSz2YmcSfSg5Vdl0JUvZf6rcuJ0ZivJIuMD4edTg8obaA==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.72.1.tgz",
+      "integrity": "sha512-e4D5R5vpeAEPBxT2BAzsFQL3sbwyeeeo5+aczgNSRK1V734jE7pTqaGFU+fXapWEQwnZbpFaTn32+Z8DwS6OTg==",
       "dev": true,
       "license": "MIT",
       "engines": {
@@ -1008,15 +1009,15 @@
       }
     },
     "node_modules/@typescript-eslint/type-utils": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/type-utils/-/type-utils-8.72.0.tgz",
-      "integrity": "sha512-gEXxmmbSTSOVTC37IYYvremOM31v+UN2W772bJxmVYPhAOPSUxtacyb7wkm1EhkYKU6KzFJsdU44DCV4to0LWw==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/type-utils/-/type-utils-8.72.1.tgz",
+      "integrity": "sha512-iY2wlmyrXJmx4yxUGP3aYCFF3cA/6ShddOKmLU2dx7LnEykbAM8WThlxZEfd1NddqceF6eJmZUayxx9oKIYNlg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.72.0",
-        "@typescript-eslint/typescript-estree": "8.72.0",
-        "@typescript-eslint/utils": "8.72.0",
+        "@typescript-eslint/types": "8.72.1",
+        "@typescript-eslint/typescript-estree": "8.72.1",
+        "@typescript-eslint/utils": "8.72.1",
         "debug": "^4.4.3",
         "ts-api-utils": "^2.5.0"
       },
@@ -1033,9 +1034,9 @@
       }
     },
     "node_modules/@typescript-eslint/types": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/types/-/types-8.72.0.tgz",
-      "integrity": "sha512-Adfoy59kxNEjT5E5fnyrp7GpHYuWs8ONbdohu4ez6IU46qDq8LltG90tLmkucZB2uhYL8mqBjtXqGd8yhfjXqQ==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/types/-/types-8.72.1.tgz",
+      "integrity": "sha512-LmE5IhQet1BWOWEXqBrVtBPsMAOQ6Nzk35d+WLh3mk4EUF33sqlfxjio1MdYeSvKSG5skactKKuixBIKXhL4Rw==",
       "dev": true,
       "license": "MIT",
       "engines": {
@@ -1047,16 +1048,16 @@
       }
     },
     "node_modules/@typescript-eslint/typescript-estree": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/typescript-estree/-/typescript-estree-8.72.0.tgz",
-      "integrity": "sha512-gwLfFgWcw15tN2KXDCJvxEOQjPn+P3j/n3eSqkZ5sX4VpW9Cosodr+tWwBZRvJT3TcKx6HnPRGZMCNAiP1Xhug==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/typescript-estree/-/typescript-estree-8.72.1.tgz",
+      "integrity": "sha512-DAlUoUV93hIvrtIQLwCbmZQYVZwOMhiHJrOVUUIWicFZaIYjTRqlY3I/NZevfkLmSqkNHRu2qYDcq9lrn16oOQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/project-service": "8.72.0",
-        "@typescript-eslint/tsconfig-utils": "8.72.0",
-        "@typescript-eslint/types": "8.72.0",
-        "@typescript-eslint/visitor-keys": "8.72.0",
+        "@typescript-eslint/project-service": "8.72.1",
+        "@typescript-eslint/tsconfig-utils": "8.72.1",
+        "@typescript-eslint/types": "8.72.1",
+        "@typescript-eslint/visitor-keys": "8.72.1",
         "debug": "^4.4.3",
         "minimatch": "^10.2.2",
         "semver": "^7.7.3",
@@ -1114,16 +1115,16 @@
       }
     },
     "node_modules/@typescript-eslint/utils": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/utils/-/utils-8.72.0.tgz",
-      "integrity": "sha512-0up3oArJZBYnzOaEXKo8DmI43QvMZyPoFEt9LWzRJcyl/RcJjfKKPebknN1VbTgXBf3M/KggUh5uUMdURLnseg==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/utils/-/utils-8.72.1.tgz",
+      "integrity": "sha512-5v5liypurJBFHCBNqh/RjsymAD+VWcE0djuGY/BUqp5fC3Qn+luWDEksjuTtWjPn6i5zQlUtkZCRG/CYG0yCkA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
         "@eslint-community/eslint-utils": "^4.9.1",
-        "@typescript-eslint/scope-manager": "8.72.0",
-        "@typescript-eslint/types": "8.72.0",
-        "@typescript-eslint/typescript-estree": "8.72.0"
+        "@typescript-eslint/scope-manager": "8.72.1",
+        "@typescript-eslint/types": "8.72.1",
+        "@typescript-eslint/typescript-estree": "8.72.1"
       },
       "engines": {
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -1138,13 +1139,13 @@
       }
     },
     "node_modules/@typescript-eslint/visitor-keys": {
-      "version": "8.72.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/visitor-keys/-/visitor-keys-8.72.0.tgz",
-      "integrity": "sha512-E2mroviasaWecDzTGiGMtuEguuLVOeRggnrIn93CJuxYJzQBHbyymlT08aVQydbBal5538o+JkBKXh2sRuCyIA==",
+      "version": "8.72.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript-eslint/visitor-keys/-/visitor-keys-8.72.1.tgz",
+      "integrity": "sha512-SB8xqipSzZHUePCCLNeYxqnxq83X61/qzNhjQGbTfjxGZIeOEP7tBgWYX05Tcd6CgE02WdTJnh5b8kMZJ/+bnQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@typescript-eslint/types": "8.72.0",
+        "@typescript-eslint/types": "8.72.1",
         "eslint-visitor-keys": "^5.0.0"
       },
       "engines": {
@@ -1712,9 +1713,9 @@
       }
     },
     "node_modules/axios": {
-      "version": "1.20.0",
-      "resolved": "https://registry.npmjs.org/axios/-/axios-1.20.0.tgz",
-      "integrity": "sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==",
+      "version": "1.21.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/axios/-/axios-1.21.0.tgz",
+      "integrity": "sha512-YCzXMB53Q9PZBsh7yN7wtapit4WepwcHS2fP8QhGsBxSz5YtgYobV7GGlWlAJi+RxfU77GQTQi2DSLUma42EYA==",
       "license": "MIT",
       "dependencies": {
         "follow-redirects": "^1.16.0",
@@ -4195,7 +4196,9 @@
       "optional": true
     },
     "node_modules/node-forge": {
-      "version": "1.4.0",
+      "version": "1.4.2",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-forge/-/node-forge-1.4.2.tgz",
+      "integrity": "sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==",
       "license": "(BSD-3-Clause OR GPL-2.0)",
       "engines": {
         "node": ">= 6.13.0"
