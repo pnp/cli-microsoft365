@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { IdentityResponse, spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './propertybag-remove.js';
+import command, { options } from './propertybag-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PROPERTYBAG_REMOVE, () => {
@@ -21,6 +21,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const stubAllPostRequests = (
     requestObjectIdentityResp: any = null,
@@ -103,6 +104,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -153,23 +155,22 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     stubAllPostRequests();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1',
         force: true
-      }
+      })
     });
     assert(loggerLogSpy.notCalled);
   });
 
   it('should prompt before removing property when confirmation argument not passed', async () => {
     await command.action(logger, {
-      options:
-      {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -181,10 +182,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1'
-      }
+      })
     });
     assert(postCallsSpy.notCalled === true);
   });
@@ -196,11 +197,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1',
         debug: true
-      }
+      })
     });
     assert(postCallsSpy.calledTwice === true);
     assert(removePropertySpy.calledOnce === true);
@@ -209,19 +210,19 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should call removeProperty when folder is not specified', async () => {
     stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       debug: true,
       force: true
-    };
+    });
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(removePropertySpy.calledWith(objIdentity, options));
+    await command.action(logger, { options: parsedOptions } as any);
+    assert(removePropertySpy.calledWith(objIdentity, parsedOptions));
     assert(removePropertySpy.calledOnce === true);
   });
 
@@ -237,169 +238,172 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       "ServerRelativeUrl": "\u002f"
     }]));
     const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       force: true
-    };
+    });
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(removePropertySpy.calledWith(objIdentity, options));
+    await command.action(logger, { options: parsedOptions } as any);
+    assert(removePropertySpy.calledWith(objIdentity, parsedOptions));
     assert(removePropertySpy.calledOnce === true);
   });
 
   it('should call removeProperty when list folder is specified', async () => {
     stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       key: 'key1',
       folder: '/Shared Documents',
       force: true
-    };
+    });
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/sites/abc/Shared Documents"
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(removePropertySpy.calledWith(objIdentity, options));
+    await command.action(logger, { options: parsedOptions } as any);
+    assert(removePropertySpy.calledWith(objIdentity, parsedOptions));
     assert(removePropertySpy.calledOnce === true);
   });
 
   it('should send correct remove request data when folder is not specified', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       force: true
-    };
+    });
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    await command.action(logger, { options: options } as any);
-    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+    await command.action(logger, { options: parsedOptions } as any);
+    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(parsedOptions as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
     assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
   });
 
   it('should send correct remove request data when folder is specified', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       force: true
-    };
+    });
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
     };
 
-    await command.action(logger, { options: options } as any);
-    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+    await command.action(logger, { options: parsedOptions });
+    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(parsedOptions as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
     assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
   });
 
   it('should correctly handle requestObjectIdentity reject promise', async () => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('requestObjectIdentity error'));
   });
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('should correctly handle requestFolderObjectIdentity reject promise', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       force: true,
       debug: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('abc'));
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
       folder: '/',
       verbose: true,
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('requestFolderObjectIdentity error'));
   });
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
       folder: '/',
       debug: true,
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('ClientSvc unknown error'));
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found'));
   });
 
   it('should correctly handle removeProperty reject promise response', async () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('removeProperty promise error'); }));
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
       folder: '/',
       verbose: true,
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('removeProperty promise error'));
     assert(removePropertySpy.calledOnce === true);
   });
@@ -407,54 +411,43 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should correctly handle removeProperty ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "removeProperty error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
       folder: '/',
       verbose: true,
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('removeProperty error'));
   });
 
   it('should correctly handle removeProperty ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
-    const options = {
+    const parsedOptions = commandOptionsSchema.parse({
       webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
       folder: '/',
       verbose: true,
       force: true
-    };
+    });
 
-    await assert.rejects(command.action(logger, { options: options } as any),
+    await assert.rejects(command.action(logger, { options: parsedOptions }),
       new CommandError('ClientSvc unknown error'));
   });
 
-  it('supports specifying folder', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[folder]') > -1) {
-        containsScopeOption = true;
-      }
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo',
+      key: 'key1'
     });
-    assert(containsScopeOption);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo',
-        key: 'key1'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the key option is not specified', async () => {
+  it('fails validation if the key option is not specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -463,48 +456,40 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the url option specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        key: 'key1'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url option specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the url and folder options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        key: 'key1',
-        folder: '/'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url and folder options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1',
+      folder: '/'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('doesn\'t fail validation if the optional folder option not specified', async () => {
-    const actual = await command.validate(
-      {
-        options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1'
-        }
-      }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('doesn\'t fail validation if the optional folder option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      key: 'key1'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', key: 'abc', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
 

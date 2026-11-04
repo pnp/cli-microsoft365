@@ -60,6 +60,25 @@ const yargsConfiguration: Partial<yargs.Configuration> = {
   'camel-case-expansion': false
 };
 
+function isMissingRequiredValueError(error: z.core.$ZodIssue, options: yargs.Arguments): boolean {
+  if (error.code !== 'invalid_type') {
+    return false;
+  }
+
+  let currentValue: any = options;
+  for (const pathSegment of error.path) {
+    if (currentValue === null ||
+      typeof currentValue !== 'object' ||
+      !Object.prototype.hasOwnProperty.call(currentValue, pathSegment)) {
+      return true;
+    }
+
+    currentValue = currentValue[pathSegment];
+  }
+
+  return false;
+}
+
 function getConfig(): Configstore {
   if (!_config) {
     _config = new Configstore(config.configstoreName);
@@ -193,8 +212,7 @@ async function execute(rawArgs: string[]): Promise<void> {
 
         if (!shouldPrompt) {
           result.error.issues.forEach(e => {
-            if (e.code === 'invalid_type' &&
-              e.input === undefined) {
+            if (isMissingRequiredValueError(e, cli.optionsFromArgs!.options)) {
               (e.message as any) = `Required option not specified`;
             }
           });
@@ -202,7 +220,7 @@ async function execute(rawArgs: string[]): Promise<void> {
         }
 
         const missingRequiredValuesErrors: z.core.$ZodIssue[] = result.error.issues
-          .filter(e => (e.code === 'invalid_type' && e.input === undefined) ||
+          .filter(e => isMissingRequiredValueError(e, cli.optionsFromArgs!.options) ||
             (e.code === 'custom' && e.params?.customCode === 'required'));
         const optionSetErrors: z.core.$ZodIssueCustom[] = result.error.issues
           .filter(e => e.code === 'custom' && e.params?.customCode === 'optionSet') as z.core.$ZodIssueCustom[];

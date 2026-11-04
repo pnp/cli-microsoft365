@@ -321,6 +321,23 @@ class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchemaAndNumberRequiredOption extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema number required';
+  }
+  public get description(): string {
+    return 'Mock command with schema and required numeric option';
+  }
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      id: z.coerce.number()
+    });
+  }
+  public async commandAction(): Promise<void> {
+  }
+}
+
 const refinedSchemaOptions = z.strictObject({
   ...globalOptionsZod.shape,
   authType: z.string().optional(),
@@ -474,6 +491,7 @@ describe('cli', () => {
   let mockCommandWithSchemaAndRequiredOptions: Command;
   let mockCommandWithSchemaAndProcessedRequiredOptions: Command;
   let mockCommandWithSchemaAndBoolRequiredOption: Command;
+  let mockCommandWithSchemaAndNumberRequiredOption: Command;
   let mockCommandWithRefinedSchema: Command;
   let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
@@ -501,6 +519,7 @@ describe('cli', () => {
     mockCommandWithSchemaAndRequiredOptions = new MockCommandWithSchemaAndRequiredOptions();
     mockCommandWithSchemaAndProcessedRequiredOptions = new MockCommandWithSchemaAndProcessedRequiredOptions();
     mockCommandWithSchemaAndBoolRequiredOption = new MockCommandWithSchemaAndBoolRequiredOption();
+    mockCommandWithSchemaAndNumberRequiredOption = new MockCommandWithSchemaAndNumberRequiredOption();
     mockCommandWithRefinedSchema = new MockCommandWithRefinedSchema();
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
@@ -526,6 +545,7 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithSchemaAndRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndProcessedRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndBoolRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndNumberRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
@@ -1374,6 +1394,56 @@ describe('cli', () => {
       });
   });
 
+  it('does not prompt for an invalid supplied number when prompting is enabled', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema number required');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'number',
+      'required',
+      '--id',
+      'abc'
+    ]));
+
+    assert(promptForValueSpy.notCalled);
+    assert(cliErrorStub.getCalls().some(call => call.firstArg.includes('expected number')));
+    assert(cliErrorStub.getCalls().every(call => !call.firstArg.includes('Required option not specified')));
+  });
+
+  it('shows the numeric validation error for an invalid supplied number when prompting is disabled', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema number required');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'number',
+      'required',
+      '--id',
+      'abc'
+    ]));
+
+    assert(cliErrorStub.getCalls().some(call => call.firstArg.includes('expected number')));
+    assert(cliErrorStub.getCalls().every(call => !call.firstArg.includes('Required option not specified')));
+  });
+
   it(`throws error if coercing value fails when validating schema`, (done) => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema bool required');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -2163,7 +2233,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  14 commands'));
+    assert(cliLogStub.calledWith('  cli *  15 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2176,7 +2246,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        11 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        12 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2189,7 +2259,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  14 commands'));
+    assert(cliLogStub.calledWith('  cli *  15 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
