@@ -17,7 +17,7 @@ import { brandCenter } from '../../../../utils/brandCenter.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   type: z.enum(['TeamSite', 'CommunicationSite', 'ClassicSite', 'BrandCenter']).optional(),
-  title: z.string().optional().alias('t'),
+  title: z.string().alias('t'),
   alias: z.string().optional().alias('a'),
   url: z.string().optional().alias('u'),
   timeZone: z.coerce.number().optional().alias('z'),
@@ -37,7 +37,7 @@ export const options = z.strictObject({
   removeDeletedSite: z.boolean().optional(),
   withAppCatalog: z.boolean().optional(),
   wait: z.boolean().optional(),
-  force: z.boolean().optional()
+  force: z.boolean().optional().alias('f')
 });
 
 export declare type Options = z.infer<typeof options>;
