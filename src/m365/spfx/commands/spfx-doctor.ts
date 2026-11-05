@@ -4,18 +4,23 @@ import { z } from 'zod';
 import { Logger } from '../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../Command.js';
 import { CheckStatus, formatting } from '../../../utils/formatting.js';
+import { zod } from '../../../utils/zod.js';
 import commands from '../commands.js';
 import { BaseProjectCommand } from './project/base-project-command.js';
 import { SharePointVersion, SpfxVersionPrerequisites, VersionCheck, versions } from './SpfxCompatibilityMatrix.js';
 
+const environments = {
+  sp2016: 'sp2016',
+  sp2019: 'sp2019',
+  spo: 'spo'
+} as const;
+const spfxVersions = Object.keys(versions) as [string, ...string[]];
+
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  env: z.preprocess(
-    val => typeof val === 'string' ? val.toLowerCase() : val,
-    z.enum(['sp2016', 'sp2019', 'spo'])
-  ).optional().alias('e'),
-  spfxVersion: z.enum(Object.keys(versions), {
-    error: `The specified version is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`
+  env: zod.coercedEnum(environments).optional().alias('e'),
+  spfxVersion: z.enum(spfxVersions, {
+    error: `The specified version is not a supported SharePoint Framework version. Supported versions are ${spfxVersions.join(', ')}`
   }).optional().alias('v'),
   output: z.enum(['text', 'json']).optional().alias('o')
 });
