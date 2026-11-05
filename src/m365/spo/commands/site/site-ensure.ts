@@ -33,7 +33,7 @@ export const options = z.strictObject({
   storageQuota: z.coerce.number().optional(),
   storageQuotaWarningLevel: z.coerce.number().optional(),
   removeDeletedSite: z.boolean().optional(),
-  disableFlows: z.boolean().optional(),
+  disableFlows: z.boolean().optional().autocomplete(['true', 'false']),
   sharingCapability: z.enum(['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']).optional(),
   wait: z.boolean().optional()
 });

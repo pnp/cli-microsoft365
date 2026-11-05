@@ -27,11 +27,11 @@ export const options = z.strictObject({
   title: z.string().optional().alias('t'),
   description: z.string().optional().alias('d'),
   classification: z.string().optional(),
-  disableFlows: z.boolean().optional(),
-  socialBarOnSitePagesDisabled: z.boolean().optional(),
-  isPublic: z.boolean().optional(),
+  disableFlows: z.boolean().optional().autocomplete(['true', 'false']),
+  socialBarOnSitePagesDisabled: z.boolean().optional().autocomplete(['true', 'false']),
+  isPublic: z.boolean().optional().autocomplete(['true', 'false']),
   owners: z.string().optional(),
-  shareByEmailEnabled: z.boolean().optional(),
+  shareByEmailEnabled: z.boolean().optional().autocomplete(['true', 'false']),
   siteDesignId: z.string()
     .refine(id => validation.isValidGuid(id), {
       error: e => `'${e.input}' is not a valid GUID.`
@@ -43,9 +43,9 @@ export const options = z.strictObject({
   resourceQuotaWarningLevel: z.coerce.number().optional(),
   storageQuota: z.coerce.number().optional(),
   storageQuotaWarningLevel: z.coerce.number().optional(),
-  allowSelfServiceUpgrade: z.boolean().optional(),
+  allowSelfServiceUpgrade: z.boolean().optional().autocomplete(['true', 'false']),
   lockState: z.enum(['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']).optional(),
-  noScriptSite: z.boolean().optional(),
+  noScriptSite: z.boolean().optional().autocomplete(['true', 'false']),
   wait: z.boolean().optional()
 });
 
