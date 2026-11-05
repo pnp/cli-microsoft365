@@ -698,6 +698,12 @@ describe('validation/validation', () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('isValidSharePointUrl returns an error message if url is not a string', () => {
+    const actual = validation.isValidSharePointUrl(undefined as unknown as string);
+
+    assert.strictEqual(actual, 'SharePoint Online site URL must be a string.');
+  });
+
   it('isValidGraphDateTime returns true for a valid Graph API date time', () => {
     const result = validation.isValidGraphDateTime('2019-04-16T09:00:00');
     assert.strictEqual(result, true);
@@ -741,5 +747,23 @@ describe('validation/validation', () => {
   it('isValidGraphDateTime returns true for February 29 in a century leap year', () => {
     const result = validation.isValidGraphDateTime('2000-02-29T09:00:00');
     assert.strictEqual(result, true);
+  });
+
+  it('isValidJsonOrEmpty returns true for an empty string', () => {
+    const result = validation.isValidJsonOrEmpty('');
+
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidJsonOrEmpty returns true for valid JSON', () => {
+    const result = validation.isValidJsonOrEmpty('{"property":"value"}');
+
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidJsonOrEmpty returns false for invalid JSON', () => {
+    const result = validation.isValidJsonOrEmpty('invalid JSON');
+
+    assert.strictEqual(result, false);
   });
 });

@@ -60,6 +60,25 @@ const yargsConfiguration: Partial<yargs.Configuration> = {
   'camel-case-expansion': false
 };
 
+function isMissingRequiredValueError(error: z.core.$ZodIssue, options: yargs.Arguments): boolean {
+  if (error.code !== 'invalid_type') {
+    return false;
+  }
+
+  let currentValue: any = options;
+  for (const pathSegment of error.path) {
+    if (currentValue === null ||
+      typeof currentValue !== 'object' ||
+      !Object.prototype.hasOwnProperty.call(currentValue, pathSegment)) {
+      return true;
+    }
+
+    currentValue = currentValue[pathSegment];
+  }
+
+  return false;
+}
+
 function getConfig(): Configstore {
   if (!_config) {
     _config = new Configstore(config.configstoreName);
@@ -193,8 +212,7 @@ async function execute(rawArgs: string[]): Promise<void> {
 
         if (!shouldPrompt) {
           result.error.issues.forEach(e => {
-            if (e.code === 'invalid_type' &&
-              e.input === undefined) {
+            if (isMissingRequiredValueError(e, cli.optionsFromArgs!.options)) {
               (e.message as any) = `Required option not specified`;
             }
           });
@@ -202,7 +220,7 @@ async function execute(rawArgs: string[]): Promise<void> {
         }
 
         const missingRequiredValuesErrors: z.core.$ZodIssue[] = result.error.issues
-          .filter(e => (e.code === 'invalid_type' && e.input === undefined) ||
+          .filter(e => isMissingRequiredValueError(e, cli.optionsFromArgs!.options) ||
             (e.code === 'custom' && e.params?.customCode === 'required'));
         const optionSetErrors: z.core.$ZodIssueCustom[] = result.error.issues
           .filter(e => e.code === 'custom' && e.params?.customCode === 'optionSet') as z.core.$ZodIssueCustom[];
@@ -230,6 +248,12 @@ async function execute(rawArgs: string[]): Promise<void> {
             }
           }
 
+          try {
+            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          }
+          catch (e: any) {
+            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
+          }
           continue;
         }
 
@@ -238,6 +262,12 @@ async function execute(rawArgs: string[]): Promise<void> {
             await promptForOptionSetNameAndValue(cli.optionsFromArgs, error.params?.options);
           }
 
+          try {
+            await cli.commandToExecute.command.processOptions(cli.optionsFromArgs.options);
+          }
+          catch (e: any) {
+            return cli.closeWithError(e.message, cli.optionsFromArgs, false);
+          }
           continue;
         }
       }
@@ -1087,28 +1117,16 @@ async function promptForOptionSetNameAndValue(args: CommandArgs, options: string
   const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: options.map((choice: any) => { return { name: choice, value: choice }; }) });
   const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
-  let coercedValue: unknown = optionValue;
-
-  // Basic type coercion to align with how CLI arguments are typically parsed
-  if (typeof optionValue === 'string') {
-    const trimmed = optionValue.trim();
-
-    if (trimmed === 'true') {
-      coercedValue = true;
-    }
-    else if (trimmed === 'false') {
-      coercedValue = false;
-    }
-    else if (trimmed !== '' && !isNaN(Number(trimmed))) {
-      coercedValue = Number(trimmed);
-    }
-  }
+  const parsedOptions = getCommandOptionsFromArgs(
+    [`--${selectedOptionName}`, optionValue],
+    cli.commandToExecute
+  );
 
   options
     .filter(optionName => optionName !== selectedOptionName)
     .forEach(optionName => args.options[optionName] = undefined);
 
-  args.options[selectedOptionName] = coercedValue as any;
+  args.options[selectedOptionName] = parsedOptions[selectedOptionName];
   await cli.error('');
 }
 

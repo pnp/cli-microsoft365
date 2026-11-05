@@ -452,5 +452,19 @@ export const validation = {
   isValidPowerPagesUrl(url: string): boolean {
     const powerPagesUrlPattern = /^https:\/\/[a-zA-Z0-9-]+\.powerappsportals\.com$/;
     return powerPagesUrlPattern.test(url);
+  },
+
+  isValidJsonOrEmpty(value: string): boolean {
+    if (value === '') {
+      return true;
+    }
+
+    try {
+      JSON.parse(value);
+      return true;
+    }
+    catch {
+      return false;
+    }
   }
 };

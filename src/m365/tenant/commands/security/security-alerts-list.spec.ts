@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './security-alerts-list.js';
+import command, { options } from './security-alerts-list.js';
 
 describe(commands.SECURITY_ALERTS_LIST, () => {
 
@@ -532,6 +534,8 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -539,6 +543,8 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -580,6 +586,19 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'severity']);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      vendor: 'ASC',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
   it('correctly returns list of security alerts for vendor with name Azure Security Center', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts?$filter=vendorInformation/provider eq 'ASC'`) {
@@ -595,7 +614,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Azure Security Center'
     };
 
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(alertASC));
   });
 
@@ -614,7 +633,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Microsoft Cloud App Security'
     };
 
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(alertMCAS));
   });
 
@@ -633,7 +652,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Azure Active Directory Identity Protection'
     };
 
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(alertIPC));
   });
 
@@ -652,7 +671,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       output: "csv"
     };
 
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(alertResponseCSV));
   });
 
@@ -670,7 +689,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     const options: any = {
     };
 
-    await command.action(logger, { options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith(alertResponse));
   });
 
@@ -683,13 +702,13 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Error fetching security alerts'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('Error fetching security alerts'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 });

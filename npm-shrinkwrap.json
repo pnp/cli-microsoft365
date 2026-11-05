@@ -1,17 +1,16 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "12.0.0",
+  "version": "12.1.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@pnp/cli-microsoft365",
-      "version": "12.0.0",
+      "version": "12.1.0",
       "license": "MIT",
       "dependencies": {
         "@azure/msal-common": "^16.15.0",
         "@azure/msal-node": "^7.1.2",
-        "@azure/msal-node-extensions": "5.5.4",
         "@inquirer/confirm": "^6.3.5",
         "@inquirer/input": "^5.1.9",
         "@inquirer/select": "^5.2.8",
@@ -115,21 +114,21 @@
       "license": "MIT"
     },
     "node_modules/@azure/msal-common": {
-      "version": "16.15.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-16.15.0.tgz",
-      "integrity": "sha512-lwdLb1B9Q5nEhPLVIKe78XH5wFMN15fCiDkY7ylPDSWZuWcD93G3jpJajrKhO3CQld8SLKz0sHiOi24mxdvtsg==",
+      "version": "16.16.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-common/-/msal-common-16.16.0.tgz",
+      "integrity": "sha512-EZgd8h5nczsdRAQAgXA0A0pC5L/zj43n1jePXvUMgdwXMbH2zhb7b7Hp+Oe7ZOODK/sch2x+soD6FOrtgUbx/w==",
       "license": "MIT",
       "engines": {
         "node": ">=0.8.0"
       }
     },
     "node_modules/@azure/msal-node": {
-      "version": "7.1.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node/-/msal-node-7.1.2.tgz",
-      "integrity": "sha512-52hKQLGpEQzwNufIXG1SPVU+wQ3RIe7Rp2+g+VdAmZojCAZ6yCdGEffzQEQ6RnBZGBEs40nl14rWBmfJpCoHsg==",
+      "version": "7.2.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node/-/msal-node-7.2.0.tgz",
+      "integrity": "sha512-Y87VJsMWF4jiqLqq8XYLb1o+rGc/HacwS3Zydi3bDtaVm5Sa8FlB7YrKrBFKRIYj27RJXAaDkErImMAqtM10Pg==",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "16.15.0",
+        "@azure/msal-common": "16.16.0",
         "jsonwebtoken": "^9.0.0"
       },
       "engines": {
@@ -137,14 +136,14 @@
       }
     },
     "node_modules/@azure/msal-node-extensions": {
-      "version": "5.5.4",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-extensions/-/msal-node-extensions-5.5.4.tgz",
-      "integrity": "sha512-dTnQNoldF3Dw8SxLDTodkii4q43EZvO1yuWncVHi5qQ8xsuo71GlTGpQMIlWNLgw5jJW0KQ0XQoGDzyHX6wb7Q==",
+      "version": "5.6.0",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-extensions/-/msal-node-extensions-5.6.0.tgz",
+      "integrity": "sha512-fiudFtrBgHBOnS5uBxzYbUooBtB+5IKbVB5ZE3xvnC4P9zOWMuFhtV9RXr+huKfqXPuoniV6BUa/NExhydVGQA==",
       "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
       "dependencies": {
-        "@azure/msal-common": "16.15.0",
+        "@azure/msal-common": "16.16.0",
         "@azure/msal-node-runtime": "^0.20.0",
         "keytar": "^7.8.0"
       },
@@ -154,7 +153,7 @@
     },
     "node_modules/@azure/msal-node-runtime": {
       "version": "0.20.6",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@azure/msal-node-runtime/-/msal-node-runtime-0.20.6.tgz",
+      "resolved": "https://registry.npmjs.org/@azure/msal-node-runtime/-/msal-node-runtime-0.20.6.tgz",
       "integrity": "sha1-EQ3GT4uReISiL6VxQ3tuogN/WGo=",
       "license": "MIT",
       "optional": true
@@ -341,39 +340,21 @@
       }
     },
     "node_modules/@humanfs/core": {
-      "version": "0.19.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@humanfs/core/-/core-0.19.2.tgz",
-      "integrity": "sha1-qCcsoDsqz0kmcCIrIyC2xCG/3mA=",
+      "version": "0.19.1",
       "dev": true,
       "license": "Apache-2.0",
-      "dependencies": {
-        "@humanfs/types": "^0.15.0"
-      },
       "engines": {
         "node": ">=18.18.0"
       }
     },
     "node_modules/@humanfs/node": {
-      "version": "0.16.8",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@humanfs/node/-/node-0.16.8.tgz",
-      "integrity": "sha1-j4AMzME/T4zTEW4tnAqUk52j4+0=",
+      "version": "0.16.7",
       "dev": true,
       "license": "Apache-2.0",
       "dependencies": {
-        "@humanfs/core": "^0.19.2",
-        "@humanfs/types": "^0.15.0",
+        "@humanfs/core": "^0.19.1",
         "@humanwhocodes/retry": "^0.4.0"
       },
-      "engines": {
-        "node": ">=18.18.0"
-      }
-    },
-    "node_modules/@humanfs/types": {
-      "version": "0.15.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@humanfs/types/-/types-0.15.0.tgz",
-      "integrity": "sha1-8qCfYgEjkLK/8/xvskjd7IwJoJA=",
-      "dev": true,
-      "license": "Apache-2.0",
       "engines": {
         "node": ">=18.18.0"
       }
@@ -842,7 +823,7 @@
     },
     "node_modules/@types/proper-lockfile": {
       "version": "4.1.4",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/proper-lockfile/-/proper-lockfile-4.1.4.tgz",
+      "resolved": "https://registry.npmjs.org/@types/proper-lockfile/-/proper-lockfile-4.1.4.tgz",
       "integrity": "sha1-zZ+rkr2wRzDBraVCw1bwNiD4QAg=",
       "dev": true,
       "license": "MIT",
@@ -852,7 +833,7 @@
     },
     "node_modules/@types/retry": {
       "version": "0.12.5",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@types/retry/-/retry-0.12.5.tgz",
+      "resolved": "https://registry.npmjs.org/@types/retry/-/retry-0.12.5.tgz",
       "integrity": "sha1-8JD/S9jS5blA/ycKs5/Vyhg0oH4=",
       "dev": true,
       "license": "MIT"
@@ -1171,7 +1152,7 @@
     },
     "node_modules/@typescript/typescript-aix-ppc64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-aix-ppc64/-/typescript-aix-ppc64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-aix-ppc64/-/typescript-aix-ppc64-7.0.2.tgz",
       "integrity": "sha1-zcfOgdYPHgkDSWDd+x+4gNendrY=",
       "cpu": [
         "ppc64"
@@ -1188,7 +1169,7 @@
     },
     "node_modules/@typescript/typescript-darwin-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz",
       "integrity": "sha1-pV/fz6WN9Y0n2yI3zealweNacjU=",
       "cpu": [
         "arm64"
@@ -1205,7 +1186,7 @@
     },
     "node_modules/@typescript/typescript-darwin-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-darwin-x64/-/typescript-darwin-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-darwin-x64/-/typescript-darwin-x64-7.0.2.tgz",
       "integrity": "sha1-ONHJFygAqR1we+xk0qNwoBZjTbQ=",
       "cpu": [
         "x64"
@@ -1222,7 +1203,7 @@
     },
     "node_modules/@typescript/typescript-freebsd-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-freebsd-arm64/-/typescript-freebsd-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-freebsd-arm64/-/typescript-freebsd-arm64-7.0.2.tgz",
       "integrity": "sha1-8f+IEAMLNdK1vg22otxlBGDqlPo=",
       "cpu": [
         "arm64"
@@ -1239,7 +1220,7 @@
     },
     "node_modules/@typescript/typescript-freebsd-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-freebsd-x64/-/typescript-freebsd-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-freebsd-x64/-/typescript-freebsd-x64-7.0.2.tgz",
       "integrity": "sha1-PYawPzU8WxupUWLrbONVM7/ClL0=",
       "cpu": [
         "x64"
@@ -1256,7 +1237,7 @@
     },
     "node_modules/@typescript/typescript-linux-arm": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz",
       "integrity": "sha1-rZS0HhruKk3MaimMe2fEM0X94y4=",
       "cpu": [
         "arm"
@@ -1273,7 +1254,7 @@
     },
     "node_modules/@typescript/typescript-linux-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz",
       "integrity": "sha1-2TNNltbaxv+F2pyGVYiUjek56R8=",
       "cpu": [
         "arm64"
@@ -1290,7 +1271,7 @@
     },
     "node_modules/@typescript/typescript-linux-loong64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz",
       "integrity": "sha1-KWWu5PyHM2ATnYk9qv5jl6KROK0=",
       "cpu": [
         "loong64"
@@ -1307,7 +1288,7 @@
     },
     "node_modules/@typescript/typescript-linux-mips64el": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-mips64el/-/typescript-linux-mips64el-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-mips64el/-/typescript-linux-mips64el-7.0.2.tgz",
       "integrity": "sha1-Goh6MRvtOoM/gL/Uqe03wnGTbPA=",
       "cpu": [
         "mips64el"
@@ -1324,7 +1305,7 @@
     },
     "node_modules/@typescript/typescript-linux-ppc64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-ppc64/-/typescript-linux-ppc64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-ppc64/-/typescript-linux-ppc64-7.0.2.tgz",
       "integrity": "sha1-i2PJsvRFs5PrTkPsIdoiXa3jV30=",
       "cpu": [
         "ppc64"
@@ -1341,7 +1322,7 @@
     },
     "node_modules/@typescript/typescript-linux-riscv64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz",
       "integrity": "sha1-tuijXCibPql6kqQdRhqu7Q07NuE=",
       "cpu": [
         "riscv64"
@@ -1358,7 +1339,7 @@
     },
     "node_modules/@typescript/typescript-linux-s390x": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-s390x/-/typescript-linux-s390x-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-s390x/-/typescript-linux-s390x-7.0.2.tgz",
       "integrity": "sha1-Lvlmk75IYfbReWVCflsAnLvtGj4=",
       "cpu": [
         "s390x"
@@ -1375,7 +1356,7 @@
     },
     "node_modules/@typescript/typescript-linux-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz",
       "integrity": "sha1-cyacsLq6UK6gygYERaa4jlg/HOI=",
       "cpu": [
         "x64"
@@ -1392,7 +1373,7 @@
     },
     "node_modules/@typescript/typescript-netbsd-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-netbsd-arm64/-/typescript-netbsd-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-netbsd-arm64/-/typescript-netbsd-arm64-7.0.2.tgz",
       "integrity": "sha1-OjZJ+X+vohC05uN5jBXgZgXIqQE=",
       "cpu": [
         "arm64"
@@ -1409,7 +1390,7 @@
     },
     "node_modules/@typescript/typescript-netbsd-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-netbsd-x64/-/typescript-netbsd-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-netbsd-x64/-/typescript-netbsd-x64-7.0.2.tgz",
       "integrity": "sha1-R+xZSRpAxHDSgH3E0rglUo/Zeas=",
       "cpu": [
         "x64"
@@ -1426,7 +1407,7 @@
     },
     "node_modules/@typescript/typescript-openbsd-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-openbsd-arm64/-/typescript-openbsd-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-openbsd-arm64/-/typescript-openbsd-arm64-7.0.2.tgz",
       "integrity": "sha1-eWvo2gvZidij+5bygB44qDZbS68=",
       "cpu": [
         "arm64"
@@ -1443,7 +1424,7 @@
     },
     "node_modules/@typescript/typescript-openbsd-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-openbsd-x64/-/typescript-openbsd-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-openbsd-x64/-/typescript-openbsd-x64-7.0.2.tgz",
       "integrity": "sha1-03/ipynrlCwHbEVO5/GBX699Vg8=",
       "cpu": [
         "x64"
@@ -1460,7 +1441,7 @@
     },
     "node_modules/@typescript/typescript-sunos-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-sunos-x64/-/typescript-sunos-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-sunos-x64/-/typescript-sunos-x64-7.0.2.tgz",
       "integrity": "sha1-q6jTRkw1ZacER4m6upaRa9SrLIg=",
       "cpu": [
         "x64"
@@ -1477,7 +1458,7 @@
     },
     "node_modules/@typescript/typescript-win32-arm64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-win32-arm64/-/typescript-win32-arm64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-win32-arm64/-/typescript-win32-arm64-7.0.2.tgz",
       "integrity": "sha1-ud5QoXGWOD9iYgtfnQovNK07YNc=",
       "cpu": [
         "arm64"
@@ -1494,7 +1475,7 @@
     },
     "node_modules/@typescript/typescript-win32-x64": {
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz",
       "integrity": "sha1-zzt7DWzlY12spMjgHBic3N5H7Dw=",
       "cpu": [
         "x64"
@@ -1756,7 +1737,7 @@
     },
     "node_modules/base64-js": {
       "version": "1.5.1",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/base64-js/-/base64-js-1.5.1.tgz",
+      "resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
       "integrity": "sha1-GxtEAWClv3rUC2UPCVljSBkDkwo=",
       "funding": [
         {
@@ -1784,7 +1765,7 @@
     },
     "node_modules/bl": {
       "version": "4.1.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/bl/-/bl-4.1.0.tgz",
+      "resolved": "https://registry.npmjs.org/bl/-/bl-4.1.0.tgz",
       "integrity": "sha1-RRU1JkGCvsL7vIOmKrmM8R2fezo=",
       "license": "MIT",
       "optional": true,
@@ -1876,7 +1857,7 @@
     },
     "node_modules/buffer": {
       "version": "5.7.1",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/buffer/-/buffer-5.7.1.tgz",
+      "resolved": "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz",
       "integrity": "sha1-umLnwTEzBTWCGXFghRqPZI6Z7tA=",
       "funding": [
         {
@@ -2116,7 +2097,7 @@
     },
     "node_modules/chownr": {
       "version": "1.1.4",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/chownr/-/chownr-1.1.4.tgz",
+      "resolved": "https://registry.npmjs.org/chownr/-/chownr-1.1.4.tgz",
       "integrity": "sha1-b8nXtC0ypYNZYzdmbn0ICE2izGs=",
       "license": "ISC",
       "optional": true
@@ -2397,7 +2378,7 @@
     },
     "node_modules/decompress-response": {
       "version": "6.0.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/decompress-response/-/decompress-response-6.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/decompress-response/-/decompress-response-6.0.0.tgz",
       "integrity": "sha1-yjh2Et234QS9FthaqwDV7PCcZvw=",
       "license": "MIT",
       "optional": true,
@@ -2483,7 +2464,7 @@
     },
     "node_modules/detect-libc": {
       "version": "2.1.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/detect-libc/-/detect-libc-2.1.2.tgz",
+      "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz",
       "integrity": "sha1-aJxdzcGQDvVYOky59te0c3QgdK0=",
       "license": "Apache-2.0",
       "optional": true,
@@ -2568,7 +2549,7 @@
     },
     "node_modules/end-of-stream": {
       "version": "1.4.5",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/end-of-stream/-/end-of-stream-1.4.5.tgz",
+      "resolved": "https://registry.npmjs.org/end-of-stream/-/end-of-stream-1.4.5.tgz",
       "integrity": "sha1-c0TXEd6kDgt0q8LtSXeHQ8ztsIw=",
       "license": "MIT",
       "optional": true,
@@ -2916,7 +2897,7 @@
     },
     "node_modules/expand-template": {
       "version": "2.0.3",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/expand-template/-/expand-template-2.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/expand-template/-/expand-template-2.0.3.tgz",
       "integrity": "sha1-bhSz/O4POmNA7LV9LokYaSBSpHw=",
       "license": "(MIT OR WTFPL)",
       "optional": true,
@@ -3151,7 +3132,7 @@
     },
     "node_modules/fs-constants": {
       "version": "1.0.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/fs-constants/-/fs-constants-1.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/fs-constants/-/fs-constants-1.0.0.tgz",
       "integrity": "sha1-a+Dem+mYzhavivwkSXue6bfM2a0=",
       "license": "MIT",
       "optional": true
@@ -3238,7 +3219,7 @@
     },
     "node_modules/github-from-package": {
       "version": "0.0.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/github-from-package/-/github-from-package-0.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/github-from-package/-/github-from-package-0.0.0.tgz",
       "integrity": "sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=",
       "license": "MIT",
       "optional": true
@@ -3408,7 +3389,7 @@
     },
     "node_modules/ieee754": {
       "version": "1.2.1",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/ieee754/-/ieee754-1.2.1.tgz",
+      "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz",
       "integrity": "sha1-jrehCmP/8l0VpXsAFYbRd9Gw01I=",
       "funding": [
         {
@@ -3812,7 +3793,7 @@
     },
     "node_modules/keytar": {
       "version": "7.9.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/keytar/-/keytar-7.9.0.tgz",
+      "resolved": "https://registry.npmjs.org/keytar/-/keytar-7.9.0.tgz",
       "integrity": "sha1-TGIlcI9RtQy/d8Wq6BchlkwpGMs=",
       "hasInstallScript": true,
       "license": "MIT",
@@ -4033,7 +4014,7 @@
     },
     "node_modules/mimic-response": {
       "version": "3.1.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mimic-response/-/mimic-response-3.1.0.tgz",
+      "resolved": "https://registry.npmjs.org/mimic-response/-/mimic-response-3.1.0.tgz",
       "integrity": "sha1-LR1Zr5wbEpgVrMwsRqAipc4fo8k=",
       "license": "MIT",
       "optional": true,
@@ -4075,15 +4056,15 @@
     },
     "node_modules/mkdirp-classic": {
       "version": "0.5.3",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz",
+      "resolved": "https://registry.npmjs.org/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz",
       "integrity": "sha1-+hDJEVzG2IZb4iG6R+6b7XhgERM=",
       "license": "MIT",
       "optional": true
     },
     "node_modules/mocha": {
       "version": "11.8.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/mocha/-/mocha-11.8.0.tgz",
-      "integrity": "sha1-kWPMWWAOwmRw9rBA4wqlGsyXPtI=",
+      "resolved": "https://registry.npmjs.org/mocha/-/mocha-11.8.0.tgz",
+      "integrity": "sha512-VyCeUdGN3A9lmCTTgG4yuvY9ixxaDk+xt2R/7/+1AP6EqNG+G9OKkzBwhVtVYoNX8YsxNSgAl8mOv3IAeOpFbw==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -4165,7 +4146,7 @@
     },
     "node_modules/napi-build-utils": {
       "version": "2.0.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/napi-build-utils/-/napi-build-utils-2.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/napi-build-utils/-/napi-build-utils-2.0.0.tgz",
       "integrity": "sha1-E8IsAYf8/MzhRhhEE2NypH3cAn4=",
       "license": "MIT",
       "optional": true
@@ -4177,7 +4158,7 @@
     },
     "node_modules/node-abi": {
       "version": "3.96.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-abi/-/node-abi-3.96.0.tgz",
+      "resolved": "https://registry.npmjs.org/node-abi/-/node-abi-3.96.0.tgz",
       "integrity": "sha1-iwOLxsypfWzsLpqv24G5ANof+A0=",
       "license": "MIT",
       "optional": true,
@@ -4190,7 +4171,7 @@
     },
     "node_modules/node-addon-api": {
       "version": "4.3.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/node-addon-api/-/node-addon-api-4.3.0.tgz",
+      "resolved": "https://registry.npmjs.org/node-addon-api/-/node-addon-api-4.3.0.tgz",
       "integrity": "sha1-UqGgtHUZPgko6Y4EJqDRJUeCt38=",
       "license": "MIT",
       "optional": true
@@ -4236,7 +4217,7 @@
     },
     "node_modules/once": {
       "version": "1.4.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/once/-/once-1.4.0.tgz",
+      "resolved": "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
       "integrity": "sha1-WDsap3WWHUsROsF9nFC6753Xa9E=",
       "license": "ISC",
       "optional": true,
@@ -4432,7 +4413,7 @@
     },
     "node_modules/prebuild-install": {
       "version": "7.1.3",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/prebuild-install/-/prebuild-install-7.1.3.tgz",
+      "resolved": "https://registry.npmjs.org/prebuild-install/-/prebuild-install-7.1.3.tgz",
       "integrity": "sha1-1jCrrSsUdEPyCiEpF76uaLgJLuw=",
       "deprecated": "No longer maintained. Please contact the author of the relevant native addon; alternatives are available.",
       "license": "MIT",
@@ -4481,7 +4462,7 @@
     },
     "node_modules/proper-lockfile": {
       "version": "4.1.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/proper-lockfile/-/proper-lockfile-4.1.2.tgz",
+      "resolved": "https://registry.npmjs.org/proper-lockfile/-/proper-lockfile-4.1.2.tgz",
       "integrity": "sha1-yLneKvay8WAQZ/mOAaxmuqIjFB8=",
       "license": "MIT",
       "dependencies": {
@@ -4492,7 +4473,7 @@
     },
     "node_modules/proper-lockfile/node_modules/signal-exit": {
       "version": "3.0.7",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/signal-exit/-/signal-exit-3.0.7.tgz",
+      "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.7.tgz",
       "integrity": "sha1-qaF2f4r4QVURTqq9c/mSc8j1mtk=",
       "license": "ISC"
     },
@@ -4509,7 +4490,7 @@
     },
     "node_modules/pump": {
       "version": "3.0.4",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/pump/-/pump-3.0.4.tgz",
+      "resolved": "https://registry.npmjs.org/pump/-/pump-3.0.4.tgz",
       "integrity": "sha1-HzE0MFJ/qLkFYi69Iv4UROdXqzw=",
       "license": "MIT",
       "optional": true,
@@ -4643,7 +4624,7 @@
     },
     "node_modules/retry": {
       "version": "0.12.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/retry/-/retry-0.12.0.tgz",
+      "resolved": "https://registry.npmjs.org/retry/-/retry-0.12.0.tgz",
       "integrity": "sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=",
       "license": "MIT",
       "engines": {
@@ -4908,7 +4889,7 @@
     },
     "node_modules/simple-concat": {
       "version": "1.0.1",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/simple-concat/-/simple-concat-1.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/simple-concat/-/simple-concat-1.0.1.tgz",
       "integrity": "sha1-9Gl2CCujXCJj8cirXt/ibEHJVS8=",
       "funding": [
         {
@@ -4929,7 +4910,7 @@
     },
     "node_modules/simple-get": {
       "version": "4.0.1",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/simple-get/-/simple-get-4.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/simple-get/-/simple-get-4.0.1.tgz",
       "integrity": "sha1-SjnbVJKHyXnTUhEvoD/Zn9a8NUM=",
       "funding": [
         {
@@ -5109,9 +5090,9 @@
       }
     },
     "node_modules/strnum": {
-      "version": "2.4.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/strnum/-/strnum-2.4.2.tgz",
-      "integrity": "sha1-r0OrUaBtBCJwI/wuQsoikhTsEPA=",
+      "version": "2.5.1",
+      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/strnum/-/strnum-2.5.1.tgz",
+      "integrity": "sha512-UM4nTLWzQiDBseVxUGxN0wJzIk0UU89Qi7pKXz9qISo+lhviJikTuikBsK/oFRlpvYHvSdz0TVoLyQ+sEpYwxA==",
       "funding": [
         {
           "type": "github",
@@ -5211,7 +5192,7 @@
     },
     "node_modules/tar-fs": {
       "version": "2.1.5",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-fs/-/tar-fs-2.1.5.tgz",
+      "resolved": "https://registry.npmjs.org/tar-fs/-/tar-fs-2.1.5.tgz",
       "integrity": "sha1-M+nClBPc4MWK2n/3fbTlowr//nA=",
       "license": "MIT",
       "optional": true,
@@ -5224,7 +5205,7 @@
     },
     "node_modules/tar-stream": {
       "version": "2.2.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tar-stream/-/tar-stream-2.2.0.tgz",
+      "resolved": "https://registry.npmjs.org/tar-stream/-/tar-stream-2.2.0.tgz",
       "integrity": "sha1-rK2EwoQTawYNw/qmRHSqmuvXcoc=",
       "license": "MIT",
       "optional": true,
@@ -5366,7 +5347,7 @@
     },
     "node_modules/tunnel-agent": {
       "version": "0.6.0",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/tunnel-agent/-/tunnel-agent-0.6.0.tgz",
+      "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.6.0.tgz",
       "integrity": "sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=",
       "license": "Apache-2.0",
       "optional": true,
@@ -5422,7 +5403,7 @@
     "node_modules/typescript-native": {
       "name": "typescript",
       "version": "7.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/typescript/-/typescript-7.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
       "integrity": "sha1-nsdz15VKjBgsF8xbvVdaoovFFYI=",
       "dev": true,
       "license": "Apache-2.0",
@@ -5815,7 +5796,7 @@
     },
     "node_modules/wrappy": {
       "version": "1.0.2",
-      "resolved": "https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/wrappy/-/wrappy-1.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
       "integrity": "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
       "license": "ISC",
       "optional": true

@@ -21,6 +21,7 @@ import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { cli, CommandOutput } from './cli.js';
 import { Logger } from './Logger.js';
+import spoEventreceiverGetCommand from '../m365/spo/commands/eventreceiver/eventreceiver-get.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -279,6 +280,30 @@ class MockCommandWithSchemaAndRequiredOptions extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchemaAndProcessedRequiredOptions extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema processed required';
+  }
+  public get description(): string {
+    return 'Mock command with schema and processed required options';
+  }
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      url: z.string().refine(value => value.startsWith('https://'), {
+        message: 'The value of url must be an absolute URL.'
+      })
+    });
+  }
+  public async processOptions(options: any): Promise < void> {
+    if (options.url?.startsWith('/')) {
+      options.url = `https://contoso.sharepoint.com${options.url}`;
+    }
+  }
+  public async commandAction(): Promise < void> {
+  }
+}
+
 class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
   public get name(): string {
     return 'cli mock schema bool required';
@@ -291,6 +316,23 @@ class MockCommandWithSchemaAndBoolRequiredOption extends AnonymousCommand {
       ...globalOptionsZod.shape,
       url: z.string(),
       bool: z.boolean()
+    });
+  }
+  public async commandAction(): Promise<void> {
+  }
+}
+
+class MockCommandWithSchemaAndNumberRequiredOption extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema number required';
+  }
+  public get description(): string {
+    return 'Mock command with schema and required numeric option';
+  }
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      id: z.coerce.number()
     });
   }
   public async commandAction(): Promise<void> {
@@ -448,7 +490,9 @@ describe('cli', () => {
   let mockCommandWithValidation: Command;
   let mockCommandWithSchema: Command;
   let mockCommandWithSchemaAndRequiredOptions: Command;
+  let mockCommandWithSchemaAndProcessedRequiredOptions: Command;
   let mockCommandWithSchemaAndBoolRequiredOption: Command;
+  let mockCommandWithSchemaAndNumberRequiredOption: Command;
   let mockCommandWithRefinedSchema: Command;
   let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
@@ -474,7 +518,9 @@ describe('cli', () => {
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithSchema = new MockCommandWithSchema();
     mockCommandWithSchemaAndRequiredOptions = new MockCommandWithSchemaAndRequiredOptions();
+    mockCommandWithSchemaAndProcessedRequiredOptions = new MockCommandWithSchemaAndProcessedRequiredOptions();
     mockCommandWithSchemaAndBoolRequiredOption = new MockCommandWithSchemaAndBoolRequiredOption();
+    mockCommandWithSchemaAndNumberRequiredOption = new MockCommandWithSchemaAndNumberRequiredOption();
     mockCommandWithRefinedSchema = new MockCommandWithRefinedSchema();
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
@@ -498,11 +544,14 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchema, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndProcessedRequiredOptions, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithSchemaAndBoolRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndNumberRequiredOption, 'cli-schema-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchema, 'cli-schema-refined-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
-      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
+      cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
+      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -516,6 +565,7 @@ describe('cli', () => {
     md2plainSpy.resetHistory();
     mockCommandActionSpy.resetHistory();
     sinonUtil.restore([
+      cli.closeWithError,
       cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
@@ -530,6 +580,8 @@ describe('cli', () => {
       mockCommandWithSchema.action,
       mockCommand.commandAction,
       mockCommand.processOptions,
+      mockCommandWithSchemaAndProcessedRequiredOptions.processOptions,
+      mockCommandWithRefinedSchema.processOptions,
       prompt.forInput,
       prompt.forSelection,
       prompt.forConfirmation,
@@ -1234,6 +1286,95 @@ describe('cli', () => {
       }, e => done(e));
   });
 
+  it(`processes prompted required options before rerunning schema validation`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed required');
+    sinon.stub(prompt, 'forInput').resolves('/sites/branding/assets');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'processed', 'required']);
+
+    assert(executeCommandSpy.calledOnce);
+    assert.strictEqual(
+      executeCommandSpy.firstCall.args[1].options.url,
+      'https://contoso.sharepoint.com/sites/branding/assets'
+    );
+  });
+
+  it(`shows an error when processing prompted required options fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema processed required');
+    sinon.stub(prompt, 'forInput').resolves('/sites/branding/assets');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithSchemaAndProcessedRequiredOptions, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted options'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute(['cli', 'mock', 'schema', 'processed', 'required']);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted options')
+      ));
+    }
+  });
+
+  it(`shows an error when processing prompted option set values fails`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined');
+    sinon.stub(prompt, 'forSelection').resolves('certificateFile');
+    sinon.stub(prompt, 'forInput').resolves('/path/to/cert.pem');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const processOptionsStub = sinon.stub(mockCommandWithRefinedSchema, 'processOptions');
+    processOptionsStub.onFirstCall().resolves();
+    processOptionsStub.onSecondCall().rejects(new Error('Unable to process prompted option set'));
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    try {
+      await cli.execute([
+        'cli',
+        'mock',
+        'schema',
+        'refined',
+        '--authType',
+        'certificate'
+      ]);
+      assert.fail('Error not thrown');
+    }
+    catch {
+      assert.strictEqual(processOptionsStub.callCount, 2);
+      assert(executeCommandSpy.notCalled);
+      assert(cliErrorStub.calledWith(
+        chalk.red('Error: Unable to process prompted option set')
+      ));
+    }
+  });
+
   it(`shows validation error for missing required options when validating schema and prompting disabled`, (done) => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema required');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -1254,6 +1395,56 @@ describe('cli', () => {
           done(e);
         }
       });
+  });
+
+  it('does not prompt for an invalid supplied number when prompting is enabled', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema number required');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'number',
+      'required',
+      '--id',
+      'abc'
+    ]));
+
+    assert(promptForValueSpy.notCalled);
+    assert(cliErrorStub.getCalls().some(call => call.firstArg.includes('expected number')));
+    assert(cliErrorStub.getCalls().every(call => !call.firstArg.includes('Required option not specified')));
+  });
+
+  it('shows the numeric validation error for an invalid supplied number when prompting is disabled', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema number required');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'number',
+      'required',
+      '--id',
+      'abc'
+    ]));
+
+    assert(cliErrorStub.getCalls().some(call => call.firstArg.includes('expected number')));
+    assert(cliErrorStub.getCalls().every(call => !call.firstArg.includes('Required option not specified')));
   });
 
   it(`throws error if coercing value fails when validating schema`, (done) => {
@@ -1436,21 +1627,42 @@ describe('cli', () => {
     assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optA, 42);
   });
 
-  it(`keeps string value as string when prompting for option set value`, async () => {
+  it(`keeps numeric-looking value as string when prompting for a string option set value`, async () => {
     cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
     sinon.stub(prompt, 'forSelection').resolves('optE');
-    sinon.stub(prompt, 'forInput').resolves('hello world');
+    sinon.stub(prompt, 'forInput').resolves('5');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return true;
       }
+
       return defaultValue;
     });
     const executeCommandSpy = sinon.spy(cli, 'executeCommand');
 
     await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+
     assert(executeCommandSpy.called);
-    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'hello world');
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, '5');
+  });
+
+  it(`keeps boolean-looking value as string when prompting for a string option set value`, async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === 'cli mock schema refined coercion');
+    sinon.stub(prompt, 'forSelection').resolves('optE');
+    sinon.stub(prompt, 'forInput').resolves('true');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute(['cli', 'mock', 'schema', 'refined', 'coercion', '--mode', 'string']);
+
+    assert(executeCommandSpy.called);
+    assert.strictEqual(executeCommandSpy.firstCall.args[1].options.optE, 'true');
   });
 
   it(`executes command when validation passed`, async () => {
@@ -2024,7 +2236,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  15 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2037,7 +2249,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        10 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        12 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2050,7 +2262,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  13 commands'));
+    assert(cliLogStub.calledWith('  cli *  15 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
@@ -2337,5 +2549,77 @@ describe('cli', () => {
       executeCommandSpy.firstCall.args[1].options.certificateBase64Encoded,
       undefined
     );
+  });
+
+  it('returns a validation error instead of prompting when multiple event receiver list selectors are specified', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === spoEventreceiverGetCommand.name);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw error;
+    });
+
+    await assert.rejects(
+      cli.execute([
+        'spo',
+        'eventreceiver',
+        'get',
+        '--webUrl',
+        'https://contoso.sharepoint.com/sites/sales',
+        '--name',
+        'PnP Test Receiver',
+        '--listTitle',
+        'Documents',
+        '--listUrl',
+        'Lists/Documents'
+      ]),
+      /Specify either list id or title or list url/
+    );
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
+  });
+
+  it('returns a validation error instead of prompting when site scope is combined with a list selector', async () => {
+    cli.commandToExecute = cli.commands.find(c => c.name === spoEventreceiverGetCommand.name);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw error;
+    });
+
+    await assert.rejects(
+      cli.execute([
+        'spo',
+        'eventreceiver',
+        'get',
+        '--webUrl',
+        'https://contoso.sharepoint.com/sites/sales',
+        '--name',
+        'PnP Test Receiver',
+        '--scope',
+        'site',
+        '--listTitle',
+        'Documents'
+      ]),
+      /Scope cannot be set to site when retrieving list event receivers\./
+    );
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
   });
 });
