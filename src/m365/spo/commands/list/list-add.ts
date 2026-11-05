@@ -139,22 +139,13 @@ class SpoListAddCommand extends SpoCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(opts => !opts.emailAlias || opts.enableAssignToEmail === true, {
-        error: 'emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.',
-        params: {
-          customCode: 'required'
-        }
+        error: 'emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.'
       })
       .refine(opts => opts.majorVersionLimit === undefined || opts.enableVersioning === true, {
-        error: 'majorVersionLimit option is only valid in combination with enableVersioning.',
-        params: {
-          customCode: 'required'
-        }
+        error: 'majorVersionLimit option is only valid in combination with enableVersioning.'
       })
       .refine(opts => opts.majorWithMinorVersionsLimit === undefined || opts.enableMinorVersions === true || opts.enableModeration === true, {
-        error: 'majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.',
-        params: {
-          customCode: 'required'
-        }
+        error: 'majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.'
       });
   }
 
