@@ -25,7 +25,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  fileId: z.uuid().optional(),
+  fileId: z.guid().optional(),
   fileUrl: z.string().optional(),
   type: zod.coercedEnum(SharingLinkType),
   expirationDateTime: z.string()

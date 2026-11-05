@@ -14,8 +14,8 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.uuid(),
-  fileId: z.uuid().optional(),
+  id: z.guid(),
+  fileId: z.guid().optional(),
   fileUrl: z.string().optional(),
   expirationDateTime: z.string()
     .refine(date => validation.isValidISODateTime(date) === true, {

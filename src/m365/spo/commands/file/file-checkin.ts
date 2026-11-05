@@ -29,7 +29,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   url: z.string().optional(),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   type: zod.coercedEnum(CheckinTypeOption).optional().alias('t'),
   comment: z.string()
     .max(1023, { error: 'The length of the comment must be less than 1024 letters' })

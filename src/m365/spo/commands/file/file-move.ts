@@ -16,7 +16,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   sourceUrl: z.string().optional().alias('s'),
-  sourceId: z.uuid().optional().alias('i'),
+  sourceId: z.guid().optional().alias('i'),
   targetUrl: z.string().alias('t'),
   newName: z.string().optional(),
   nameConflictBehavior: z.enum(['fail', 'replace', 'rename']).optional(),

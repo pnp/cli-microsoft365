@@ -16,7 +16,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   fileUrl: z.string().optional(),
-  fileId: z.uuid().optional(),
+  fileId: z.guid().optional(),
   id: z.string().alias('i'),
   force: z.boolean().optional().alias('f')
 });

@@ -16,7 +16,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   fileUrl: z.string().optional(),
-  fileId: z.uuid().optional().alias('i')
+  fileId: z.guid().optional().alias('i')
 });
 
 declare type Options = z.infer<typeof options>;

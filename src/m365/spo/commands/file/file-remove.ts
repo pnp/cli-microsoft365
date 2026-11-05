@@ -16,7 +16,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   url: z.string().optional(),
   permanent: z.boolean().optional(),
   bypassSharedLock: z.boolean().optional(),

@@ -19,7 +19,7 @@ export const options = z.strictObject({
     .alias('u'),
   name: z.string(),
   fileUrl: z.string().optional(),
-  fileId: z.uuid().optional().alias('i'),
+  fileId: z.guid().optional().alias('i'),
   assetId: z.string().optional().alias('a')
 });
 

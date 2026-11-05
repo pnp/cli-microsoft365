@@ -24,7 +24,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   fileUrl: z.string().optional(),
-  fileId: z.uuid().optional(),
+  fileId: z.guid().optional(),
   scope: zod.coercedEnum(SharingLinkScope).optional().alias('s'),
   force: z.boolean().optional().alias('f')
 });

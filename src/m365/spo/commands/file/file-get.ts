@@ -19,7 +19,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   url: z.string().optional(),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   asString: z.boolean().optional(),
   asListItem: z.boolean().optional(),
   asFile: z.boolean().optional(),

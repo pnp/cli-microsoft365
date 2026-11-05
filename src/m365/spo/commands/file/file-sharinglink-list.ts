@@ -22,7 +22,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  fileId: z.uuid().optional(),
+  fileId: z.guid().optional(),
   fileUrl: z.string().optional(),
   scope: zod.coercedEnum(SharingLinkScope).optional().alias('s')
 });
