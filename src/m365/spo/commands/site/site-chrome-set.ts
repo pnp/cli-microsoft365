@@ -43,9 +43,9 @@ export const options = z.strictObject({
   logoAlignment: z.enum(['Left', 'Center', 'Right']).optional(),
   footerLayout: z.enum(['Simple', 'Extended']).optional(),
   footerEmphasis: z.enum(['Lightest', 'Light', 'Dark', 'Darkest']).optional(),
-  disableMegaMenu: z.boolean().optional(),
-  hideTitleInHeader: z.boolean().optional(),
-  disableFooter: z.boolean().optional()
+  disableMegaMenu: z.boolean().optional().autocomplete(['true', 'false']),
+  hideTitleInHeader: z.boolean().optional().autocomplete(['true', 'false']),
+  disableFooter: z.boolean().optional().autocomplete(['true', 'false'])
 });
 
 declare type Options = z.infer<typeof options>;
