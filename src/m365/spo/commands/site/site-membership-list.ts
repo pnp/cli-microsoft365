@@ -21,7 +21,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  role: zod.coercedEnum(Role).optional().alias('r')
+  role: zod.coercedEnum(Role).optional().alias('r').autocomplete(Object.values(Role))
 });
 
 declare type Options = z.infer<typeof options>;
