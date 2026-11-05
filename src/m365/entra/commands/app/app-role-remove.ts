@@ -1,13 +1,13 @@
-import { Application, AppRole } from "@microsoft/microsoft-graph-types";
+import { Application, AppRole } from '@microsoft/microsoft-graph-types';
 import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from "../../../../utils/formatting.js";
+import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { entraApp } from "../../../../utils/entraApp.js";
+import { entraApp } from '../../../../utils/entraApp.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,

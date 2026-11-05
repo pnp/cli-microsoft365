@@ -2,7 +2,7 @@ import { Application } from '@microsoft/microsoft-graph-types';
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
-import { odata } from "../../../../utils/odata.js";
+import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
@@ -31,7 +31,7 @@ class EntraAppListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['appId', 'id', 'displayName', "signInAudience"];
+    return ['appId', 'id', 'displayName', 'signInAudience'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -103,7 +103,7 @@ class EntraAppSetCommand extends GraphCommand {
       return app.id!;
     }
     else {
-      const app = await entraApp.getAppRegistrationByAppName(name!, ["id"]);
+      const app = await entraApp.getAppRegistrationByAppName(name!, ['id']);
       return app.id!;
     }
   }

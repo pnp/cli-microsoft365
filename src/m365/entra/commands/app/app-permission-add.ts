@@ -1,13 +1,13 @@
-import { AppRole, Application, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from "@microsoft/microsoft-graph-types";
+import { AppRole, Application, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import { z } from 'zod';
-import { globalOptionsZod } from "../../../../Command.js";
-import { odata } from "../../../../utils/odata.js";
-import GraphCommand from "../../../base/GraphCommand.js";
-import commands from "../../commands.js";
-import request, { CliRequestOptions } from "../../../../request.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { entraApp } from "../../../../utils/entraApp.js";
-import { entraServicePrincipal } from "../../../../utils/entraServicePrincipal.js";
+import { globalOptionsZod } from '../../../../Command.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { entraApp } from '../../../../utils/entraApp.js';
+import { entraServicePrincipal } from '../../../../utils/entraServicePrincipal.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,

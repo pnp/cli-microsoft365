@@ -1,12 +1,12 @@
-import { AppRole, Application, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from "@microsoft/microsoft-graph-types";
+import { AppRole, Application, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import { z } from 'zod';
-import { globalOptionsZod } from "../../../../Command.js";
-import GraphCommand from "../../../base/GraphCommand.js";
-import commands from "../../commands.js";
-import request, { CliRequestOptions } from "../../../../request.js";
-import { Logger } from "../../../../cli/Logger.js";
-import { entraApp } from "../../../../utils/entraApp.js";
-import { zod } from "../../../../utils/zod.js";
+import { globalOptionsZod } from '../../../../Command.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { entraApp } from '../../../../utils/entraApp.js';
+import { zod } from '../../../../utils/zod.js';
 
 const allowedTypes = { delegated: 'delegated', application: 'application', all: 'all' } as const;
 
@@ -84,11 +84,11 @@ class EntraAppPermissionListCommand extends GraphCommand {
     }
 
     if (appId) {
-      const app = await entraApp.getAppRegistrationByAppId(appId, ["id"]);
+      const app = await entraApp.getAppRegistrationByAppId(appId, ['id']);
       return app.id!;
     }
     else {
-      const app = await entraApp.getAppRegistrationByAppName(appName!, ["id"]);
+      const app = await entraApp.getAppRegistrationByAppName(appName!, ['id']);
       return app.id!;
     }
   }
