@@ -12,7 +12,6 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command, { options } from './site-accessrequest-setting-set.js';
-import { z } from 'zod';
 
 describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
   const siteUrl = 'https://contoso.sharepoint.com/sites/Management';
@@ -20,8 +19,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let baseSchema: z.ZodTypeAny;
-  let refinedSchema: typeof options;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,8 +29,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
     auth.connection.active = true;
 
     commandInfo = cli.getCommandInfo(command);
-    baseSchema = commandInfo.command.getSchemaToParse()!;
-    refinedSchema = commandInfo.command.getSchemaToParse() as typeof options;
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,59 +69,59 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
 
   // Schema validation
   it('fails validation if siteUrl is not a valid URL', () => {
-    const actual = baseSchema.safeParse({ siteUrl: 'invalid', disabled: true });
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalid', disabled: true });
     assert.strictEqual(actual.success, false);
     assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when none of disabled, ownerGroup or email are provided', () => {
-    const actual = refinedSchema.safeParse({ siteUrl });
+    const actual = commandOptionsSchema.safeParse({ siteUrl });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when two options among disabled, ownerGroup, email are provided', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, disabled: true, ownerGroup: true });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, disabled: true, ownerGroup: true });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when message is used with disabled', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, disabled: true, message: 'not allowed' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, disabled: true, message: 'not allowed' });
     assert.strictEqual(actual.success, false);
   });
 
   it('fails validation when email is invalid', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, email: 'foo' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, email: 'foo' });
     assert.strictEqual(actual.success, false);
     assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid email address.`);
   });
 
   it('passes validation when disabled specified', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, disabled: true });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, disabled: true });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when ownerGroup specified', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, ownerGroup: true });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, ownerGroup: true });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when email specified with a valid email', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when email specified with a message', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com', message: 'Hello' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com', message: 'Hello' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when ownerGroup specified with a message', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, ownerGroup: true, message: 'Hello' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, ownerGroup: true, message: 'Hello' });
     assert.strictEqual(actual.success, true);
   });
 
   it('passes validation when email specified with empty message (clear message)', () => {
-    const actual = refinedSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com', message: '' });
+    const actual = commandOptionsSchema.safeParse({ siteUrl, email: 'john.doe@contoso.com', message: '' });
     assert.strictEqual(actual.success, true);
   });
 
@@ -144,7 +141,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, disabled: true, verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, disabled: true, verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -165,7 +162,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -186,7 +183,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledOnce, true);
@@ -210,7 +207,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: 'Motivate why you need access.', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: 'Motivate why you need access.', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -234,7 +231,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: '', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, email: 'john.doe@contoso.com', message: '', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -258,7 +255,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, message: 'Hello', verbose: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, ownerGroup: true, message: 'Hello', verbose: true }) });
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.calledTwice, true);
@@ -285,7 +282,7 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: refinedSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) }), new CommandError('Access is denied.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, email: 'john.doe@contoso.com', verbose: true }) }), new CommandError('Access is denied.'));
 
     assert.strictEqual(patchStub.calledOnce, true);
     assert.strictEqual(postStub.called, false);
@@ -315,6 +312,6 @@ describe(commands.SITE_ACCESSREQUEST_SETTING_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: refinedSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) }), new CommandError('Failed to set default.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl, ownerGroup: true, verbose: true }) }), new CommandError('Failed to set default.'));
   });
 });

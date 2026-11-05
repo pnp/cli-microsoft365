@@ -183,15 +183,6 @@ describe(commands.SITE_ENSURE, () => {
     await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' }) }));
   });
 
-  // it('returns error when the specified site type is invalid', async () => {
-  //   const webResponseSts = { ...webResponse };
-  //   webResponseSts.WebTemplate = 'STS';
-
-  //   sinon.stub(spo, 'getWeb').resolves(webResponseSts);
-
-  //   await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' }) }));
-  // });
-
   it('returns error when a communication site expected but a team site found', async () => {
     sinon.stub(spo, 'getWeb').resolves(webResponse);
 
