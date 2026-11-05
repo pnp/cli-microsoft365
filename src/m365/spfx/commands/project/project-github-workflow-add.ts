@@ -56,7 +56,7 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
         path: ['siteUrl']
       })
       .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || !opts.siteUrl || validation.isValidSharePointUrl(opts.siteUrl) === true, {
-        error: `The specified siteUrl is not a valid SharePoint Online site URL.`
+        error: issue => validation.isValidSharePointUrl((issue.input as Options).siteUrl!) as string
       });
   }
 

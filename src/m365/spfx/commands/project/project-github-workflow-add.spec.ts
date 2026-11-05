@@ -87,6 +87,7 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
   it('fails validation if siteUrl is not valid', () => {
     const actual = commandOptionsSchema.safeParse({ scope: 'sitecollection', siteUrl: 'abc' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if all required properties are provided', () => {
