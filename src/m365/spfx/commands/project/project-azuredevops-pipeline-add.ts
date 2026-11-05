@@ -54,11 +54,8 @@ class SpfxProjectAzureDevOpsPipelineAddCommand extends BaseProjectCommand {
         },
         path: ['siteUrl']
       })
-      .refine(opts => !opts.scope || opts.scope !== 'sitecollection' || validation.isValidSharePointUrl(opts.siteUrl!) === true, {
-        error: `The specified siteUrl is not a valid SharePoint Online site URL.`,
-        params: {
-          customCode: 'required'
-        }
+      .refine(opts => !opts.siteUrl || validation.isValidSharePointUrl(opts.siteUrl) === true, {
+        error: `The specified siteUrl is not a valid SharePoint Online site URL.`
       });
   }
 
