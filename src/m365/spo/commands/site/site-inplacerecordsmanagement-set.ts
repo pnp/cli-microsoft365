@@ -13,7 +13,10 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  enabled: z.boolean()
+  enabled: z.string()
+    .pipe(z.enum(['true', 'false']))
+    .transform(value => value === 'true')
+    .autocomplete(['true', 'false'])
 });
 
 declare type Options = z.infer<typeof options>;
