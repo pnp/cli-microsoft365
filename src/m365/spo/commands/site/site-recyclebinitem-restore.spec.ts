@@ -170,6 +170,16 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if ids is empty', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com',
+      ids: ''
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `Option 'ids' cannot be empty.`);
+  });
+
   it('restores specified items from the recycle bin', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin/RestoreByIds') > -1) {

@@ -15,6 +15,9 @@ export const options = z.strictObject({
     })
     .alias('u'),
   ids: z.string()
+    .refine(ids => ids.trim().length > 0, {
+      error: `Option 'ids' cannot be empty.`
+    })
     .refine(ids => formatting.splitAndTrim(ids).every(id => validation.isValidGuid(id)), {
       error: e => `The following GUIDs are invalid for the option 'ids': ${validation.isValidGuidArray(e.input as string)}.`
     })
