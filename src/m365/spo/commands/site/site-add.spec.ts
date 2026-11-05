@@ -119,7 +119,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', title: 'Team 1' }) });
   });
 
   it('creates modern team site using the correct endpoint (debug)', async () => {
@@ -131,7 +131,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', debug: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', title: 'Team 1', debug: true }) });
   });
 
   it('creates modern team site and enables site collection app catalog', async () => {
@@ -169,7 +169,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', verbose: true, withAppCatalog: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', title: 'Team 1', verbose: true, withAppCatalog: true }) });
   });
 
   it('correctly handles error when creating site collection app catalog', async () => {
@@ -197,7 +197,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', withAppCatalog: true }) }), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ alias: 'team1', title: 'Team 1', withAppCatalog: true }) }), new CommandError('Unknown Error'));
   });
 
   it('sets specified title for modern team site', async () => {
@@ -228,7 +228,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: expected, title: 'Team 1' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -244,7 +244,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', isPublic: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', isPublic: true }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -260,7 +260,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -276,7 +276,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', description: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', description: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -292,7 +292,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -308,7 +308,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', classification: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', classification: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -324,7 +324,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -340,7 +340,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', lcid: 1033 }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', lcid: 1033 }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -356,7 +356,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', owners: 'admin@contoso.com' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', owners: 'admin@contoso.com' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -372,7 +372,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', owners: 'admin@contoso.com,steve@contoso.com' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', owners: 'admin@contoso.com,steve@contoso.com' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -388,7 +388,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', owners: 'admin@contoso.com, steve@contoso.com' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1', title: 'Team 1', owners: 'admin@contoso.com, steve@contoso.com' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -401,7 +401,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1' }) }), new CommandError('The group alias already exists.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', title: 'Team 1', alias: 'team1' }) }), new CommandError('The group alias already exists.'));
   });
 
   it('correctly handles OData error when creating a modern team site', async () => {
@@ -409,7 +409,7 @@ describe(commands.SITE_ADD, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', alias: 'team1' }) }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ type: 'TeamSite', title: 'Team 1', alias: 'team1' }) }), new CommandError('An error has occurred'));
   });
 
   it('creates communication site using the correct endpoint', async () => {
@@ -421,7 +421,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
   });
 
   it('sets specified title for communication site', async () => {
@@ -449,7 +449,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
   });
 
   it('sets specified title for communication site when owners option is passed', async () => {
@@ -480,7 +480,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: expected, title: 'Marketing' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -496,7 +496,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', shareByEmailEnabled: true }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', shareByEmailEnabled: true }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -512,7 +512,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -528,7 +528,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', description: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', description: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -544,7 +544,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -560,7 +560,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', classification: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', classification: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -576,7 +576,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -592,7 +592,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', siteDesign: 'Topic' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', siteDesign: 'Topic' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -608,7 +608,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', siteDesign: 'Showcase' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', siteDesign: 'Showcase' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -624,7 +624,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', siteDesign: 'Blank' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', siteDesign: 'Blank' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -640,7 +640,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing' }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing' }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -656,7 +656,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', siteDesignId: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', siteDesignId: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -672,7 +672,7 @@ describe(commands.SITE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', lcid: expected }) });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'CommunicationSite', url: 'https://contoso.sharepoint.com/sites/marketing', title: 'Marketing', lcid: expected }) });
     assert.strictEqual(actual, expected);
   });
 
@@ -750,6 +750,14 @@ describe(commands.SITE_ADD, () => {
       url: 'https://contoso.sharepoint.com/sites/marketing'
     });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if title is missing', () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: 'Invalid',
+      alias: 'team1'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if an invalid type option specified', () => {
