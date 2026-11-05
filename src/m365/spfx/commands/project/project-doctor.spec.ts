@@ -133,7 +133,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
 
     try {
-      await  command.action(logger, { options: commandOptionsSchema.parse({ output: 'md' }) });
+      await command.action(logger, { options: commandOptionsSchema.parse({ output: 'md' }) });
       assert(log[0].indexOf('## Findings') > -1);
     }
     finally {
@@ -640,10 +640,12 @@ describe(commands.PROJECT_DOCTOR, () => {
       unknownOption: 'value'
     });
     assert.strictEqual(actual.success, false);
+  });
+
   it('e2e: shows correct number of findings for a valid 1.24.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1240-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     // 10 because SPFx v1.24.0 scaffolds a broken project
     assert.strictEqual(findings.length, 10);
@@ -652,7 +654,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   it('e2e: shows correct number of findings for a valid 1.24.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1241-webpart-react'));
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
   });
@@ -673,14 +675,9 @@ describe(commands.PROJECT_DOCTOR, () => {
       return JSON.stringify(packageJson);
     });
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.filter(f => f.id === 'FN002022').length, 1);
-  });
-
-  it('passes validation when package manager not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 
   it('passes validation when package manager not specified', () => {

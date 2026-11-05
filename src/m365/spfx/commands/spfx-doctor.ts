@@ -10,10 +10,13 @@ import { SharePointVersion, SpfxVersionPrerequisites, VersionCheck, versions } f
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  env: z.enum(['sp2016', 'sp2019', 'spo']).optional().alias('e'),
-  spfxVersion: z.string().optional().refine(val => !val || versions[val], {
-    message: `The specified version is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`
-  }).alias('v'),
+  env: z.preprocess(
+    val => typeof val === 'string' ? val.toLowerCase() : val,
+    z.enum(['sp2016', 'sp2019', 'spo'])
+  ).optional().alias('e'),
+  spfxVersion: z.enum(Object.keys(versions), {
+    error: `The specified version is not a supported SharePoint Framework version. Supported versions are ${Object.keys(versions).join(', ')}`
+  }).optional().alias('v'),
   output: z.enum(['text', 'json']).optional().alias('o')
 });
 

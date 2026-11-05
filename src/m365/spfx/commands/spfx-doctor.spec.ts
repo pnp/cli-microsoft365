@@ -1157,10 +1157,17 @@ describe(commands.DOCTOR, () => {
   it('fails validation when unsupported version of SPFx specified', () => {
     const actual = commandOptionsSchema.safeParse({ spfxVersion: '1.2.3' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The specified version is not a supported SharePoint Framework version. Supported versions are 1.0.0, 1.1.0, 1.2.0, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.10.0, 1.11.0, 1.12.0, 1.12.1, 1.13.0, 1.13.1, 1.14.0, 1.15.0, 1.15.2, 1.16.0, 1.16.1, 1.17.0, 1.17.1, 1.17.2, 1.17.3, 1.17.4, 1.18.0, 1.18.1, 1.18.2, 1.19.0, 1.20.0, 1.21.0, 1.21.1, 1.22.0, 1.22.1, 1.22.2, 1.23.0, 1.23.2, 1.24.0, 1.24.1');
   });
 
   it('fails validation when supported version of SPFx prefixed with v specified', () => {
     const actual = commandOptionsSchema.safeParse({ spfxVersion: 'v1.15.2' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'The specified version is not a supported SharePoint Framework version. Supported versions are 1.0.0, 1.1.0, 1.2.0, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.10.0, 1.11.0, 1.12.0, 1.12.1, 1.13.0, 1.13.1, 1.14.0, 1.15.0, 1.15.2, 1.16.0, 1.16.1, 1.17.0, 1.17.1, 1.17.2, 1.17.3, 1.17.4, 1.18.0, 1.18.1, 1.18.2, 1.19.0, 1.20.0, 1.21.0, 1.21.1, 1.22.0, 1.22.1, 1.22.2, 1.23.0, 1.23.2, 1.24.0, 1.24.1');
+  });
+
+  it('fails validation when env is not a string', () => {
+    const actual = commandOptionsSchema.safeParse({ env: 2016 });
     assert.strictEqual(actual.success, false);
   });
 });
