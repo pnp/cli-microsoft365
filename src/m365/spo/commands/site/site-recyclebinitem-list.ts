@@ -3,15 +3,8 @@ import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-
-enum RecycleBinItemType {
-  files = 'files',
-  listItems = 'listItems',
-  folders = 'folders'
-}
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -20,7 +13,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  type: zod.coercedEnum(RecycleBinItemType).optional().alias('t'),
+  type: z.enum(['files', 'listItems', 'folders']).optional().alias('t'),
   secondary: z.boolean().optional().alias('s')
 });
 
