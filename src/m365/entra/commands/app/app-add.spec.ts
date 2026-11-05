@@ -189,7 +189,6 @@ describe(commands.APP_ADD, () => {
       fs.readFileSync,
       fs.writeFileSync
     ]);
-    (command as any).manifest = undefined;
   });
 
   after(() => {
@@ -7442,7 +7441,6 @@ describe(commands.APP_ADD, () => {
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         manifest: JSON.stringify(basicManifest),
@@ -7592,7 +7590,6 @@ describe(commands.APP_ADD, () => {
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         manifest: JSON.stringify(basicManifest),
@@ -7742,7 +7739,6 @@ describe(commands.APP_ADD, () => {
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         manifest: JSON.stringify(basicManifest),
@@ -7910,7 +7906,6 @@ describe(commands.APP_ADD, () => {
       throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
-    (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         manifest: JSON.stringify(basicManifest),

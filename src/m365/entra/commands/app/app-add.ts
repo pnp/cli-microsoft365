@@ -49,7 +49,6 @@ interface CommandArgs {
 }
 
 class EntraAppAddCommand extends GraphCommand {
-  private manifest: any;
   private appName: string = '';
 
   public get name(): string {
@@ -108,12 +107,7 @@ class EntraAppAddCommand extends GraphCommand {
 
         try {
           const manifest = JSON.parse(options.manifest);
-          if (!options.name && !manifest.name) {
-            return false;
-          }
-
-          this.manifest = manifest;
-          return true;
+          return !!options.name || !!manifest.name;
         }
         catch {
           return false;
@@ -138,15 +132,20 @@ class EntraAppAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (!args.options.name && this.manifest) {
-      args.options.name = this.manifest.name;
+    const manifest = args.options.manifest
+      ? JSON.parse(args.options.manifest)
+      : undefined;
+
+    if (!args.options.name && manifest) {
+      args.options.name = manifest.name;
     }
+
     this.appName = args.options.name!;
 
     try {
       const apis = await entraApp.resolveApis({
         options: args.options,
-        manifest: this.manifest,
+        manifest,
         logger,
         verbose: this.verbose,
         debug: this.debug
