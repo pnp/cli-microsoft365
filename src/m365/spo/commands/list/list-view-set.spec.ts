@@ -109,6 +109,18 @@ describe(commands.LIST_VIEW_SET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('passes validation for unknown view properties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl,
+      listTitle,
+      title: viewTitle,
+      CustomFormatter: 'abc'
+    });
+
+    assert.strictEqual(actual.success, true);
+    assert.strictEqual(actual.data?.CustomFormatter, 'abc');
+  });
+
   it('ignores global options when creating request data', async () => {
     const patchRequest: sinon.SinonStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(listTitle)}')/views/GetByTitle('${formatting.encodeQueryParameter(viewTitle)}')`) {
