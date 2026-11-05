@@ -271,4 +271,16 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     });
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation if the position option is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+      id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
+      position: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
 });

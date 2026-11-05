@@ -34,7 +34,7 @@ export const options = z.strictObject({
     })
     .optional(),
   title: z.string().optional(),
-  position: z.number()
+  position: z.number().int()
 });
 
 declare type Options = z.infer<typeof options>;
