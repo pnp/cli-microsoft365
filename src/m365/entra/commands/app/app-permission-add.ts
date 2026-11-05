@@ -11,9 +11,9 @@ import { entraServicePrincipal } from "../../../../utils/entraServicePrincipal.j
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional().alias('i'),
+  appId: z.guid().optional().alias('i'),
   appName: z.string().optional().alias('n'),
-  appObjectId: z.uuid().optional(),
+  appObjectId: z.guid().optional(),
   applicationPermissions: z.string().optional().alias('a'),
   delegatedPermissions: z.string().optional().alias('d'),
   grantAdminConsent: z.boolean().optional()

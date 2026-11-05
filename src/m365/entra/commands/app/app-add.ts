@@ -71,7 +71,11 @@ class EntraAppAddCommand extends GraphCommand {
   public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
     return schema
       .refine(options => [options.name, options.manifest].filter(x => x !== undefined).length === 1, {
-        error: 'Specify either name or manifest, but not both'
+        error: 'Specify either name or manifest, but not both',
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'manifest']
+        }
       })
       .refine(options => !options.redirectUris || !!options.platform, {
         error: 'When you specify redirectUris you also need to specify platform'

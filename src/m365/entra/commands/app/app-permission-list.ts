@@ -12,9 +12,9 @@ const allowedTypes = { delegated: 'delegated', application: 'application', all: 
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional().alias('i'),
+  appId: z.guid().optional().alias('i'),
   appName: z.string().optional().alias('n'),
-  appObjectId: z.uuid().optional(),
+  appObjectId: z.guid().optional(),
   type: zod.coercedEnum(allowedTypes).optional()
 });
 

@@ -11,12 +11,12 @@ import { entraApp } from "../../../../utils/entraApp.js";
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional(),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  appObjectId: z.guid().optional(),
   appName: z.string().optional(),
   claim: z.string().optional().alias('c'),
   name: z.string().optional().alias('n'),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   force: z.boolean().optional().alias('f')
 });
 

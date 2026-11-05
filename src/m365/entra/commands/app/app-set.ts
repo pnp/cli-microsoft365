@@ -14,8 +14,8 @@ const aadApplicationPlatform = ['spa', 'web', 'publicClient'] as const;
 
 export const options = z.looseObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional(),
-  objectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  objectId: z.guid().optional(),
   name: z.string().optional().alias('n'),
   uris: z.string().optional().alias('u'),
   redirectUris: z.string().optional().alias('r'),

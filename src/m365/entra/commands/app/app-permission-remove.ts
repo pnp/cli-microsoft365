@@ -12,8 +12,8 @@ import { entraApp } from "../../../../utils/entraApp.js";
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional().alias('i'),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional().alias('i'),
+  appObjectId: z.guid().optional(),
   appName: z.string().optional().alias('n'),
   applicationPermissions: z.string()
     .refine(permissions => validation.isValidPermission(permissions) === true, {

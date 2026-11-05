@@ -10,8 +10,8 @@ import { entraApp } from '../../../../utils/entraApp.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  appId: z.uuid().optional(),
-  appObjectId: z.uuid().optional(),
+  appId: z.guid().optional(),
+  appObjectId: z.guid().optional(),
   appName: z.string().optional(),
   name: z.string().alias('n'),
   description: z.string().alias('d'),
