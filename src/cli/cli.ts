@@ -61,7 +61,7 @@ const yargsConfiguration: Partial<yargs.Configuration> = {
 };
 
 function isMissingRequiredValueError(error: z.core.$ZodIssue, options: yargs.Arguments): boolean {
-  if (error.code !== 'invalid_type') {
+  if (error.code !== 'invalid_type' && error.code !== 'invalid_value') {
     return false;
   }
 
@@ -211,12 +211,26 @@ async function execute(rawArgs: string[]): Promise<void> {
         const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
         if (!shouldPrompt) {
-          result.error.issues.forEach(e => {
-            if (isMissingRequiredValueError(e, cli.optionsFromArgs!.options)) {
-              (e.message as any) = `Required option not specified`;
-            }
-          });
-          return cli.closeWithError(result.error, cli.optionsFromArgs, true);
+          const errorMessage = result.error.issues
+            .map(issue => {
+              const message = isMissingRequiredValueError(
+                issue,
+                cli.optionsFromArgs!.options
+              )
+                ? 'Required option not specified'
+                : issue.message;
+
+              return issue.path.length > 0
+                ? `${issue.path.join('.')}: ${message}`
+                : message;
+            })
+            .join(os.EOL);
+
+          return cli.closeWithError(
+            errorMessage,
+            cli.optionsFromArgs,
+            true
+          );
         }
 
         const missingRequiredValuesErrors: z.core.$ZodIssue[] = result.error.issues
