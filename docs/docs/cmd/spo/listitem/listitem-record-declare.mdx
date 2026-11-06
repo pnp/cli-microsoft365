@@ -36,6 +36,25 @@ m365 spo listitem record declare [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Declare a document with id _1_ as a record in list with title _Demo List_ located in site _https://contoso.sharepoint.com/sites/project-x_
