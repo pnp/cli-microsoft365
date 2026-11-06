@@ -46,6 +46,27 @@ This command is based on an API that is currently in preview and is subject to c
 
 Creating a community is limited to networks in Native mode only - legacy and external Yammer networks will not be able to use this API for community creation.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions             |
+  |-----------------|-------------------------|
+  | Microsoft Graph | Community.ReadWrite.All |
+  | Microsoft Graph | User.ReadBasic.All      |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions             |
+  |-----------------|-------------------------|
+  | Microsoft Graph | Community.ReadWrite.All |
+  | Microsoft Graph | User.ReadBasic.All      |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 Create a public community and wait for the community to be created
