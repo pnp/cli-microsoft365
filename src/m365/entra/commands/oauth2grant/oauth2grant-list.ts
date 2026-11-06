@@ -8,7 +8,7 @@ import commands from '../../commands.js';
 
 export const options = globalOptionsZod
   .extend({
-    spObjectId: z.uuid().alias('i')
+    spObjectId: z.guid().alias('i')
   }).strict();
 declare type Options = z.infer<typeof options>;
 

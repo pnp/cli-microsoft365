@@ -17,7 +17,7 @@ const RoleEnum = {
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   filter: z.string().optional().alias('f'),
-  groupId: z.uuid().optional().alias('i'),
+  groupId: z.guid().optional().alias('i'),
   groupDisplayName: z.string().optional().alias('n'),
   properties: z.string().optional().alias('p'),
   role: zod.coercedEnum(RoleEnum).optional().alias('r')

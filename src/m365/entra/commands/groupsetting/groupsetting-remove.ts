@@ -8,7 +8,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().alias('i'),
+  id: z.guid().alias('i'),
   force: z.boolean().optional().alias('f')
 });
 
