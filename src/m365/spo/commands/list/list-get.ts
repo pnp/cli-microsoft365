@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -9,6 +10,23 @@ import commands from '../../commands.js';
 import { DefaultTrimModeType, ListInstance, VersionPolicy } from "./ListInstance.js";
 import { ListPrincipalType } from './ListPrincipalType.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} is not a valid GUID`
+  }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  url: z.string().optional(),
+  properties: z.string().optional().alias('p'),
+  withPermissions: z.boolean().optional(),
+  default: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface Properties {
   selectProperties: string[],
   expandProperties: string[]
@@ -16,16 +34,6 @@ interface Properties {
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id?: string;
-  title?: string;
-  url?: string;
-  properties?: string;
-  withPermissions?: boolean;
-  default?: boolean;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -39,75 +47,19 @@ class SpoListGetCommand extends SpoCommand {
     return 'Gets information about the specific list';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        withPermissions: !!args.options.withPermissions,
-        default: !!args.options.default
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title, opts.url, opts.default].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: id, title, url, default.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'url', 'default']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--url [url]'
-      },
-      {
-        option: '--default'
-      },
-      {
-        option: '-p, --properties [properties]'
-      },
-      {
-        option: '--withPermissions'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url', 'default'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -222,4 +222,11 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });
