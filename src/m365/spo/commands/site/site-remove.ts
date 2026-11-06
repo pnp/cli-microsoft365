@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
@@ -11,15 +12,22 @@ import { spo } from '../../../../utils/spo.js';
 import { setTimeout } from 'timers/promises';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  url: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  permanent: z.boolean().optional(),
+  fromRecycleBin: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  url: string;
-  permanent?: boolean;
-  fromRecycleBin?: boolean;
-  force?: boolean;
 }
 
 interface SiteDetails {
@@ -40,67 +48,31 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return 'Removes the specified site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        permanent: !!args.options.permanent,
-        fromRecycleBin: !!args.options.fromRecycleBin,
-        force: !!args.options.force
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--permanent'
-      },
-      {
-        option: '--fromRecycleBin'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => {
+        if (validation.isValidSharePointUrl(o.url) !== true) {
+          return true;
         }
 
-        const uri = new URL(args.options.url);
+        const uri = new URL(o.url);
         const rootUrl = `${uri.protocol}//${uri.hostname}`;
-        if (rootUrl.toLowerCase() === urlUtil.removeTrailingSlashes(args.options.url.toLowerCase())) {
-          return `The root site cannot be deleted.`;
+        return rootUrl.toLowerCase() !== urlUtil.removeTrailingSlashes(o.url.toLowerCase());
+      }, {
+        error: 'The root site cannot be deleted.',
+        path: ['url']
+      })
+      .refine(o => !(o.fromRecycleBin && o.permanent), {
+        error: 'Specify either fromRecycleBin or permanent, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['fromRecycleBin', 'permanent']
         }
-
-        if (args.options.fromRecycleBin && args.options.permanent) {
-          return 'Specify either fromRecycleBin or permanent, but not both.';
-        }
-
-        return true;
       });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('url');
-    this.types.boolean.push('permanent', 'fromRecycleBin', 'force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -12,8 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-admin-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './site-admin-list.js';
 
 describe(commands.SITE_ADMIN_LIST, () => {
   let log: any[];
@@ -21,6 +20,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const primaryAdminLoginName = 'user1loginName';
   const listOfAdminsResultRegularMode = [
@@ -111,6 +111,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -165,7 +166,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl }) });
     assert(loggerLogSpy.calledOnceWithExactly(listOfAdminsResultRegularMode));
   });
 
@@ -196,7 +197,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, asAdmin: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(listOfAdminsResultAsAdmin));
   });
 
@@ -210,14 +211,14 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl }) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('correctly handles errors from API in regular mode', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl }) }), new CommandError('An error has occurred'));
   });
 
   it('correctly handles empty list of site collection admins from API in admin mode', async () => {
@@ -247,7 +248,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, asAdmin: true }) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
@@ -261,7 +262,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl } }), new CommandError('Sinon-provided Invalid request'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl }) }), new CommandError('Sinon-provided Invalid request'));
   });
 
   it('handles error when primary admin API returns error in admin mode', async () => {
@@ -291,56 +292,49 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } }), new CommandError('Sinon-provided Invalid request'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, asAdmin: true }) }), new CommandError('Sinon-provided Invalid request'));
   });
 
   it('handles error when returned siteId is incorrect in admin mode', async () => {
     sinon.stub(spo, 'getSiteAdminPropertiesByUrl').rejects(new Error(`Cannot get site ${siteUrl}`));
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true } }), new CommandError(`Cannot get site ${siteUrl}`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, asAdmin: true }) }), new CommandError(`Cannot get site ${siteUrl}`));
   });
 
-  it('passes validation when only correct siteUrl option specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when correct siteUrl and correct asAdmin options specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/site',
-        asAdmin: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when the url option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation when only correct siteUrl option specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site'
     });
-
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.notDeepEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation when correct siteUrl and correct asAdmin options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site',
+      asAdmin: true
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when the url option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: siteUrl,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('get additional log when verbose parameter is set in regular mode', async () => {
@@ -353,7 +347,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, verbose: true }) });
     assert(loggerLogToStderrSpy.firstCall.firstArg === 'Retrieving site administrators...');
   });
 
@@ -384,7 +378,7 @@ describe(commands.SITE_ADMIN_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: siteUrl, asAdmin: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, asAdmin: true, verbose: true }) });
     assert(loggerLogToStderrSpy.firstCall.firstArg === 'Retrieving site administrators as an administrator...');
   });
 });

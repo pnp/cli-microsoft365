@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -11,18 +12,37 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { AdminResult, AdminUserResult } from './SiteAdmin.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  userId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional(),
+  userName: z.string()
+    .refine(name => validation.isValidUserPrincipalName(name), {
+      error: e => `${e.input} is not a valid userName`
+    })
+    .optional(),
+  groupId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .optional(),
+  groupName: z.string().optional(),
+  asAdmin: z.boolean().optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  userId?: string;
-  userName?: string;
-  groupId?: string;
-  groupName?: string;
-  asAdmin?: boolean;
-  force?: boolean;
 }
 
 class SpoSiteAdminRemoveCommand extends SpoCommand {
@@ -34,84 +54,19 @@ class SpoSiteAdminRemoveCommand extends SpoCommand {
     return 'Removes a user or group as site collection administrator';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        force: !!args.options.force,
-        asAdmin: !!args.options.asAdmin
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(o => [o.userId, o.userName, o.groupId, o.groupName].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'userId', 'userName', 'groupId', or 'groupName', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['userId', 'userName', 'groupId', 'groupName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--asAdmin'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId &&
-          !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid userName`;
-        }
-
-        if (args.options.groupId &&
-          !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('siteUrl', 'userId', 'userName', 'groupId', 'groupName');
-    this.types.boolean.push('force', 'asAdmin');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

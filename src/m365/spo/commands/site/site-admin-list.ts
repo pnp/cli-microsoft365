@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -8,13 +9,20 @@ import commands from '../../commands.js';
 import { ListPrincipalType } from '../list/ListPrincipalType.js';
 import { AdminResult, AdminUserResult, AdminCommandResultItem, SiteResult, SiteUserResult } from './SiteAdmin.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  asAdmin: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
-  asAdmin?: boolean;
 }
 
 class SpoSiteAdminListCommand extends SpoCommand {
@@ -30,43 +38,8 @@ class SpoSiteAdminListCommand extends SpoCommand {
     return ['Id', 'LoginName', 'Title', 'PrincipalTypeString'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--asAdmin'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('siteUrl');
-    this.types.boolean.push('asAdmin');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
