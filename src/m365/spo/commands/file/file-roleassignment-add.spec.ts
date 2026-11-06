@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-roleassignment-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './file-roleassignment-add.js';
 import { spo } from '../../../../utils/spo.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
@@ -23,6 +22,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const roleDefinitionResponse = {
     BasePermissions: {
       High: 2147483647,
@@ -202,6 +202,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'ensureEntraGroup').withArgs(webUrl, graphGroup).resolves(entraGroupResponse);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -244,47 +245,46 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', groupName: 'Group name A', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'foo', groupName: 'Group name A', roleDefinitionName: 'Read' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, entraGroupId: 'Invalid Guid', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entraGroupId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, entraGroupId: 'Invalid Guid', roleDefinitionName: 'Read' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid Guid' is not a valid GUID for option entraGroupId.`);
   });
 
-  it('fails validation if the principalId option is not a valid number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'NaN', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, principalId: 'NaN', roleDefinitionName: 'Read' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the roleDefinitionId option is not a valid number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionId: 'NaN' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the roleDefinitionId option is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionId: 'NaN' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if no roledefinition is passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if no roledefinition is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, principalId: 1 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and fileId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles error when adding file role assignment', async () => {
@@ -301,13 +301,13 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         principalId: 10,
         roleDefinitionId: 1073741827
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
@@ -323,12 +323,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getRoleDefinitionByName').resolves(roleDefinitionResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         principalId: 10,
         roleDefinitionName: 'Full Control'
-      }
+      })
     });
   });
 
@@ -345,12 +345,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getRoleDefinitionByName').resolves(roleDefinitionResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId,
         principalId: 10,
         roleDefinitionName: 'Full Control'
-      }
+      })
     });
   });
 
@@ -366,12 +366,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -380,12 +380,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
-      }
+      })
     }), new CommandError('no user found'));
   });
 
@@ -401,12 +401,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         groupName: 'Group A',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -420,13 +420,13 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileUrl: fileUrl,
         entraGroupId: graphGroup.id,
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -440,13 +440,13 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileUrl: fileUrl,
         entraGroupName: graphGroup.displayName,
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -455,12 +455,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getRoleDefinitionByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         groupName: 'Group A',
         roleDefinitionName: 'Non-existing Role Definition'
-      }
+      })
     }), new CommandError('no role definition found'));
   });
 
@@ -469,12 +469,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         groupName: 'Group A',
         roleDefinitionId: 1073741827
-      }
+      })
     }), new CommandError('no group found'));
   });
 });

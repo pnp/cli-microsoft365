@@ -14,13 +14,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { GraphFileDetails } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './file-sharinglink-list.js';
+import command, { options } from './file-sharinglink-list.js';
 
 describe(commands.FILE_SHARINGLINK_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com';
   const fileId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
@@ -114,6 +115,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -162,7 +164,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, output: 'json', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value));
   });
 
@@ -176,7 +178,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, output: 'json', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value));
   });
 
@@ -191,7 +193,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
   });
 
@@ -206,7 +208,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
   });
 
@@ -221,7 +223,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
   });
 
@@ -236,7 +238,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'text', verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'text', verbose: true }) } as any);
     assert(loggerLogSpy.calledWith(graphResponseText));
   });
 
@@ -249,27 +251,33 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, verbose: true }) } as any),
       new CommandError(`File Not Found.`));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid scope specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, scope: 'invalid scope' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid scope specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, scope: 'invalid scope' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', fileId: fileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

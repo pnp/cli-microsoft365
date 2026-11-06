@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-roleinheritance-break.js';
+import command, { options } from './file-roleinheritance-break.js';
 import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
@@ -23,6 +23,7 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   const fileResponse = {
     CheckInComment: '',
@@ -59,6 +60,7 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -103,27 +105,33 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, force: true });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'foo', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and fileId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', force: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', force: true, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before breaking role inheritance for the file when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId
-      }
+      })
     });
 
 
@@ -134,10 +142,10 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId
-      }
+      })
     });
 
     assert(postSpy.notCalled);
@@ -153,13 +161,13 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         clearExistingPermissions: true,
         force: true
-      }
+      })
     });
   });
 
@@ -173,13 +181,13 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         clearExistingPermissions: false,
         force: true
-      }
+      })
     });
   });
 
@@ -198,10 +206,10 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId
-      }
+      })
     });
   });
 
@@ -219,12 +227,12 @@ describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         force: true
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 });
