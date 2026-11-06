@@ -12,13 +12,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-add.js';
+import command, { options } from './folder-add.js';
+import { FolderColorValues } from './FolderColor.js';
 
 describe(commands.FOLDER_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let stubPostResponses: any;
 
   const addResponse = { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
@@ -52,6 +54,7 @@ describe(commands.FOLDER_ADD, () => {
       });
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,24 +107,24 @@ describe(commands.FOLDER_ADD, () => {
     stubPostResponses(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('should correctly handle folder add success request', async () => {
     stubPostResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
-      }
+      })
     });
     assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
   });
@@ -130,12 +133,12 @@ describe(commands.FOLDER_ADD, () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
-      }
+      })
     });
     assert(request.calledWith({
       url: `https://contoso.sharepoint.com/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('/Shared Documents/abc')}')`,
@@ -149,12 +152,12 @@ describe(commands.FOLDER_ADD, () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         parentFolderUrl: 'Shared Documents',
         name: 'abc'
-      }
+      })
     });
     assert(request.calledWith({
       url: `https://contoso.sharepoint.com/sites/test1/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('/sites/test1/Shared Documents/abc')}')`,
@@ -172,7 +175,7 @@ describe(commands.FOLDER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
         ColorHex: `${colorNumber}`
@@ -188,7 +191,7 @@ describe(commands.FOLDER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       coloringInformation: {
         ColorHex: colorNumber
@@ -220,13 +223,13 @@ describe(commands.FOLDER_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: '/Shared Documents/abc',
         name: 'folder1',
         ensureParentFolders: true
-      }
+      })
     });
 
     assert.strictEqual(requestGet.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('Shared Documents/abc')}')?$select=Exists`);
@@ -234,28 +237,35 @@ describe(commands.FOLDER_ADD, () => {
     assert.strictEqual(requestPost.callCount, 2);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', parentFolderUrl: parentFolder, name: folderName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', parentFolderUrl: parentFolder, name: folderName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if color is passed as string and color is not a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if color is passed as string and color is not a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`);
   });
 
-  it('passes validation if color is passed as string and color is a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if color is passed as string and color is a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if color is passed as number and color is a valid color', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if color is passed as number and color is a valid color', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, color: colorNumber });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolder, name: folderName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

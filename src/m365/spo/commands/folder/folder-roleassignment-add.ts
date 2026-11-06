@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -9,20 +10,39 @@ import commands from '../../commands.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderUrl: z.string(),
+  principalId: z.number()
+    .refine(id => validation.isValidPositiveInteger(id), {
+      error: e => `Specified principalId '${e.input}' is not a valid number.`
+    })
+    .optional(),
+  upn: z.string().optional(),
+  groupName: z.string().optional(),
+  entraGroupId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option entraGroupId.`
+    })
+    .optional(),
+  entraGroupName: z.string().optional(),
+  roleDefinitionId: z.number()
+    .refine(id => validation.isValidPositiveInteger(id), {
+      error: e => `Specified roleDefinitionId '${e.input}' is not a valid number.`
+    })
+    .optional(),
+  roleDefinitionName: z.string().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl: string;
-  principalId?: number;
-  upn?: string;
-  groupName?: string;
-  entraGroupId?: string;
-  entraGroupName?: string;
-  roleDefinitionId?: number;
-  roleDefinitionName?: string;
 }
 
 class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
@@ -34,106 +54,26 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     return 'Adds a role assignment to the specified folder.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        principalId: typeof args.options.principalId !== 'undefined',
-        upn: typeof args.options.upn !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined',
-        entraGroupId: typeof args.options.entraGroupId !== 'undefined',
-        entraGroupName: typeof args.options.entraGroupName !== 'undefined',
-        roleDefinitionId: typeof args.options.roleDefinitionId !== 'undefined',
-        roleDefinitionName: typeof args.options.roleDefinitionName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.principalId, opts.upn, opts.groupName, opts.entraGroupId, opts.entraGroupName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: principalId, upn, groupName, entraGroupId, entraGroupName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['principalId', 'upn', 'groupName', 'entraGroupId', 'entraGroupName']
+        }
+      })
+      .refine(opts => [opts.roleDefinitionId, opts.roleDefinitionName].filter(o => o !== undefined).length === 1, {
+        error: 'Specify one of the following options: roleDefinitionId, roleDefinitionName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['roleDefinitionId', 'roleDefinitionName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--folderUrl <folderUrl>'
-      },
-      {
-        option: '--principalId [principalId]'
-      },
-      {
-        option: '--upn [upn]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--entraGroupId [entraGroupId]'
-      },
-      {
-        option: '--entraGroupName [entraGroupName]'
-      },
-      {
-        option: '--roleDefinitionId [roleDefinitionId]'
-      },
-      {
-        option: '--roleDefinitionName [roleDefinitionName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.principalId && isNaN(args.options.principalId)) {
-          return `Specified principalId ${args.options.principalId} is not a number`;
-        }
-
-        if (args.options.entraGroupId && !validation.isValidGuid(args.options.entraGroupId)) {
-          return `'${args.options.entraGroupId}' is not a valid GUID for option entraGroupId.`;
-        }
-
-        if (args.options.roleDefinitionId && isNaN(args.options.roleDefinitionId)) {
-          return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
-        }
-
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName, args.options.entraGroupId, args.options.entraGroupName];
-        if (!principalOptions.some(item => item !== undefined)) {
-          return `Specify either principalId, upn, groupName, entraGroupId or entraGroupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId, upn, groupName, entraGroupId or entraGroupName but not multiple`;
-        }
-
-        const roleDefinitionOptions: any[] = [args.options.roleDefinitionId, args.options.roleDefinitionName];
-        if (!roleDefinitionOptions.some(item => item !== undefined)) {
-          return `Specify either roleDefinitionId id or roleDefinitionName`;
-        }
-
-        if (roleDefinitionOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either roleDefinitionId id or roleDefinitionName but not both`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folderUrl', 'upn', 'groupName', 'roleDefinitionName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

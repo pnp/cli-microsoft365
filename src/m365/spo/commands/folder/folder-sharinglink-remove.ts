@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { drive } from '../../../../utils/drive.js';
@@ -10,16 +11,31 @@ import { Drive } from '@microsoft/microsoft-graph-types';
 import request, { CliRequestOptions } from '../../../../request.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderUrl: z.string().optional(),
+  folderId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'folderId'.`
+    })
+    .optional(),
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'id'.`
+    })
+    .alias('i'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl?: string;
-  folderId?: string;
-  id: string;
-  force?: boolean;
 }
 
 class SpoFolderSharingLinkRemoveCommand extends SpoCommand {
@@ -31,62 +47,19 @@ class SpoFolderSharingLinkRemoveCommand extends SpoCommand {
     return 'Removes a sharing link from a folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
-        folderId: typeof args.options.folderId !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.folderUrl, opts.folderId].filter(o => o !== undefined).length === 1, {
+        error: `Specify one of the following options: folderUrl, folderId.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['folderUrl', 'folderId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '--folderUrl [folderUrl]' },
-      { option: '--folderId [folderId]' },
-      { option: '-i, --id <id>' },
-      { option: '-f, --force' }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['folderUrl', 'folderId'] }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.folderId && !validation.isValidGuid(args.options.folderId)) {
-          return `${args.options.folderId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folderUrl', 'folderId', 'id');
-    this.types.boolean.push('force');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
