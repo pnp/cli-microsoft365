@@ -169,6 +169,15 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      roleId: roleId,
+      userId: userId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('removes the user specified by id from Viva Engage role specified by id without prompting for confirmation', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/employeeExperience/roles/${roleId}/members/${userId}`) {

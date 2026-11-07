@@ -164,6 +164,15 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId,
+      roleId: roleId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('adds the user specified by id to Viva Engage role specified by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles/${roleId}/members`) {

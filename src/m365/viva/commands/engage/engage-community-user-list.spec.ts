@@ -150,6 +150,14 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('passes validation if entraGroupId is specified with a proper GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId

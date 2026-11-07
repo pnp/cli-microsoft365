@@ -210,7 +210,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       })
-    } as any), new CommandError('404 - FILE NOT FOUND'));
+    }), new CommandError('404 - FILE NOT FOUND'));
     assert(admZipMockWriteZipSpy.notCalled);
   });
 
@@ -229,7 +229,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         outlineIconPath: 'icon-outline.png',
         debug: true
       })
-    } as any), new CommandError('404 - FILE NOT FOUND'));
+    }), new CommandError('404 - FILE NOT FOUND'));
   });
 
   it('fails with an error if the specified site is not a communication site', async () => {
@@ -249,10 +249,10 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         outlineIconPath: 'icon-outline.png',
         debug: true
       })
-    } as any), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
+    }), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
   });
 
-  it(`fails with an error if creating the zip file failed`, async () => {
+  it('fails with an error if creating the zip file failed', async () => {
     sinon.stub(spo, 'getWeb').resolves(webResponse);
 
     sinon.stub(admZipMock, 'writeZip').callsFake(() => {
@@ -270,11 +270,11 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       })
-    } as any), new CommandError('An error has occurred'));
+    }), new CommandError('An error has occurred'));
   });
 
-  it(`fails validation if the specified app name is longer than 30 chars`, () => {
-    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+  it('fails validation if the specified app name is longer than 30 chars', () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(p => !p.toString().endsWith('.zip'));
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',
       name: `Stay on top of what's happening at Contoso`,
@@ -288,8 +288,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified description is longer than 80 chars`, () => {
-    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+  it('fails validation if the specified description is longer than 80 chars', () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(p => !p.toString().endsWith('.zip'));
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',
       name: 'Contoso',
@@ -303,8 +303,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if the specified long description is longer than 4000 chars`, () => {
-    (fs.existsSync as sinon.SinonStub).callsFake(() => false);
+  it('fails validation if the specified long description is longer than 4000 chars', () => {
+    (fs.existsSync as sinon.SinonStub).callsFake(p => !p.toString().endsWith('.zip'));
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',
       name: 'Contoso',
@@ -334,7 +334,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it(`fails validation if a file with the app name already exists and no force flag specified`, () => {
+  it('fails validation if a file with the app name already exists and no force flag specified', () => {
     (fs.existsSync as sinon.SinonStub).callsFake(() => true);
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',
@@ -393,7 +393,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.strictEqual(actual.error?.issues[0].message, `File ${path.resolve('icon-outline.png')} doesn't exist`);
   });
 
-  it(`passes validation if a file with the app name already exists and force flag specified`, () => {
+  it('passes validation if a file with the app name already exists and force flag specified', () => {
     (fs.existsSync as sinon.SinonStub).callsFake(() => true);
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',
@@ -409,7 +409,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if all arguments are correct`, () => {
+  it('passes validation if all arguments are correct', () => {
     (fs.existsSync as sinon.SinonStub).callsFake((path) => path.toString().indexOf('.zip') < 0);
     const actual = commandOptionsSchema.safeParse({
       portalUrl: 'https://contoso.sharepoint.com',

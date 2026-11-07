@@ -116,6 +116,15 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      userName: userName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('passes validation if communityId is specified', () => {
     const actual = commandOptionsSchema.safeParse({
       communityId: communityId,

@@ -117,7 +117,7 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ id: communityId, unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ id: communityId, description: 'Community for all devs', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 

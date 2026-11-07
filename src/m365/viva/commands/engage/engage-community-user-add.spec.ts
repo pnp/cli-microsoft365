@@ -1,4 +1,3 @@
-
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
@@ -129,6 +128,16 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       role: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      userNames: userNames.join(','),
+      role: 'Admin',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if communityId is specified', () => {

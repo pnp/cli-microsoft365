@@ -102,6 +102,14 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      roleId: roleId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation if neither roleId nor roleName is specified', () => {
     const actual = commandOptionsSchema.safeParse({});
     assert.notStrictEqual(actual.success, true);

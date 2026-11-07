@@ -9,7 +9,7 @@ import commands from '../../commands.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   messageId: z.coerce.number(),
-  enable: z.boolean().optional(),
+  enable: z.boolean().optional().autocomplete(['true', 'false']),
   force: z.boolean().optional().alias('f')
 });
 
