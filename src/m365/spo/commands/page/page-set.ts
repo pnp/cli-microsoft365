@@ -22,7 +22,7 @@ export const options = z.strictObject({
   layoutType: z.enum(supportedPageLayouts).optional().alias('l'),
   promoteAs: z.enum(supportedPromoteAs).optional().alias('p'),
   demoteFrom: z.enum(['NewsPage']).optional(),
-  commentsEnabled: z.boolean().optional(),
+  commentsEnabled: z.boolean().optional().autocomplete(['true', 'false']),
   publish: z.boolean().optional(),
   publishMessage: z.string().optional(),
   description: z.string().optional(),
@@ -40,7 +40,7 @@ export const options = z.strictObject({
       error: 'Specified content is not a valid JSON string.'
     })
     .optional(),
-  isRetired: z.boolean().optional()
+  isRetired: z.boolean().optional().autocomplete(['true', 'false'])
 });
 
 declare type Options = z.infer<typeof options>;

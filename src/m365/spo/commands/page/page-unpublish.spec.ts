@@ -84,10 +84,10 @@ describe(commands.PAGE_UNPUBLISH, () => {
   it('logs no command output', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(loggerLogSpy.notCalled);
@@ -96,10 +96,10 @@ describe(commands.PAGE_UNPUBLISH, () => {
   it('correctly unpublishes page', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(postStub.calledOnce);

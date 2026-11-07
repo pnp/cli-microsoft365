@@ -335,13 +335,11 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         await logger.logToStderr('');
       }
 
-      try {
-        const properties: any = JSON.parse(args.options.webPartProperties);
-        (webPart as any).webPartData.properties = this.extend((webPart as any).webPartData.properties, properties);
-      }
-      catch {
-        // Do nothing
-      }
+      const properties: any = JSON.parse(args.options.webPartProperties);
+      (webPart as any).webPartData.properties = this.extend(
+        (webPart as any).webPartData.properties,
+        properties
+      );
     }
 
     if (args.options.webPartData) {
