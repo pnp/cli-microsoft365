@@ -62,7 +62,7 @@ class VivaEngageUserListCommand extends VivaEngageCommand {
       }
 
       endPoint += `?page=${page}`;
-      if (args.options.reverse !== undefined) {
+      if (args.options.reverse) {
         endPoint += `&reverse=true`;
       }
       if (args.options.sortBy !== undefined) {

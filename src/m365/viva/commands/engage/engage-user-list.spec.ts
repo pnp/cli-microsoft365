@@ -287,6 +287,21 @@ describe(commands.ENGAGE_USER_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
+  it('does not sort users in reverse order when reverse is false', async () => {
+    const requestStub = sinon.stub(request, 'get').resolves([
+      { type: 'user', id: 1496550646, full_name: 'John Doe' }
+    ]);
+
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({ reverse: false })
+    });
+
+    assert.strictEqual(
+      requestStub.firstCall.args[0].url,
+      'https://www.yammer.com/api/v1/users.json?page=1'
+    );
+  });
+
   it('sorts users in reverse order in a group and limits the user to 2', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1&reverse=true') {

@@ -132,7 +132,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
 
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
-      id: communityId,
+      communityId: communityId,
       userNames: userNames.join(','),
       role: 'Admin',
       unknownOption: 'value'
