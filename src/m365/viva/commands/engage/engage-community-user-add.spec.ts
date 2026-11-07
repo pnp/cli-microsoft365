@@ -1,4 +1,3 @@
-
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
@@ -86,24 +85,26 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if ids contains invalid guids', () => {
+  it('fails validation if ids contains invalid GUIDs', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId,
-      ids: userIds.join(',') + ',invalid',
+      ids: `${userIds.join(',')},invalid`,
       role: 'Member'
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid: ${userIds.join(',')},invalid.`);
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'The following GUIDs are invalid: invalid.');
   });
 
   it('fails validation if userNames contains invalid user principal names', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId,
-      userNames: userNames.join(',') + ',invalid',
+      userNames: `${userNames.join(',')},invalid`,
       role: 'Member'
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid: ${userNames.join(',')},invalid.`);
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'The following user principal names are invalid: invalid.');
   });
 
   it('fails validation if communityId, communityDisplayName or entraGroupId are not specified', () => {
@@ -129,6 +130,16 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       role: 'invalid'
     });
     assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      userNames: userNames.join(','),
+      role: 'Admin',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if communityId is specified', () => {
@@ -168,7 +179,29 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly adds users specified by id as owner', async () => {
+  it('fails validation if neither ids nor userNames is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      role: 'Member'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify either ids or userNames, but not both.');
+  });
+
+  it('fails validation if both ids and userNames are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      ids: userIds.join(','),
+      userNames: userNames.join(','),
+      role: 'Member'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify either ids or userNames, but not both.');
+  });
+
+  it('correctly adds users specified by id as admin', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/$batch`) {
         return {
@@ -182,7 +215,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityDisplayName: communityDisplayName, verbose: true, ids: userIds.join(','), role: 'Owner' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityDisplayName: communityDisplayName, verbose: true, ids: userIds.join(','), role: 'Admin' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -219,7 +252,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { communityId: communityId, verbose: true, ids: userIds.join(','), role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, verbose: true, ids: userIds.join(','), role: 'Member' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -256,7 +289,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, verbose: true, userNames: userNames.join(','), role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, verbose: true, userNames: userNames.join(','), role: 'Member' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -305,7 +338,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { entraGroupId: entraGroupId, ids: userIds.join(','), role: 'Member' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, ids: userIds.join(','), role: 'Member' }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 });
