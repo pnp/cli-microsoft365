@@ -306,7 +306,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
   });
 
-  it(`fails validation if the enableForTeams option is invalid`, () => {
+  it('fails validation if the enableForTeams option is invalid', () => {
     const actual = commandOptionsSchema.safeParse({
       webPartTitle: 'Amsterdam weather',
       webPartDescription: 'Shows weather in Amsterdam',
@@ -318,7 +318,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     assert.strictEqual(actual.success, false);
   });
 
-  it(`passes validation if the enableForTeams option is set to tab`, () => {
+  it('passes validation if the enableForTeams option is set to tab', () => {
     const actual = commandOptionsSchema.safeParse({
       webPartTitle: 'Amsterdam weather',
       webPartDescription: 'Shows weather in Amsterdam',
@@ -330,7 +330,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to personalApp`, () => {
+  it('passes validation if the enableForTeams option is set to personalApp', () => {
     const actual = commandOptionsSchema.safeParse({
       webPartTitle: 'Amsterdam weather',
       webPartDescription: 'Shows weather in Amsterdam',
@@ -342,7 +342,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     assert.strictEqual(actual.success, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to all`, () => {
+  it('passes validation if the enableForTeams option is set to all', () => {
     const actual = commandOptionsSchema.safeParse({
       webPartTitle: 'Amsterdam weather',
       webPartDescription: 'Shows weather in Amsterdam',
@@ -357,6 +357,9 @@ describe(commands.PACKAGE_GENERATE, () => {
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({
       webPartTitle: 'Amsterdam weather',
+      webPartDescription: 'Shows weather in Amsterdam',
+      name: 'amsterdam-weather',
+      html: '@amsterdam-weather.html',
       unknownOption: 'value'
     });
     assert.strictEqual(actual.success, false);
