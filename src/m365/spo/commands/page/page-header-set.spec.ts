@@ -12,12 +12,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { mockCanvasContentStringified, mockPageJsonCanvasContent } from './page-control-set.mock.js';
-import command from './page-header-set.js';
+import command, { options } from './page-header-set.js';
 
 describe(commands.PAGE_HEADER_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -97,11 +99,11 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         pageName: 'page',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
-      }
+      })
     });
     assert.strictEqual(postStub.firstCall.args[0].url, `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`);
   });
@@ -131,10 +133,10 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
-      }
+      })
     });
     assert.notStrictEqual(postStub.firstCall.args[0].url, `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`);
   });
@@ -168,7 +170,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -235,7 +237,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
     const postStub = sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom' }) });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
@@ -269,7 +271,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -302,7 +304,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'None' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'None' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -354,7 +356,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -406,7 +408,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -440,14 +442,14 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         type: 'Custom',
         imageUrl: '',
         altText: 'Updated alternative text',
         layout: 'ColorBlock'
-      }
+      })
     });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
@@ -500,7 +502,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -533,7 +535,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', textAlignment: 'Center' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', textAlignment: 'Center' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -567,7 +569,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -600,7 +602,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showPublishDate: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showPublishDate: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -633,7 +635,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showTimeToRead: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Default', showTimeToRead: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -667,7 +669,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', authors: 'Joe Doe, Jane Doe' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', authors: 'Joe Doe, Jane Doe' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, mockData);
   });
 
@@ -695,7 +697,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) });
     assert.deepStrictEqual(getStub.firstCall.args[0].url, `https://contoso.sharepoint.com/sites/newsletter/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`);
   });
 
@@ -728,7 +730,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       LayoutWebpartsContent: '[]',
       CanvasContent1: '[{"controlType":3,"displayMode":2,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","position":{"zoneIndex":1,"sectionIndex":2,"sectionFactor":12,"layoutIndex":1,"controlIndex":1},"webPartId":"ede2ee65-157d-4523-b4ed-87b9b64374a6","emphasis":{},"addedFromPersistedData":true,"reservedHeight":600,"reservedWidth":969,"webPartData":{"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","instanceId":"dcd01c36-24f9-42e5-8e03-76e4af572468","title":"valo-markdown","description":"Use markdown to add text, tables, links, and images to your page.","serverProcessedContent":{"htmlStrings":{"html":"<h2 id=\\"this-is-just-a-test\\">This is just a test</h2><p>Test for playbook 123</p><div class=\\"react-codemirror2\\"><div class=\\"CodeMirror cm-s-monokai CodeMirror-wrap\\"><div class=\\"CodeMirror-vscrollbar\\" tabindex=\\"-1\\" style=\\"bottom:0px;\\"><div style=\\"min-width:1px;height:0px;\\"></div></div><div class=\\"CodeMirror-hscrollbar\\" tabindex=\\"-1\\"><div style=\\"height:100%;min-height:1px;width:0px;\\"></div></div><div class=\\"CodeMirror-scrollbar-filler\\"></div><div class=\\"CodeMirror-gutter-filler\\"></div><div class=\\"CodeMirror-scroll\\" tabindex=\\"-1\\"><div class=\\"CodeMirror-sizer\\" style=\\"margin-left:0px;margin-bottom:-8px;border-right-width:22px;min-height:290px;padding-right:0px;padding-bottom:0px;\\"><div style=\\"position:relative;top:0px;\\"><div class=\\"CodeMirror-lines\\" role=\\"presentation\\"><div role=\\"presentation\\" style=\\"position:relative;outline:none;\\"><div class=\\"CodeMirror-measure\\"></div><div class=\\"CodeMirror-measure\\"></div><div style=\\"position:relative;z-index:1;\\"></div><div class=\\"CodeMirror-cursors\\"><div class=\\"CodeMirror-cursor\\" style=\\"left:55.0089px;top:260.571px;height:21.7143px;\\">&nbsp;</div></div><div class=\\"CodeMirror-code\\" role=\\"presentation\\"><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> { <span class=\\"cm-def\\">exec</span> } <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">child_process</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">fs</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">fs</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">path</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">path</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">parseMarkdown</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">frontmatter</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">valoWpTitle</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-string-2\\">`valo-markdown`</span>;</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">siteUrl</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-string-2\\">`https://contoso.sharepoint.com/sites/StaticPages`</span>;</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">(() <span class=\\"cm-operator\\">=&gt;</span> {</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"> &nbsp;<span class=\\"cm-keyword\\">if</span> (<span class=\\"cm-atom\\">true</span>) {</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">  }</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">})();</span></pre></div></div></div></div></div><div style=\\"position:absolute;height:22px;width:1px;border-bottom:0px solid transparent;top:290px;\\"></div><div class=\\"CodeMirror-gutters\\" style=\\"display:none;height:312px;\\"></div></div></div></div><p>!!! Warning\\n    This is a warning of mkdocs</p><p>&lt;p style=\\"color:red\\"&gt;This is a paragraph&lt;/p&gt;</p>"},"searchablePlainTexts":{"code":"\\n# This is just a test\\n\\nTest for playbook 123\\n\\n```typescript\\nconst { exec } = require(child_process);\\nconst fs = require(fs);\\nconst path = require(path);\\nconst parseMarkdown = require(frontmatter);\\n\\nconst valoWpTitle = `valo-markdown`;\\nconst siteUrl = `https://contoso.sharepoint.com/sites/StaticPages`;\\n\\n(() => {\\n  if (true) {\\n\\n  }\\n})();\\n```\\n\\n\\n!!! Warning\\n    This is a warning of mkdocs\\n\\n\\n<p style=\\"color:red\\">This is a paragraph</p>"},"imageSources":{},"links":{}},"dataVersion":"2.0","properties":{"displayPreview":true,"lineWrapping":true,"miniMap":{"enabled":false},"previewState":"Show","theme":"Monokai"}}},{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","controlType":3,"displayMode":2,"emphasis":{},"position":{"zoneIndex":1,"sectionFactor":0,"layoutIndex":1,"controlIndex":1,"sectionIndex":1},"webPartId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","webPartData":{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"title":"","imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"showTimeToRead":false,"topicHeader":""}}}]'
@@ -764,7 +766,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       LayoutWebpartsContent: '[]',
       CanvasContent1: '[{"controlType":3,"displayMode":2,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","position":{"zoneIndex":1,"sectionIndex":2,"sectionFactor":12,"layoutIndex":1,"controlIndex":1},"webPartId":"ede2ee65-157d-4523-b4ed-87b9b64374a6","emphasis":{},"addedFromPersistedData":true,"reservedHeight":600,"reservedWidth":969,"webPartData":{"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","instanceId":"dcd01c36-24f9-42e5-8e03-76e4af572468","title":"valo-markdown","description":"Use markdown to add text, tables, links, and images to your page.","serverProcessedContent":{"htmlStrings":{"html":"<h2 id=\\"this-is-just-a-test\\">This is just a test</h2><p>Test for playbook 123</p><div class=\\"react-codemirror2\\"><div class=\\"CodeMirror cm-s-monokai CodeMirror-wrap\\"><div class=\\"CodeMirror-vscrollbar\\" tabindex=\\"-1\\" style=\\"bottom:0px;\\"><div style=\\"min-width:1px;height:0px;\\"></div></div><div class=\\"CodeMirror-hscrollbar\\" tabindex=\\"-1\\"><div style=\\"height:100%;min-height:1px;width:0px;\\"></div></div><div class=\\"CodeMirror-scrollbar-filler\\"></div><div class=\\"CodeMirror-gutter-filler\\"></div><div class=\\"CodeMirror-scroll\\" tabindex=\\"-1\\"><div class=\\"CodeMirror-sizer\\" style=\\"margin-left:0px;margin-bottom:-8px;border-right-width:22px;min-height:290px;padding-right:0px;padding-bottom:0px;\\"><div style=\\"position:relative;top:0px;\\"><div class=\\"CodeMirror-lines\\" role=\\"presentation\\"><div role=\\"presentation\\" style=\\"position:relative;outline:none;\\"><div class=\\"CodeMirror-measure\\"></div><div class=\\"CodeMirror-measure\\"></div><div style=\\"position:relative;z-index:1;\\"></div><div class=\\"CodeMirror-cursors\\"><div class=\\"CodeMirror-cursor\\" style=\\"left:55.0089px;top:260.571px;height:21.7143px;\\">&nbsp;</div></div><div class=\\"CodeMirror-code\\" role=\\"presentation\\"><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> { <span class=\\"cm-def\\">exec</span> } <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">child_process</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">fs</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">fs</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">path</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">path</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">parseMarkdown</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-variable\\">require</span>(<span class=\\"cm-variable\\">frontmatter</span>);</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">valoWpTitle</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-string-2\\">`valo-markdown`</span>;</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span class=\\"cm-keyword\\">const</span> <span class=\\"cm-def\\">siteUrl</span> <span class=\\"cm-operator\\">=</span> <span class=\\"cm-string-2\\">`https://contoso.sharepoint.com/sites/StaticPages`</span>;</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">(() <span class=\\"cm-operator\\">=&gt;</span> {</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"> &nbsp;<span class=\\"cm-keyword\\">if</span> (<span class=\\"cm-atom\\">true</span>) {</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\"><span>&nbsp;</span></span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">  }</span></pre><pre class=\\" CodeMirror-line \\" role=\\"presentation\\"><span role=\\"presentation\\" style=\\"padding-right:0.1px;\\">})();</span></pre></div></div></div></div></div><div style=\\"position:absolute;height:22px;width:1px;border-bottom:0px solid transparent;top:290px;\\"></div><div class=\\"CodeMirror-gutters\\" style=\\"display:none;height:312px;\\"></div></div></div></div><p>!!! Warning\\n    This is a warning of mkdocs</p><p>&lt;p style=\\"color:red\\"&gt;This is a paragraph&lt;/p&gt;</p>"},"searchablePlainTexts":{"code":"\\n# This is just a test\\n\\nTest for playbook 123\\n\\n```typescript\\nconst { exec } = require(child_process);\\nconst fs = require(fs);\\nconst path = require(path);\\nconst parseMarkdown = require(frontmatter);\\n\\nconst valoWpTitle = `valo-markdown`;\\nconst siteUrl = `https://contoso.sharepoint.com/sites/StaticPages`;\\n\\n(() => {\\n  if (true) {\\n\\n  }\\n})();\\n```\\n\\n\\n!!! Warning\\n    This is a warning of mkdocs\\n\\n\\n<p style=\\"color:red\\">This is a paragraph</p>"},"imageSources":{},"links":{}},"dataVersion":"2.0","properties":{"displayPreview":true,"lineWrapping":true,"miniMap":{"enabled":false},"previewState":"Show","theme":"Monokai"}}},{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","controlType":3,"displayMode":2,"emphasis":{},"position":{"zoneIndex":1,"sectionFactor":0,"layoutIndex":1,"controlIndex":1,"sectionIndex":1},"webPartId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","webPartData":{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"title":"","imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"showTimeToRead":false,"topicHeader":""}}}]'
@@ -776,7 +778,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -788,7 +790,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter' }) }),
       new CommandError(`The specified page 'page.aspx' does not exist.`));
   });
 
@@ -824,97 +826,104 @@ describe(commands.PAGE_HEADER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/newsletter', type: 'Custom', imageUrl: '/sites/newsletter/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if webUrl is not an absolute URL', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'http://foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'http://foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'http://foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when pageName has no extension', async () => {
-    const actual = await command.validate({ options: { pageName: 'page', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when pageName has no extension', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page', webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if type is invalid', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if type is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if type is None', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'None' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if type is None', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'None' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if type is Default', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Default' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if type is Default', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Default' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if type is Custom', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Custom' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if type is Custom', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Custom' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if translateX is not a valid number', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateX: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if translateX is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateX: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if translateY is not a valid number', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateY: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if translateY is not a valid number', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateY: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if layout is invalid', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if layout is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if layout is FullWidthImage', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'FullWidthImage' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout is FullWidthImage', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'FullWidthImage' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout is NoImage', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'NoImage' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout is NoImage', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'NoImage' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout is ColorBlock', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'ColorBlock' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout is ColorBlock', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'ColorBlock' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout is CutInShape', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'CutInShape' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout is CutInShape', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'CutInShape' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if textAlignment is invalid', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if textAlignment is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if textAlignment is Left', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Left' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if textAlignment is Left', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Left' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if textAlignment is Center', async () => {
-    const actual = await command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Center' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if textAlignment is Center', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Center' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
