@@ -2,6 +2,8 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -9,11 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './project-rename.js';
+import command, { options } from './project-rename.js';
 
 describe(commands.PROJECT_RENAME, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetryCommandName: any;
@@ -27,6 +31,8 @@ describe(commands.PROJECT_RENAME, () => {
     });
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,21 +79,21 @@ describe(commands.PROJECT_RENAME, () => {
   it('calls telemetry', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
 
-    await command.action(logger, { options: { newName: 'spfx-react' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert(trackEvent.called);
   });
 
   it('logs correct telemetry event', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
 
-    await command.action(logger, { options: { newName: 'spfx-react' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert.strictEqual(telemetryCommandName, commands.PROJECT_RENAME);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(null);
 
-    await assert.rejects(command.action(logger, { options: { newName: 'spfx-react' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) }),
       new CommandError(`Couldn't find project root folder`, 1));
   });
 
@@ -101,7 +107,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     });
     sinon.stub(fs, 'existsSync').returns(false);
-    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert(writeFileSyncSpy.notCalled);
   });
 
@@ -115,7 +121,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => { throw 'error'; });
-    await assert.rejects(command.action(logger, { options: { newName: 'spfx-react' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) }),
       new CommandError('error'));
   });
 
@@ -164,7 +170,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react', generateNewId: true }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -189,7 +195,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -216,7 +222,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true, debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react', generateNewId: true, debug: true }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -237,7 +243,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -260,7 +266,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react', generateNewId: true }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -275,7 +281,7 @@ describe(commands.PROJECT_RENAME, () => {
   "accessKey": "<!-- ACCESS KEY -->"
 }`;
 
-    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react' }) });
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
@@ -310,11 +316,19 @@ gulp bundle - TODO
 gulp package-solution - TODO
 `;
 
-    await command.action(logger, { options: { newName: 'spfx-react', debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ newName: 'spfx-react', debug: true }) });
     let fileSyncContent: string = writeFileSyncSpy.lastCall.args[1];
     fileSyncContent = fileSyncContent.replace(/(\r\n|\n|\r)/gm, "");
     replacedContent = replacedContent.replace(/(\r\n|\n|\r)/gm, "");
     assert.strictEqual(fileSyncContent, replacedContent);
     assert.strictEqual(loggerLogToStderrSpy.getCall(5).args[0], `Updated README.md`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      newName: 'spfx-react',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

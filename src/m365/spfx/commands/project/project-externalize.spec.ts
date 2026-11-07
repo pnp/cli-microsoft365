@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -11,13 +12,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './project-externalize.js';
+import command, { options } from './project-externalize.js';
 import { ExternalizeEntry, FileEdit } from './project-externalize/index.js';
 import { External, ExternalConfiguration, Project } from './project-model/index.js';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let trackEvent: any;
   let telemetryCommandName: any;
   const logEntryToCheck = 1; //necessary as long as we display the beta message
@@ -30,6 +33,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
   });
 
@@ -87,7 +92,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(null);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`Couldn't find project root folder`, 1));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`Couldn't find project root folder`, 1));
   });
 
   it('searches for package.json in the parent folder when it doesn\'t exist in the current folder', async () => {
@@ -100,7 +105,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`Couldn't find project root folder`, 1));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`Couldn't find project root folder`, 1));
   });
 
   it(`correctly handles the case when .yo-rc.json exists but doesn't contain spfx project info`, async () => {
@@ -131,7 +136,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
   });
 
@@ -163,7 +168,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await assert.rejects(command.action(logger, { options: {} } as any));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }));
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
   });
 
@@ -217,7 +222,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
@@ -232,7 +237,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3));
   });
 
@@ -289,7 +294,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
@@ -416,7 +421,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'head').resolves();
     sinon.stub(request, 'post').resolves(JSON.stringify({ scriptType: 'module' }));
 
-    await command.action(logger, { options: { output: 'json', debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', debug: true }) });
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
     assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
   });
@@ -450,7 +455,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'head').resolves();
     sinon.stub(request, 'post').resolves(JSON.stringify({ scriptType: 'script' }));
 
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
     assert.notStrictEqual(findings.edits.length, 0);
   });
@@ -514,14 +519,14 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { output: 'json', debug: true } } as any));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ output: 'json', debug: true }) }));
   });
   //#endregion
 
   it('outputs JSON object with output format json', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    await command.action(logger, { options: { output: 'json' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(JSON.stringify(log[0]).startsWith('{'));
   });
 
@@ -541,7 +546,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         'prop2': 'value2'
       }
     ];
-    const actual = command.getMdOutput(expected, command, { options: { output: 'md' } } as any);
+    const actual = command.getMdOutput(expected, command, { options: commandOptionsSchema.parse({ output: 'md' }) } as any);
     assert.deepStrictEqual(actual, expected);
   });
 
@@ -591,19 +596,31 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     assert(emptyReport.length === 122 || emptyReport.length === 124);
   });
 
-  it('passes validation when json output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'json' } }, cli.getCommandInfo(command)), true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      output: 'json',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when text output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'text' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when json output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'json' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when md output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'md' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when text output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'text' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when csv output specified', async () => {
-    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, cli.getCommandInfo(command)), true);
+  it('passes validation when md output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'md' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when csv output specified', () => {
+    const actual = commandOptionsSchema.safeParse({ output: 'csv' });
+    assert.strictEqual(actual.success, false);
   });
 });
