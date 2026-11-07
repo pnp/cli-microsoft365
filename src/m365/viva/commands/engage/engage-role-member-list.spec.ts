@@ -138,7 +138,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { verbose: true, roleId: roleId }
+      options: commandOptionsSchema.parse({ verbose: true, roleId: roleId })
     });
 
     assert(
@@ -181,7 +181,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { verbose: true, roleName: roleName }
+      options: commandOptionsSchema.parse({ verbose: true, roleName: roleName })
     });
 
     assert(
@@ -204,7 +204,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_LIST, () => {
     sinon.stub(request, 'get').rejects({ error: { message: 'An error has occurred' } });
 
     await assert.rejects(
-      command.action(logger, { options: { roleId: roleId } }),
+      command.action(logger, { options: commandOptionsSchema.parse({ roleId: roleId }) }),
       new CommandError('An error has occurred')
     );
   });

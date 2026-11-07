@@ -256,7 +256,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
   });
 
   it('prompts before removing a member from a Viva Engage role when confirm option not passed', async () => {
-    await command.action(logger, { options: { roleId: roleId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ roleId: roleId, userId: userId }) });
 
     assert(promptIssued);
   });

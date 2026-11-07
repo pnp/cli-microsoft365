@@ -256,7 +256,7 @@ describe(commands.ENGAGE_SEARCH, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ queryText: '123' }) }), new CommandError('An error has occurred.'));
   });
 
   it('does not pass validation without parameters', () => {

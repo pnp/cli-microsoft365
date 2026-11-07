@@ -99,7 +99,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', () => {
@@ -167,7 +167,7 @@ describe(commands.ENGAGE_MESSAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: {} } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
