@@ -175,4 +175,13 @@ describe(commands.PAGE_UNPUBLISH, () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, name: 'page' });
     assert.strictEqual(actual.success, true);
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      name: pageName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });

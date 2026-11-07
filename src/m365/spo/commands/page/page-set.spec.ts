@@ -754,7 +754,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('fails validation with unknown options', () => {
-    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
   });
 });

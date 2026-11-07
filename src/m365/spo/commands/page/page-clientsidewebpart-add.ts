@@ -335,7 +335,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         await logger.logToStderr('');
       }
 
-      const properties: any = JSON.parse(args.options.webPartProperties);
+      const properties: any = JSON.parse(args.options.webPartProperties) ?? {};
       (webPart as any).webPartData.properties = this.extend(
         (webPart as any).webPartData.properties,
         properties

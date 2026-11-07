@@ -1046,4 +1046,14 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
 
     assert.strictEqual(actual.success, false);
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 1,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });

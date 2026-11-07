@@ -270,4 +270,13 @@ describe(commands.PAGE_GET, () => {
 
     assert.strictEqual(actual.success, true);
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      name: 'home.aspx',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });
