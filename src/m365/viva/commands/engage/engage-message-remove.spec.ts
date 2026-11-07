@@ -72,6 +72,11 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'nonumber' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({ id: 1, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
