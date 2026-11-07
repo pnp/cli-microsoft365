@@ -96,6 +96,33 @@ describe(commands.ENGAGE_COMMUNITY_REMOVE, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      displayName: displayName
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when id and entraGroupId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      entraGroupId: entraGroupId
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when displayName and entraGroupId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      entraGroupId: entraGroupId
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
   it('prompts before removing the community when confirm option not passed', async () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ id: communityId }) });
 

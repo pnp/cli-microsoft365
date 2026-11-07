@@ -125,7 +125,8 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
       roleId: roleId,
       userId: 'invalid'
     });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if userId is a valid GUID', () => {

@@ -89,7 +89,8 @@ describe(commands.ENGAGE_COMMUNITY_USER_REMOVE, () => {
       entraGroupId: entraGroupId,
       id: 'invalid'
     });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if userName is invalid user principal name', () => {

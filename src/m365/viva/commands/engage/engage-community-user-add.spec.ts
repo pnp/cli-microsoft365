@@ -85,24 +85,26 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if ids contains invalid guids', () => {
+  it('fails validation if ids contains invalid GUIDs', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId,
-      ids: userIds.join(',') + ',invalid',
+      ids: `${userIds.join(',')},invalid`,
       role: 'Member'
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid: ${userIds.join(',')},invalid.`);
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'The following GUIDs are invalid: invalid.');
   });
 
   it('fails validation if userNames contains invalid user principal names', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId,
-      userNames: userNames.join(',') + ',invalid',
+      userNames: `${userNames.join(',')},invalid`,
       role: 'Member'
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid: ${userNames.join(',')},invalid.`);
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'The following user principal names are invalid: invalid.');
   });
 
   it('fails validation if communityId, communityDisplayName or entraGroupId are not specified', () => {
@@ -175,6 +177,28 @@ describe(commands.ENGAGE_COMMUNITY_USER_ADD, () => {
     });
     assert.strictEqual(actual.success, true);
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('fails validation if neither ids nor userNames is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      role: 'Member'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify either ids or userNames, but not both.');
+  });
+
+  it('fails validation if both ids and userNames are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      ids: userIds.join(','),
+      userNames: userNames.join(','),
+      role: 'Member'
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify either ids or userNames, but not both.');
   });
 
   it('correctly adds users specified by id as admin', async () => {

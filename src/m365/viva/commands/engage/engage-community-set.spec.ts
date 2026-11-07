@@ -116,6 +116,44 @@ describe(commands.ENGAGE_COMMUNITY_SET, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation when no community identifier is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      description: 'Community for all devs'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      displayName: displayName,
+      description: 'Community for all devs'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when id and entraGroupId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: communityId,
+      entraGroupId: entraGroupId,
+      description: 'Community for all devs'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when displayName and entraGroupId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: displayName,
+      entraGroupId: entraGroupId,
+      description: 'Community for all devs'
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({ id: communityId, description: 'Community for all devs', unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
