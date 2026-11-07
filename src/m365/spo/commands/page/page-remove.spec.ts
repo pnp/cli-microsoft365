@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './page-remove.js';
+import command, { options } from './page-remove.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { formatting } from '../../../../utils/formatting.js';
 
@@ -20,6 +20,7 @@ describe(commands.PAGE_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   let postStub: sinon.SinonStub;
   let deleteStub: sinon.SinonStub;
@@ -36,6 +37,7 @@ describe(commands.PAGE_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -102,10 +104,10 @@ describe(commands.PAGE_REMOVE, () => {
   it('should prompt before removing page when confirmation argument not passed', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(promptIssued);
@@ -114,10 +116,10 @@ describe(commands.PAGE_REMOVE, () => {
   it('aborts removing page when prompt not confirmed', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(deleteStub.notCalled);
@@ -127,12 +129,12 @@ describe(commands.PAGE_REMOVE, () => {
   it('logs no command output', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName,
           permanent: true,
           force: true
-        }
+        })
       });
 
     assert(loggerLogSpy.notCalled);
@@ -144,12 +146,12 @@ describe(commands.PAGE_REMOVE, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName,
           permanent: true,
           verbose: true
-        }
+        })
       });
 
     assert(deleteStub.calledOnce);
@@ -159,11 +161,11 @@ describe(commands.PAGE_REMOVE, () => {
   it('correctly recycles page', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName,
           force: true
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -173,13 +175,13 @@ describe(commands.PAGE_REMOVE, () => {
   it('correctly bypasses a shared lock', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName,
           bypassSharedLock: true,
           permanent: true,
           force: true
-        }
+        })
       });
 
     assert.deepStrictEqual(deleteStub.firstCall.args[0].headers.Prefer, 'bypass-shared-lock');
@@ -188,11 +190,11 @@ describe(commands.PAGE_REMOVE, () => {
   it('correctly recycles a page when extension is not specified', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName.substring(0, pageName.lastIndexOf('.')),
           force: true
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -213,12 +215,12 @@ describe(commands.PAGE_REMOVE, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageUrl,
           permanent: true,
           force: true
-        }
+        })
       });
 
     assert(deleteStub.calledOnce);
@@ -239,33 +241,34 @@ describe(commands.PAGE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: pageName, permanent: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: pageName, permanent: true, force: true }) }),
       new CommandError(errorMessage));
   });
 
-  it('fails validation if webUrl is not an absolute URL', async () => {
-    const actual = await command.validate({ options: { name: pageName, webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: pageName, webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: { name: pageName, webUrl: 'http://foo' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: pageName, webUrl: 'http://foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'http://foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
-    const actual = await command.validate({
-      options: { name: pageName, webUrl: webUrl }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: pageName, webUrl: webUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when name has no extension', async () => {
-    const actual = await command.validate({
-      options: { name: 'page', webUrl: webUrl }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: pageName, webUrl: webUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when name has no extension', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page', webUrl: webUrl });
+    assert.strictEqual(actual.success, true);
   });
 });

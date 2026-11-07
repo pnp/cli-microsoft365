@@ -84,10 +84,10 @@ describe(commands.PAGE_PUBLISH, () => {
   it('logs no command output', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(loggerLogSpy.notCalled);
@@ -96,10 +96,10 @@ describe(commands.PAGE_PUBLISH, () => {
   it('correctly publishes page', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -108,11 +108,11 @@ describe(commands.PAGE_PUBLISH, () => {
   it('correctly publishes a page when extension is not specified', async () => {
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageName.substring(0, pageName.lastIndexOf('.')),
           verbose: true
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -132,10 +132,10 @@ describe(commands.PAGE_PUBLISH, () => {
 
     await command.action(logger,
       {
-        options: {
+        options: commandOptionsSchema.parse({
           webUrl: webUrl,
           name: pageUrl
-        }
+        })
       });
 
     assert(postStub.calledOnce);
@@ -156,7 +156,7 @@ describe(commands.PAGE_PUBLISH, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: pageName } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, name: pageName }) }),
       new CommandError(errorMessage));
   });
 
@@ -174,5 +174,14 @@ describe(commands.PAGE_PUBLISH, () => {
   it('passes validation when name has no extension', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, name: 'page' });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: webUrl,
+      name: pageName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
