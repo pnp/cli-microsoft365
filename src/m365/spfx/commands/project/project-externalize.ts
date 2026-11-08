@@ -53,10 +53,6 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
 
-  protected get allowedOutputs(): string[] {
-    return ['json', 'text', 'md'];
-  }
-
   public get name(): string {
     return commands.PROJECT_EXTERNALIZE;
   }

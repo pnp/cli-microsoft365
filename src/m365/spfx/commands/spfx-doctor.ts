@@ -63,10 +63,6 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   private resultsObject: SpfxDoctorCheck[] = [];
   private logger!: Logger;
 
-  protected get allowedOutputs(): string[] {
-    return ['text', 'json'];
-  }
-
   public get name(): string {
     return commands.DOCTOR;
   }

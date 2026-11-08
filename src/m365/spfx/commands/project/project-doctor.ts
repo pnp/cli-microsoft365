@@ -90,10 +90,6 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.24.1'
   ];
 
-  protected get allowedOutputs(): string[] {
-    return ['json', 'text', 'md', 'tour'];
-  }
-
   public get name(): string {
     return commands.PROJECT_DOCTOR;
   }
