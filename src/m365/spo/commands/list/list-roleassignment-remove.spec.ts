@@ -196,7 +196,6 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   it('fails validation if the principalId option is not a valid number', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: -5 });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, `'-5' is not a valid number for option principalId.`);
   });
 
   it('passes validation if the principalId option is a number', () => {

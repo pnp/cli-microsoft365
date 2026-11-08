@@ -27,11 +27,7 @@ export const options = z.strictObject({
     .optional(),
   listTitle: z.string().alias('t').optional(),
   listUrl: z.string().optional(),
-  principalId: z.number()
-    .refine(id => validation.isValidPositiveInteger(id), {
-      error: e => `'${e.input}' is not a valid number for option principalId.`
-    })
-    .optional(),
+  principalId: z.number().int().positive().optional(),
   upn: z.string()
     .refine(upn => validation.isValidUserPrincipalName(upn), {
       error: e => `'${e.input}' is not a valid user principal name for option upn.`

@@ -217,7 +217,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   it('fails validation if the principalId option is not a valid number', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: -5, roleDefinitionId: 1073741827 });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, `Specified principalId '-5' is not a valid number.`);
   });
 
   it('passes validation if the principalId option is a number', () => {
@@ -228,7 +227,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   it('fails validation if the roleDefinitionId option is not a valid number', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: -5 });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, `Specified roleDefinitionId '-5' is not a valid number.`);
   });
 
   it('passes validation if the roleDefinitionId option is a number', () => {

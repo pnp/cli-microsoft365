@@ -26,11 +26,7 @@ export const options = z.strictObject({
     .optional(),
   listTitle: z.string().alias('t').optional(),
   listUrl: z.string().optional(),
-  principalId: z.number()
-    .refine(id => validation.isValidPositiveInteger(id), {
-      error: e => `Specified principalId '${e.input}' is not a valid number.`
-    })
-    .optional(),
+  principalId: z.number().int().positive().optional(),
   upn: z.string()
     .refine(upn => validation.isValidUserPrincipalName(upn), {
       error: e => `'${e.input}' is not a valid user principal name for option upn.`
@@ -43,11 +39,7 @@ export const options = z.strictObject({
     })
     .optional(),
   entraGroupName: z.string().optional(),
-  roleDefinitionId: z.number()
-    .refine(id => validation.isValidPositiveInteger(id), {
-      error: e => `Specified roleDefinitionId '${e.input}' is not a valid number.`
-    })
-    .optional(),
+  roleDefinitionId: z.number().int().positive().optional(),
   roleDefinitionName: z.string().optional()
 });
 
