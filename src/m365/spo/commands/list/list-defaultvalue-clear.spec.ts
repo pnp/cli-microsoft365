@@ -137,22 +137,22 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
   });
 
   it('prompts before removing default values', async () => {
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId }) });
     assert(confirmationPromptStub.calledOnce);
   });
 
   it('prompts before removing default values with fieldName', async () => {
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldName: fieldName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldName: fieldName }) });
     assert(confirmationPromptStub.calledOnce);
   });
 
   it('prompts before removing default values with folderUrl', async () => {
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, folderUrl: folderUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, folderUrl: folderUrl }) });
     assert(confirmationPromptStub.calledOnce);
   });
 
   it('aborts removing default values when prompt not confirmed', async () => {
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId }) });
     assert(putStub.notCalled);
   });
 
@@ -173,7 +173,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -194,7 +194,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: siteRelListUrl, verbose: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: siteRelListUrl, verbose: true, force: true }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, '<MetadataDefaults />');
   });
 
@@ -215,7 +215,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, folderUrl: folderUrl, verbose: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, folderUrl: folderUrl, verbose: true, force: true }) });
     const expectedXml = `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`;
 
     assert.deepStrictEqual(putStub.firstCall.args[0].data, expectedXml);
@@ -238,7 +238,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, verbose: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, verbose: true, force: true }) });
     const expectedXml = `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue></a></MetadataDefaults>`;
 
     assert.deepStrictEqual(putStub.firstCall.args[0].data, expectedXml);
@@ -264,7 +264,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, verbose: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, verbose: true, force: true }) });
     assert(putStub.notCalled);
   });
 
@@ -282,7 +282,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listId: listId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, force: true }) }),
       new CommandError('The specified list is not a document library.'));
   });
 
@@ -295,7 +295,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, force: true }) }),
       new CommandError(`List '${listUrl}' was not found.`));
   });
 
@@ -316,7 +316,7 @@ describe(commands.LIST_DEFAULTVALUE_CLEAR, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, force: true }) }),
       new CommandError(`An error has occurred.`));
   });
 });

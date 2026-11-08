@@ -345,12 +345,12 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
-      }
+      })
     });
 
     // Verify that Paged defaults to true when not specified
@@ -367,12 +367,12 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(viewCreationResponse));
   });
@@ -387,12 +387,12 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
@@ -419,14 +419,14 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listId: validListId,
         type: 'kanban',
         title: validTitle,
         fields: validFieldsInput,
         kanbanBucketField: 'Status'
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
@@ -455,7 +455,7 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         type: 'gallery',
         listUrl: validListUrl,
@@ -463,7 +463,7 @@ describe(commands.LIST_VIEW_ADD, () => {
         fields: validFieldsInput,
         rowLimit: 100,
         verbose: true
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
@@ -491,7 +491,7 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listId: validListId,
         type: 'calendar',
@@ -499,7 +499,7 @@ describe(commands.LIST_VIEW_ADD, () => {
         calendarStartDateField: 'StartDate',
         calendarEndDateField: 'EndDate',
         calendarTitleField: 'Title'
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
@@ -529,7 +529,7 @@ describe(commands.LIST_VIEW_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listId: validListId,
         type: 'calendar',
@@ -541,7 +541,7 @@ describe(commands.LIST_VIEW_ADD, () => {
         calendarSubTitleField: 'Subtitle',
         calendarDefaultLayout: 'workWeek',
         customFormatter: JSON.stringify({ someProperty: 'someValue' })
-      }
+      })
     });
 
     assert.deepStrictEqual(postStub.lastCall.args[0].data.parameters, {
@@ -575,13 +575,13 @@ describe(commands.LIST_VIEW_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validWebUrl,
         listUrl: validListUrl,
         title: validTitle,
         fields: validFieldsInput,
         rowLimit: 100
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 });

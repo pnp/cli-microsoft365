@@ -113,13 +113,13 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
   });
 
   it('prompts before removing the sensitivity label when force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the sensitivity label when using listUrl and force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listUrl: listUrl }) });
 
     assert(promptIssued);
   });
@@ -127,7 +127,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
   it('aborts removing sensitivity label when prompt not confirmed', async () => {
     const patchSpy = sinon.stub(request, 'patch').resolves();
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
     assert(patchSpy.notCalled);
   });
 
@@ -140,7 +140,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -155,7 +155,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listId: listId, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -170,7 +170,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listUrl: listUrl, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -188,7 +188,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -215,11 +215,11 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         force: true
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
   });
 

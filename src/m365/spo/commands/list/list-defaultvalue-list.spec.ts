@@ -155,7 +155,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId }) });
     assert(loggerLogSpy.calledOnce);
   });
 
@@ -172,7 +172,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues);
   });
 
@@ -189,7 +189,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listTitle: listTitle, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues);
   });
 
@@ -206,7 +206,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues);
   });
 
@@ -223,7 +223,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: siteRelListUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: siteRelListUrl, verbose: true }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues);
   });
 
@@ -240,7 +240,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: siteRelListUrl, folderUrl: '/sites/Marketing/Shared Documents/Logos' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: siteRelListUrl, folderUrl: '/sites/Marketing/Shared Documents/Logos' }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues.filter(d => d.folderUrl.toLowerCase() === '/sites/marketing/shared documents/logos'));
   });
 
@@ -257,7 +257,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: siteRelListUrl, folderUrl: '/Shared Documents/TeMpLaTeS' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: siteRelListUrl, folderUrl: '/Shared Documents/TeMpLaTeS' }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], defaultColumnValues.filter(d => d.folderUrl.toLowerCase() === '/sites/marketing/shared documents/templates'));
   });
 
@@ -274,21 +274,21 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl }) });
     assert.deepStrictEqual(loggerLogSpy.firstCall.args[0], []);
   });
 
   it('correctly handles error when list is not found', async () => {
     sinon.stub(request, 'get').rejects({ status: 404 });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl }) }),
       new CommandError(`List '${listUrl}' was not found.`));
   });
 
   it('correctly handles error when retrieving column list', async () => {
     sinon.stub(request, 'get').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listId: listId } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -301,7 +301,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -314,7 +314,7 @@ describe(commands.LIST_DEFAULTVALUE_LIST, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl }) }),
       new CommandError(`List '${listUrl}' is not a document library.`));
   });
 });
