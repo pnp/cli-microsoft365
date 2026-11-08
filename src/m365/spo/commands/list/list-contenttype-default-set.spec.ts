@@ -615,7 +615,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('fails validation if the listId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', contentTypeId: '0x0120' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {

@@ -36,7 +36,7 @@ export const options = z.strictObject({
   ]).optional(),
   webUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
   description: z.string().optional(),

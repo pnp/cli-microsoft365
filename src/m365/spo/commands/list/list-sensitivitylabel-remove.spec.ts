@@ -92,12 +92,13 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
 
   it('fails validation if webUrl is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listTitle: listTitle });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: 'invalid' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', () => {

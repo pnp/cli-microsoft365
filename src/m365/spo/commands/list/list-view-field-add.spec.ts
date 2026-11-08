@@ -128,25 +128,25 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('fails validation if the viewId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: '12345', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '12345' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {

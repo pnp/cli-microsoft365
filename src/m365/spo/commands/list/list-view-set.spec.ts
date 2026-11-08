@@ -89,7 +89,7 @@ describe(commands.LIST_VIEW_SET, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listTitle: listTitle, title: viewTitle });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not a GUID', () => {

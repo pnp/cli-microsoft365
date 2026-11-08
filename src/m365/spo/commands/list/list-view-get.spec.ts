@@ -154,7 +154,7 @@ describe(commands.LIST_VIEW_GET, () => {
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listTitle: 'List 1', title: 'All items' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if neither listId nor listTitle nor listUrl specified', () => {
@@ -165,7 +165,7 @@ describe(commands.LIST_VIEW_GET, () => {
   it('fails validation if listId is not a GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'invalid', title: 'All items' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'invalid in option listId is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if neither id nor title specified', () => {
@@ -181,7 +181,7 @@ describe(commands.LIST_VIEW_GET, () => {
   it('fails validation if id is not a GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', id: 'invalid' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'invalid in option id is not a valid GUID');
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation when title and listTitle specified', () => {

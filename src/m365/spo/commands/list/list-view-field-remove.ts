@@ -13,25 +13,25 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
   listId: z.string()
     .refine(id => validation.isValidGuid(id), {
-      error: e => `${e.input} is not a valid GUID`
+      error: e => `'${e.input}' is not a valid GUID.`
     })
     .optional(),
   listTitle: z.string().optional(),
   listUrl: z.string().optional(),
   viewId: z.string()
     .refine(id => validation.isValidGuid(id), {
-      error: e => `${e.input} is not a valid GUID`
+      error: e => `'${e.input}' is not a valid GUID.`
     })
     .optional(),
   viewTitle: z.string().optional(),
   id: z.string()
     .refine(id => validation.isValidGuid(id), {
-      error: e => `${e.input} is not a valid GUID`
+      error: e => `'${e.input}' is not a valid GUID.`
     })
     .optional(),
   title: z.string().optional(),

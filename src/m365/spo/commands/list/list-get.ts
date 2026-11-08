@@ -16,7 +16,7 @@ export const options = z.strictObject({
     error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
   }).alias('u'),
   id: z.string().refine(id => validation.isValidGuid(id), {
-    error: e => `${e.input} is not a valid GUID`
+    error: e => `'${e.input}' is not a valid GUID.`
   }).optional().alias('i'),
   title: z.string().optional().alias('t'),
   url: z.string().optional(),

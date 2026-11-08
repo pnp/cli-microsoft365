@@ -83,13 +83,13 @@ describe(commands.LIST_VIEW_LIST, () => {
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: listId });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: '12345' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error?.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if valid options are specified', () => {

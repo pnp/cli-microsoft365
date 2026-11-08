@@ -298,7 +298,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
     });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -317,7 +317,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
     });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error?.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if the listid option is a valid GUID', () => {

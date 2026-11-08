@@ -73,7 +73,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId and listTitle are specified', () => {
@@ -104,7 +104,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   it('fails validation if the id option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, `12345 is not a valid GUID`);
+    assert.strictEqual(actual.error.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if the id option is a valid GUID', () => {

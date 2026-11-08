@@ -259,7 +259,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85', listTitle: 'Documents' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -270,13 +270,13 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   it('fails validation if the listId option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '12345', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error?.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '12345' });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
+    assert.strictEqual(actual.error?.issues[0].message, `'12345' is not a valid GUID.`);
   });
 
   it('passes validation if the id option is a valid GUID', () => {

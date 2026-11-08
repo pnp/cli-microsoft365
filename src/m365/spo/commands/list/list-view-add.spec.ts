@@ -101,7 +101,8 @@ describe(commands.LIST_VIEW_ADD, () => {
       title: validTitle,
       fields: validFieldsInput
     });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not a valid GUID', async () => {

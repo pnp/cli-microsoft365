@@ -13,7 +13,7 @@ export const options = z.object({
   ...globalOptionsZod.shape,
   webUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
   listId: z.string()

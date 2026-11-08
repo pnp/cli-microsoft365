@@ -174,7 +174,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11 });
     assert.strictEqual(actual.success, false);
-    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {

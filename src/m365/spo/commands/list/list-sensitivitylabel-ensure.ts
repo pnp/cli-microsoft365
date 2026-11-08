@@ -12,20 +12,20 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: e => `${e.input} is not a valid SharePoint Online site URL.`
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
   name: z.string().alias('n').optional(),
   id: z.string()
     .refine(id => validation.isValidGuid(id), {
-      error: e => `${e.input} is not a valid GUID`
+      error: e => `'${e.input}' is not a valid GUID.`
     })
     .alias('i')
     .optional(),
   listTitle: z.string().alias('t').optional(),
   listId: z.string()
     .refine(id => validation.isValidGuid(id), {
-      error: e => `${e.input} is not a valid GUID`
+      error: e => `'${e.input}' is not a valid GUID.`
     })
     .alias('l')
     .optional(),
