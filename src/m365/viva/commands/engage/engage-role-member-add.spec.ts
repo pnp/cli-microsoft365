@@ -78,8 +78,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       roleId: 'invalid',
       userId: userId
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[1].message, `'invalid' is not a valid GUID.`);
+    assert.strictEqual(actual.success, false);
   });
 
   it('passes validation if roleId is a valid GUID', () => {
@@ -119,8 +118,8 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       roleId: roleId,
       userId: 'invalid'
     });
-    assert.notStrictEqual(actual.success, true);
-    assert.strictEqual(actual.error?.issues[1].message, `'invalid' is not a valid GUID.`);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if userId is a valid GUID', () => {
@@ -162,6 +161,15 @@ describe(commands.ENGAGE_ROLE_MEMBER_ADD, () => {
       roleId: roleId
     });
     assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId,
+      roleId: roleId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds the user specified by id to Viva Engage role specified by id', async () => {

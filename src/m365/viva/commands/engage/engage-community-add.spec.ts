@@ -12,15 +12,15 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-community-add.js';
+import command, { options } from './engage-community-add.js';
 import { accessToken } from '../../../../utils/accessToken.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 
 describe(commands.ENGAGE_COMMUNITY_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
   const operationLocation = `https://graph.microsoft.com/beta/employeeExperience/engagementAsyncOperations('eyJfdHlwZSI6IkxvbmdSdW5uaW5nT3BlcmF0aW9uIiwiaWQiOiI4ZmM2NzEyZS0wMWY4LTQxN2YtYWNmMS1iZTJiYmMxY2FjNGQiLCJvcGVyYXRpb24iOiJDcmVhdGVDb21tdW5pdHkifQ')`;
 
@@ -37,6 +37,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       };
     }
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -79,130 +80,112 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if \'displayName\' is more than 255 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.",
-        description: "A community for all software engineers",
-        privacy: 'public'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if \'description\' is more than 1024 characters', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.`,
-        privacy: 'public'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid privacy option is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers',
-        privacy: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid adminEntraId is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers',
-        privacy: 'private',
-        adminEntraIds: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid adminEntraUserName is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers',
-        privacy: 'private',
-        adminEntraUserNames: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both adminEntraIds and adminEntraUserNames are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if \'displayName\' is more than 255 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.",
+      description: "A community for all software engineers",
+      privacy: 'public'
     });
-
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers.',
-        privacy: 'public',
-        adminEntraIds: '50674d84-6bf1-470b-89b5-d55ce0a5a720',
-        adminEntraUserNames: 'john.doe@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when more than 20 admins are specified by id', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers.',
-        privacy: 'public',
-        adminEntraIds: Array(21).fill('50674d84-6bf1-470b-89b5-d55ce0a5a720').join(',')
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if \'description\' is more than 1024 characters', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.`,
+      privacy: 'public'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when more than 20 admins are specified by UPN', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers.',
-        privacy: 'public',
-        adminEntraUserNames: Array(21).fill('john.doe@contoso.onmicrosoft.com').join(',')
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid privacy option is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers',
+      privacy: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid options are provided with adminEntraIds', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers.',
-        privacy: 'public',
-        adminEntraIds: '50674d84-6bf1-470b-89b5-d55ce0a5a720'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when invalid adminEntraId is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers',
+      privacy: 'private',
+      adminEntraIds: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid options are provided with adminEntraUserNames', async () => {
-    const actual = await command.validate({
-      options: {
-        displayName: 'Software engineers',
-        description: 'A community for all software engineers.',
-        privacy: 'public',
-        adminEntraUserNames: 'john.doe@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when invalid adminEntraUserName is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers',
+      privacy: 'private',
+      adminEntraUserNames: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both adminEntraIds and adminEntraUserNames are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      adminEntraIds: '50674d84-6bf1-470b-89b5-d55ce0a5a720',
+      adminEntraUserNames: 'john.doe@contoso.onmicrosoft.com'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when more than 20 admins are specified by id', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      adminEntraIds: Array(21).fill('50674d84-6bf1-470b-89b5-d55ce0a5a720').join(',')
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when more than 20 admins are specified by UPN', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      adminEntraUserNames: Array(21).fill('john.doe@contoso.onmicrosoft.com').join(',')
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when valid options are provided with adminEntraIds', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      adminEntraIds: '50674d84-6bf1-470b-89b5-d55ce0a5a720'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid options are provided with adminEntraUserNames', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      adminEntraUserNames: 'john.doe@contoso.onmicrosoft.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      displayName: 'Software engineers',
+      description: 'A community for all software engineers.',
+      privacy: 'public',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('creates a community without waiting for provisioning to complete', async () => {
@@ -216,7 +199,7 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { displayName: 'Software engineers', description: 'A community for all software engineers', privacy: 'public', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Software engineers', description: 'A community for all software engineers', privacy: 'public', verbose: true }) });
     assert(loggerLogSpy.calledOnceWithExactly(operationLocation));
   });
 
@@ -256,14 +239,14 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: 'Software engineers',
         description: 'A community for all software engineers',
         privacy: 'public',
         adminEntraIds: '50674d84-6bf1-470b-89b5-d55ce0a5a720',
         wait: true,
         verbose: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly({
@@ -316,14 +299,14 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: 'Software engineers',
         description: 'A community for all software engineers',
         privacy: 'public',
         adminEntraUserNames: 'john.doe@consoto.onmicrosoft.com',
         wait: true,
         debug: true
-      }
+      })
     });
 
     assert(loggerLogSpy.calledOnceWithExactly({
@@ -369,12 +352,12 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: 'Software engineers',
         description: 'A community for all software engineers',
         privacy: 'public',
         wait: true
-      }
+      })
     }), new CommandError('Community creation failed: An error has occurred'));
   });
 
@@ -383,12 +366,12 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: 'Software engineers',
         description: 'A community for all software engineers',
         privacy: 'public',
         wait: true
-      }
+      })
     }), new CommandError('Specify at least one admin using either adminEntraIds or adminEntraUserNames options when using application permissions.'));
   });
 
@@ -405,12 +388,12 @@ describe(commands.ENGAGE_COMMUNITY_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         displayName: 'Software engineers',
         description: 'A community for all software engineers',
         privacy: 'public',
         wait: true
-      }
+      })
     }), new CommandError('Invalid request'));
   });
 });

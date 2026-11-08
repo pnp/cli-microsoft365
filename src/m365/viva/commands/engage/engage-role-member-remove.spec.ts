@@ -125,7 +125,8 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
       roleId: roleId,
       userId: 'invalid'
     });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if userId is a valid GUID', () => {
@@ -167,6 +168,15 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
       roleId: roleId
     });
     assert.notStrictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      roleId: roleId,
+      userId: userId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('removes the user specified by id from Viva Engage role specified by id without prompting for confirmation', async () => {
@@ -247,7 +257,7 @@ describe(commands.ENGAGE_ROLE_MEMBER_REMOVE, () => {
   });
 
   it('prompts before removing a member from a Viva Engage role when confirm option not passed', async () => {
-    await command.action(logger, { options: { roleId: roleId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ roleId: roleId, userId: userId }) });
 
     assert(promptIssued);
   });
