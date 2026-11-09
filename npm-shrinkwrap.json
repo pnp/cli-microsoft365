@@ -11,6 +11,7 @@
       "dependencies": {
         "@azure/msal-common": "^16.15.0",
         "@azure/msal-node": "^7.1.2",
+        "@azure/msal-node-extensions": "5.5.4",
         "@inquirer/confirm": "^6.3.5",
         "@inquirer/input": "^5.1.9",
         "@inquirer/select": "^5.2.8",
@@ -114,21 +115,21 @@
       "license": "MIT"
     },
     "node_modules/@azure/msal-common": {
-      "version": "16.16.0",
-      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-16.16.0.tgz",
-      "integrity": "sha512-EZgd8h5nczsdRAQAgXA0A0pC5L/zj43n1jePXvUMgdwXMbH2zhb7b7Hp+Oe7ZOODK/sch2x+soD6FOrtgUbx/w==",
+      "version": "16.15.0",
+      "resolved": "https://registry.npmjs.org/@azure/msal-common/-/msal-common-16.15.0.tgz",
+      "integrity": "sha512-lwdLb1B9Q5nEhPLVIKe78XH5wFMN15fCiDkY7ylPDSWZuWcD93G3jpJajrKhO3CQld8SLKz0sHiOi24mxdvtsg==",
       "license": "MIT",
       "engines": {
         "node": ">=0.8.0"
       }
     },
     "node_modules/@azure/msal-node": {
-      "version": "7.2.0",
-      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-7.2.0.tgz",
-      "integrity": "sha512-Y87VJsMWF4jiqLqq8XYLb1o+rGc/HacwS3Zydi3bDtaVm5Sa8FlB7YrKrBFKRIYj27RJXAaDkErImMAqtM10Pg==",
+      "version": "7.1.2",
+      "resolved": "https://registry.npmjs.org/@azure/msal-node/-/msal-node-7.1.2.tgz",
+      "integrity": "sha512-52hKQLGpEQzwNufIXG1SPVU+wQ3RIe7Rp2+g+VdAmZojCAZ6yCdGEffzQEQ6RnBZGBEs40nl14rWBmfJpCoHsg==",
       "license": "MIT",
       "dependencies": {
-        "@azure/msal-common": "16.16.0",
+        "@azure/msal-common": "16.15.0",
         "jsonwebtoken": "^9.0.0"
       },
       "engines": {
@@ -136,14 +137,14 @@
       }
     },
     "node_modules/@azure/msal-node-extensions": {
-      "version": "5.6.0",
-      "resolved": "https://registry.npmjs.org/@azure/msal-node-extensions/-/msal-node-extensions-5.6.0.tgz",
-      "integrity": "sha512-fiudFtrBgHBOnS5uBxzYbUooBtB+5IKbVB5ZE3xvnC4P9zOWMuFhtV9RXr+huKfqXPuoniV6BUa/NExhydVGQA==",
+      "version": "5.5.4",
+      "resolved": "https://registry.npmjs.org/@azure/msal-node-extensions/-/msal-node-extensions-5.5.4.tgz",
+      "integrity": "sha512-dTnQNoldF3Dw8SxLDTodkii4q43EZvO1yuWncVHi5qQ8xsuo71GlTGpQMIlWNLgw5jJW0KQ0XQoGDzyHX6wb7Q==",
       "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
       "dependencies": {
-        "@azure/msal-common": "16.16.0",
+        "@azure/msal-common": "16.15.0",
         "@azure/msal-node-runtime": "^0.20.0",
         "keytar": "^7.8.0"
       },
