@@ -475,6 +475,26 @@ class MockCommandWithRefinedSchemaCoercion extends AnonymousCommand {
   }
 }
 
+class MockCommandWithSchemaAndEnumRequiredOption extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock schema enum required';
+  }
+
+  public get description(): string {
+    return 'Mock command with schema and required enum option';
+  }
+
+  public get schema(): z.ZodType {
+    return z.strictObject({
+      ...globalOptionsZod.shape,
+      allowedMembers: z.enum(['usersGroups', 'applications', 'both'])
+    });
+  }
+
+  public async commandAction(): Promise<void> {
+  }
+}
+
 describe('cli', () => {
   let rootFolder: string;
   let cliLogStub: sinon.SinonStub;
@@ -497,16 +517,13 @@ describe('cli', () => {
   let mockCommandWithRefinedSchemaCoercion: Command;
   let log: string[] = [];
   let mockCommandWithBooleanRewrite: Command;
+  let mockCommandWithSchemaAndEnumRequiredOption: Command;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
 
-    cliLogStub = sinon.stub(cli, 'log').callsFake(message => {
-      log.push(message as string ?? '');
-    });
-    cliErrorStub = sinon.stub(cli, 'error');
     cliFormatOutputSpy = sinon.spy(cli, 'formatOutput');
     processExitStub = sinon.stub(process, 'exit').callsFake((() => { }) as any);
     md2plainSpy = sinon.spy(md, 'md2plain');
@@ -525,6 +542,7 @@ describe('cli', () => {
     mockCommandWithRefinedSchemaCoercion = new MockCommandWithRefinedSchemaCoercion();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
+    mockCommandWithSchemaAndEnumRequiredOption = new MockCommandWithSchemaAndEnumRequiredOption();
 
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
@@ -536,6 +554,12 @@ describe('cli', () => {
 
   beforeEach(() => {
     log = [];
+    sinonUtil.restore(cli.log);
+    sinonUtil.restore(cli.error);
+    cliLogStub = sinon.stub(cli, 'log').callsFake(message => {
+      log.push(message as string ?? '');
+    });
+    cliErrorStub = sinon.stub(cli, 'error');
     cli.commands = [
       cli.getCommandInfo(mockCommand, 'cli-mock.js', 'help.mdx'),
       cli.getCommandInfo(mockCommandWithAutocomplete, 'cli-autocomplete-mock.js', 'help.mdx'),
@@ -551,7 +575,8 @@ describe('cli', () => {
       cli.getCommandInfo(mockCommandWithRefinedSchemaCoercion, 'cli-schema-refined-coercion-mock.js', 'help.mdx'),
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
-      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx')
+      cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx'),
+      cli.getCommandInfo(mockCommandWithSchemaAndEnumRequiredOption, 'cli-schema-enum-required-mock.js', 'help.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -578,6 +603,7 @@ describe('cli', () => {
       mockCommandWithValidation.action,
       mockCommandWithValidation.validate,
       mockCommandWithSchema.action,
+      mockCommandWithSchema.getSchemaToParse,
       mockCommand.commandAction,
       mockCommand.processOptions,
       mockCommandWithSchemaAndProcessedRequiredOptions.processOptions,
@@ -2236,7 +2262,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  15 commands'));
+    assert(cliLogStub.calledWith('  cli *  16 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2249,7 +2275,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        12 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        13 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2262,7 +2288,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  15 commands'));
+    assert(cliLogStub.calledWith('  cli *  16 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
@@ -2621,5 +2647,145 @@ describe('cli', () => {
 
     assert(promptForValueSpy.notCalled);
     assert(executeCommandSpy.notCalled);
+  });
+
+  it('prompts for a missing required enum option when prompting is enabled', async () => {
+    cli.commandToExecute = cli.commands.find(
+      c => c.name === 'cli mock schema enum required'
+    );
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const promptForValueStub = sinon
+      .stub(cli, 'promptForValue')
+      .resolves('usersGroups');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'enum',
+      'required'
+    ]);
+
+    assert(promptForValueStub.calledOnce);
+    assert(executeCommandSpy.calledOnce);
+    assert.strictEqual(
+      executeCommandSpy.firstCall.args[1].options.allowedMembers,
+      'usersGroups'
+    );
+  });
+
+  it('reports a missing required enum option when prompting is disabled', async () => {
+    cli.commandToExecute = cli.commands.find(
+      c => c.name === 'cli mock schema enum required'
+    );
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'enum',
+      'required'
+    ]));
+
+    assert(executeCommandSpy.notCalled);
+    assert(
+      cliErrorStub.calledWith(
+        chalk.red('Error: allowedMembers: Required option not specified')
+      )
+    );
+  });
+
+  it('does not prompt for an invalid supplied enum value', async () => {
+    cli.commandToExecute = cli.commands.find(
+      c => c.name === 'cli mock schema enum required'
+    );
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+
+    await assert.rejects(cli.execute([
+      'cli',
+      'mock',
+      'schema',
+      'enum',
+      'required',
+      '--allowedMembers',
+      'invalid'
+    ]));
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
+    assert(
+      cliErrorStub.getCalls().every(
+        call => !call.firstArg.includes('Required option not specified')
+      )
+    );
+  });
+
+  it('reports a schema-level validation error without an option path', async () => {
+    cli.commandToExecute = cli.commands.find(
+      c => c.name === 'cli mock schema'
+    );
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const schemaStub = sinon.stub(mockCommandWithSchema, 'getSchemaToParse').returns(
+      z.strictObject({
+        ...globalOptionsZod.shape
+      }).refine(() => false, {
+        message: 'Root validation failed'
+      })
+    );
+
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw new Error(error);
+    });
+
+    try {
+      await assert.rejects(
+        cli.execute([
+          'cli',
+          'mock',
+          'schema'
+        ]),
+        /Root validation failed/
+      );
+    }
+    finally {
+      schemaStub.restore();
+    }
   });
 });
