@@ -150,7 +150,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
 
     sinon.stub(request, 'put').resolves();
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldValue: fieldValue, fieldName: fieldName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldValue: fieldValue, fieldName: fieldName, verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -179,7 +179,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, fieldValue: fieldValue, fieldName: fieldName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listTitle: listTitle, fieldValue: fieldValue, fieldName: fieldName }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`);
   });
 
@@ -213,7 +213,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid PUT request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl, verbose: true }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`);
   });
 
@@ -255,7 +255,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid POST request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, '<MetadataDefaults />');
     assert.deepStrictEqual(putStub.firstCall.args[0].data, `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a></MetadataDefaults>`);
   });
@@ -290,7 +290,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid PUT request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl.toUpperCase(), verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: folderUrl.toUpperCase(), verbose: true }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`);
   });
 
@@ -324,7 +324,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid PUT request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: '/Shared Documents/Logos' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldValue: fieldValue, fieldName: fieldName, folderUrl: '/Shared Documents/Logos' }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, `<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="Countries">20;#Canada|e3d25461-68ef-4070-8523-5ba439f6d4d5</DefaultValue><DefaultValue FieldName="DocumentType">Logo</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Templates"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>`);
   });
 
@@ -342,7 +342,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldName: fieldName, fieldValue: fieldValue } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldName: fieldName, fieldValue: fieldValue }) }),
       new CommandError('The specified list is not a document library.'));
   });
 
@@ -355,7 +355,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue }) }),
       new CommandError(`List '${listUrl}' was not found.`));
   });
 
@@ -378,7 +378,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue, folderUrl: folderUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue, folderUrl: folderUrl }) }),
       new CommandError(`Folder '${folderUrl}' was not found.`));
   });
 
@@ -399,7 +399,7 @@ describe(commands.LIST_DEFAULTVALUE_SET, () => {
       throw `Invalid request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, fieldValue: fieldValue }) }),
       new CommandError('You don\'t have permission to view this file.'));
   });
 });

@@ -13,11 +13,11 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   webUrl: z.string()
     .refine(url => validation.isValidSharePointUrl(url) === true, {
-      error: 'Specify a valid SharePoint site URL.'
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
   listTitle: z.string().optional().alias('t'),
-  listId: z.uuid().optional().alias('l'),
+  listId: z.guid().optional().alias('l'),
   listUrl: z.string().optional(),
   force: z.boolean().optional().alias('f')
 });
@@ -36,7 +36,7 @@ class SpoListSensitivityLabelRemoveCommand extends SpoCommand {
     return 'Clears a default sensitivity label from a document library';
   }
 
-  public get schema(): z.ZodTypeAny {
+  public get schema(): z.ZodType {
     return options;
   }
 

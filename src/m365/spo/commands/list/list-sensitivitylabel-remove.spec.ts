@@ -92,12 +92,13 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
 
   it('fails validation if webUrl is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listTitle: listTitle });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if listId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: 'invalid' });
-    assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', () => {
@@ -113,13 +114,13 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
   });
 
   it('prompts before removing the sensitivity label when force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
 
     assert(promptIssued);
   });
 
   it('prompts before removing the sensitivity label when using listUrl and force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listUrl: listUrl }) });
 
     assert(promptIssued);
   });
@@ -127,7 +128,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
   it('aborts removing sensitivity label when prompt not confirmed', async () => {
     const patchSpy = sinon.stub(request, 'patch').resolves();
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
     assert(patchSpy.notCalled);
   });
 
@@ -140,7 +141,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -155,7 +156,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listId: listId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listId: listId, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -170,7 +171,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listUrl: listUrl, force: true, verbose: true }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -188,7 +189,7 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, listTitle: listTitle }) });
 
     const lastCall = patchStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, '');
@@ -215,11 +216,18 @@ describe(commands.LIST_SENSITIVITYLABEL_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         force: true
-      }
+      })
     }), new CommandError(error.error['odata.error'].message.value));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: listTitle,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });
