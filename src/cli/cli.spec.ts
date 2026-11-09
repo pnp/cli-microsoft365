@@ -577,7 +577,7 @@ describe('cli', () => {
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
       cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx'),
-      cli.getCommandInfo(mockCommandWithSchemaAndEnumRequiredOption, 'cli-schema-enum-required-mock.js', 'help.mdx')
+      cli.getCommandInfo(mockCommandWithSchemaAndEnumRequiredOption, 'cli-schema-enum-required-mock.js', 'help.mdx'),
       cli.getCommandInfo(spoListAddCommand, 'spo/commands/list/list-add.js', 'spo/list/list-add.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
