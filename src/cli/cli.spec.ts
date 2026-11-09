@@ -2295,7 +2295,7 @@ describe('cli', () => {
     await cli.loadCommandFromArgs(['spo', 'site', 'list']);
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  16 commands'));
+    assert(cliLogStub.calledWith('  cli *  17 commands'));
   });
 
   it(`prints commands from the specified group`, async () => {
@@ -2308,7 +2308,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli mock *        13 commands'));
+    assert(cliLogStub.calledWith('  cli mock *        14 commands'));
   });
 
   it(`prints commands from the root group when the specified string doesn't match any group`, async () => {
@@ -2321,7 +2321,7 @@ describe('cli', () => {
     };
     cli.printAvailableCommands();
 
-    assert(cliLogStub.calledWith('  cli *  16 commands'));
+    assert(cliLogStub.calledWith('  cli *  17 commands'));
   });
 
   it(`runs properly when context file not found`, async () => {
