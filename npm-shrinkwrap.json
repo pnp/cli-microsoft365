@@ -63,7 +63,7 @@
         "@types/proper-lockfile": "^4.1.4",
         "@types/semver": "^7.8.0",
         "@types/sinon": "^22.0.2",
-        "@types/update-notifier": "^6.0.8",
+        "@types/update-notifier": "^6.0.9",
         "@types/uuid": "^10.0.0",
         "@types/yargs-parser": "^21.0.3",
         "@typescript-eslint/eslint-plugin": "^8.72.1",
@@ -856,11 +856,13 @@
       }
     },
     "node_modules/@types/update-notifier": {
-      "version": "6.0.8",
+      "version": "6.0.9",
+      "resolved": "https://registry.npmjs.org/@types/update-notifier/-/update-notifier-6.0.9.tgz",
+      "integrity": "sha512-10lRzgXVppJdo7f8WgPnp1z25QrdLlNQpUzw0uJqqOVyGAn6t9F3yEKlLdDcn75iIADDXfXNJXXkJWe3eExsEg==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
-        "@types/configstore": "*",
+        "@types/configstore": "^6",
         "boxen": "^7.1.1"
       }
     },

@@ -334,7 +334,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "@types/semver": "^7.8.0",
     "@types/sinon": "^22.0.2",
-    "@types/update-notifier": "^6.0.8",
+    "@types/update-notifier": "^6.0.9",
     "@types/uuid": "^10.0.0",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
