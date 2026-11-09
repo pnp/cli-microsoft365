@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './task-list.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './task-list.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.TASK_LIST, () => {
@@ -20,6 +19,7 @@ describe(commands.TASK_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -29,6 +29,7 @@ describe(commands.TASK_LIST, () => {
     sinon.stub(accessToken, 'assertAccessTokenType').returns();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -72,39 +73,9 @@ describe(commands.TASK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
   });
 
-  it('fails validation if both listId and listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
 
-      return defaultValue;
-    });
 
-    const actual = await command.validate({
-      options: {
-        listId: 'AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA==',
-        listName: 'Tasks List'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
-  it('fails validation if neither listId nor listName options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('fails to get ToDo Task list when the specified task list does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -114,26 +85,12 @@ describe(commands.TASK_LIST, () => {
       throw 'The specified task list does not exist';
     });
 
-    await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ listName: 'Tasks List' }) } as any), new CommandError('The specified task list does not exist'));
   });
 
-  it('passes validation if only listId is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        listId: 'AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=='
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 
-  it('passes validation if only listName is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        listName: 'Tasks List'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
+
+
 
   it('lists To Do tasks using listId in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -174,10 +131,10 @@ describe(commands.TASK_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         listId: "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(
       [
@@ -255,10 +212,10 @@ describe(commands.TASK_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         listName: 'Tasks List',
         output: 'text'
-      }
+      })
     });
     const actual = JSON.stringify(log[log.length - 1]);
     const expected = JSON.stringify([
@@ -279,4 +236,10 @@ describe(commands.TASK_LIST, () => {
     ]);
     assert.strictEqual(actual, expected);
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
 });
