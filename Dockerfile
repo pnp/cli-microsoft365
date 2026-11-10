@@ -38,7 +38,7 @@ ENV 0="/bin/bash" \
 
 RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/home/.local/bin" >> ~/.bash_profile' \
   && bash -c 'echo "export CLIMICROSOFT365_ENV=\"docker\"" >> ~/.bash_profile' \
-  && bash -c 'npm i -g @pnp/cli-microsoft365@${CLI_VERSION} --omit=dev --quiet --no-progress' \ 
+  && bash -c 'npm i -g @pnp/cli-microsoft365@${CLI_VERSION} --omit=dev --quiet --no-progress' \
   && bash -c 'echo "source /etc/bash/bash_completion.sh" >> ~/.bash_profile' \
   && bash -c 'echo "alias \"m365?\"=\"m365_chili\"" >> ~/.bash_profile' \
   && bash -c 'echo ". .bashrc" >> ~/.bash_profile' \
