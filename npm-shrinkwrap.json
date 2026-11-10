@@ -11,7 +11,6 @@
       "dependencies": {
         "@azure/msal-common": "^16.15.0",
         "@azure/msal-node": "^7.1.2",
-        "@azure/msal-node-extensions": "5.5.4",
         "@inquirer/confirm": "^6.3.5",
         "@inquirer/input": "^5.1.9",
         "@inquirer/select": "^5.2.8",
@@ -33,7 +32,7 @@
         "omelette": "^0.4.17",
         "open": "^11.0.4",
         "proper-lockfile": "^4.1.2",
-        "semver": "^7.8.5",
+        "semver": "^7.8.6",
         "strip-json-comments": "^5.0.3",
         "typescript": "^5.9.3",
         "update-notifier": "^7.3.1",
@@ -4862,9 +4861,9 @@
       "license": "MIT"
     },
     "node_modules/semver": {
-      "version": "7.8.5",
-      "resolved": "https://registry.npmjs.org/semver/-/semver-7.8.5.tgz",
-      "integrity": "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==",
+      "version": "7.8.6",
+      "resolved": "https://registry.npmjs.org/semver/-/semver-7.8.6.tgz",
+      "integrity": "sha512-9lpSSU4Mly3mrtruwLs1eLK6+gzbzqeBFwRNjIjE+9LuDpWdYctrQlQ3ej1Ilgi7gknpsTRnPoLP8DpCHqHIJw==",
       "license": "ISC",
       "bin": {
         "semver": "bin/semver.js"
