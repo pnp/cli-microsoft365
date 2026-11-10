@@ -24,6 +24,25 @@ m365 teams user app list [options]
 
 <Global />
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                      |
+  |-----------------|----------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadForUser |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                          |
+  |-----------------|--------------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadForUser.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List the apps installed in the personal scope of the specified user using its ID.

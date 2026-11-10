@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # teams user app upgrade
 
@@ -27,6 +29,25 @@ m365 teams user app upgrade [options]
 ```
 
 <Global />
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                           |
+  |-----------------|---------------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadWriteForUser |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                               |
+  |-----------------|-------------------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadWriteForUser.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
