@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # teams team clone
 
@@ -39,6 +41,25 @@ m365 teams team clone [options]
 Using this command, global admins and Microsoft Teams service admins can access teams that they are not a member of.
 
 When tabs are cloned, they are put into an unconfigured state. The first time you open them, you'll go through the configuration screen. If the person opening the tab does not have permission to configure apps, they will see a message explaining that the tab hasn't been configured.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions |
+  |-----------------|-------------|
+  | Microsoft Graph | Team.Create |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions |
+  |-----------------|-------------|
+  | Microsoft Graph | Team.Create |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
