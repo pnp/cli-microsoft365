@@ -200,4 +200,9 @@ describe('AppCommand', () => {
     const actual = commandOptionsSchema.safeParse({ appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d' });
     assert.strictEqual(actual.success, true);
   });
+
+  it('passes validation if the specified appId is a GUID with non-RFC variant bits', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'e23d235c-fcdf-45d1-0c5f-24ab2ee0695d' });
+    assert.strictEqual(actual.success, true);
+  });
 });

@@ -12,7 +12,7 @@ export const options = z.strictObject({
   id: z.string().alias('i'),
   containerId: z.string().optional(),
   containerName: z.string().alias('n').optional(),
-  containerTypeId: z.uuid().optional(),
+  containerTypeId: z.guid().optional(),
   containerTypeName: z.string().optional(),
   roles: z.string().transform((value) => value.split(',').map(role => role.trim())).pipe(z.enum(['reader', 'writer', 'manager', 'owner']).array()).alias('r')
 });

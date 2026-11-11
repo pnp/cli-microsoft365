@@ -13,7 +13,7 @@ const options = z.strictObject({
     .refine(url => validation.isValidSharePointUrl(url) === true, {
       error: e => `'${e.input}' is not a valid SharePoint URL.`
     }),
-  id: z.uuid()
+  id: z.guid()
 });
 
 declare type Options = z.infer<typeof options>;

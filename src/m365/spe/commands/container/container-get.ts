@@ -10,7 +10,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   id: z.string().alias('i').optional(),
   name: z.string().alias('n').optional(),
-  containerTypeId: z.uuid().optional(),
+  containerTypeId: z.guid().optional(),
   containerTypeName: z.string().optional()
 });
 

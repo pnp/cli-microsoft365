@@ -9,8 +9,8 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().alias('i'),
-  administrativeUnitId: z.uuid().optional().alias('u'),
+  id: z.guid().alias('i'),
+  administrativeUnitId: z.guid().optional().alias('u'),
   administrativeUnitName: z.string().optional().alias('n'),
   properties: z.string().optional().alias('p')
 });

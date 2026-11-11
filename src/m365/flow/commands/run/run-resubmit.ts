@@ -11,7 +11,7 @@ import PowerAutomateCommand from '../../../base/PowerAutomateCommand.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   name: z.string().alias('n'),
-  flowName: z.uuid(),
+  flowName: z.guid(),
   environmentName: z.string().alias('e'),
   force: z.boolean().optional().alias('f')
 });

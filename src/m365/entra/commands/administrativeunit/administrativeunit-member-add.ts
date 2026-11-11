@@ -11,13 +11,13 @@ import { entraDevice } from "../../../../utils/entraDevice.js";
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  administrativeUnitId: z.uuid().optional().alias('i'),
+  administrativeUnitId: z.guid().optional().alias('i'),
   administrativeUnitName: z.string().optional().alias('n'),
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.guid().optional(),
   groupName: z.string().optional(),
-  deviceId: z.uuid().optional(),
+  deviceId: z.guid().optional(),
   deviceName: z.string().optional()
 });
 

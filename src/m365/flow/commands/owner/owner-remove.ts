@@ -12,7 +12,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  flowName: z.uuid(),
+  flowName: z.guid(),
   environmentName: z.string().alias('e'),
   userId: z.string().refine(id => validation.isValidGuid(id), {
     error: e => `'${e.input}' is not a valid GUID.`
