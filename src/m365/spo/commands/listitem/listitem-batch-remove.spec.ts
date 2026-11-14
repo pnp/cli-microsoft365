@@ -159,6 +159,24 @@ describe(commands.LISTITEM_BATCH_REMOVE, () => {
     assert(postStub.firstCall.args[0].data.includes('/items(1)'));
   });
 
+  it('trims spaces around the IDs in the csv file before building the request', async () => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('ID\n1 \n 2');
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return mockBatchSuccessfulResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, verbose: true }) });
+    const body = postStub.firstCall.args[0].data;
+    assert(body.includes('/items(1)/recycle()') && body.includes('/items(2)/recycle()') && !/items\( ?\d+ \)|items\( \d/.test(body));
+  });
+
   it('removes items from a sharepoint list retrieved by id when passing a list of ids via string', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {

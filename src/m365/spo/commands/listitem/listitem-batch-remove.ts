@@ -113,7 +113,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
           const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
 
-          idsToRemove = jsonContent.map((item: any) => item[idKey!]);
+          idsToRemove = jsonContent.map((item: any) => item[idKey!].toString().trim());
         }
         else {
           idsToRemove = formatting.splitAndTrim(args.options.ids!);
