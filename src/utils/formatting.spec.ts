@@ -36,4 +36,24 @@ describe('utils/formatting', () => {
     const result = formatting.extractCsomDate('invalid');
     assert.strictEqual(result, 'invalid');
   });
+
+  it('casts numeric-looking values to numbers by default when using parseCsvToJson', () => {
+    const result = formatting.parseCsvToJson('Title,Count\nA,5');
+    assert.deepStrictEqual(result, [{ Title: 'A', Count: 5 }]);
+  });
+
+  it('keeps values as text when cast is disabled when using parseCsvToJson', () => {
+    const result = formatting.parseCsvToJson('Title,Zip,Phone,Code,Exp\nA,"00123",+31612345678,12345678901234567890,1e3', { cast: false });
+    assert.deepStrictEqual(result, [{ Title: 'A', Zip: '00123', Phone: '+31612345678', Code: '12345678901234567890', Exp: '1e3' }]);
+  });
+
+  it('strips the UTF-8 BOM from the first header when using parseCsvToJson', () => {
+    const result = formatting.parseCsvToJson('\uFEFFID,Title\n1,A');
+    assert.deepStrictEqual(Object.keys(result[0]), ['ID', 'Title']);
+  });
+
+  it('uses the specified quote character and delimiter when using parseCsvToJson', () => {
+    const result = formatting.parseCsvToJson('Title;Note\n|A;B|;C', { quoteChar: '|', delimiter: ';' });
+    assert.deepStrictEqual(result, [{ Title: 'A;B', Note: 'C' }]);
+  });
 });

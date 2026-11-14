@@ -163,6 +163,28 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     assert(postStub.called);
   });
 
+  it('keeps csv values that look like numbers as text when updating items', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(_ => `\uFEFFId,Title\n10,"00123"`);
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=InternalName eq 'Title'`) {
+        return [{ 'InternalName': 'Title', 'TypeAsString': 'Text' }];
+      }
+
+      throw 'Invalid request';
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify(batchCsomResponse);
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, filePath: filePath, listId: listId, idColumn: idColumn }) });
+    const data: string = postStub.firstCall.args[0].data;
+    assert(data.includes('<Parameter Type="String">Title</Parameter><Parameter Type="String">00123</Parameter>'));
+  });
+
   it('updates items in multiple batches to a sharepoint list retrieved by title', async () => {
     let amountOfExecutions = 0;
     let csvContent150Items = csvContent;

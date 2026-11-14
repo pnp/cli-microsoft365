@@ -84,7 +84,7 @@ class SpoListItemBatchAddCommand extends SpoCommand {
         await logger.logToStderr(`Starting to create batch items from csv ${args.options.filePath ? `at path ${args.options.filePath}` : 'from content'}`);
       }
       const csvContent = args.options.filePath ? fs.readFileSync(args.options.filePath, 'utf8') : args.options.csvContent;
-      const jsonContent = formatting.parseCsvToJson(csvContent!);
+      const jsonContent = formatting.parseCsvToJson(csvContent!, { cast: false });
       await this.addItemsAsBatch(jsonContent, args.options, logger);
     }
     catch (err: any) {
