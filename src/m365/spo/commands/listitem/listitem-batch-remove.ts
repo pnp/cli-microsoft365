@@ -30,7 +30,7 @@ export const options = z.strictObject({
       }
 
       const fileContent = fs.readFileSync(path, 'utf-8');
-      const jsonContent: any[] = formatting.parseCsvToJson(fileContent);
+      const jsonContent: any[] = formatting.parseCsvToJson(fileContent, { cast: false });
 
       const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
 
@@ -109,7 +109,7 @@ class SpoListItemBatchRemoveCommand extends SpoCommand {
 
         if (args.options.filePath) {
           const csvContent = fs.readFileSync(args.options.filePath, 'utf-8');
-          const jsonContent = formatting.parseCsvToJson(csvContent);
+          const jsonContent = formatting.parseCsvToJson(csvContent, { cast: false });
 
           const idKey = Object.keys(jsonContent[0]).find(key => key.toLowerCase() === 'id');
 

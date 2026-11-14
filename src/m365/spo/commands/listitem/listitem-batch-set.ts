@@ -82,7 +82,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       }
 
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
-      const jsonContent: any[] = formatting.parseCsvToJson(csvContent);
+      const jsonContent: any[] = formatting.parseCsvToJson(csvContent, { cast: false });
       const amountOfRows = jsonContent.length;
       const idColumn = args.options.idColumn || 'ID';
 
