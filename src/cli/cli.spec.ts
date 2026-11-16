@@ -22,6 +22,7 @@ import { sinonUtil } from '../utils/sinonUtil.js';
 import { cli, CommandOutput } from './cli.js';
 import { Logger } from './Logger.js';
 import spoEventreceiverGetCommand from '../m365/spo/commands/eventreceiver/eventreceiver-get.js';
+import spoListAddCommand from '../m365/spo/commands/list/list-add.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -576,7 +577,8 @@ describe('cli', () => {
       cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
       cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx'),
       cli.getCommandInfo(spoEventreceiverGetCommand, 'spo/commands/eventreceiver/eventreceiver-get.js', 'spo/eventreceiver/eventreceiver-get.mdx'),
-      cli.getCommandInfo(mockCommandWithSchemaAndEnumRequiredOption, 'cli-schema-enum-required-mock.js', 'help.mdx')
+      cli.getCommandInfo(mockCommandWithSchemaAndEnumRequiredOption, 'cli-schema-enum-required-mock.js', 'help.mdx'),
+      cli.getCommandInfo(spoListAddCommand, 'spo/commands/list/list-add.js', 'spo/list/list-add.mdx')
     ];
     sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
     cli.commandToExecute = undefined;
@@ -2643,6 +2645,40 @@ describe('cli', () => {
         'Documents'
       ]),
       /Scope cannot be set to site when retrieving list event receivers\./
+    );
+
+    assert(promptForValueSpy.notCalled);
+    assert(executeCommandSpy.notCalled);
+  });
+
+  it('returns conditional refinement errors without prompting', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    const promptForValueSpy = sinon.spy(cli, 'promptForValue');
+    const executeCommandSpy = sinon.spy(cli, 'executeCommand');
+    sinon.stub(cli, 'closeWithError').callsFake(async error => {
+      throw error;
+    });
+
+    await assert.rejects(
+      cli.execute([
+        'spo',
+        'list',
+        'add',
+        '--title',
+        'List 1',
+        '--webUrl',
+        'https://contoso.sharepoint.com',
+        '--emailAlias',
+        'foo'
+      ]),
+      /emailAlias could not be set if enableAssignToEmail is not set to true\. Please set enableAssignToEmail\./
     );
 
     assert(promptForValueSpy.notCalled);
