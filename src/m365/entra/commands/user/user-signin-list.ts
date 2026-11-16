@@ -13,9 +13,9 @@ export const options = z.strictObject({
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid userName.`
   }).optional().alias('n'),
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   appDisplayName: z.string().optional(),
-  appId: z.uuid().optional()
+  appId: z.guid().optional()
 });
 
 declare type Options = z.infer<typeof options>;

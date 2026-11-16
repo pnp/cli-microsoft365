@@ -10,7 +10,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid user principal name (UPN).`
   }).optional(),

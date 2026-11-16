@@ -30,7 +30,7 @@ export const options = z.looseObject({
   companyName: z.string().max(64, { error: `The maximum amount of characters for 'companyName' is 64.` }).optional(),
   department: z.string().max(64, { error: `The maximum amount of characters for 'department' is 64.` }).optional(),
   preferredLanguage: z.string().min(2, { error: e => `'${e.input}' is not a valid preferredLanguage.` }).optional(),
-  managerUserId: z.uuid().optional(),
+  managerUserId: z.guid().optional(),
   managerUserName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid user principal name.`
   }).optional()

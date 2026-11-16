@@ -7,7 +7,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().alias('i')
+  id: z.guid().alias('i')
 });
 declare type Options = z.infer<typeof options>;
 

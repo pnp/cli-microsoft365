@@ -10,7 +10,7 @@ import { odata } from '../../../../utils/odata.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('d'),
   marketingNotificationEmails: z.string().refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
     error: e => `The following marketing notification emails are invalid: ${e.input}.`

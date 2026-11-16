@@ -9,7 +9,7 @@ import { Webrole } from './Webrole.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  websiteId: z.uuid().optional(),
+  websiteId: z.guid().optional(),
   websiteName: z.string().optional(),
   environmentName: z.string().alias('e'),
   asAdmin: z.boolean().optional()

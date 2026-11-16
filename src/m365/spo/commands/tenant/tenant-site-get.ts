@@ -11,7 +11,7 @@ import { cli } from '../../../../cli/cli.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   title: z.string().optional().alias('t'),
   url: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
     message: 'Specify a valid SharePoint site URL'

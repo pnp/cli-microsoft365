@@ -11,7 +11,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  flowName: z.uuid(),
+  flowName: z.guid(),
   environmentName: z.string().alias('e'),
   roleName: z.enum(['CanView', 'CanEdit']),
   userId: z.string().refine(id => validation.isValidGuid(id), {

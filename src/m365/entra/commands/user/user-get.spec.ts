@@ -313,6 +313,11 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('passes validation if the id is a GUID with non-RFC variant bits', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '68be84bf-a585-4776-00b3-30aa5207aa22' });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('passes validation if the userName is specified', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'john.doe@contoso.onmicrosoft.com' });
     assert.strictEqual(actual.success, true);

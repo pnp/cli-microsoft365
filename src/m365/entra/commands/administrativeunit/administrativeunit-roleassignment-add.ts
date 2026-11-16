@@ -10,11 +10,11 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  administrativeUnitId: z.uuid().optional().alias('i'),
+  administrativeUnitId: z.guid().optional().alias('i'),
   administrativeUnitName: z.string().optional().alias('n'),
-  roleDefinitionId: z.uuid().optional(),
+  roleDefinitionId: z.guid().optional(),
   roleDefinitionName: z.string().optional(),
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().optional()
 });
 

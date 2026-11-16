@@ -19,7 +19,7 @@ import { User } from '@microsoft/microsoft-graph-types';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   newDisplayName: z.string().optional(),
   description: z.string().optional().alias('d'),

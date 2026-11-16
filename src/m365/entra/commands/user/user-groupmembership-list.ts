@@ -10,7 +10,7 @@ import { ODataResponse } from '../../../../utils/odata.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional().alias('i'),
+  userId: z.guid().optional().alias('i'),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid user principal name.`
   }).optional().alias('n'),

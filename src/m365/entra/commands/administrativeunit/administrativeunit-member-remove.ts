@@ -12,14 +12,14 @@ import { cli } from '../../../../cli/cli.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
-  userId: z.uuid().optional(),
+  id: z.guid().optional().alias('i'),
+  userId: z.guid().optional(),
   userName: z.string().optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.guid().optional(),
   groupName: z.string().optional(),
-  deviceId: z.uuid().optional(),
+  deviceId: z.guid().optional(),
   deviceName: z.string().optional(),
-  administrativeUnitId: z.uuid().optional(),
+  administrativeUnitId: z.guid().optional(),
   administrativeUnitName: z.string().optional(),
   force: z.boolean().optional().alias('f')
 });

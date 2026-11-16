@@ -27,7 +27,7 @@ interface FlowPermissionPrincipal {
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  flowName: z.uuid(),
+  flowName: z.guid(),
   environmentName: z.string().alias('e'),
   asAdmin: z.boolean().optional()
 });

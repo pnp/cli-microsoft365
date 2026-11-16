@@ -10,7 +10,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  groupId: z.uuid().optional().alias('i'),
+  groupId: z.guid().optional().alias('i'),
   groupName: z.string().optional().alias('d'),
   threadId: z.string().alias('t')
 });
