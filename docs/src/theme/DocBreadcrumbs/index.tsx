@@ -18,7 +18,7 @@ function BreadcrumbsItemLink({
   children: ReactNode;
   href?: string;
   isLast: boolean;
-}): JSX.Element {
+}): React.JSX.Element {
   const className = 'breadcrumbs__link';
   if (isLast) {
     return (
@@ -52,7 +52,7 @@ function BreadcrumbsItem({
   active?: boolean;
   index: number;
   addMicrodata: boolean;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <li
       {...(addMicrodata && {
@@ -89,7 +89,7 @@ function getCurrentHeadFolderName(folderId: string): string {
   }
 }
 
-export default function DocBreadcrumbs(): JSX.Element | null {
+export default function DocBreadcrumbs(): React.JSX.Element | null {
   const breadcrumbs = useSidebarBreadcrumbs();
   const homePageRoute = useHomePageRoute();
 

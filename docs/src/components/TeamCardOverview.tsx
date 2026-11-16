@@ -13,7 +13,7 @@ interface ITeamCardOverview {
   individuals: IIndividual[];
 }
 
-const TeamCardOverview = ({individuals}: ITeamCardOverview): JSX.Element => (
+const TeamCardOverview = ({individuals}: ITeamCardOverview): React.JSX.Element => (
   <div className={styles.grid}>
     {
       individuals.map(individual => 
