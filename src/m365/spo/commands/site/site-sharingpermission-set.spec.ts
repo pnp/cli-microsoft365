@@ -101,11 +101,11 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
     sinon.stub(request, 'patch').resolves();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: siteUrl,
         capability: 'full',
         verbose: true
-      }
+      })
     });
 
     assert(loggerLogSpy.notCalled);
@@ -113,10 +113,10 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
 
   it('correctly sets sharing permissions to full', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: siteUrl,
         capability: 'full'
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.firstCall.args[0].data, { MembersCanShare: true });
@@ -125,10 +125,10 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
 
   it('correctly sets sharing permissions to limited', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: siteUrl,
         capability: 'limited'
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.firstCall.args[0].data, { MembersCanShare: true });
@@ -137,10 +137,10 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
 
   it('correctly sets sharing permissions to ownersOnly', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: siteUrl,
         capability: 'ownersOnly'
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.firstCall.args[0].data, { MembersCanShare: false });
@@ -162,7 +162,7 @@ describe(commands.SITE_SHARINGPERMISSION_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: siteUrl, capability: 'limited' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: siteUrl, capability: 'limited' }) }),
       new CommandError(errorMessage));
   });
 });

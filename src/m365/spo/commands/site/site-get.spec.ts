@@ -120,7 +120,7 @@ describe(commands.SITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert(loggerLogSpy.calledWith(siteProperties));
   });
 
@@ -179,7 +179,7 @@ describe(commands.SITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' }) });
     assert(loggerLogSpy.calledWith(siteProperties));
   });
 
@@ -192,7 +192,7 @@ describe(commands.SITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' }) }), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

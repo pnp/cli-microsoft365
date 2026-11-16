@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-set.js';
+import command, { options } from './site-set.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.SITE_SET, () => {
@@ -21,6 +21,7 @@ describe(commands.SITE_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let waitUntilFinishedStub: sinon.SinonStub;
 
@@ -37,6 +38,7 @@ describe(commands.SITE_SET, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     auth.connection.spoTenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
   });
@@ -86,274 +88,245 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url is not a valid url', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'ABC', title: 'Team'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url is not a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'ABC', title: 'Team'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'ABC' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'http://contoso', title: 'Team'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url is not a valid SharePoint url', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'http://contoso', title: 'Team'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if no option is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if no option is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the resourceQuota is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 'ABC'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the resourceQuota is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 'ABC'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 'ABC'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 'ABC'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        resourceQuotaWarningLevel: 10, resourceQuota: 5
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+      resourceQuotaWarningLevel: 10, resourceQuota: 5
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the storageQuota is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        storageQuota: 'ABC'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the storageQuota is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+      storageQuota: 'ABC'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is not a number', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        storageQuotaWarningLevel: 'ABC'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the storageQuotaWarningLevel is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+      storageQuotaWarningLevel: 'ABC'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        storageQuotaWarningLevel: 10, storageQuota: 5
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+      storageQuotaWarningLevel: 10, storageQuota: 5
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if sharing is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if sharingCapability is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', sharingCapability: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if lockState is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if lockState is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if siteLogoUrl is not a string', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteLogoUrl is not a string', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } );
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if siteThumbnailUrl is not a string', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if siteThumbnailUrl is not a string', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: true } );
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if non-GUID value specified for siteDesignId', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if non-GUID value specified for siteDesignId', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } );
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid GUID.`);
   });
 
-  it('passes validation if allowSelfServiceUpgrade is set to true', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team',
+      title: 'Team',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if allowSelfServiceUpgrade is set to false', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: false
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if allowSelfServiceUpgrade is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if lockState is set to Unlock', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Unlock'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if allowSelfServiceUpgrade is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: false
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if lockState is set to NoAdditions', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAdditions'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if lockState is set to Unlock', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Unlock'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if lockState is set to ReadOnly', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', lockState: 'ReadOnly'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if lockState is set to NoAdditions', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAdditions'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if lockState is set to NoAccess', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if lockState is set to ReadOnly', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', lockState: 'ReadOnly'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if noScriptSite is set to true', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if lockState is set to NoAccess', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if noScriptSite is set to false', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if noScriptSite is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if all options are correct', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        resourceQuota: 100, resourceQuotaWarningLevel: 90,
-        storageQuota: 100, storageQuotaWarningLevel: 90,
-        sharingCapability: 'Disabled', allowSelfServiceUpgrade: true,
-        owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: true
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if noScriptSite is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and classification specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: 'HBI' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if all options are correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
+      resourceQuota: 100, resourceQuotaWarningLevel: 90,
+      storageQuota: 100, storageQuotaWarningLevel: 90,
+      sharingCapability: 'Disabled', allowSelfServiceUpgrade: true,
+      owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: true
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and empty classification specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: '' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and classification specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', classification: 'HBI' } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and disableFlows true specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and empty classification specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', classification: '' } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and disableFlows false specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and disableFlows true specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', disableFlows: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and socialBarOnSitePagesDisabled true specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', socialBarOnSitePagesDisabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and disableFlows false specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', disableFlows: false } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if url and socialBarOnSitePagesDisabled false specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', socialBarOnSitePagesDisabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and socialBarOnSitePagesDisabled true specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', socialBarOnSitePagesDisabled: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if true specified for isPublic', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if url and socialBarOnSitePagesDisabled false specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', socialBarOnSitePagesDisabled: false } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if false specified for isPublic', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if true specified for isPublic', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', isPublic: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if true specified for shareByEmailEnabled', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if false specified for isPublic', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', isPublic: false } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if false specified for shareByEmailEnabled', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: false } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if true specified for shareByEmailEnabled', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', shareByEmailEnabled: true } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if a valid GUID specified for siteDesignId', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if false specified for shareByEmailEnabled', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', shareByEmailEnabled: false } );
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if non existing sharingCapability specified', async () => {
+  it('passes validation if a valid GUID specified for siteDesignId', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } );
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if non existing sharingCapability specified', () => {
     const sharingCapabilityvalue = 'nonExistentSharingCapabilityValue';
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } );
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if correct sharingCapability specified', async () => {
+  it('passes validation if correct sharingCapability specified', () => {
     const sharingCapabilityvalue = 'ExternalUserSharingOnly';
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } );
+    assert.strictEqual(actual.success, true);
   });
 
   it('updates title of the specified site', async () => {
@@ -390,7 +363,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -428,7 +401,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -477,7 +450,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -526,7 +499,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -575,7 +548,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -603,7 +576,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('updates site description.', async () => {
@@ -630,7 +603,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' }) });
   });
 
   it('updates isPublic property of the specified groupified site', async () => {
@@ -652,7 +625,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(executeSetGroupSpy.called);
   });
 
@@ -690,7 +663,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -728,7 +701,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -774,7 +747,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -821,7 +794,7 @@ describe(commands.SITE_SET, () => {
     waitUntilFinishedStub.restore();
     sinon.stub(spo, 'waitUntilFinished').rejects(new Error("An error has occurred."));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true }) }),
       new CommandError('An error has occurred.'));
   });
 
@@ -878,7 +851,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -916,7 +889,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -975,7 +948,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -995,7 +968,7 @@ describe(commands.SITE_SET, () => {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'ABC' &&
-          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
+          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
           return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1205", "ErrorInfo": null, "TraceCorrelationId": "54d8499e-b001-5000-cb83-9445b3944fb9"
@@ -1013,7 +986,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', sharingCapability: 'Disabled' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1051,7 +1024,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1089,7 +1062,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1127,7 +1100,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1165,7 +1138,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1203,7 +1176,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1241,7 +1214,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1279,7 +1252,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1317,7 +1290,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1345,7 +1318,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1372,7 +1345,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogToStderrSpy.calledWith('Site is not group connected'));
   });
 
@@ -1400,7 +1373,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1428,7 +1401,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, classification: 'HBI', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogToStderrSpy.calledWith(`Site attached to group e10a459e-60c8-4000-8240-a68d6a12d39e`));
   });
 
@@ -1466,7 +1439,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1504,7 +1477,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1535,7 +1508,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('updates owners of the specified groupified site with one owner (debug)', async () => {
@@ -1565,7 +1538,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogToStderrSpy.calledWith('Retrieving user information to set group owners...'));
   });
 
@@ -1600,7 +1573,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('updates owners of the specified groupified site with multiple owners with extra spaces', async () => {
@@ -1634,7 +1607,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: ' admin1@contoso.onmicrosoft.com , admin2@contoso.onmicrosoft.com ', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: ' admin1@contoso.onmicrosoft.com , admin2@contoso.onmicrosoft.com ', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('resets the classification of the specified site', async () => {
@@ -1661,7 +1634,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1689,7 +1662,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ classification: '', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1717,7 +1690,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1745,7 +1718,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ disableFlows: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1773,7 +1746,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { disableFlows: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ disableFlows: false, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1801,7 +1774,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1829,7 +1802,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ socialBarOnSitePagesDisabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1857,7 +1830,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { socialBarOnSitePagesDisabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ socialBarOnSitePagesDisabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1885,7 +1858,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1913,7 +1886,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ shareByEmailEnabled: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1941,7 +1914,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1969,7 +1942,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ shareByEmailEnabled: false, url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2011,7 +1984,7 @@ describe(commands.SITE_SET, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2054,7 +2027,7 @@ describe(commands.SITE_SET, () => {
       }
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -2070,7 +2043,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) }),
       new CommandError(`The isPublic option can't be set on a site that is not groupified`));
   });
 
@@ -2104,7 +2077,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' }) }),
       new CommandError('Unknown Error'));
   });
 
@@ -2121,7 +2094,7 @@ describe(commands.SITE_SET, () => {
     });
     sinon.stub(entraGroup, 'setGroup').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -2152,7 +2125,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('fails silently if could not resolve users when setting groupified site owners', async () => {
@@ -2173,7 +2146,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
   });
 
   it('applies site design to the specified site', async () => {
@@ -2189,7 +2162,7 @@ describe(commands.SITE_SET, () => {
     });
     const executeApplySiteDesignSpy = await sinon.stub(spo, 'applySiteDesign').resolves();
 
-    await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
 
     assert(executeApplySiteDesignSpy.called);
   });
@@ -2208,7 +2181,7 @@ describe(commands.SITE_SET, () => {
 
     const executeApplySiteDesignSpy = sinon.stub(spo, 'applySiteDesign').resolves();
 
-    await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' }) });
 
     assert(executeApplySiteDesignSpy.called);
   });
@@ -2236,7 +2209,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2263,7 +2236,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/another_site/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/another_site/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/another_site/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2290,7 +2263,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2317,7 +2290,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/another_site/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/another_site/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/another_site/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2344,7 +2317,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" }) });
     assert.strictEqual(data.relativeLogoUrl, "");
   });
 
@@ -2371,7 +2344,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2398,7 +2371,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "/sites/another_site/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "/sites/another_site/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/another_site/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2425,7 +2398,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2452,7 +2425,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "https://contoso.sharepoint.com/sites/another_site/SiteAssets/parker-ms-1200.png" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "https://contoso.sharepoint.com/sites/another_site/SiteAssets/parker-ms-1200.png" }) });
     assert.strictEqual(data.relativeLogoUrl, "/sites/another_site/SiteAssets/parker-ms-1200.png");
   });
 
@@ -2479,7 +2452,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "" }) });
     assert.strictEqual(data.relativeLogoUrl, "");
   });
 
@@ -2498,7 +2471,7 @@ describe(commands.SITE_SET, () => {
 
     sinon.stub(spo, 'applySiteDesign').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -2511,7 +2484,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' } } as any), new CommandError("404 - \"404 FILE NOT FOUND\""));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' }) }), new CommandError("404 - \"404 FILE NOT FOUND\""));
   });
 
   it('correctly handles API error while updating shared properties', async () => {
@@ -2539,7 +2512,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/Sales', classification: 'HBI' }) }),
       new CommandError("An error has occurred."));
   });
 
@@ -2568,7 +2541,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Invalid' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Disabled' }) }),
       new CommandError("An error has occurred."));
   });
 
@@ -2591,75 +2564,8 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Disabled' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Disabled' }) }),
       new CommandError('An error has occurred'));
-  });
-
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
-  });
-
-  it('configures classification as string option', () => {
-    const types = command.types;
-    ['classification'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
-  });
-
-  it('supports specifying site url', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying site classification', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--classification') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying disableFlows', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--disableFlows') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying socialBarOnSitePagesDisabled', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--socialBarOnSitePagesDisabled') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying site logo', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--siteLogoUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles error while adding site admin', async () => {
@@ -2692,7 +2598,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' }) }),
       new CommandError('Unknown Error'));
   });
 
@@ -2720,7 +2626,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' }) }),
       new CommandError('Unknown Error'));
   });
 
@@ -2755,7 +2661,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' }) }),
       new CommandError('Unknown Error'));
   });
 
@@ -2814,7 +2720,7 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true }) });
     assert(loggerLogSpy.notCalled);
   });
 });
