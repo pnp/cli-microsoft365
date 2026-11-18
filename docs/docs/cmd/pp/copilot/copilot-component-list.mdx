@@ -1,0 +1,165 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp copilot component list
+
+Lists the components of the specified copilot
+
+## Usage
+
+```sh
+m365 pp copilot component list [options]
+```
+
+## Options
+
+```md definition-list
+`-e, --environmentName <environmentName>`
+: The name of the environment.
+
+`-i, --copilotId [copilotId]`
+: The ID of the copilot. Specify either `copilotId` or `copilotName` but not both.
+
+`-n, --copilotName [copilotName]`
+: The name of the copilot. Specify either `copilotId` or `copilotName` but not both.
+
+`-t, --type [type]`
+: Filter by component type. Allowed values: `topic`, `skill`, `variable`, `entity`, `dialog`, `trigger`, `languageUnderstanding`, `languageGeneration`, `dialogSchema`, `topicV2`, `translationsV2`, `entityV2`, `variableV2`, `skillV2`, `fileAttachment`, `customGpt`, `knowledgeSource`, `externalTrigger`, `settings`, `testCase`, `customMetricDefinition`.
+
+`--asAdmin`
+: Run the command as admin for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Remarks
+
+The `--type` option maps to the `componenttype` choice set of the `botcomponent` table. The V1 and V2 types are kept separate because they map to different values.
+
+Value | Label | `--type` value
+----- | ----- | --------------
+0 | Topic | `topic`
+1 | Skill | `skill`
+2 | Bot variable | `variable`
+3 | Bot entity | `entity`
+4 | Dialog | `dialog`
+5 | Trigger | `trigger`
+6 | Language understanding | `languageUnderstanding`
+7 | Language generation | `languageGeneration`
+8 | Dialog schema | `dialogSchema`
+9 | Topic (V2) | `topicV2`
+10 | Bot translations (V2) | `translationsV2`
+11 | Bot entity (V2) | `entityV2`
+12 | Bot variable (V2) | `variableV2`
+13 | Skill (V2) | `skillV2`
+14 | Bot File Attachment | `fileAttachment`
+15 | Custom GPT | `customGpt`
+16 | Knowledge Source | `knowledgeSource`
+17 | External Trigger | `externalTrigger`
+18 | Copilot Settings | `settings`
+19 | Test Case | `testCase`
+20 | Custom Metric Definition | `customMetricDefinition`
+
+When you specify `copilotName` and multiple copilots with that name exist, the command behaves like [pp copilot get](./copilot-get.mdx) and asks which one to use.
+
+The `content` and `data` columns of a component can each hold up to 1 MB, so this command does not return them.
+
+## Examples
+
+List all components of a copilot in the given environment.
+
+```sh
+m365 pp copilot component list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --copilotId "9be05428-a279-4aa3-ae54-8449c2cc2722"
+```
+
+List only the knowledge sources of a copilot, by name.
+
+```sh
+m365 pp copilot component list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --copilotName "HR Assistant" --type knowledgeSource
+```
+
+List the components of a copilot as administrator.
+
+```sh
+m365 pp copilot component list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --copilotId "9be05428-a279-4aa3-ae54-8449c2cc2722" --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "botcomponentid": "0f1b6f8c-5d3e-4c0a-9d0b-6c1a7a1f2e01",
+      "name": "Greeting",
+      "componenttype": 9,
+      "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d.topic.Greeting",
+      "ismanaged": false,
+      "statecode": 0
+    },
+    {
+      "botcomponentid": "5b0c2f55-8a4b-4d83-b0f4-3a8f4e2b7c02",
+      "name": "HR policies",
+      "componenttype": 16,
+      "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d.knowledge.HRPolicies",
+      "ismanaged": false,
+      "statecode": 0
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  botcomponentid                        name         componenttype  schemaname                                                     ismanaged  statecode
+  ------------------------------------  -----------  -------------  -------------------------------------------------------------  ---------  ---------
+  0f1b6f8c-5d3e-4c0a-9d0b-6c1a7a1f2e01  Greeting     9              new_bot_23f5f58697fd43d595eb451c9797a53d.topic.Greeting        false      0
+  5b0c2f55-8a4b-4d83-b0f4-3a8f4e2b7c02  HR policies  16             new_bot_23f5f58697fd43d595eb451c9797a53d.knowledge.HRPolicies  false      0
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  botcomponentid,name,componenttype,schemaname,ismanaged,statecode
+  0f1b6f8c-5d3e-4c0a-9d0b-6c1a7a1f2e01,Greeting,9,new_bot_23f5f58697fd43d595eb451c9797a53d.topic.Greeting,0,0
+  5b0c2f55-8a4b-4d83-b0f4-3a8f4e2b7c02,HR policies,16,new_bot_23f5f58697fd43d595eb451c9797a53d.knowledge.HRPolicies,0,0
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # pp copilot component list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --copilotId "9be05428-a279-4aa3-ae54-8449c2cc2722"
+
+  Date: 11/18/2026
+
+  ## Greeting
+
+  Property | Value
+  ---------|-------
+  botcomponentid | 0f1b6f8c-5d3e-4c0a-9d0b-6c1a7a1f2e01
+  name | Greeting
+  componenttype | 9
+  schemaname | new\_bot\_23f5f58697fd43d595eb451c9797a53d.topic.Greeting
+  ismanaged | false
+  statecode | 0
+
+  ## HR policies
+
+  Property | Value
+  ---------|-------
+  botcomponentid | 5b0c2f55-8a4b-4d83-b0f4-3a8f4e2b7c02
+  name | HR policies
+  componenttype | 16
+  schemaname | new\_bot\_23f5f58697fd43d595eb451c9797a53d.knowledge.HRPolicies
+  ismanaged | false
+  statecode | 0
+  ```
+
+  </TabItem>
+</Tabs>

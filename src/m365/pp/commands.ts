@@ -4,6 +4,7 @@ export default {
   AIBUILDERMODEL_GET: `${prefix} aibuildermodel get`,
   AIBUILDERMODEL_LIST: `${prefix} aibuildermodel list`,
   AIBUILDERMODEL_REMOVE: `${prefix} aibuildermodel remove`,
+  COPILOT_COMPONENT_LIST: `${prefix} copilot component list`,
   COPILOT_GET: `${prefix} copilot get`,
   COPILOT_LIST: `${prefix} copilot list`,
   COPILOT_REMOVE: `${prefix} copilot remove`,
