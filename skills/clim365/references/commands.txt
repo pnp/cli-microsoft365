@@ -58,6 +58,7 @@ entra approleassignment remove|Deletes an app role assignment for the specified 
 entra enterpriseapp add|Creates an enterprise application (or service principal) for a registered Entra app
 entra enterpriseapp get|Gets information about an Enterprise Application
 entra enterpriseapp list|Lists the enterprise applications (or service principals) in Entra ID
+entra enterpriseapp permission list|Lists the application and delegated permissions for a specified Entra enterprise application
 entra enterpriseapp remove|Deletes an enterprise application (or service principal)
 entra group add|Creates a Microsoft Entra group
 entra group get|Gets information about the specified Entra group

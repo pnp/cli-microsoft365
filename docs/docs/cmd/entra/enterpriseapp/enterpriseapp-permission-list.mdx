@@ -1,0 +1,138 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# entra enterpriseapp permission list
+
+Lists the application and delegated permissions for a specified Entra enterprise application
+
+## Usage
+
+```sh
+m365 entra enterpriseapp permission list [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --appId [appId]`
+: Client ID of the Entra enterprise application to retrieve the permissions for. Specify either `appId`, `appObjectId` or `appName`.
+
+`--appObjectId [appObjectId]`
+: Object ID of the Entra enterprise application to retrieve the permissions for. Specify either `appId`, `appObjectId` or `appName`.
+
+`-n, --appName [appName]`
+: Display name of the Entra enterprise application to retrieve the permissions for. Specify either `appId`, `appObjectId` or `appName`.
+
+`--type [type]`
+: The type of permissions to retrieve. Allowed values: `delegated`, `application`, `all`. Defaults to `all`.
+```
+
+<Global />
+
+## Remarks
+
+The command lists the permissions granted to the enterprise application (service principal): application permissions from its app role assignments and delegated permissions from its OAuth2 permission grants. To list the permissions that an application registration requests, use [entra app permission list](../app/app-permission-list.mdx).
+
+Delegated permissions include both admin consent and consent granted by individual users. A permission that was consented to by more than one user is listed once for each consent.
+
+For best performance use the `appObjectId` option to reference the Entra enterprise application. If you use `appId` or `appName`, this command will first need to find the corresponding object ID for that enterprise application.
+
+If multiple enterprise applications with the specified name are found, you will be prompted to choose one.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Directory.Read.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions        |
+  |-----------------|--------------------|
+  | Microsoft Graph | Directory.Read.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+Retrieves all permissions for an Entra enterprise application specified by client id.
+
+```sh
+m365 entra enterpriseapp permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690'
+```
+
+Retrieves all delegated permissions for an Entra enterprise application specified by client id.
+
+```sh
+m365 entra enterpriseapp permission list --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --type delegated
+```
+
+Retrieves all application permissions for an Entra enterprise application specified by display name.
+
+```sh
+m365 entra enterpriseapp permission list --appName 'Contoso App' --type application
+```
+
+Retrieves all permissions for an Entra enterprise application specified by object id.
+
+```sh
+m365 entra enterpriseapp permission list --appObjectId '64381cda-d40d-4fb0-bce2-bece391546a2'
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "resource": "Microsoft Graph",
+      "resourceId": "00000003-0000-0000-c000-000000000000",
+      "permission": "Sites.Read.All",
+      "type": "Application"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  resource         resourceId                            permission      type
+  ---------------  ------------------------------------  --------------  -----------
+  Microsoft Graph  00000003-0000-0000-c000-000000000000  Sites.Read.All  Application
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  resource,resourceId,permission,type
+  Microsoft Graph,00000003-0000-0000-c000-000000000000,Sites.Read.All,Application
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # entra enterpriseapp permission list --appId "f1417aa3-bf0b-4cc5-a845-a0b2cf11f690"
+
+  Date: 20/11/2026
+
+  Property | Value
+  ---------|-------
+  resource | Microsoft Graph
+  resourceId | 00000003-0000-0000-c000-000000000000
+  permission | Sites.Read.All
+  type | Application
+  ```
+
+  </TabItem>
+</Tabs>
