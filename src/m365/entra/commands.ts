@@ -39,6 +39,7 @@ export default {
   ENTERPRISEAPP_ADD: `${prefix} enterpriseapp add`,
   ENTERPRISEAPP_GET: `${prefix} enterpriseapp get`,
   ENTERPRISEAPP_LIST: `${prefix} enterpriseapp list`,
+  ENTERPRISEAPP_PERMISSION_LIST: `${prefix} enterpriseapp permission list`,
   ENTERPRISEAPP_REMOVE: `${prefix} enterpriseapp remove`,
   GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
