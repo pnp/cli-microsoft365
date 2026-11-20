@@ -694,9 +694,12 @@ async function formatOutput(command: Command, logStatement: any, options: Global
   // command doesn't specify default properties, return original data
   if (cli.shouldTrimOutput(options.output)) {
     const currentCommand: CommandInfo | undefined = cli.commandToExecute;
+    const defaultProperties: string[] | undefined = currentCommand ?
+      command.getDefaultPropertiesForOutput(options, currentCommand.defaultProperties) :
+      undefined;
 
     if (arrayType === 'object' &&
-      currentCommand && currentCommand.defaultProperties) {
+      currentCommand && defaultProperties) {
       // the log statement contains the same properties as the original object
       // so it can be filtered following the default properties specified on
       // the command
@@ -710,7 +713,7 @@ async function formatOutput(command: Command, logStatement: any, options: Global
         }
 
         logStatement = logStatement.map((s: any) =>
-          formatting.filterObject(s, currentCommand.defaultProperties as string[]));
+          formatting.filterObject(s, defaultProperties));
       }
     }
   }

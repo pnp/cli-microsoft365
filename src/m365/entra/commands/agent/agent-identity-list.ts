@@ -2,6 +2,7 @@ import { DirectoryObject, NullableOption } from '@microsoft/microsoft-graph-type
 import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -49,19 +50,28 @@ class EntraAgentIdentityListCommand extends GraphCommand {
     return ['id', 'displayName'];
   }
 
+  public getDefaultPropertiesForOutput(options: GlobalOptions, defaults: string[] | undefined): string[] | undefined {
+    const selectProperties: string[] = this.getSelectProperties(options.properties);
+    return selectProperties.length > 0 ? selectProperties : defaults;
+  }
+
+  private getSelectProperties(properties: string | undefined): string[] {
+    if (!properties) {
+      return [];
+    }
+
+    return properties
+      .split(',')
+      .map(prop => prop.replace(/['"]/g, '').trim())
+      .filter(prop => prop.length > 0 && !prop.includes('/'));
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const queryParameters: string[] = [];
+    const selectProperties: string[] = this.getSelectProperties(args.options.properties);
 
-    if (args.options.properties) {
-      const allProperties = args.options.properties
-        .split(',')
-        .map(prop => prop.replace(/['"]/g, '').trim())
-        .filter(prop => prop.length > 0);
-      const selectProperties = allProperties.filter(prop => !prop.includes('/'));
-
-      if (selectProperties.length > 0) {
-        queryParameters.push(`$select=${formatting.encodeQueryParameter(selectProperties.join(','))}`);
-      }
+    if (selectProperties.length > 0) {
+      queryParameters.push(`$select=${formatting.encodeQueryParameter(selectProperties.join(','))}`);
     }
 
     const queryString = queryParameters.length > 0

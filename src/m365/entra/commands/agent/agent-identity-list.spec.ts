@@ -34,6 +34,35 @@ describe(commands.AGENT_IDENTITY_LIST, () => {
     displayName: 'My Agent Identity',
     id: '1b7313c4-05d0-4a08-88e3-7b76c003a0a2'
   }];
+  const customPropertiesResponse = [{
+    id: '1b7313c4-05d0-4a08-88e3-7b76c003a0a2',
+    displayName: 'My Agent Identity',
+    createdDateTime: '2019-09-17T19:10:35Z'
+  }];
+  const defaultUrl = 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity';
+  const customUrl = 'https://graph.microsoft.com/v1.0/servicePrincipals/microsoft.graph.agentIdentity?$select=id%2CdisplayName%2CcreatedDateTime';
+
+  const runAndFormatOutput = async (rawOptions: Record<string, string>, output: 'text' | 'json'): Promise<string> => {
+    const originalCommandToExecute = cli.commandToExecute;
+    const outputLogger: Logger = {
+      log: async () => {},
+      logRaw: async () => {},
+      logToStderr: async () => {}
+    };
+    const outputLoggerLogSpy = sinon.spy(outputLogger, 'log');
+
+    try {
+      cli.commandToExecute = commandInfo;
+      const parsedOptions = commandOptionsSchema.parse(rawOptions);
+      await command.action(outputLogger, { options: parsedOptions });
+      assert(outputLoggerLogSpy.calledOnce);
+      const formatted = await cli.formatOutput(command, outputLoggerLogSpy.firstCall.args[0], { ...parsedOptions, output });
+      return typeof formatted === 'string' ? formatted : JSON.stringify(formatted);
+    }
+    finally {
+      cli.commandToExecute = originalCommandToExecute;
+    }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -235,6 +264,75 @@ describe(commands.AGENT_IDENTITY_LIST, () => {
 
     await command.action(logger, { options: commandOptionsSchema.parse({ properties: 'manager/displayName' }) });
     assert(loggerLogSpy.calledWith(identities));
+  });
+
+  it('shows only the default properties in text output when no properties are specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === defaultUrl) {
+        return { value: identities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const output = await runAndFormatOutput({}, 'text');
+    assert(output.includes('1b7313c4-05d0-4a08-88e3-7b76c003a0a2'));
+    assert(output.includes('My Agent Identity'));
+    assert(!output.includes('createdDateTime'));
+    assert(!output.includes('createdByAppId'));
+    assert(!output.includes('ServiceIdentity'));
+  });
+
+  it('shows the specified properties in text output', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === customUrl) {
+        return { value: customPropertiesResponse };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const output = await runAndFormatOutput({ properties: 'id,displayName,createdDateTime' }, 'text');
+    assert(output.includes('1b7313c4-05d0-4a08-88e3-7b76c003a0a2'));
+    assert(output.includes('My Agent Identity'));
+    assert(output.includes('createdDateTime'));
+    assert(output.includes('2019-09-17T19:10:35Z'));
+  });
+
+  it('shows only the default properties in text output after a run with specified properties', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === customUrl) {
+        return { value: customPropertiesResponse };
+      }
+
+      if (opts.url === defaultUrl) {
+        return { value: identities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const customOutput = await runAndFormatOutput({ properties: 'id,displayName,createdDateTime' }, 'text');
+    assert(customOutput.includes('createdDateTime'));
+    assert(customOutput.includes('2019-09-17T19:10:35Z'));
+
+    const defaultOutput = await runAndFormatOutput({}, 'text');
+    assert(defaultOutput.includes('My Agent Identity'));
+    assert(!defaultOutput.includes('createdDateTime'));
+    assert(!defaultOutput.includes('2019-09-17T19:10:35Z'));
+  });
+
+  it('does not trim properties in json output when no properties are specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === defaultUrl) {
+        return { value: identities };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const output = await runAndFormatOutput({}, 'json');
+    assert.deepStrictEqual(JSON.parse(output), identities);
   });
 
   it('handles error when retrieving the agent identities list failed', async () => {

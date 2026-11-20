@@ -23,7 +23,9 @@ m365 entra agent identity list [options]
 
 ## Remarks
 
-Using the `--properties` option, you can specify a comma-separated list of agent identity properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command will output the default properties returned by Graph.
+Using the `--properties` option, you can specify a comma-separated list of agent identity properties to retrieve from the Microsoft Graph. If you don't specify any properties, the command retrieves the default properties returned by Microsoft Graph. The properties retrieved from Microsoft Graph don't depend on the output mode.
+
+When you use the `text` output mode, the command shows only the `id` and `displayName` properties by default. If you specify properties using the `--properties` option, the `text` output shows the properties you requested instead. Other output modes don't apply this trimming.
 
 The command returns only agent identity objects. Other types of service principals aren't returned.
 
@@ -104,38 +106,6 @@ m365 entra agent identity list --properties 'id,displayName'
   ------------------------------------  -----------------
   1b7313c4-05d0-4a08-88e3-7b76c003a0a2  My Agent Identity
   4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74  Support Agent
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  id,displayName
-  1b7313c4-05d0-4a08-88e3-7b76c003a0a2,My Agent Identity
-  4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74,Support Agent
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  # entra agent identity list --debug "false" --verbose "false"
-
-  Date: 3/21/2026
-
-  ## My Agent Identity (1b7313c4-05d0-4a08-88e3-7b76c003a0a2)
-
-  Property | Value
-  ---------|-------
-  id | 1b7313c4-05d0-4a08-88e3-7b76c003a0a2
-  displayName | My Agent Identity
-
-  ## Support Agent (4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74)
-
-  Property | Value
-  ---------|-------
-  id | 4d2f9c18-6b7e-4a35-9c1f-8a0d5e6b2c74
-  displayName | Support Agent
   ```
 
   </TabItem>
