@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-unregister.js';
+import command, { options } from './hubsite-unregister.js';
 
 describe(commands.HUBSITE_UNREGISTER, () => {
   let log: string[];
@@ -21,6 +21,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptIssued: boolean = false;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +36,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -94,12 +96,12 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/sales', force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before unregistering the hub site when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/sales' }) });
 
     assert(promptIssued);
   });
@@ -108,7 +110,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/sales' }) });
     assert(requests.length === 0);
   });
 
@@ -129,7 +131,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, url: 'https://contoso.sharepoint.com/sites/sales' }) });
   });
 
   it('correctly handles failure when the specified site is not a hub site', async () => {
@@ -151,17 +153,23 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/sales', force: true }) }),
       new CommandError("hubSiteId"));
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when the url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

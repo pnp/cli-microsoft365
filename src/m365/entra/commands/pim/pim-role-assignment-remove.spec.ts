@@ -254,6 +254,7 @@ describe(commands.PIM_ROLE_ASSIGNMENT_REMOVE, () => {
   it('fails validation when userName is not a valid UPN', async () => {
     const actual = commandOptionsSchema.safeParse({ roleDefinitionId: 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690', userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid user principal name for option 'userName'.`);
   });
 
   it('fails validation when administrativeUnitId is not a valid GUID', async () => {

@@ -1,23 +1,32 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { CliRequestOptions } from '../../../../request.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
-import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
-import { CliRequestOptions } from '../../../../request.js';
+
+const RoleEnum = {
+  Owner: 'Owner',
+  Member: 'Member'
+} as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  filter: z.string().optional().alias('f'),
+  groupId: z.uuid().optional().alias('i'),
+  groupDisplayName: z.string().optional().alias('n'),
+  properties: z.string().optional().alias('p'),
+  role: zod.coercedEnum(RoleEnum).optional().alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  filter?: string;
-  groupId?: string;
-  groupDisplayName?: string;
-  properties?: string;
-  role?: string;
 }
 
 interface ExtendedUser extends User {
@@ -33,72 +42,19 @@ class EntraM365GroupUserListCommand extends GraphCommand {
     return "Lists users for the specified Microsoft 365 group";
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initOptionSets();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
-        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
-        role: typeof args.options.role !== 'undefined',
-        properties: typeof args.options.properties !== 'undefined',
-        filter: typeof args.options.filter !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.groupId, opts.groupDisplayName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: groupId or groupDisplayName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupDisplayName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: "-i, --groupId [groupId]"
-      },
-      {
-        option: "-n, --groupDisplayName [groupDisplayName]"
-      },
-      {
-        option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member"]
-      },
-      {
-        option: "-p, --properties [properties]"
-      },
-      {
-        option: "-f, --filter [filter]"
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['groupId', 'groupDisplayName']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
-        }
-
-        if (args.options.role) {
-          if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
-            return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

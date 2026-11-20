@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitedesign-remove.js';
+import command, { options } from './sitedesign-remove.js';
 
 describe(commands.SITEDESIGN_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -88,7 +90,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -96,7 +98,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6' }) });
 
     assert(confirmationStub.calledOnce);
   });
@@ -104,7 +106,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   it('aborts removing site design when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6' }) });
     assert(postSpy.notCalled);
   });
 
@@ -114,45 +116,28 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6' }) });
     assert(postStub.called);
   });
 
   it('correctly handles error when site design not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' }) } as any), new CommandError('File Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying confirmation flag', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--force') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,15 +9,26 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FolderColorValues } from './FolderColor.js';
 
+const folderColorValues = [...Object.keys(FolderColorValues), ...Object.values(FolderColorValues)] as [string, ...string[]];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  url: z.string(),
+  name: z.string().optional().alias('n'),
+  color: z.enum(folderColorValues, {
+    error: e => `'${e.input}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  url: string;
-  name?: string;
-  color?: string;
 }
 
 class SpoFolderSetCommand extends SpoCommand {
@@ -29,64 +41,19 @@ class SpoFolderSetCommand extends SpoCommand {
     return 'Updates a folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        color: typeof args.options.color !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.name !== undefined || opts.color !== undefined, {
+        error: `Specify at least one of the options: name or color.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['name', 'color']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--url <url>'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--color [color]',
-        autocomplete: Object.keys(FolderColorValues)
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.color === undefined && args.options.name === undefined) {
-          return `Specify at least one of the options: name or color.`;
-        }
-
-        if (args.options.color && !Object.entries(FolderColorValues).flat().includes(args.options.color)) {
-          return `'${args.options.color}' is not a valid value for option 'color'. Allowed values are ${Object.keys(FolderColorValues).join(', ')}, ${Object.values(FolderColorValues).join(', ')}.`;
-        }
-
-        return true;
-      });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'url', 'name', 'color');
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

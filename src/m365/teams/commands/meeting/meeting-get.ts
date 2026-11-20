@@ -1,6 +1,7 @@
 import { Event } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraUser } from '../../../../utils/entraUser.js';
@@ -10,15 +11,21 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string()
+    .refine(value => validation.isValidGuid(value), {
+      message: 'The userId value must be a valid GUID.'
+    }).optional().alias('u'),
+  userName: z.string().optional().alias('n'),
+  email: z.string().optional(),
+  joinUrl: z.string().alias('j')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  email?: string;
-  joinUrl: string;
 }
 
 class TeamsMeetingGetCommand extends GraphCommand {
@@ -30,51 +37,8 @@ class TeamsMeetingGetCommand extends GraphCommand {
     return 'Gets specified meeting details';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userId [userId]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '-j, --joinUrl <joinUrl>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid Guid`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

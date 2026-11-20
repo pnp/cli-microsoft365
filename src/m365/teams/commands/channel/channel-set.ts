@@ -1,24 +1,45 @@
 import { Channel } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams channel id.'
+    })
+    .optional()
+    .alias('i'),
+  name: z.string()
+    .refine(val => val.toLowerCase() !== 'general', {
+      message: 'General channel cannot be updated.'
+    })
+    .optional()
+    .alias('n'),
+  description: z.string()
+    .optional(),
+  newName: z.string()
+    .optional(),
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional(),
+  teamName: z.string()
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
-  description?: string
-  newName?: string;
-  teamId?: string;
-  teamName?: string;
 }
 
 class TeamsChannelSetCommand extends GraphCommand {
@@ -29,76 +50,26 @@ class TeamsChannelSetCommand extends GraphCommand {
     return 'Updates properties of the specified channel in the given Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        newName: typeof args.options.newName !== 'undefined',
-        description: typeof args.options.description !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either id or name, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
+      })
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--newName [newName]'
-      },
-      {
-        option: '--description [description]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.id && !validation.isValidTeamsChannelId(args.options.id)) {
-          return `${args.options.id} is not a valid Teams channel id`;
-        }
-
-        if (args.options.name && args.options.name.toLowerCase() === "general") {
-          return 'General channel cannot be updated';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'name'] },
-      { options: ['teamId', 'teamName'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

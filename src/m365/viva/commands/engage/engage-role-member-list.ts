@@ -8,7 +8,7 @@ import { vivaEngage } from '../../../../utils/vivaEngage.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  roleId: z.uuid().optional().alias('i'),
+  roleId: z.guid().optional().alias('i'),
   roleName: z.string().optional().alias('n')
 });
 declare type Options = z.infer<typeof options>;

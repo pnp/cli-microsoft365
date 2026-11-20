@@ -1,21 +1,36 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const appCatalogScopeOptions = { tenant: 'tenant', sitecollection: 'sitecollection' } as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('i'),
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('s'),
+  appCatalogScope: zod.coercedEnum(appCatalogScopeOptions).optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  siteUrl: string;
-  force?: boolean;
-  appCatalogScope?: string;
 }
 
 class SpoAppUninstallCommand extends SpoCommand {
@@ -27,58 +42,8 @@ class SpoAppUninstallCommand extends SpoCommand {
     return 'Uninstalls an app from the site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString(),
-        appCatalogScope: args.options.appCatalogScope || 'tenant'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-s, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--appCatalogScope [appCatalogScope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appCatalogScope) {
-          const testScope: string = args.options.appCatalogScope.toLowerCase();
-          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
-          }
-        }
-
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

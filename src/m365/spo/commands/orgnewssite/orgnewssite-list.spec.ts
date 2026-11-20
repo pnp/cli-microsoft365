@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -10,12 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './orgnewssite-list.js';
+import command, { options } from './orgnewssite-list.js';
 
 describe(commands.ORGNEWSSITE_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,6 +34,8 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     });
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -79,7 +85,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
   });
@@ -95,7 +101,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: false }) });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
   });
@@ -129,6 +135,18 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

@@ -1,5 +1,6 @@
 import auth from '../../../../Auth.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
@@ -8,15 +9,27 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  userId: z.string()
+    .refine(value => validation.isValidGuid(value), {
+      message: 'The userId value must be a valid GUID.'
+    }).optional().alias('u'),
+  userName: z.string()
+    .refine(value => validation.isValidUserPrincipalName(value), {
+      message: 'The userName value must be a valid user principal name (UPN).'
+    }).optional().alias('n'),
+  email: z.string()
+    .refine(value => validation.isValidUserPrincipalName(value), {
+      message: 'The email value must be a valid email.'
+    }).optional(),
+  meetingId: z.string().alias('m')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  userId?: string;
-  userName?: string;
-  email?: string;
-  meetingId: string;
 }
 
 class TeamsMeetingTranscriptListCommand extends GraphCommand {
@@ -32,66 +45,17 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
     return ['id', 'createdDateTime'];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --userId [userId]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '-m, --meetingId <meetingId>'
+  public getRefinedSchema(schema: typeof options): z.ZodType {
+    return schema.refine(options => [options.userId, options.userName, options.email].filter(value => value !== undefined).length <= 1, {
+      message: 'Specify either userId, userName or email, but not multiple.',
+      params: {
+        customCode: 'optionSet',
+        options: ['userId', 'userName', 'email']
       }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid Guid`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name (UPN)`;
-        }
-
-        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
-          return `${args.options.email} is not a valid email`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({
-      options: ['userId', 'userName', 'email'],
-      runsWhen: (args) => args.options.userId || args.options.userName || args.options.email
     });
   }
 

@@ -1,4 +1,6 @@
 import { OAuth2PermissionGrant, ServicePrincipal } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -7,6 +9,8 @@ import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../u
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePrincipalPermissionRequest.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public get name(): string {
@@ -19,6 +23,10 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
 
   public alias(): string[] | undefined {
     return [commands.SP_PERMISSIONREQUEST_LIST];
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

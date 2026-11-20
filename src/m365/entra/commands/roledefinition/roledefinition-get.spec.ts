@@ -103,6 +103,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
       id: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues.find(i => i.code === 'custom')?.message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if both id and displayName are provided', () => {

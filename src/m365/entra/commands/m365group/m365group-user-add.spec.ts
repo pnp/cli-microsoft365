@@ -7,14 +7,13 @@ import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
+import { entraUser } from '../../../../utils/entraUser.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-user-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
-import { entraUser } from '../../../../utils/entraUser.js';
+import command, { options } from './m365group-user-add.js';
 
 describe(commands.M365GROUP_USER_ADD, () => {
   const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
@@ -24,6 +23,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -33,6 +33,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(true);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -73,114 +74,93 @@ describe(commands.M365GROUP_USER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the groupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the groupId nor teamId are provided.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the groupId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        role: 'Member',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both groupId and teamId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if ids contains an invalid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, ids: `${userIds[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither the groupId nor teamId are provided.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      role: 'Member',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if userNames contains an invalid UPN', async () => {
-    const actual = await command.validate({ options: { groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when both groupId and teamId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if ids contains an invalid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, ids: `${userIds[0]},foo`, role: 'Member' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid for the option 'ids': foo.`);
   });
 
-  it('passes validation when valid groupId, userName and no role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if userNames contains an invalid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ groupId: groupId, userNames: `${userUpns[0]},foo`, role: 'Member' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `The following user principal names are invalid for the option 'userNames': foo.`);
   });
 
-  it('passes validation when valid groupId, userName and Owner role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'owner'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when invalid role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com',
+      role: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid groupId, userName and Member role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        userNames: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'member'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when valid groupId, userName and no role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid groupId, userName and Owner role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com',
+      role: 'owner'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when valid groupId, userName and Member role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      userNames: 'anne.matthews@contoso.onmicrosoft.com',
+      role: 'member'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('correctly adds owners to specified Microsoft 365 group', async () => {
@@ -200,7 +180,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: 'Contoso', userNames: userUpns.join(','), role: 'Owner', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -237,7 +217,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: groupId, ids: userIds.join(','), role: 'Member', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: groupId, ids: userIds.join(','), role: 'Member', verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -276,7 +256,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamName: 'Contoso', ids: userIds.join(','), verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamName: 'Contoso', ids: userIds.join(','), verbose: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data.requests, [
       {
         id: 1,
@@ -325,7 +305,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, ids: userIds.join(',') } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, ids: userIds.join(',') }) }),
       new CommandError(`One or more added object references already exist for the following modified properties: 'members'.`));
   });
 
@@ -333,7 +313,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, userNames: 'anne.matthews@contoso.onmicrosoft.com' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ groupId: groupId, userNames: 'anne.matthews@contoso.onmicrosoft.com' }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

@@ -1,15 +1,3 @@
-export interface NavigationNode {
-  Id: number;
-  IsDocLib: boolean;
-  IsExternal: boolean;
-  IsVisible: boolean;
-  ListTemplateType: number;
-  Title: string;
-  Url: string;
-  AudienceIds: string[];
-  Children?: NavigationNode[];
-}
-
 export interface MenuStateNode {
   AudienceIds: string[];
   CurrentLCID: number;
@@ -18,7 +6,7 @@ export interface MenuStateNode {
   IsDeleted: boolean;
   IsHidden: boolean;
   IsTitleForExistingLanguage: boolean;
-  Key: string;
+  Key: string | null;
   Nodes: MenuStateNode[];
   NodeType: number;
   OpenInNewWindow?: boolean | null;

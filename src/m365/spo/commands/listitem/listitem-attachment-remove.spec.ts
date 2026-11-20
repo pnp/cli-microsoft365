@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-attachment-remove.js';
+import command, { options } from './listitem-attachment-remove.js';
 
 describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -25,6 +25,7 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean;
 
   before(() => {
@@ -34,6 +35,7 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -81,50 +83,46 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listTitle: listTitle, listItemId: listItemId, fileName: fileName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: listTitle, listItemId: listItemId, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: listTitle, listItemId: listItemId, fileName: fileName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: listTitle, listItemId: listItemId, fileName: fileName } }, commandInfo);
-    assert(actual);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'foo', listItemId: listItemId, fileName: fileName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo in option listId is not a valid GUID');
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', listItemId: listItemId, fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: listId, listItemId: listItemId, fileName: fileName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: listId, listItemId: listItemId, fileName: fileName } }, commandInfo);
-    assert(actual);
+  it('fails validation if the specified listItemId is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: listTitle, listItemId: 'a', fileName: fileName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the specified listItemId is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: listTitle, listItemId: 'a', fileName: fileName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: listTitle, listItemId: listItemId, fileName: fileName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing attachment from list item when confirmation argument not passed (listId)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listId: listId,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
 
     assert(promptIssued);
@@ -132,12 +130,12 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
 
   it('prompts before removing attachment from list item when force argument not passed (listTitle)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
 
     assert(promptIssued);
@@ -147,12 +145,12 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listId: listId,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
   });
 
@@ -173,13 +171,13 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listId: listId,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
     assert(postStub.called);
     assert(loggerLogSpy.notCalled);
@@ -202,13 +200,13 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
     assert(postStub.called);
     assert(loggerLogSpy.notCalled);
@@ -231,13 +229,13 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listUrl: listUrl,
         listItemId: listItemId,
         fileName: fileName
-      }
+      })
     });
     assert(postStub.called);
     assert(loggerLogSpy.notCalled);
@@ -254,14 +252,14 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName,
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -275,13 +273,13 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName,
         force: true
-      }
+      })
     });
     assert(postStub.called);
     assert(loggerLogSpy.notCalled);

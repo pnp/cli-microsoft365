@@ -118,6 +118,7 @@ describe(commands.USER_LICENSE_LIST, () => {
   it('fails validation if userName is not a valid UPN', () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid user principal name (UPN).`);
   });
 
   it('validates for a correct input with a userId defined', () => {

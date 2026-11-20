@@ -121,11 +121,13 @@ describe(commands.SET, () => {
   it('fails validation if newName is already an existing connection name', async () => {
     const actual = await commandOptionsSchema.safeParseAsync({ name: 'Contoso', newName: 'Fabrikam' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `Connection with name 'Fabrikam' already exists.`);
   });
 
   it('fails validation if name is not an existing connection name', async () => {
     const actual = await commandOptionsSchema.safeParseAsync({ name: 'NonExistent', newName: 'Contoso Application' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `Connection with name 'NonExistent' does not exist.`);
   });
 
   it('passes validation if name and newName are correctly set', async () => {

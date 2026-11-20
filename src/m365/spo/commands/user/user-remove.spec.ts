@@ -183,6 +183,7 @@ describe(commands.USER_REMOVE, () => {
   it('fails validation if entraGroupId is not a valid id', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, entraGroupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid GUID.');
   });
 
   it('fails validation if id is not a valid number', () => {
@@ -193,11 +194,13 @@ describe(commands.USER_REMOVE, () => {
   it('fails validation if userName is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, userName: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid userName.');
   });
 
   it('fails validation if email is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: validWebUrl, email: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid email.');
   });
 
   it('passes validation url is valid and id is passed', () => {

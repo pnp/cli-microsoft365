@@ -1,19 +1,22 @@
 import { Conversation } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { entraGroup } from '../../../../utils/entraGroup.js';
 import { odata } from '../../../../utils/odata.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { entraGroup } from '../../../../utils/entraGroup.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  groupId: z.uuid().optional().alias('i'),
+  groupName: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  groupId?: string;
-  groupName?: string;
 }
 
 class EntraM365GroupConversationListCommand extends GraphCommand {
@@ -29,44 +32,19 @@ class EntraM365GroupConversationListCommand extends GraphCommand {
     return ['topic', 'lastDeliveredDateTime', 'id'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '-n, --groupName [groupName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-          return `${args.options.groupId} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.groupId, opts.groupName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: groupId or groupName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['groupId', 'groupName']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupId', 'groupName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('groupId', 'groupName');
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

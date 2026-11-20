@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-retract.js';
+import command, { options } from './app-retract.js';
 
 describe(commands.APP_RETRACT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
 
@@ -28,6 +29,7 @@ describe(commands.APP_RETRACT, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -90,7 +92,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', force: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
@@ -117,7 +119,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', force: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
@@ -144,7 +146,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps', force: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`https://contoso.sharepoint.com/sites/apps/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
@@ -171,7 +173,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1', appCatalogScope: 'sitecollection', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1', appCatalogScope: 'sitecollection', force: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`https://contoso.sharepoint.com/sites/site1/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
@@ -184,7 +186,7 @@ describe(commands.APP_RETRACT, () => {
   });
 
   it('prompts before retracting an app when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' }) });
 
     assert(promptIssued);
   });
@@ -192,7 +194,7 @@ describe(commands.APP_RETRACT, () => {
   it('aborts retracting app when prompt not confirmed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' }) });
     assert(requests.length === 0);
   });
 
@@ -213,7 +215,7 @@ describe(commands.APP_RETRACT, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/retract`) > -1 &&
@@ -250,7 +252,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true }) }),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
@@ -268,7 +270,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -286,7 +288,7 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true }) }),
       new CommandError('{"message":"An error has occurred"}'));
   });
 
@@ -313,37 +315,47 @@ describe(commands.APP_RETRACT, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', force: true }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when the id is specified and the appCatalogUrl is not', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is specified and the appCatalogUrl is not', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the id is not a GUID', async () => {
-    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the id is not a GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '123' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '123 is not a valid GUID');
   });
 
-  it('fails validation when scope is \'sitecollection\', but no appCatalogUrl specified', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when scope is \'sitecollection\', but no appCatalogUrl specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'You must specify appCatalogUrl when the appCatalogScope is sitecollection');
   });
 
-  it('fails validation when the scope is not \'tenant\' nor \'sitecollection\'', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the scope is not \'tenant\' nor \'sitecollection\'', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Invalid option: expected one of "tenant"|"sitecollection"');
   });
 
-  it('passes validation when the id, appCatalogUrl and scope options are specified', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id, appCatalogUrl and scope options are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'b2307a39-e878-458b-bc90-03bc578531d6', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 });

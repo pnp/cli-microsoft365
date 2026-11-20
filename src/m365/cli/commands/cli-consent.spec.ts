@@ -1,8 +1,10 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import auth from '../../../Auth.js';
 import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
+import { CommandError } from '../../../Command.js';
 import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
 import { session } from '../../../utils/session.js';
@@ -21,6 +23,7 @@ describe(commands.CONSENT, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
     commandInfo = cli.getCommandInfo(command);
     commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
@@ -47,6 +50,9 @@ describe(commands.CONSENT, () => {
       cli.getClientId,
       (command as any).warn
     ]);
+    auth.connection.active = false;
+    auth.connection.appId = undefined;
+    auth.connection.tenant = 'common';
   });
 
   after(() => {
@@ -66,6 +72,21 @@ describe(commands.CONSENT, () => {
     sinon.stub(cli, 'getClientId').returns('2587b55d-a41e-436d-bb1d-6223eb185dd4');
     await command.action(logger, { options: commandOptionsSchema.parse({ service: 'VivaEngage' }) });
     assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=2587b55d-a41e-436d-bb1d-6223eb185dd4&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
+  });
+
+  it('shows consent URL using the app ID and tenant of the active connection', async () => {
+    sinon.stub(cli, 'getClientId').returns(undefined);
+    auth.connection.active = true;
+    auth.connection.appId = '31359c7f-bd7e-475c-86db-fdb8c937548e';
+    auth.connection.tenant = 'fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89';
+    await command.action(logger, { options: commandOptionsSchema.parse({ service: 'VivaEngage' }) });
+    assert(loggerLogSpy.calledWith(`To consent permissions for executing VivaEngage commands, navigate in your web browser to https://login.microsoftonline.com/fb5cb38f-ecdb-4c6a-a93b-b8cfd56b4a89/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation`));
+  });
+
+  it('throws an error when not logged in and no client ID is stored in the settings', async () => {
+    sinon.stub(cli, 'getClientId').returns(undefined);
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ service: 'VivaEngage' }) }),
+      new CommandError(`Unable to determine the client ID of the Microsoft Entra application used by the CLI. Log in to Microsoft 365 first or store the client ID using 'm365 cli config set --key clientId --value <appId>'.`));
   });
 
   it('fails validation with no options', () => {

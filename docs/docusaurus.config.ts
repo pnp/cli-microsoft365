@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import LightCodeTheme from './src/config/lightCodeTheme';
 import DarkCodeTheme from './src/config/darkCodeTheme';
 import definitionList from './src/remark/definitionLists';
+import { versionedDocsVcs } from './src/config/versionedDocsVcs';
 
 const hasStableVersion = existsSync('versions.json');
 const stableVersion = hasStableVersion
@@ -51,7 +52,8 @@ const config: Config = {
       mdx1CompatDisabledByDefault: true,
       siteStorageNamespacing: true
     },
-    faster: true
+    faster: true,
+    experimental_vcs: versionedDocsVcs
   },
 
   plugins: [

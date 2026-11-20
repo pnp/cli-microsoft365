@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roledefinition-remove.js';
+import command, { options } from './roledefinition-remove.js';
 
 describe(commands.ROLEDEFINITION_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
 
@@ -27,6 +28,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,24 +73,25 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', id: '1' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if id is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if id is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('remove role definitions handles reject request correctly', async () => {
@@ -102,17 +105,17 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 1,
+        id: '1',
         force: true
-      }
+      })
     }), new CommandError(err));
   });
 
   it('prompts before removing role definition when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '1' }) });
 
     assert(promptIssued);
   });
@@ -120,7 +123,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
   it('aborts removing role definition when prompt not confirmed', async () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', id: '1' }) });
     assert(requests.length === 0);
   });
 
@@ -141,7 +144,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', id: '1' }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
@@ -168,7 +171,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', id: '1', force: true }) });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
@@ -178,5 +181,10 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       }
     });
     assert(correctRequestIssued);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '1', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

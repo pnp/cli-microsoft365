@@ -22,7 +22,7 @@ m365 spo file get [options]
 : The server- or site-relative decoded URL of the file to retrieve. Specify either `url` or `id` but not both.
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both.
+: The unique ID (GUID) of the file to retrieve. Specify either `url` or `id` but not both.
 
 `--asString`
 : Set to retrieve the contents of the specified file as string.
@@ -63,25 +63,25 @@ m365 spo file get [options]
 
 ## Examples
 
-Get file properties for a file with id (UniqueId) parameter located in a site.
+Get file properties for a file with id (unique ID) parameter located in a site.
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
-Get contents of the file with id (UniqueId) parameter located in a site.
+Get contents of the file with id (unique ID) parameter located in a site.
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
 ```
 
-Get list item properties for a file with id (UniqueId) parameter located in a site.
+Get list item properties for a file with id (unique ID) parameter located in a site.
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem
 ```
 
-Saves the file with id (UniqueId) parameter located in a site to a local file.
+Saves the file with id (unique ID) parameter located in a site to a local file.
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
@@ -111,7 +111,7 @@ Saves a file with the server-relative url located in a site to a local file.
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents/SavedAsTest1.docx
 ```
 
-Gets the file properties for a file with id (UniqueId) parameter located in a site with permissions.
+Gets the file properties for a file with id (unique ID) parameter located in a site with permissions.
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --withPermissions

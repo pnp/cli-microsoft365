@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './people-profilecardproperty-get.js';
+import command, { options } from './people-profilecardproperty-get.js';
 
 describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
   const profileCardPropertyName = 'customAttribute1';
@@ -37,6 +37,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -45,6 +46,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -82,19 +84,27 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when name is invalid', async () => {
-    const actual = await command.validate({ options: { name: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when name is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when name is valid', async () => {
-    const actual = await command.validate({ options: { name: profileCardPropertyName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name is valid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: profileCardPropertyName });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when name is valid with different capitalization', async () => {
-    const actual = await command.validate({ options: { name: 'cUstoMATTriBUtE1' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name is valid with different capitalization', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'cUstoMATTriBUtE1' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: profileCardPropertyName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('gets profile card property information', async () => {
@@ -106,7 +116,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { name: profileCardPropertyName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName, verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(response));
   });
 
@@ -125,7 +135,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
       ['displayName ' + response.annotations[0].localizations[0].languageTag]: response.annotations[0].localizations[0].displayName
     };
 
-    await command.action(logger, { options: { name: profileCardPropertyName, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName, output: 'text' }) });
     assert(loggerLogSpy.calledOnceWith(textOutput));
   });
 
@@ -138,7 +148,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { name: profileCardPropertyName.toUpperCase() } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName.toUpperCase() }) });
     assert(getStub.called);
   });
 
@@ -149,7 +159,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { name: profileCardPropertyName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName }) } as any),
       new CommandError(`Profile card property '${profileCardPropertyName}' does not exist.`));
   });
 
@@ -161,7 +171,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { name: profileCardPropertyName } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: profileCardPropertyName }) } as any),
       new CommandError(errorMessage));
   });
 });

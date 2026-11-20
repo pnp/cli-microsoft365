@@ -1,16 +1,23 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { profileCardPropertyNames, ProfileCardProperty } from './profileCardProperties.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string()
+    .transform(value => profileCardPropertyNames.find(p => p.toLowerCase() === value.toLowerCase()) ?? value)
+    .pipe(z.enum(profileCardPropertyNames))
+    .alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  name: string;
 }
 
 class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
@@ -22,32 +29,8 @@ class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
     return 'Retrieves information about a specific profile card property';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name <name>',
-        autocomplete: profileCardPropertyNames
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!profileCardPropertyNames.some(p => p.toLowerCase() === args.options.name.toLowerCase())) {
-          return `'${args.options.name}' is not a valid value for option name. Allowed values are: ${profileCardPropertyNames.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

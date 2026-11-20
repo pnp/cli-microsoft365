@@ -139,6 +139,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'tenant'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if principalId is not a valid GUID', () => {
@@ -148,6 +149,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'tenant'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if scope is set to user, but userId is not a valid GUID', () => {
@@ -158,6 +160,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'user'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if scope is set to user, but userName is not a valid UPN', () => {
@@ -168,6 +171,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'user'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if scope is set to group, but groupId is not a valid GUID', () => {
@@ -178,6 +182,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'group'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if scope is set to administrativeUnit, but administrativeUnitId is not a valid GUID', () => {
@@ -188,6 +193,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'administrativeUnit'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if scope is set to custom, but customAppScopeId is not a valid GUID', () => {
@@ -198,6 +204,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       scope: 'custom'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The '[object Object]' must be a valid GUID`);
   });
 
   it('fails validation if userId is specified, but scope user is missing', () => {

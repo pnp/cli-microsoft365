@@ -1,24 +1,36 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .alias('i'),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value must be a valid Teams channel ID.'
+    })
+    .alias('c'),
+  appId: z.string(),
+  appName: z.string(),
+  contentUrl: z.string(),
+  entityId: z.string().optional(),
+  removeUrl: z.string().optional(),
+  websiteUrl: z.string().optional()
+}).catchall(z.unknown());
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId: string;
-  channelId: string;
-  appId: string;
-  appName: string;
-  contentUrl: string;
-  entityId?: string;
-  removeUrl?: string;
-  websiteUrl?: string;
 }
 
 class TeamsTabAddCommand extends GraphCommand {
@@ -33,66 +45,8 @@ class TeamsTabAddCommand extends GraphCommand {
     return 'Adds a tab to the specified channel';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        entityId: typeof args.options.entityId !== 'undefined',
-        removeUrl: typeof args.options.removeUrl !== 'undefined',
-        websiteUrl: typeof args.options.websiteUrl !== 'undefined'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '-c, --channelId <channelId>'
-      },
-      {
-        option: '--appId <appId>'
-      },
-      {
-        option: '--appName <appName>'
-      },
-      {
-        option: '--contentUrl <contentUrl>'
-      },
-      {
-        option: '--entityId [entityId]'
-      },
-      {
-        option: '--removeUrl [removeUrl]'
-      },
-      {
-        option: '--websiteUrl [websiteUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

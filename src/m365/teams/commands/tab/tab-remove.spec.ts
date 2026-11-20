@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tab-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './tab-remove.js';
 
 describe(commands.TAB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.TAB_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -70,74 +71,65 @@ describe(commands.TAB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid channelId, teamId and id is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: '00000000-0000-0000-0000-000000000000',
-        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if the teamId , channelId and id are not provided', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation when valid channelId, teamId and id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      teamId: '00000000-0000-0000-0000-000000000000',
+      id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
     });
-
-    const actual = await command.validate({
-      options: {
-
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the channelId is not valid channelId', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        channelId: 'invalid',
-        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId , channelId and id are not provided', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the channelId is not valid channelId', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      channelId: 'invalid',
+      id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+    });
+    assert.strictEqual(actual.success, false);
   });
-  it('fails validation if the id is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if the id is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      id: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
 
   it('prompts before removing the specified tab when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -145,12 +137,12 @@ describe(commands.TAB_REMOVE, () => {
 
   it('prompts before removing the specified tab when force option not passed (debug)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -159,12 +151,12 @@ describe(commands.TAB_REMOVE, () => {
   it('aborts removing the specified tab when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -172,12 +164,12 @@ describe(commands.TAB_REMOVE, () => {
   it('aborts removing the specified tab when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -195,12 +187,12 @@ describe(commands.TAB_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
+      })
     });
   });
 
@@ -215,13 +207,13 @@ describe(commands.TAB_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         force: true
-      }
+      })
     });
   });
 
@@ -241,12 +233,12 @@ describe(commands.TAB_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         force: true
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

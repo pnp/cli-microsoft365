@@ -1,10 +1,4 @@
-export const profileCardPropertyNames: string[] = [
-  'UserPrincipalName',
-  'Fax',
-  'StreetAddress',
-  'PostalCode',
-  'StateOrProvince',
-  'Alias',
+export const customAttributePropertyNames = [
   'customAttribute1',
   'customAttribute2',
   'customAttribute3',
@@ -20,7 +14,17 @@ export const profileCardPropertyNames: string[] = [
   'customAttribute13',
   'customAttribute14',
   'customAttribute15'
-];
+] as const;
+
+export const profileCardPropertyNames = [
+  'UserPrincipalName',
+  'Fax',
+  'StreetAddress',
+  'PostalCode',
+  'StateOrProvince',
+  'Alias',
+  ...customAttributePropertyNames
+] as const;
 
 export interface ProfileCardProperty {
   directoryPropertyName: string;

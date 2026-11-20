@@ -215,6 +215,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', principalId: 11, roleDefinitionId: 1073741827 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -245,6 +246,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   it('fails validation if the entaGroupId is not a valid guid', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', entraGroupId: 'invalid', roleDefinitionId: 1073741827 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option entraGroupId.`);
   });
 
   it('passes validation if the entaGroupId is a valid guid', () => {

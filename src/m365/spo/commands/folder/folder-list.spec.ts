@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './folder-list.js';
+import command, { options } from './folder-list.js';
 
 describe(commands.FOLDER_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -47,6 +47,7 @@ describe(commands.FOLDER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -55,6 +56,7 @@ describe(commands.FOLDER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -104,12 +106,12 @@ describe(commands.FOLDER_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
-      }
-    } as any), new CommandError('error1'));
+      })
+    }), new CommandError('error1'));
   });
 
   it('should correctly handle folder get success request', async () => {
@@ -122,11 +124,11 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(folderListOutput.value));
   });
@@ -160,13 +162,13 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl,
         filter: `name eq 'Folder1'`,
         fields: 'ListItemAllFields/Id,Name'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([{ ListItemAllFields: { Id: 1 }, Name: "Test1" }, { ListItemAllFields: { Id: 2 }, Name: "Test2" }, { Name: "Test3" }]));
   });
@@ -189,11 +191,11 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([...folderThresholdLimitOutput.value, ...folderListOutput.value]));
   });
@@ -207,12 +209,12 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl,
         output: 'json'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(folderListOutput.value));
   });
@@ -242,12 +244,12 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl,
         recursive: true
-      }
+      })
     });
     const expectedResults = folderListOutputSingleFolder.value;
     folderListOutputRecursiveLevel1.value.forEach(element => {
@@ -266,10 +268,10 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(folderListOutput.value));
   });
@@ -286,23 +288,29 @@ describe(commands.FOLDER_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
-      }
+      })
     });
 
     assert(loggerLogSpy.lastCall.calledWith(folderListOutput.value));
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', parentFolderUrl: parentFolderUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', parentFolderUrl: parentFolderUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, parentFolderUrl: parentFolderUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and parentFolderUrl specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolderUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, parentFolderUrl: parentFolderUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

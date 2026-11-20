@@ -343,6 +343,7 @@ describe(commands.WEB_SET, () => {
   it('fails validation if url is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ url: 'abc' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'abc is not a valid SharePoint Online site URL.');
   });
 
   it('passes validation when the url is a valid SharePoint URL', () => {
@@ -378,6 +379,7 @@ describe(commands.WEB_SET, () => {
   it('fails validation if headerEmphasis is out of bounds', () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: '4' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '4 is not a valid value for headerEmphasis. Allowed values are 0|1|2|3');
   });
 
   it('passes validation if headerEmphasis is 0', () => {

@@ -125,6 +125,7 @@ describe(commands.CALENDAR_GET, () => {
       userId: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid GUID.`);
   });
 
   it('fails validation if userName is not a valid user principal name', () => {
@@ -133,6 +134,7 @@ describe(commands.CALENDAR_GET, () => {
       userName: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid UPN.`);
   });
 
   it('fails validation if both userId and userName is specified', () => {
@@ -194,7 +196,7 @@ describe(commands.CALENDAR_GET, () => {
 
   it('correctly retrieves a calendar by name for a user specified by name from a calendar group specified by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users('${userName}')/calendarGroups/${calendarGroupId}/calendars?$filter=name eq '${formatting.encodeQueryParameter(calendarName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users('${formatting.encodeQueryParameter(userName)}')/calendarGroups/${calendarGroupId}/calendars?$filter=name eq '${ formatting.encodeQueryParameter(calendarName) }'`) {
         return {
           value: [response]
         };

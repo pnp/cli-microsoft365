@@ -1,6 +1,7 @@
 import child_process from 'child_process';
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 import { cache } from './cache.js';
 
 function getProcessNameOnMacOs(pid: number): string | undefined {
@@ -25,24 +26,15 @@ function getProcessNameOnLinux(pid: number): string | undefined {
 }
 
 function getProcessNameOnWindows(pid: number): string | undefined {
-  const findProcess = child_process.spawnSync('wmic', ['PROCESS', 'where', `ProcessId=${pid}`, 'get', 'Caption'], { encoding: 'utf8' });
-  if (findProcess.error || findProcess.stderr) {
+  const tasklist = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tasklist.exe');
+  const res = child_process.spawnSync(tasklist, ['/FI', `PID eq ${pid}`, '/FO', 'CSV', '/NH'], { encoding: 'utf8' });
+  if (res.error || res.status !== 0) {
     return undefined;
   }
-  else {
-    const getPid = child_process.spawnSync('find', ['/V', '"Caption"'], {
-      encoding: 'utf8',
-      input: findProcess.stdout,
-      // must include or passing quoted "Caption" will fail
-      windowsVerbatimArguments: true
-    });
-    if (getPid.error || getPid.stderr) {
-      return undefined;
-    }
-    else {
-      return getPid.stdout.trim();
-    }
-  }
+
+  // "pwsh.exe","12345","Console","1","98,765 K"
+  const match = res.stdout.match(/^"([^"]+)","(\d+)"/m);
+  return match && match[2] === pid.toString() ? match[1] : undefined;
 }
 
 export const pid = {

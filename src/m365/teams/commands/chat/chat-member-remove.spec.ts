@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chat-member-remove.js';
+import command, { options } from './chat-member-remove.js';
 
 describe(commands.CHAT_MEMBER_REMOVE, () => {
   const chatId = '19:09fd7575940146d383a4a83fc9598546@thread.v2';
@@ -43,6 +43,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -52,6 +53,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -112,7 +114,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId, force: true, verbose: true }) });
     assert(deleteStub.called);
   });
 
@@ -125,7 +127,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { chatId: chatId, id: chatMemberId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, id: chatMemberId, force: true, verbose: true }) });
     assert(deleteStub.called);
   });
 
@@ -149,7 +151,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userName: userPrincipalName, verbose: true }) });
     assert(deleteStub.called);
   });
 
@@ -162,7 +164,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, force: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userName: userPrincipalName, force: true, verbose: true }) }),
       new CommandError(`Member with userName '${userPrincipalName}' could not be found in the chat.`));
   });
 
@@ -175,13 +177,12 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { chatId: chatId, userId: userId, force: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId, force: true, verbose: true }) }),
       new CommandError(`Member with userId '${userId}' could not be found in the chat.`));
   });
 
   it('prompts before removing the specified message when force option not passed', async () => {
-    await command.action(logger, { options: { chatId: chatId, id: chatMemberId } });
-
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, id: chatMemberId }) });
 
     assert(promptIssued);
   });
@@ -189,37 +190,71 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
   it('aborts removing the specified chat member when force option not passed and prompt not confirmed', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ chatId: chatId, userId: userId }) });
     assert(deleteStub.notCalled);
   });
 
-  it('fails validation if the chatId is not valid chatId', async () => {
-    const actual = await command.validate({ options: { chatId: 'invalid', userId: userId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the chatId is not valid chatId', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: 'invalid', userId: userId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userId is not valid guid', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the userName is not valid UPN', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userName: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userName is not valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userName: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if ID of a chat member is passed', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, id: chatMemberId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if ID of a chat member is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, id: chatMemberId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the userId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the userId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the userName is a valid UPN', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userName: userPrincipalName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the userName is a valid UPN', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      chatId: chatId,
+      id: chatMemberId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if none of id, userId, userName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both id and userId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, id: chatMemberId, userId: userId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both id and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, id: chatMemberId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if both userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, userId: userId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if all three of id, userId, userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ chatId: chatId, id: chatMemberId, userId: userId, userName: userPrincipalName });
+    assert.strictEqual(actual.success, false);
   });
 });

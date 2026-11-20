@@ -16,12 +16,14 @@ export const options = z.strictObject({
   entraGroupId: z.uuid().optional(),
   ids: z.string()
     .refine(ids => validation.isValidGuidArray(ids) === true, {
-      error: e => `The following GUIDs are invalid: ${e.input}.`
-    }).optional(),
+      error: issue => `The following GUIDs are invalid: ${validation.isValidGuidArray(String(issue.input))}.`
+    })
+    .optional(),
   userNames: z.string()
     .refine(userNames => validation.isValidUserPrincipalNameArray(userNames) === true, {
-      error: e => `The following user principal names are invalid: ${e.input}.`
-    }).optional(),
+      error: issue => `The following user principal names are invalid: ${validation.isValidUserPrincipalNameArray(String(issue.input))}.`
+    })
+    .optional(),
   role: z.enum(['Admin', 'Member']).alias('r')
 });
 declare type Options = z.infer<typeof options>;
@@ -60,14 +62,8 @@ class VivaEngageCommunityUserAddCommand extends GraphCommand {
           options: ['communityId', 'communityDisplayName', 'entraGroupId']
         }
       })
-      .refine(options => options.ids || options.userNames, {
-        error: 'Specify either of ids or userNames.',
-        params: {
-          customCode: 'optionSet',
-          options: ['ids', 'userNames']
-        }
-      })
-      .refine(options => typeof options.userNames !== 'undefined' || typeof options.ids !== 'undefined', {
+      .refine(options =>
+        [options.ids, options.userNames].filter(x => x !== undefined).length === 1, {
         error: 'Specify either ids or userNames, but not both.',
         params: {
           customCode: 'optionSet',

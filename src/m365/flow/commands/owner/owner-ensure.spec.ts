@@ -89,16 +89,19 @@ describe(commands.OWNER_ENSURE, () => {
   it('fails validation if userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userId: 'invalid', roleName: validRoleName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if groupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, groupId: 'invalid', roleName: validRoleName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if username is not a valid user principal name', () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: validEnvironmentName, flowName: validFlowName, userName: 'invalid', roleName: validRoleName });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid userName.`);
   });
 
   it('fails validation if roleName is not a valid role name', () => {

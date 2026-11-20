@@ -116,6 +116,7 @@ describe(commands.WEBSITE_REMOVE, () => {
   it('fails validation if the url option is not a valid Power Pages site URL', async () => {
     const actual = commandOptionsSchema.safeParse({ environmentName: environment, url: 'https://site-0uaq9.contoso.com' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'https://site-0uaq9.contoso.com' is not a valid Power Pages URL.`);
   });
 
   it('passes validation if the url option is a valid Power Pages site URL', async () => {

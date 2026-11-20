@@ -7,11 +7,17 @@ declare module 'zod' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ZodType<out Output = unknown, out Input = unknown, out Internals extends z.core.$ZodTypeInternals<Output, Input> = z.core.$ZodTypeInternals<Output, Input>> {
     alias(name: string): this & { alias?: string };
+    autocomplete(values: string[]): this & { autocomplete?: string[] };
   }
 }
 
 z.ZodType.prototype.alias = function (name: string) {
   (this.def as any).alias = name;
+  return this;
+};
+
+z.ZodType.prototype.autocomplete = function (values: string[]) {
+  (this.def as any).autocomplete = values;
   return this;
 };
 
@@ -23,6 +29,7 @@ function parseObject(schema: JSONSchema.JSONSchema, options: CommandOptionInfo[]
       name: key,
       long: key,
       short: (property as any)['x-alias'],
+      autocomplete: (property as any)['x-autocomplete'],
       required: schema.required?.includes(key) && (property as any).default === undefined || false,
       type: 'string'
     };
@@ -40,6 +47,9 @@ function parseString(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo[
 
     if (schema.enum) {
       currentOption.autocomplete = schema.enum.map(e => String(e));
+    }
+    else if (schema['x-autocomplete']) {
+      currentOption.autocomplete = schema['x-autocomplete'] as string[];
     }
   }
 
@@ -62,7 +72,7 @@ function parseBoolean(schema: JSONSchema.JSONSchema, _options: CommandOptionInfo
   return;
 }
 
-function getParseFn(typeName?: "object" | "array" | "string" | "number" | "boolean" | "null" | "integer"): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
+function getParseFn(typeName?: JSONSchema.JSONSchema['type']): undefined | ((schema: JSONSchema.JSONSchema, options: CommandOptionInfo[], currentOption?: CommandOptionInfo) => JSONSchema.JSONSchema | undefined) {
   switch (typeName) {
     case 'object':
       return parseObject;
@@ -122,9 +132,14 @@ export const zod = {
   schemaToOptionInfo(schema: z.ZodSchema<any>): CommandOptionInfo[] {
     const jsonSchema = z.toJSONSchema(schema, {
       override: s => {
-        const alias = ((s.zodSchema as unknown as z.core.$ZodTypeInternals).def as any).alias;
-        if (alias) {
-          s.jsonSchema['x-alias'] = alias;
+        const definition = ((s.zodSchema as unknown as z.core.$ZodTypeInternals).def as any);
+
+        if (definition.alias) {
+          s.jsonSchema['x-alias'] = definition.alias;
+        }
+
+        if (definition.autocomplete) {
+          s.jsonSchema['x-autocomplete'] = definition.autocomplete;
         }
       },
       unrepresentable: 'any'
@@ -146,15 +161,17 @@ export const zod = {
     return options;
   },
 
-  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPreprocess<z.ZodEnum<T>> =>
-    z.preprocess(val => {
-      const target = String(val)?.toLowerCase();
-      for (const k of Object.values(e)) {
-        if (String(k)?.toLowerCase() === target) {
-          return k;
+  coercedEnum: <T extends util.EnumLike>(e: T): z.ZodPipe<z.ZodString, z.ZodPreprocess<z.ZodEnum<T>, string>> =>
+    z.string().pipe(
+      z.preprocess(val => {
+        const target = String(val).toLowerCase();
+        for (const k of Object.values(e)) {
+          if (String(k).toLowerCase() === target) {
+            return k;
+          }
         }
-      }
 
-      return null;
-    }, z.enum(e))
+        return null;
+      }, z.enum(e))
+    )
 };

@@ -11,13 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-app-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './user-app-add.js';
 
 describe(commands.USER_APP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +26,7 @@ describe(commands.USER_APP_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -48,7 +49,6 @@ describe(commands.USER_APP_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
   });
@@ -66,80 +66,63 @@ describe(commands.USER_APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the userId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: 'invalid',
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the userName is not a valid UPN.', async () => {
-    const actual = await command.validate({
-      options: {
-        userName: "not-a-upn",
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if id and name are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: 'invalid',
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
     });
-
-    const actual = await command.validate({ options: { id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', name: 'TeamsApp', userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither id nor name are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if the userName is not a valid UPN.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userName: "not-a-upn",
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
     });
-
-    const actual = await command.validate({ options: { userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the input is correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
-        userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'not-c49b-4fd4-8223-28f0ac3a6402',
+      userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the input is correct (userName)', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        userName: 'admin@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', name: 'TeamsApp', userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither id nor name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when the input is correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+      userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when the input is correct (userName)', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      userName: 'admin@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('adds app by id from the catalog for the specified user by id', async () => {
@@ -153,11 +136,11 @@ describe(commands.USER_APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any);
+      })
+    });
   });
 
   it('adds app by id from the catalog for the specified user by name', async () => {
@@ -171,11 +154,11 @@ describe(commands.USER_APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'admin@contoso.com',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any);
+      })
+    });
   });
 
   it('adds app by name from the catalog for the specified user', async () => {
@@ -204,11 +187,11 @@ describe(commands.USER_APP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'TeamsApp'
-      }
-    } as any);
+      })
+    });
   });
 
   it('fails to get teams app when app by name does not exists', async () => {
@@ -221,12 +204,12 @@ describe(commands.USER_APP_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'TeamsApp'
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
+      })
+    }), new CommandError('The specified Teams app does not exist'));
   });
 
   it('handles selecting single result when multiple teams apps with the specified name found and cli is set to prompt', async () => {
@@ -263,7 +246,7 @@ describe(commands.USER_APP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userId: 'c527a470-a882-481c-981c-ee6efaba85c7', name: 'TeamsApp' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, userId: 'c527a470-a882-481c-981c-ee6efaba85c7', name: 'TeamsApp' }) });
     assert(addRequestIssued);
   });
 
@@ -283,10 +266,10 @@ describe(commands.USER_APP_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 });

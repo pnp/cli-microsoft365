@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
-import command from './m365group-remove.js';
+import command, { options } from './m365group-remove.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
 describe(commands.M365GROUP_REMOVE, () => {
@@ -21,6 +21,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const groupId = '3e6e705d-6fb5-4ca7-84dc-3c8f5154fe2c';
@@ -106,6 +107,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -160,18 +162,28 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when both id and displayName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', displayName: 'Finance' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified group when force option not passed', async () => {
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
 
     assert(promptIssued);
   });
@@ -179,7 +191,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   it('aborts removing the group when prompt not confirmed', async () => {
     const getGroupSpy: sinon.SinonStub = defaultGetStub();
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: '28beab62-7540-4db1-a23f-29a6018a3848' }) });
     assert(getGroupSpy.notCalled);
   });
 
@@ -190,7 +202,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { id: groupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true }) });
     assert(deletedGroupSpy.calledOnce);
     assert(loggerLogToStderrSpy.calledWith(`Deleting the group site: 'https://contoso.sharepoint.com/teams/sales'...`));
   });
@@ -202,7 +214,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { displayName: 'Finance', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Finance', verbose: true }) });
     assert(deletedGroupSpy.calledOnce);
     assert(loggerLogToStderrSpy.calledWith(`Deleting the group site: 'https://contoso.sharepoint.com/teams/sales'...`));
   });
@@ -212,7 +224,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true, permanent: true, force: true }) });
     assert(deleteStub.called);
     assert(loggerLogToStderrSpy.calledWith("Group has been deleted and is now available in the deleted groups list. Removing permanently..."));
   });
@@ -230,7 +242,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true, permanent: true, force: true }) });
     assert(deleteStub.called);
   });
 
@@ -274,7 +286,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     });
     defaultDeleteStub();
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, permanent: true, force: true, debug: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, permanent: true, force: true, debug: true }) }),
       new CommandError('An error has occurred.'));
   });
 
@@ -290,7 +302,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     defaultDeleteStub();
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true, permanent: true, force: true }) }),
       new CommandError('Error'));
   });
 
@@ -306,7 +318,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     defaultPostStub();
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
-    await command.action(logger, { options: { id: groupId, verbose: true, permanent: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, verbose: true, permanent: true, force: true }) });
     assert(deleteStub.notCalled);
   });
 
@@ -316,7 +328,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinonUtil.restore(entraGroup.isUnifiedGroup);
     sinon.stub(entraGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { id: groupId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: groupId, force: true }) }),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

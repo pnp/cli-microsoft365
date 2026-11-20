@@ -14,14 +14,14 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './field-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './field-set.js';
 
 describe(commands.FIELD_SET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +36,7 @@ describe(commands.FIELD_SET, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -56,8 +57,7 @@ describe(commands.FIELD_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -108,7 +108,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -146,7 +146,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn', Description: 'My column' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -184,7 +184,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My cool column', Title: 'My column', updateExistingLists: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My cool column', Title: 'My column', updateExistingLists: true }) });
   });
 
   it('updates list column specified by id, list specified by id', async () => {
@@ -236,7 +236,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -289,7 +289,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', title: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', title: 'MyColumn', Description: 'My column' }) });
   });
 
   it('updates list column specified by internalName, list specified by title', async () => {
@@ -341,7 +341,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', internalName: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', internalName: 'MyColumn', Description: 'My column' }) });
   });
 
   it('updates list column specified by name, list specified by url', async () => {
@@ -396,7 +396,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, listUrl: listUrl, title: 'MyColumn', Description: 'My column Description' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, listUrl: listUrl, title: 'MyColumn', Description: 'My column Description' }) });
   });
 
   it('updates list column specified by internalName, list specified by url', async () => {
@@ -451,7 +451,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: webUrl, listUrl: listUrl, internalName: 'MyColumn', Description: 'My column Description' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: webUrl, listUrl: listUrl, internalName: 'MyColumn', Description: 'My column Description' }) });
   });
 
   it('correctly escapes XML in list title', async () => {
@@ -503,7 +503,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', title: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', title: 'MyColumn', Description: 'My column' }) });
   });
 
   it('ignores global options when creating request data', async () => {
@@ -555,7 +555,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', title: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, verbose: true, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', title: 'MyColumn', Description: 'My column' }) });
     assert.strictEqual(postStub.thirdCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="667" ObjectPathId="663" Name="Description"><Parameter Type="String">My column</Parameter></SetProperty><Method Name="UpdateAndPushChanges" Id="9000" ObjectPathId="663"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="663" Name="fe0ea19e-7022-0000-37ae-1357e77e046c|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:ff7a8065-9120-4c0a-982a-163ab9014179:web:e781d3dc-238d-44f7-8724-5e3e9eabcd6e:list:03cef05c-ba50-4dcf-a876-304f0626085c:field:5d021339-4d62-4fe9-9d2a-c99bc56a157a" /></ObjectPaths></Request>`);
   });
 
@@ -593,7 +593,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -631,7 +631,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn>', Description: 'My column' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn>', Description: 'My column' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -669,7 +669,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -700,7 +700,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My cool column', Title: 'My column', updateExistingLists: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My cool column', Title: 'My column', updateExistingLists: true }) } as any),
       new CommandError(`Invalid field name. {5d021339-4d62-4fe9-9d2a-c99bc56a157a} https:\u002f\u002fcontoso.sharepoint.com `));
   });
 
@@ -731,7 +731,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' }) } as any),
       new CommandError(`Column 'MyColumn' does not exist. It may have been deleted by another user.`));
   });
 
@@ -762,7 +762,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', internalName: 'MyColumn', Description: 'My column' }) } as any),
       new CommandError(`Column 'MyColumn' does not exist. It may have been deleted by another user.`));
   });
 
@@ -793,7 +793,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' }) } as any),
       new CommandError(`List does not exist.\n\nThe page you selected contains a list that does not exist.  It may have been deleted by another user.`));
   });
 
@@ -824,7 +824,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', title: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', title: 'MyColumn', Description: 'My column' }) } as any),
       new CommandError(`List 'My List' does not exist at site with URL 'https:\u002f\u002fcontoso.sharepoint.com'.`));
   });
 
@@ -869,7 +869,7 @@ describe(commands.FIELD_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' }) } as any),
       new CommandError(`An error has occurred`));
   });
 
@@ -878,108 +878,77 @@ describe(commands.FIELD_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if either id, title, or internalName are not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if either id, title, or internalName are not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify one of the following options: id, title, internalName.');
   });
 
-  it('fails validation if both id and title are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify one of the following options: id, title, internalName.');
   });
 
-  it('fails validation if both id and internalName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', internalName: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both id and internalName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', internalName: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify one of the following options: id, title, internalName.');
   });
 
-  it('fails validation if both title and internalName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', internalName: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both title and internalName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', internalName: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify one of the following options: id, title, internalName.');
   });
 
-  it('fails validation if id, title and internalName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn', internalName: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id, title and internalName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn', internalName: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify one of the following options: id, title, internalName.');
   });
 
-  it('fails validation if id is specified and is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is specified and is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option id is not a valid GUID');
   });
 
-  it('fails validation if listId, listTitle and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', listTitle: 'My List', listUrl: '/lists/testlist', title: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId, listTitle and listUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', listTitle: 'My List', listUrl: '/lists/testlist', title: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Specify either list id or title or list url, but not multiple');
   });
 
-  it('fails validation if listId is specified and is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'invalid', title: 'MyColumn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId is specified and is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'invalid', title: 'MyColumn' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid in option listId is not a valid GUID');
   });
 
-  it('passes validation when webUrl and id are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl and id are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when webUrl, listId and title are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl, listId and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when webUrl, listId and internalName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', internalName: 'MyColumn' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl, listId and internalName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', internalName: 'MyColumn' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when webUrl, listTitle and id are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when webUrl, listTitle and id are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' });
+    assert.strictEqual(actual.success, true);
   });
 });

@@ -18,7 +18,10 @@ export const options = z.strictObject({
     })
     .alias('u'),
   pageName: z.string().alias('n'),
-  section: z.number().alias('s'),
+  section: z.number()
+    .int()
+    .min(1, { error: 'The value of parameter section must be 1 or higher' })
+    .alias('s'),
   force: z.boolean().optional().alias('f')
 });
 

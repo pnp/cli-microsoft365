@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { ConversationMember } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -8,16 +9,25 @@ import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  chatId: z.string().refine(val => validation.isValidTeamsChatId(val), {
+    message: 'The value of the option chatId must be a valid Teams ChatId.'
+  }).alias('i'),
+  id: z.string().optional(),
+  userId: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value of the option userId must be a valid GUID.'
+  }).optional(),
+  userName: z.string().refine(val => validation.isValidUserPrincipalName(val), {
+    message: 'The value of the option userName must be a valid user principal name.'
+  }).optional(),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  chatId: string;
-  id?: string;
-  userId?: string;
-  userName?: string;
-  force?: boolean;
 }
 
 class TeamsChatMemberRemoveCommand extends GraphCommand {
@@ -29,68 +39,19 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
     return 'Removes a member from a Microsoft Teams chat conversation';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        force: !!args.options.force
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.userId, opts.userName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify one of id, userId or userName, but not more than one.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'userId', 'userName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --chatId <chatId>'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid Teams chatId.`;
-        }
-
-        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid userId.`;
-        }
-
-        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

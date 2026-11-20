@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
@@ -9,12 +10,15 @@ import { AssociatedSite } from './AssociatedSite.js';
 import { HubSite } from './HubSite.js';
 import { QueryListResult } from './QueryListResult.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  withAssociatedSites: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  withAssociatedSites?: boolean;
 }
 
 class SpoHubSiteListCommand extends SpoCommand {
@@ -32,28 +36,8 @@ class SpoHubSiteListCommand extends SpoCommand {
     return ['ID', 'SiteUrl', 'Title'];
   }
 
-  constructor() {
-    super();
-    this.batchSize = 30;
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        withAssociatedSites: args.options.withAssociatedSites === true
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--withAssociatedSites'
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

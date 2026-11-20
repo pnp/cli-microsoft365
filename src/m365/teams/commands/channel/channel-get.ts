@@ -1,22 +1,38 @@
 import { Channel } from '@microsoft/microsoft-graph-types';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { teams } from '../../../../utils/teams.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional(),
+  teamName: z.string()
+    .optional(),
+  id: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams channel id.'
+    })
+    .optional()
+    .alias('i'),
+  name: z.string()
+    .optional(),
+  primary: z.boolean()
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  id?: string;
-  name?: string;
-  primary?: boolean;
 }
 
 class TeamsChannelGetCommand extends GraphCommand {
@@ -28,68 +44,26 @@ class TeamsChannelGetCommand extends GraphCommand {
     return 'Gets information about the specific Microsoft Teams team channel';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        primary: !!args.options.primary
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
+      })
+      .refine(opts => [opts.id, opts.name, opts.primary].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either id, name, or primary, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name', 'primary']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--name [name]'
-      },
-      {
-        option: '--primary'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.id && !validation.isValidTeamsChannelId(args.options.id)) {
-          return `${args.options.id} is not a valid Teams channel id`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['teamId', 'teamName'] },
-      { options: ['id', 'name', 'primary'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

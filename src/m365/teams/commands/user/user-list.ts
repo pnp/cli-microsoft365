@@ -1,18 +1,26 @@
 import { User } from '@microsoft/microsoft-graph-types';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .alias('i'),
+  role: z.enum(['Owner', 'Member', 'Guest']).optional().alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  role?: string;
-  teamId: string;
 }
 
 class TeamsUserListCommand extends GraphCommand {
@@ -26,50 +34,8 @@ class TeamsUserListCommand extends GraphCommand {
     return "Lists users for the specified Microsoft Teams team";
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        role: args.options.role
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: "-i, --teamId <teamId>"
-      },
-      {
-        option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member", "Guest"]
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.role) {
-          if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
-            return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

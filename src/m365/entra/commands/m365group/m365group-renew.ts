@@ -1,18 +1,21 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
 }
 
 class EntraM365GroupRenewCommand extends GraphCommand {
@@ -24,44 +27,19 @@ class EntraM365GroupRenewCommand extends GraphCommand {
     return `Renews Microsoft 365 group's expiration`;
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.displayName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: id or displayName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName');
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

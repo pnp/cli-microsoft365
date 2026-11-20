@@ -234,16 +234,19 @@ describe(commands.USER_ADD, () => {
   it('fails validation if userName is not a valid userPrincipalName', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: displayName, userName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid userName.`);
   });
 
   it('fails validation usageLocation is not a valid usageLocation', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: displayName, userName: userName, usageLocation: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid usageLocation.`);
   });
 
   it('fails validation preferredLanguage is not a valid preferredLanguage', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: displayName, userName: userName, preferredLanguage: 'z' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'z' is not a valid preferredLanguage.`);
   });
 
   it('fails validation if both managerUserId and managerUserName are specified', () => {
@@ -254,6 +257,7 @@ describe(commands.USER_ADD, () => {
   it('fails validation if managerUserName is not a valid userPrincipalName', () => {
     const actual = commandOptionsSchema.safeParse({ displayName: displayName, userName: userName, managerUserName: 'invalid' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid user principal name.`);
   });
 
   it('fails validation if managerUserId is not a valid GUID', () => {

@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './customaction-list.js';
+import command, { options } from './customaction-list.js';
 
 describe(commands.CUSTOMACTION_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -82,7 +84,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       output: 'json'
     };
 
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse(options) });
     assert(loggerLogSpy.calledWith([{ "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }, { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }]));
   });
 
@@ -101,11 +103,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith([]));
   });
@@ -124,10 +126,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
-      }
+      })
     }), new CommandError(err));
   });
 
@@ -146,23 +148,12 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
-      }
+      })
     }), new CommandError(err));
-  });
-
-  it('supports specifying scope', () => {
-    const options = command.options;
-    let containsScopeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('[scope]') > -1) {
-        containsScopeOption = true;
-      }
-    });
-    assert(containsScopeOption);
   });
 
   it('retrieves all available user custom actions', async () => {
@@ -195,7 +186,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/abc' }) });
     assert(loggerLogSpy.calledWith([
       {
         Name: 'customaction2',
@@ -243,10 +234,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/abc',
         debug: true
-      }
+      })
     });
 
     let correctLogStatement = false;
@@ -277,35 +268,27 @@ describe(commands.CUSTOMACTION_LIST, () => {
     ));
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
-  it('passes validation when the url options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the url and scope options specified', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: "Site"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the url and scope options specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: "Site"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('humanize scope shows correct value when scope odata is 2', () => {
@@ -323,69 +306,58 @@ describe(commands.CUSTOMACTION_LIST, () => {
     assert(actual === "1");
   });
 
-  it('accepts scope to be All', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'All'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts scope to be All', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'All'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts scope to be Site', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts scope to be Site', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Site'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('accepts scope to be Web', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: 'Web'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('accepts scope to be Web', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'Web'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('rejects invalid string scope', async () => {
-    const scope = 'foo';
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+  it('rejects invalid string scope', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('rejects invalid scope value specified as number', async () => {
-    const scope = 123;
-    const actual = await command.validate({
-      options: {
-        webUrl: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+  it('rejects invalid scope value specified as number', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      scope: 123
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('doesn\'t fail validation if the optional scope option not specified', async () => {
-    const actual = await command.validate(
-      {
-        options:
-        {
-          webUrl: "https://contoso.sharepoint.com"
-        }
-      }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('doesn\'t fail validation if the optional scope option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: "https://contoso.sharepoint.com",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

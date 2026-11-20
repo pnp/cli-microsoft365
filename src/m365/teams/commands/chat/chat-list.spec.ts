@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './chat-list.js';
+import command, { options } from './chat-list.js';
 
 describe(commands.CHAT_LIST, () => {
   const userId = '63be605f-94c6-433b-b763-22bb16dd4acf';
@@ -44,6 +44,7 @@ describe(commands.CHAT_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -56,6 +57,7 @@ describe(commands.CHAT_LIST, () => {
       expiresOn: new Date()
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -98,44 +100,67 @@ describe(commands.CHAT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'topic', 'chatType']);
   });
 
-  it('fails validation for an incorrect chatType.', async () => {
-    const actual = await command.validate({ options: { type: 'oneOn' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for an incorrect chatType', () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: 'oneOn'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: 'invalid'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if userId and userName are specified', async () => {
-    const actual = await command.validate({ options: { userId: userId, userName: userName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId,
+      userName: userName
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('validates for a correct input without chat type', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input without chat type', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct input with a userId defined', async () => {
-    const actual = await command.validate({ options: { userId: userId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input with a userId defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: userId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct input for oneOnOne chat conversations with a specific userName defined', async () => {
-    const actual = await command.validate({ options: { type: "oneOnOne", userName: userName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input for oneOnOne chat conversations with a specific userName defined', () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: "oneOnOne",
+      userName: userName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct input for group chat conversation', async () => {
-    const actual = await command.validate({ options: { type: "group" } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input for group chat conversation', () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: "group"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('validates for a correct input for meeting chat conversations', async () => {
-    const actual = await command.validate({ options: { type: "meeting" } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('validates for a correct input for meeting chat conversations', () => {
+    const actual = commandOptionsSchema.safeParse({
+      type: "meeting"
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('lists all chat conversations for the currently signed in user', async () => {
@@ -148,7 +173,7 @@ describe(commands.CHAT_LIST, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith(chatsResponse));
   });
 
@@ -163,7 +188,7 @@ describe(commands.CHAT_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { type: 'oneOnOne' }
+      options: commandOptionsSchema.parse({ type: 'oneOnOne' })
     });
     assert(loggerLogSpy.calledWith(chatsResponse.filter(y => y.chatType === 'oneOnOne')));
   });
@@ -178,7 +203,7 @@ describe(commands.CHAT_LIST, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { type: 'group' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'group' }) });
     assert(loggerLogSpy.calledWith(chatsResponse.filter(y => y.chatType === 'group')));
   });
 
@@ -192,7 +217,7 @@ describe(commands.CHAT_LIST, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { type: 'group', userId: userId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'group', userId: userId }) });
     assert(loggerLogSpy.calledWith(chatsResponse.filter(y => y.chatType === 'group')));
   });
 
@@ -206,7 +231,7 @@ describe(commands.CHAT_LIST, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { type: 'meeting', userName: userName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ type: 'meeting', userName: userName }) });
     assert(loggerLogSpy.calledWith(chatsResponse.filter(y => y.chatType === 'meeting')));
   });
 
@@ -223,7 +248,7 @@ describe(commands.CHAT_LIST, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(loggerLogSpy.calledWith(chatsResponse));
   });
 
@@ -242,16 +267,16 @@ describe(commands.CHAT_LIST, () => {
     };
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError('An error has occurred'));
   });
 
   it('throws an error when passing userId using delegated permissions', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    await assert.rejects(command.action(logger, { options: { userId: userId } } as any), new CommandError(`The options 'userId' or 'userName' cannot be used when obtaining chats using delegated permissions`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userId: userId }) }), new CommandError(`The options 'userId' or 'userName' cannot be used when obtaining chats using delegated permissions`));
   });
 
   it('throws an error when not passing userId or userName using application permissions', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`The option 'userId' or 'userName' is required when obtaining chats using app only permissions`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }), new CommandError(`The option 'userId' or 'userName' is required when obtaining chats using app only permissions`));
   });
 });

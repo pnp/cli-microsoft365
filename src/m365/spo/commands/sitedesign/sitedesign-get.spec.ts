@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitedesign-get.js';
+import command, { options } from './sitedesign-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITEDESIGN_GET, () => {
@@ -20,6 +20,7 @@ describe(commands.SITEDESIGN_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -35,6 +36,7 @@ describe(commands.SITEDESIGN_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,11 +86,10 @@ describe(commands.SITEDESIGN_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
+      options: commandOptionsSchema.parse({
         title: 'Contoso Site Design'
-      }
-    } as any), new CommandError('The specified site design does not exist'));
+      })
+    }), new CommandError('The specified site design does not exist'));
   });
 
   it('fails when multiple site designs with same title exists', async () => {
@@ -159,11 +160,10 @@ describe(commands.SITEDESIGN_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
+      options: commandOptionsSchema.parse({
         title: 'Contoso Site Design'
-      }
-    } as any), new CommandError(`Multiple site designs with title 'Contoso Site Design' found. Found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261.`));
+      })
+    }), new CommandError(`Multiple site designs with title 'Contoso Site Design' found. Found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261.`));
   });
 
   it('handles selecting single result when multiple site designs with the specified title found and cli is set to prompt', async () => {
@@ -248,7 +248,7 @@ describe(commands.SITEDESIGN_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves({ Id: 'ca360b7e-1946-4292-b854-e0ad904f1055' });
 
-    await command.action(logger, { options: { title: 'Contoso Site Design' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Contoso Site Design' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -288,7 +288,7 @@ describe(commands.SITEDESIGN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -358,7 +358,7 @@ describe(commands.SITEDESIGN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: 'Contoso Site Design' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: 'Contoso Site Design' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -398,7 +398,7 @@ describe(commands.SITEDESIGN_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055', debug: true }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -417,27 +417,33 @@ describe(commands.SITEDESIGN_GET, () => {
   it('correctly handles error when site design not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055' }) }), new CommandError('File Not Found.'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'ca360b7e-1946-4292-b854-e0ad904f1055', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when specifying none of id, title', () => {
+    const refined = commandInfo.command.getRefinedSchema!(commandOptionsSchema as any)!;
+    const actual = refined.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when specifying both id and title', () => {
+    const refined = commandInfo.command.getRefinedSchema!(commandOptionsSchema as any)!;
+    const actual = refined.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', title: 'Contoso' });
+    assert.strictEqual(actual.success, false);
   });
 });

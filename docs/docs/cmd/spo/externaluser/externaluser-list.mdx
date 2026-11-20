@@ -76,18 +76,12 @@ m365 spo externaluser list --pageSize 50 --position 0 --sortOrder desc
   ```json
   [
     {
-      "Id": 14,
-      "IsHiddenInUI": false,
-      "LoginName": "i:0#.f|membership|user_domain.nl#ext#@tenant.onmicrosoft.com",
-      "Title": "Jon Doe",
-      "PrincipalType": 1,
-      "Email": "user@domain.nl",
-      "Expiration": "",
-      "IsEmailAuthenticationGuestUser": false,
-      "IsShareByEmailGuestUser": true,
-      "IsSiteAdmin": false,
-      "UserId": null,
-      "UserPrincipalName": "user_domain.nl#ext#@tenant.onmicrosoft.com"
+      "DisplayName": "John Doe (External)",
+      "InvitedAs": "john.doe@contoso.com",
+      "UniqueId": "1003200012345678",
+      "AcceptedAs": "john.doe@contoso.com",
+      "WhenCreated": "2025-11-18T07:57:58.913Z",
+      "InvitedBy": null
     }
   ]
   ```
@@ -96,17 +90,17 @@ m365 spo externaluser list --pageSize 50 --position 0 --sortOrder desc
   <TabItem value="Text">
 
   ```text
-  Id  IsHiddenInUI  LoginName                                                     Title     PrincipalType   Email           Expiration  IsEmailAuthenticationGuestUser  IsShareByEmailGuestUser   IsSiteAdmin   UserId  UserPrincipalName
-  --- ------------  ------------------------------------------------------------- --------  --------------  --------------  ----------- ------------------------------- ------------------------  ------------  ------- -------------------------------------------
-  14  false         i:0#.f|membership|user_domain.nl#ext#@tenant.onmicrosoft.com  Jon Doe   1               user@domain.nl              false                           true                      false         null    user_domain.nl#ext#@tenant.onmicrosoft.com
+  AcceptedAs            DisplayName          InvitedAs             InvitedBy  UniqueId          WhenCreated
+  --------------------  -------------------  --------------------  ---------  ----------------  ------------------------
+  john.doe@contoso.com  John Doe (External)  john.doe@contoso.com  null       1003200012345678  2025-11-18T07:57:58.913Z
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  Id,IsHiddenInUI,LoginName,Title,PrincipalType,Email,Expiration,IsEmailAuthenticationGuestUser,IsShareByEmailGuestUser,IsSiteAdmin,UserId,UserPrincipalName
-  14,false,i:0#.f|membership|user_domain.nl#ext#@tenant.onmicrosoft.com,Jon Doe,1,user@domain.nl,false,true,false,null,user_domain.nl#ext#@tenant.onmicrosoft.com
+  DisplayName,InvitedAs,UniqueId,AcceptedAs,WhenCreated,InvitedBy
+  John Doe (External),john.doe@contoso.com,1003200012345678,john.doe@contoso.com,2025-11-18T07:57:58.913Z,
   ```
 
   </TabItem>
@@ -117,22 +111,15 @@ m365 spo externaluser list --pageSize 50 --position 0 --sortOrder desc
 
   Date: 10/3/2023
 
-  ## Jon Doe (14)
+  ## John Doe (External) (1003200012345678)
 
   Property | Value
   ---------|-------
-  Id | 14
-  IsHiddenInUI | false
-  LoginName | i:0#.f|membership|user_domain.nl#ext#@tenant.onmicrosoft.com
-  Title | Jon Doe
-  PrincipalType | 1
-  Email | user@domain.nl
-  Expiration | 
-  IsEmailAuthenticationGuestUser | false
-  IsShareByEmailGuestUser | true
-  IsSiteAdmin | false
-  UserId | null
-  UserPrincipalName | user_domain.nl#ext#@tenant.onmicrosoft.com
+  DisplayName | John Doe (External)
+  InvitedAs | john.doe@contoso.com
+  UniqueId | 1003200012345678
+  AcceptedAs | john.doe@contoso.com
+  WhenCreated | 2025-11-18T07:57:58.913Z
   ```
 
   </TabItem>

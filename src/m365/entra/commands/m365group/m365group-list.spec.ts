@@ -13,13 +13,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './m365group-list.js';
+import command, { options } from './m365group-list.js';
 
 describe(commands.M365GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,6 +29,7 @@ describe(commands.M365GROUP_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -132,7 +134,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -249,7 +251,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -377,7 +379,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { orphaned: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ orphaned: true }) });
     assert([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -465,7 +467,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, orphaned: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, orphaned: true }) });
     assert([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -542,7 +544,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -659,7 +661,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { mailNickname: 'team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ mailNickname: 'team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -776,7 +778,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'Team', mailNickname: 'team' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: 'Team', mailNickname: 'team' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -894,7 +896,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: displayName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ displayName: displayName }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -959,7 +961,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { mailNickname: mailNickName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ mailNickname: mailNickName }) });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -1083,7 +1085,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1256,7 +1258,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred'));
   });
 
@@ -1322,7 +1324,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ output: 'json' }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1447,7 +1449,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1576,7 +1578,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith([
       <Group>{
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1703,7 +1705,7 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { withSiteUrl: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ withSiteUrl: true }) });
     assert(loggerLogSpy.calledWith([
       <Group>{
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1830,21 +1832,26 @@ describe(commands.M365GROUP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { withSiteUrl: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ withSiteUrl: true }) }), new CommandError('An error has occurred'));
   });
 
-  it('passes validation if only withSiteUrl option set', async () => {
-    const actual = await command.validate({ options: { withSiteUrl: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only withSiteUrl option set', () => {
+    const actual = commandOptionsSchema.safeParse({ withSiteUrl: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if only orphaned option set', async () => {
-    const actual = await command.validate({ options: { orphaned: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if only orphaned option set', () => {
+    const actual = commandOptionsSchema.safeParse({ orphaned: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if no options set', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if no options set', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

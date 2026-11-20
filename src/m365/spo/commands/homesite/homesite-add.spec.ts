@@ -208,6 +208,7 @@ describe(commands.HOMESITE_ADD, () => {
   it('fails validation if the url is not a valid SharePoint url', async () => {
     const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if both audienceIds and audienceNames are specified', async () => {
@@ -224,11 +225,13 @@ describe(commands.HOMESITE_ADD, () => {
   it('correctly handles non-integer order', async () => {
     const actual = commandOptionsSchema.safeParse({ url: homeSite, order: -1 });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'-1' is not a positive integer.`);
   });
 
   it('correctly handles invalid GUIDs in audienceIds', async () => {
     const actual = commandOptionsSchema.safeParse({ url: homeSite, audienceIds: 'invalid-guid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `The following GUIDs are invalid: invalid-guid.`);
   });
 
   it('correctly handles OData error when adding a home site', async () => {

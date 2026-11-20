@@ -433,6 +433,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       expirationDateTime: '2016-11-20T18:23:45.935Z'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The specified notification URL 'foo' does not start with either 'https://' or 'EventHub:https://' or 'EventGrid:?azuresubscriptionid='`);
   });
 
   it('fails validation if changeTypes is not valid', () => {
@@ -465,6 +466,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       notificationUrlAppId: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `foo is not a valid GUID for the 'notificationUrlAppId'`);
   });
 
   it('fails validation if latestTLSVersion is not valid', () => {
@@ -489,6 +491,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       lifecycleNotificationUrl: 'foo'
     });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `The lifecycle notification URL 'foo' does not start with either 'https://' or 'EventHub:https://' or 'EventGrid:?azuresubscriptionid='`);
   });
 
   it('fails validation if resource data should be included, but encryptionCertificate is not set', () => {

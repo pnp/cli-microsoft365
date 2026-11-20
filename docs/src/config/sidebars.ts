@@ -3,6 +3,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   home: [
     'index',
+    'v12-upgrade-guidance',
     'v11-upgrade-guidance',
     'v10-upgrade-guidance',
     'v9-upgrade-guidance',
@@ -260,6 +261,16 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'agent list',
               id: 'cmd/entra/agent/agent-list'
+            },
+            {
+              type: 'doc',
+              label: 'agent blueprint list',
+              id: 'cmd/entra/agent/agent-blueprint-list'
+            },
+            {
+              type: 'doc',
+              label: 'agent blueprintprincipal list',
+              id: 'cmd/entra/agent/agent-blueprintprincipal-list'
             }
           ]
         },
@@ -1349,6 +1360,11 @@ const sidebars: SidebarsConfig = {
           calendargroup: [
             {
               type: 'doc',
+              label: 'calendargroup add',
+              id: 'cmd/outlook/calendargroup/calendargroup-add'
+            },
+            {
+              type: 'doc',
               label: 'calendargroup list',
               id: 'cmd/outlook/calendargroup/calendargroup-list'
             },
@@ -1366,6 +1382,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           event: [
+            {
+              type: 'doc',
+              label: 'event add',
+              id: 'cmd/outlook/event/event-add'
+            },
             {
               type: 'doc',
               label: 'event cancel',
@@ -2257,8 +2278,23 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'container permission add',
+              id: 'cmd/spe/container/container-permission-add'
+            },
+            {
+              type: 'doc',
               label: 'container permission list',
               id: 'cmd/spe/container/container-permission-list'
+            },
+            {
+              type: 'doc',
+              label: 'container permission remove',
+              id: 'cmd/spe/container/container-permission-remove'
+            },
+            {
+              type: 'doc',
+              label: 'container permission set',
+              id: 'cmd/spe/container/container-permission-set'
             },
             {
               type: 'doc',
@@ -2941,6 +2977,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'folder unarchive',
+              id: 'cmd/spo/folder/folder-unarchive'
+            },
+            {
+              type: 'doc',
               label: 'folder retentionlabel ensure',
               id: 'cmd/spo/folder/folder-retentionlabel-ensure'
             },
@@ -3577,6 +3618,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'page set',
               id: 'cmd/spo/page/page-set'
+            },
+            {
+              type: 'doc',
+              label: 'page unpublish',
+              id: 'cmd/spo/page/page-unpublish'
             },
             {
               type: 'doc',
@@ -4378,6 +4424,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'web roleinheritance reset',
               id: 'cmd/spo/web/web-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'web rule get',
+              id: 'cmd/spo/web/web-rule-get'
             },
             {
               type: 'doc',

@@ -1,18 +1,30 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
+const appCatalogScopeOptions = { tenant: 'tenant', sitecollection: 'sitecollection' } as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  appCatalogScope: zod.coercedEnum(appCatalogScopeOptions).optional().alias('s'),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appCatalogScope?: string;
-  appCatalogUrl?: string;
 }
 
 class SpoAppListCommand extends SpoAppBaseCommand {
@@ -28,58 +40,19 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return [`Title`, `ID`, `Deployed`, `AppCatalogVersion`];
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
-        appCatalogScope: args.options.appCatalogScope || 'tenant'
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-s, --appCatalogScope [appCatalogScope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        // verify either 'tenant' or 'sitecollection' specified if scope provided
-        if (args.options.appCatalogScope) {
-          const testScope: string = args.options.appCatalogScope.toLowerCase();
-
-          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `appCatalogScope must be either 'tenant' or 'sitecollection'`;
-          }
-
-          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
-          }
-
-          if (args.options.appCatalogUrl) {
-            return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-          }
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.appCatalogScope !== 'sitecollection' || opts.appCatalogUrl !== undefined, {
+        error: 'You must specify appCatalogUrl when the appCatalogScope is sitecollection',
+        path: ['appCatalogUrl'],
+        params: {
+          customCode: 'required'
         }
-
-        return true;
-      }
-    );
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

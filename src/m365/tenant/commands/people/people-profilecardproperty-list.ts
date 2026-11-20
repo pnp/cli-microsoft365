@@ -1,12 +1,17 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import { ProfileCardProperty } from './profileCardProperties.js';
 import commands from '../../commands.js';
 import { odata } from '../../../../utils/odata.js';
 
+export const options = globalOptionsZod.strict();
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
 }
 
 class TenantPeopleProfileCardPropertyListCommand extends GraphCommand {
@@ -16,6 +21,10 @@ class TenantPeopleProfileCardPropertyListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists all profile card properties';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

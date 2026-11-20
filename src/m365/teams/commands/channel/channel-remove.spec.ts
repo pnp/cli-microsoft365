@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-remove.js';
+import command, { options } from './channel-remove.js';
 
 describe(commands.CHANNEL_REMOVE, () => {
   const id = '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype';
@@ -24,6 +24,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -76,44 +78,45 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid id & teamId is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: id,
-        teamId: teamId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid id & teamId is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: id,
+      teamId: teamId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when name & teamName is specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Channel Name',
-        teamName: teamName
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when name & teamName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      name: 'Channel Name',
+      teamName: teamName
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the teamId is not a valid guid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        id: id
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      id: id
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails to remove channel when channel does not exists', async () => {
@@ -126,22 +129,22 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: teamId,
         name: name,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
   it('prompts before removing the specified channel when force option not passed (debug)', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         teamId: teamId
-      }
+      })
     });
 
 
@@ -152,11 +155,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     const postSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         teamId: teamId
-      }
+      })
     });
 
     assert(postSpy.notCalled);
@@ -177,11 +180,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         teamName: teamName,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
@@ -189,11 +192,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(request, 'delete').returns(Promise.resolve());
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         teamId: teamId,
         force: true
-      }
+      })
     });
   });
 
@@ -210,11 +213,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         teamId: teamId
-      }
+      })
     });
   });
 
@@ -245,11 +248,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         teamName: teamName
-      }
+      })
     });
   });
 
@@ -285,11 +288,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: name,
         teamId: teamId
-      }
+      })
     });
   });
 
@@ -332,12 +335,12 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: name,
         teamName: teamName,
         force: true
-      }
+      })
     });
   });
 
@@ -356,12 +359,12 @@ describe(commands.CHANNEL_REMOVE, () => {
     sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: id,
         teamId: teamId,
         force: true
-      }
+      })
     }), new CommandError(error.error.message));
   });
 });

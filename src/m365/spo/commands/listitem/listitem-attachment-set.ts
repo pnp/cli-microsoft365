@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -8,18 +9,27 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import fs from 'fs';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option listId is not a valid GUID.`
+  }).optional(),
+  listTitle: z.string().optional(),
+  listUrl: z.string().optional(),
+  listItemId: z.number().int().positive(),
+  filePath: z.string().refine(path => fs.existsSync(path), {
+    error: e => `File with path '${e.input}' was not found.`
+  }).alias('p'),
+  fileName: z.string().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  listItemId: number;
-  fileName: string;
-  filePath: string;
 }
 
 class SpoListItemAttachmentSetCommand extends SpoCommand {
@@ -31,78 +41,19 @@ class SpoListItemAttachmentSetCommand extends SpoCommand {
     return 'Updates an attachment from a list item';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: listId, listTitle, listUrl.',
+        params: {
+          customCode: 'optionSet',
+          options: ['listId', 'listTitle', 'listUrl']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--listItemId <listItemId>'
-      },
-      {
-        option: '-p, --filePath <filePath>'
-      },
-      {
-        option: '-n, --fileName <fileName>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (isNaN(args.options.listItemId)) {
-          return `${args.options.listItemId} in option listItemId is not a valid number.`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID.`;
-        }
-
-        if (!fs.existsSync(args.options.filePath)) {
-          return `File with path '${args.options.filePath}' was not found.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

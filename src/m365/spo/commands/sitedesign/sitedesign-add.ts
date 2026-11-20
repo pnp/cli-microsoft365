@@ -1,24 +1,37 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  title: z.string().alias('t'),
+  webTemplate: z.string().pipe(z.enum(['TeamSite', 'CommunicationSite'])).alias('w'),
+  siteScripts: z.string().superRefine((val, ctx) => {
+    const items = val.split(',').map(s => s.trim());
+    const invalid = items.filter(item => !validation.isValidGuid(item));
+    if (invalid.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The following values are not valid GUIDs: ${invalid.join(', ')}`
+      });
+    }
+  }).alias('s'),
+  description: z.string().optional().alias('d'),
+  previewImageUrl: z.string().optional().alias('m'),
+  previewImageAltText: z.string().optional().alias('a'),
+  thumbnailUrl: z.string().optional(),
+  isDefault: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  title: string;
-  webTemplate: string;
-  siteScripts: string;
-  description?: string;
-  previewImageUrl?: string;
-  previewImageAltText?: string;
-  thumbnailUrl?: string;
-  isDefault?: boolean;
 }
 
 class SpoSiteDesignAddCommand extends SpoCommand {
@@ -30,77 +43,8 @@ class SpoSiteDesignAddCommand extends SpoCommand {
     return 'Adds site design for creating modern sites';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        webTemplate: args.options.webTemplate,
-        numSiteScripts: args.options.siteScripts.split(',').length,
-        description: (!(!args.options.description)).toString(),
-        previewImageUrl: (!(!args.options.previewImageUrl)).toString(),
-        previewImageAltText: (!(!args.options.previewImageAltText)).toString(),
-        thumbnailUrl: (!(!args.options.thumbnailUrl)).toString(),
-        isDefault: args.options.isDefault || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-w, --webTemplate <webTemplate>',
-        autocomplete: ['TeamSite', 'CommunicationSite']
-      },
-      {
-        option: '-s, --siteScripts <siteScripts>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-m, --previewImageUrl [previewImageUrl]'
-      },
-      {
-        option: '-a, --previewImageAltText [previewImageAltText]'
-      },
-      {
-        option: '--thumbnailUrl [thumbnailUrl]'
-      },
-      {
-        option: '--isDefault'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.webTemplate !== 'TeamSite' &&
-          args.options.webTemplate !== 'CommunicationSite') {
-          return `${args.options.webTemplate} is not a valid web template type. Allowed values TeamSite|CommunicationSite`;
-        }
-
-        const siteScripts = args.options.siteScripts.split(',');
-        for (let i: number = 0; i < siteScripts.length; i++) {
-          const trimmedId: string = siteScripts[i].trim();
-          if (!validation.isValidGuid(trimmedId)) {
-            return `${trimmedId} is not a valid GUID`;
-          }
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

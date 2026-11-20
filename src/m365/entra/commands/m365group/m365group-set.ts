@@ -2,8 +2,9 @@ import { Group } from '@microsoft/microsoft-graph-types';
 import { setTimeout } from 'timers/promises';
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -16,25 +17,51 @@ import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { User } from '@microsoft/microsoft-graph-types';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  newDisplayName: z.string().optional(),
+  description: z.string().optional().alias('d'),
+  ownerIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'ownerIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  ownerUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'ownerUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  memberIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for the option 'memberIds': ${validation.isValidGuidArray(e.input as string)}.`
+    }).optional(),
+  memberUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for the option 'memberUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    }).optional(),
+  isPrivate: z.boolean().optional(),
+  logoPath: z.string()
+    .refine(logoPath => {
+      const fullPath = path.resolve(logoPath);
+      return fs.existsSync(fullPath) && !fs.lstatSync(fullPath).isDirectory();
+    }, {
+      error: e => {
+        const fullPath = path.resolve(e.input as string);
+        return fs.existsSync(fullPath) ? `Path '${fullPath}' points to a directory` : `File '${fullPath}' not found`;
+      }
+    })
+    .optional()
+    .alias('l'),
+  allowExternalSenders: z.boolean().optional(),
+  autoSubscribeNewMembers: z.boolean().optional(),
+  hideFromAddressLists: z.boolean().optional(),
+  hideFromOutlookClients: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-export interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  newDisplayName?: string;
-  description?: string;
-  ownerIds?: string;
-  ownerUserNames?: string;
-  memberIds?: string;
-  memberUserNames?: string;
-  isPrivate?: boolean;
-  logoPath?: string;
-  allowExternalSenders?: boolean;
-  autoSubscribeNewMembers?: boolean;
-  hideFromAddressLists?: boolean;
-  hideFromOutlookClients?: boolean;
 }
 
 class EntraM365GroupSetCommand extends GraphCommand {
@@ -49,175 +76,47 @@ class EntraM365GroupSetCommand extends GraphCommand {
     return 'Updates Microsoft 365 Group properties';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        newDisplayName: typeof args.options.newDisplayName !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        ownerIds: typeof args.options.ownerIds !== 'undefined',
-        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
-        memberIds: typeof args.options.memberIds !== 'undefined',
-        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
-        isPrivate: !!args.options.isPrivate,
-        logoPath: typeof args.options.logoPath !== 'undefined',
-        allowExternalSenders: !!args.options.allowExternalSenders,
-        autoSubscribeNewMembers: !!args.options.autoSubscribeNewMembers,
-        hideFromAddressLists: !!args.options.hideFromAddressLists,
-        hideFromOutlookClients: !!args.options.hideFromOutlookClients
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.displayName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: id or displayName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
+        }
+      })
+      .refine(opts => !(opts.ownerIds && opts.ownerUserNames), {
+        error: 'Use one of the following options: ownerIds or ownerUserNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerIds', 'ownerUserNames']
+        }
+      })
+      .refine(opts => !(opts.memberIds && opts.memberUserNames), {
+        error: 'Use one of the following options: memberIds or memberUserNames.',
+        params: {
+          customCode: 'optionSet',
+          options: ['memberIds', 'memberUserNames']
+        }
+      })
+      .refine(opts => !!opts.newDisplayName ||
+        opts.description !== undefined ||
+        opts.ownerIds !== undefined ||
+        opts.ownerUserNames !== undefined ||
+        opts.memberIds !== undefined ||
+        opts.memberUserNames !== undefined ||
+        opts.isPrivate !== undefined ||
+        opts.logoPath !== undefined ||
+        opts.allowExternalSenders !== undefined ||
+        opts.autoSubscribeNewMembers !== undefined ||
+        opts.hideFromAddressLists !== undefined ||
+        opts.hideFromOutlookClients !== undefined, {
+        error: 'Specify at least one option to update.'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--newDisplayName [newDisplayName]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--ownerIds [ownerIds]'
-      },
-      {
-        option: '--ownerUserNames [ownerUserNames]'
-      },
-      {
-        option: '--memberIds [memberIds]'
-      },
-      {
-        option: '--memberUserNames [memberUserNames]'
-      },
-      {
-        option: '--isPrivate [isPrivate]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-l, --logoPath [logoPath]'
-      },
-      {
-        option: '--allowExternalSenders [allowExternalSenders]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--autoSubscribeNewMembers [autoSubscribeNewMembers]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hideFromAddressLists [hideFromAddressLists]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--hideFromOutlookClients [hideFromOutlookClients]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
-    this.optionSets.push({
-      options: ['ownerIds', 'ownerUserNames'],
-      runsWhen: (args) => {
-        return args.options.ownerIds !== undefined || args.options.ownerUserNames !== undefined;
-      }
-    });
-    this.optionSets.push({
-      options: ['memberIds', 'memberUserNames'],
-      runsWhen: (args) => {
-        return args.options.memberIds !== undefined || args.options.memberUserNames !== undefined;
-      }
-    });
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('isPrivate', 'allowEternalSenders', 'autoSubscribeNewMembers', 'hideFromAddressLists', 'hideFromOutlookClients');
-    this.types.string.push('id', 'displayName', 'newDisplayName', 'description', 'ownerIds', 'ownerUserNames', 'memberIds', 'memberUserNames', 'logoPath');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.newDisplayName &&
-          args.options.description === undefined &&
-          args.options.ownerIds === undefined &&
-          args.options.ownerUserNames === undefined &&
-          args.options.memberIds === undefined &&
-          args.options.memberUserNames === undefined &&
-          args.options.isPrivate === undefined &&
-          args.options.logoPath === undefined &&
-          args.options.allowExternalSenders === undefined &&
-          args.options.autoSubscribeNewMembers === undefined &&
-          args.options.hideFromAddressLists === undefined &&
-          args.options.hideFromOutlookClients === undefined) {
-          return 'Specify at least one option to update.';
-        }
-
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.ownerIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.ownerUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.logoPath) {
-          const fullPath: string = path.resolve(args.options.logoPath);
-
-          if (!fs.existsSync(fullPath)) {
-            return `File '${fullPath}' not found`;
-          }
-
-          if (fs.lstatSync(fullPath).isDirectory()) {
-            return `Path '${fullPath}' points to a directory`;
-          }
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

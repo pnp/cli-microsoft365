@@ -347,6 +347,7 @@ describe(commands.MAIL_SEND, () => {
 
     const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `File with path 'C:/File2.txt' was not found.`);
   });
 
   it('fails validation if attachment is not a file', () => {
@@ -361,6 +362,7 @@ describe(commands.MAIL_SEND, () => {
 
     const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'C:/File2.txt' is not a file.`);
   });
 
   it('fails validation if attachments are too large', () => {
@@ -376,6 +378,7 @@ describe(commands.MAIL_SEND, () => {
 
     const actual = commandOptionsSchema.safeParse({ subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Exceeded the max total size of attachments which is 3MB.');
   });
 
   it('passes validation when valid attachments are specified', () => {

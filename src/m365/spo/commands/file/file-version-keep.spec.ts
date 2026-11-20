@@ -72,6 +72,7 @@ describe(commands.FILE_VERSION_KEEP, () => {
   it('fails validation if webUrl is not a valid URL', async () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', label: validLabel, fileUrl: validFileUrl });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if fileId is not a valid GUID', async () => {

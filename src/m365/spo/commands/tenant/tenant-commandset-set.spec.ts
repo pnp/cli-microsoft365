@@ -11,10 +11,10 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tenant-commandset-set.js';
+import command, { options } from './tenant-commandset-set.js';
 
 describe(commands.TENANT_COMMANDSET_SET, () => {
-  const id = 1;
+  const id = '1';
   const clientSideComponentId = '9748c81b-d72e-4048-886a-e98649543743';
   const clientSideComponentProperties = '{ "someProperty": "Some value" }';
   const title = 'Some Command Set';
@@ -49,6 +49,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -58,6 +59,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = spoUrl;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -175,7 +177,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { id: id, newTitle: title, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties, verbose: true } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newTitle: title, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties, verbose: true }) }));
   });
 
   it('updates a tenant-wide ListView Command Set for lists with location ContextMenu and listType SitePages', async () => {
@@ -218,7 +220,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { id: id, location: 'ContextMenu', listType: 'SitePages' } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ id: id, location: 'ContextMenu', listType: 'SitePages' }) }));
   });
 
   it('updates a tenant-wide ListView Command Set for lists with location CommandBar and listType Library ', async () => {
@@ -261,7 +263,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { id: id, location: 'CommandBar', listType: 'Library' } }));
+    await assert.doesNotReject(command.action(logger, { options: commandOptionsSchema.parse({ id: id, location: 'CommandBar', listType: 'Library' }) }));
   });
 
   const errorMessage = 'No app catalog URL found';
@@ -275,12 +277,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: id,
-        newTitle: title
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newTitle: title }) }), new CommandError(errorMessage));
   });
 
   it('throws error when retrieving a tenant app catalog fails with an exception', async () => {
@@ -294,12 +291,7 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: id,
-        newTitle: title
-      }
-    }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newTitle: title }) }), new CommandError(errorMessage));
   });
 
   it('throws error when retrieving an item which is not a listview commandset', async () => {
@@ -340,36 +332,103 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: id,
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: id, newTitle: title }) }), new CommandError(errorMessage));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newTitle: title, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if no option to update is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if clientSideComponentId is not a valid Guid', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, clientSideComponentId: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if location value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, location: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listType value is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, listType: 'invalid' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation when all properties are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, newTitle: title, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when clearing clientSideComponentProperties', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      clientSideComponentProperties: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation when clearing webTemplate', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id,
+      webTemplate: ''
+    });
+
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if id is not a positive integer', () => {
+    const invalidIds = ['', ' ', 'foo', 'NaN', 'Infinity', '-1', '0', '1.5'];
+
+    for (const invalidId of invalidIds) {
+      const actual = commandOptionsSchema.safeParse({
+        id: invalidId,
         newTitle: title
-      }
-    }), new CommandError(errorMessage));
+      });
+
+      assert.strictEqual(
+        actual.success,
+        false,
+        `Expected id '${invalidId}' to be rejected`
+      );
+    }
   });
 
-  it('fails validation if no option to update is specified is not a valid Guid', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('returns a required validation issue when id is omitted', () => {
+    const actual = commandOptionsSchema.safeParse({});
+
+    assert.strictEqual(actual.success, false);
+
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues.some(issue =>
+          issue.code === 'invalid_type' &&
+          issue.path.join('.') === 'id'
+        ),
+        true
+      );
+    }
   });
 
-  it('fails validation if clientSideComponentId is not a valid Guid', async () => {
-    const actual = await command.validate({ options: { id: id, clientSideComponentId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
+  it('returns an option-set validation issue when update options are omitted', () => {
+    const actual = commandOptionsSchema.safeParse({ id });
 
-  it('fails validation if location value is not valid', async () => {
-    const actual = await command.validate({ options: { id: id, location: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
+    assert.strictEqual(actual.success, false);
 
-  it('fails validation if listType value is not valid', async () => {
-    const actual = await command.validate({ options: { id: id, listType: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when all properties are specified', async () => {
-    const actual = await command.validate({ options: { id: id, newTitle: title, clientSideComponentId: clientSideComponentId, listType: 'List', location: 'Both', webTemplate: webTemplate, clientSideComponentProperties: clientSideComponentProperties } }, commandInfo);
-    assert.strictEqual(actual, true);
+    if (!actual.success) {
+      assert.strictEqual(
+        actual.error.issues.some(issue =>
+          issue.code === 'custom' &&
+          issue.params?.customCode === 'optionSet'
+        ),
+        true
+      );
+    }
   });
 });

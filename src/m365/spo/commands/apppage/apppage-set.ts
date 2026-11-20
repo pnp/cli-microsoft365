@@ -1,18 +1,32 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().alias('u'),
+  name: z.string().alias('n'),
+  webPartData: z.string().refine(val => {
+    try {
+      JSON.parse(val);
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }, {
+    error: 'Specified webPartData is not a valid JSON string.'
+  }).alias('d')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  webPartData: string;
 }
 
 class SpoAppPageSetCommand extends SpoCommand {
@@ -24,40 +38,8 @@ class SpoAppPageSetCommand extends SpoCommand {
     return 'Updates the single-part app page';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --webPartData <webPartData>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        try {
-          JSON.parse(args.options.webPartData);
-        }
-        catch (e) {
-          return `Specified webPartData is not a valid JSON string. Error: ${e}`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

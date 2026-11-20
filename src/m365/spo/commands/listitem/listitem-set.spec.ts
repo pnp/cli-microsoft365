@@ -13,8 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './listitem-set.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './listitem-set.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 
@@ -22,6 +21,7 @@ describe(commands.LISTITEM_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-w';
@@ -86,6 +86,7 @@ describe(commands.LISTITEM_SET, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -109,8 +110,7 @@ describe(commands.LISTITEM_SET, () => {
       request.post,
       request.get,
       spo.updateListItem,
-      spo.systemUpdateListItem,
-      cli.getSettingWithDefaultValue
+      spo.systemUpdateListItem
     ]);
   });
 
@@ -127,112 +127,91 @@ describe(commands.LISTITEM_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+  it('allows unknown options', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
-    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  it('fails validation if listTitle, listId or listUrl option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listTitle, listId or listUrl option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listTitle, listId and listUrl are specified together', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl, id: '1' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listTitle, listId and listUrl are specified together', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl, id: '1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listTitle: 'Demo List', id: '1' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List', id: '1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: '1' } }, commandInfo);
-    assert(actual);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'foo in option listId is not a valid GUID');
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1' } }, commandInfo);
-    assert(actual);
+  it('passes validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: '1', Title: 'Test' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails to update a list item when \'fail me\' values are used', async () => {
     sinon.stub(spo, 'updateListItem').rejects(new Error(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
-    const options: any = {
-      listTitle: 'Demo List',
-      id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      Title: "fail updating me"
-    };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        listTitle: 'Demo List',
+        id: '47',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        Title: "fail updating me"
+      })
+    }), new CommandError(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
   });
 
   it('returns listItemInstance object when list item is updated with correct values', async () => {
     sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
-    command.allowUnknownOptions();
 
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      Title: expectedTitle
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listTitle: 'Demo List',
+        id: '47',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        Title: expectedTitle
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('returns listItemInstance object when list item in list retrieved by URL is updated with correct values', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(spo, 'systemUpdateListItem').resolves(listItemResponse);
-    command.allowUnknownOptions();
 
-    const options: any = {
-      verbose: true,
-      listUrl: listUrl,
-      id: 147,
-      webUrl: webUrl,
-      contentType: 'Item',
-      Title: expectedTitle,
-      systemUpdate: true
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        verbose: true,
+        listUrl: listUrl,
+        id: '147',
+        webUrl: webUrl,
+        contentType: 'Item',
+        Title: expectedTitle,
+        systemUpdate: true
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
@@ -240,15 +219,15 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
-    const options: any = {
-      listTitle: 'Demo List',
-      id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      contentType: 'Item',
-      Title: expectedTitle
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        listTitle: 'Demo List',
+        id: '47',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        contentType: 'Item',
+        Title: expectedTitle
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
@@ -256,47 +235,47 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
-    const options: any = {
-      debug: true,
-      listId: listId,
-      id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      contentType: expectedContentType,
-      Title: expectedTitle
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listId: listId,
+        id: '47',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        contentType: expectedContentType,
+        Title: expectedTitle
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
   it('fails to update the listitem when the specified contentType doesn\'t exist in the target list', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    const options: any = {
-      listTitle: 'Demo List',
-      id: 47,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      contentType: "Unexpected content type",
-      Title: expectedTitle
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        listTitle: 'Demo List',
+        id: '47',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        contentType: "Unexpected content type",
+        Title: expectedTitle
+      })
+    }), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
 
   it('successfully updates the listitem when the systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(spo, 'systemUpdateListItem').resolves(listItemResponse);
 
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      id: 147,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      Title: expectedTitle,
-      systemUpdate: true
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listTitle: 'Demo List',
+        id: '147',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        Title: expectedTitle,
+        systemUpdate: true
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 
@@ -304,34 +283,34 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(spo, 'systemUpdateListItem').rejects(new Error('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
 
-    const options: any = {
-      debug: true,
-      listTitle: 'Demo List',
-      id: 147,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      Title: "systemUpdate error",
-      contentType: "Item",
-      systemUpdate: true
-    };
-
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        listTitle: 'Demo List',
+        id: '147',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        Title: "systemUpdate error",
+        contentType: "Item",
+        systemUpdate: true
+      })
+    }), new CommandError('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
   });
 
   it('should ignore global options when creating request data', async () => {
     sinon.stub(spo, 'updateListItem').resolves(listItemResponse);
 
-    const options: any = {
-      debug: true,
-      verbose: true,
-      output: "text",
-      listTitle: 'Demo List',
-      id: 147,
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
-      Title: expectedTitle,
-      systemUpdate: false
-    };
-
-    await command.action(logger, { options: options } as any);
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        debug: true,
+        verbose: true,
+        output: "text",
+        listTitle: 'Demo List',
+        id: '147',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+        Title: expectedTitle,
+        systemUpdate: false
+      })
+    });
     assert(loggerLogSpy.calledWith(listItemResponse));
   });
 });

@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './sitedesign-rights-grant.js';
+import command, { options } from './sitedesign-rights-grant.js';
 
 describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -34,6 +35,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -88,7 +90,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -108,7 +110,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -128,7 +130,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' }) });
   });
 
   it('grants rights on the specified site design to the specified principals separated with an extra space', async () => {
@@ -147,71 +149,43 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' }) });
   });
 
   it('correctly handles OData error when granting rights', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         principals: 'PattiF',
         rights: 'View'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--siteDesignId') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: 'abc', principals: 'PattiF', rights: 'View' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying principals', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--principals') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if specified rights value is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'Invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying rights', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--rights') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation if all required parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { siteDesignId: 'abc', principals: 'PattiF', rights: 'View' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if all required parameters are valid (multiple principals)', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if specified rights value is invalid', async () => {
-    const actual = await command.validate({ options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if all required parameters are valid (multiple principals)', async () => {
-    const actual = await command.validate({ options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

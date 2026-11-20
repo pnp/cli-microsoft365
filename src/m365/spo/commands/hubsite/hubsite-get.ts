@@ -1,7 +1,7 @@
+import { z } from 'zod';
 import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import Command, { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -12,15 +12,22 @@ import spoListItemListCommand, { Options as SpoListItemListCommandOptions } from
 import { AssociatedSite } from './AssociatedSite.js';
 import { HubSite } from './HubSite.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} is not a valid GUID`
+  }).optional().alias('i'),
+  title: z.string().optional().alias('t'),
+  url: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).optional().alias('u'),
+  withAssociatedSites: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  title?: string;
-  url?: string;
-  withAssociatedSites?: boolean;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
@@ -32,53 +39,19 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return 'Gets information about the specified hub site';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        url: typeof args.options.url !== 'undefined',
-        withAssociatedSites: args.options.withAssociatedSites === true
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.title, opts.url].filter(x => x !== undefined).length === 1, {
+        error: `Specify either 'id', 'title', or 'url', but not multiple.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'title', 'url']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-i, --id [id]' },
-      { option: '-t, --title [title]' },
-      { option: '-u, --url [url]' },
-      { option: '--withAssociatedSites' }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.url) {
-          return validation.isValidSharePointUrl(args.options.url);
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title', 'url'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

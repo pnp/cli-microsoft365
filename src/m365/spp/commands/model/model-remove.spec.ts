@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './model-remove.js';
+import command, { options } from './model-remove.js';
 import { spp } from '../../../../utils/spp.js';
 
 describe(commands.MODEL_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.MODEL_REMOVE, () => {
     sinon.stub(spp, 'assertSiteIsContentCenter').resolves();
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,29 +66,59 @@ describe(commands.MODEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when required parameters are valid with id', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with id', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when required parameters are valid with title', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with title', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', title: 'ModelName' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when required parameters are valid with id and force', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid with id and force', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when siteUrl is not valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'invalidUrl', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when siteUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation when id is not valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when id is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when neither id nor title is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' });
+    assert(!actual.success);
+    const issue = actual.error.issues[0];
+    assert(issue.code === 'custom');
+    assert.deepStrictEqual(issue.params, { customCode: 'optionSet', options: ['id', 'title'] });
+  });
+
+  it('fails validation when both id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sales',
+      id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+      title: 'ModelName'
+    });
+    assert(!actual.success);
+    const issue = actual.error.issues[0];
+    assert(issue.code === 'custom');
+    assert.deepStrictEqual(issue.params, { customCode: 'optionSet', options: ['id', 'title'] });
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sales',
+      id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles an error when the model id is not found', async () => {
@@ -106,7 +138,7 @@ describe(commands.MODEL_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true }) }),
       new CommandError('File Not Found.'));
   });
 
@@ -121,21 +153,21 @@ describe(commands.MODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'modelTitle.classifier', force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'modelTitle.classifier', force: true }) }),
       new CommandError('Model not found.'));
   });
 
   it('is the confirmation prompt called with id information', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' }) });
     assert(confirmationStub.args[0][0].message.startsWith(`Are you sure you want to remove model '9b1b1e42-794b-4c71-93ac-5ed92488b67f'?`));
   });
 
   it('is the confirmation prompt called with title information', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'modelTitle' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'modelTitle' }) });
     assert(confirmationStub.args[0][0].message.startsWith(`Are you sure you want to remove model 'modelTitle'?`));
   });
 
@@ -148,7 +180,7 @@ describe(commands.MODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true }) });
     assert(stubDelete.calledOnce);
   });
 
@@ -157,7 +189,7 @@ describe(commands.MODEL_REMOVE, () => {
 
     const stubDelete = sinon.stub(request, 'delete').resolves();
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' }) });
     assert(stubDelete.notCalled);
   });
 
@@ -170,7 +202,7 @@ describe(commands.MODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal/', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal/', id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', force: true }) });
     assert(stubDelete.calledOnce);
   });
 
@@ -183,7 +215,7 @@ describe(commands.MODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName', force: true }) });
     assert(stubDelete.calledOnce);
   });
 
@@ -196,7 +228,7 @@ describe(commands.MODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName.classifier', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'ModelName.classifier', force: true }) });
     assert(stubDelete.calledOnce);
   });
 });

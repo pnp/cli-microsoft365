@@ -1,22 +1,38 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
+const appCatalogScopeOptions = { tenant: 'tenant', sitecollection: 'sitecollection' } as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `${e.input} is not a valid GUID`
+    })
+    .alias('i'),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u'),
+  appCatalogScope: zod.coercedEnum(appCatalogScopeOptions).optional().alias('s'),
+  force: z.boolean().optional().alias('f')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  appCatalogScope?: string;
-  appCatalogUrl?: string;
-  force?: boolean;
-  id: string;
 }
 
 class SpoAppRemoveCommand extends SpoAppBaseCommand {
@@ -28,68 +44,19 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     return 'Removes the specified app from the specified app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
-        force: (!(!args.options.force)).toString(),
-        appCatalogScope: args.options.appCatalogScope || 'tenant'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.appCatalogScope !== 'sitecollection' || opts.appCatalogUrl !== undefined, {
+        error: 'You must specify appCatalogUrl when the appCatalogScope is sitecollection',
+        path: ['appCatalogUrl'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      },
-      {
-        option: '-s, --appCatalogScope [appCatalogScope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '-f, --force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        // verify either 'tenant' or 'sitecollection' specified if scope provided
-        if (args.options.appCatalogScope) {
-          const testScope: string = args.options.appCatalogScope.toLowerCase();
-          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
-          }
-
-          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
-          }
-        }
-
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        if (args.options.appCatalogUrl) {
-          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

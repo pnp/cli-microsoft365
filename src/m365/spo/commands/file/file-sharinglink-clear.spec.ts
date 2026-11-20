@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { GraphFileDetails } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './file-sharinglink-clear.js';
+import command, { options } from './file-sharinglink-clear.js';
 import spoFileSharingLinkListCommand from './file-sharinglink-list.js';
 
 describe(commands.FILE_SHARINGLINK_CLEAR, () => {
@@ -35,6 +35,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -44,6 +45,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -89,29 +91,35 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the webUrl and fileId options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl and fileId options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the scope option is not a valid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, scope: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the scope option is not a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, scope: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the scope option is a valid scope', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, scope: 'users' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the scope option is a valid scope', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, scope: 'users' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, scope: 'users', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('aborts clearing the sharing links to a file when force option not passed and prompt not confirmed', async () => {
@@ -119,13 +127,13 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl }) });
 
     assert(postSpy.notCalled);
   });
 
   it('prompts before clearing the sharing links to a file when force option not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId }) });
 
     assert(promptIssued);
   });
@@ -159,7 +167,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileUrl: fileUrl, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, fileUrl: fileUrl, force: true }) });
     assert(deleteStub.called);
   });
 
@@ -190,7 +198,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' }) });
     assert(deleteStub.called);
   });
 
@@ -206,6 +214,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any), new CommandError(`File Not Found.`));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileId: fileId, verbose: true }) } as any), new CommandError(`File Not Found.`));
   });
 });

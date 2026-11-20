@@ -166,6 +166,12 @@ class MockCommandWithSchema extends Command {
       type: 'string'
     },
     {
+      name: 'requiredEnum',
+      required: true,
+      type: 'string',
+      autocomplete: ['a', 'b', 'c']
+    },
+    {
       name: 'optionalString',
       required: false,
       type: 'string'
@@ -191,6 +197,40 @@ class MockCommandWithSchema extends Command {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async commandAction(logger: Logger, args: any): Promise<void> {
     throw 'Exception';
+  }
+}
+
+const mockLooseOptions = z.looseObject({
+  ...globalOptionsZod.shape,
+  knownOption: z.string().optional()
+});
+
+class MockCommandWithUnknownSchemaOptions extends Command {
+  public get name(): string {
+    return 'mock-command-with-unknown-options';
+  }
+
+  public get description(): string {
+    return 'Mock command with unknown schema options';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return mockLooseOptions;
+  }
+
+  public optionsInfo: CommandOptionInfo[] = [
+    {
+      name: 'knownOption',
+      required: false,
+      type: 'string'
+    }
+  ];
+
+  public allowUnknownOptions(): boolean {
+    return true;
+  }
+
+  public async commandAction(): Promise<void> {
   }
 }
 
@@ -384,18 +424,39 @@ describe('Command', () => {
     const args = {
       options: {
         requiredOption: 'abc',
+        requiredEnum: 'b',
         optionalString: 'def',
         optionalEnum: 'a',
         optionalNumber: 1,
         optionalBoolean: false
       }
     };
+
     const telemetryProps = (command as any).getTelemetryProperties(args);
+
     assert.deepStrictEqual(telemetryProps, {
+      requiredEnum: 'b',
       optionalString: true,
       optionalEnum: 'a',
       optionalNumber: true,
       optionalBoolean: false
+    });
+  });
+
+  it('tracks unknown properties for schemas that allow unknown options', () => {
+    const command = new MockCommandWithUnknownSchemaOptions();
+    const args = {
+      options: {
+        knownOption: 'value',
+        'displayName-nl-NL': 'Kostenplaats'
+      }
+    };
+
+    const telemetryProps = (command as any).getTelemetryProperties(args);
+
+    assert.deepStrictEqual(telemetryProps, {
+      knownOption: true,
+      'displayName-nl-NL': true
     });
   });
 

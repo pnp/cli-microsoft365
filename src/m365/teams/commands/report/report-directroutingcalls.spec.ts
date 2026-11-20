@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './report-directroutingcalls.js';
+import command, { options } from './report-directroutingcalls.js';
 
 describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const jsonOutput = {
     "value": [{
@@ -53,6 +54,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -95,55 +97,37 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'calleeNumber', 'callerNumber', 'startDateTime']);
   });
 
-  it('fails validation on invalid fromDateTime', async () => {
-    const actual = await command.validate({
-      options: {
-        fromDateTime: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on invalid fromDateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation on invalid toDateTime', async () => {
-    const actual = await command.validate({
-      options: {
-        fromDateTime: '2020-12-01',
-        toDateTime: 'abc'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on invalid toDateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: '2020-12-01', toDateTime: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation on number of days between fromDateTime and toDateTme exceeding 90', async () => {
-    const actual = await command.validate({
-      options: {
-        fromDateTime: '2020-08-01',
-        toDateTime: '2020-12-01'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation on number of days between fromDateTime and toDateTme exceeding 90', () => {
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: '2020-08-01', toDateTime: '2020-12-01' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation on valid fromDateTime', async () => {
+  it('passes validation on valid fromDateTime', () => {
     const validfromDateTime: any = new Date();
     //fromDateTime should be less than 90 days ago for passing validation
     validfromDateTime.setDate(validfromDateTime.getDate() - 70);
-    const actual = await command.validate({
-      options: {
-        fromDateTime: validfromDateTime.toISOString().substr(0, 10)
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: validfromDateTime.toISOString().substr(0, 10) });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation on valid fromDateTime and toDateTime', async () => {
-    const actual = await command.validate({
-      options: {
-        fromDateTime: '2020-11-01',
-        toDateTime: '2020-12-01'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation on valid fromDateTime and toDateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: '2020-11-01', toDateTime: '2020-12-01' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ fromDateTime: '2020-11-01', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('gets directroutingcalls in teams', async () => {
@@ -155,7 +139,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ fromDateTime: '2019-11-01', toDateTime: '2019-12-01' }) });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
 
@@ -163,16 +147,19 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     const now = new Date();
     const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = formatting.encodeQueryParameter(now.toISOString());
+    const fromDateTime: Date = new Date();
+    fromDateTime.setDate(fromDateTime.getDate() - 70);
+    const fromDateTimeString: string = fromDateTime.toISOString().substring(0, 10);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=${fromDateTimeString},toDateTime=${toDateTime})`) {
         return jsonOutput;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { fromDateTime: '2019-11-01' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ fromDateTime: fromDateTimeString }) });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
     fakeTimers.restore();
   });
@@ -192,6 +179,6 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
 
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ fromDateTime: '2019-11-01', toDateTime: '2019-12-01' }) }), new CommandError('An error has occurred'));
   });
 });

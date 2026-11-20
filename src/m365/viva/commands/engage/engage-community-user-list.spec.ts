@@ -150,6 +150,14 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
     assert.strictEqual(actual.success, true);
   });
 
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      communityId: communityId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('passes validation if entraGroupId is specified with a proper GUID', () => {
     const actual = commandOptionsSchema.safeParse({
       entraGroupId: entraGroupId
@@ -185,7 +193,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, verbose: true }) });
     assert(loggerLogSpy.calledWith([...adminsResult, ...membersResult]));
   });
 
@@ -204,7 +212,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
 
     sinon.stub(vivaEngage, 'getCommunityById').resolves(community);
 
-    await command.action(logger, { options: { communityId: communityId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, verbose: true }) });
     assert(loggerLogSpy.calledWith([...adminsResult, ...membersResult]));
   });
 
@@ -223,7 +231,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
 
     sinon.stub(vivaEngage, 'getCommunityByDisplayName').resolves(community);
 
-    await command.action(logger, { options: { communityDisplayName: communityDisplayName, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityDisplayName: communityDisplayName, verbose: true }) });
     assert(loggerLogSpy.calledWith([...adminsResult, ...membersResult]));
   });
 
@@ -240,7 +248,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { entraGroupId: entraGroupId, role: 'Member' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ entraGroupId: entraGroupId, role: 'Member' }) });
     assert(loggerLogSpy.calledWith(membersResult));
   });
 
@@ -259,7 +267,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
 
     sinon.stub(vivaEngage, 'getCommunityById').resolves(community);
 
-    await command.action(logger, { options: { communityId: communityId, role: 'Admin' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ communityId: communityId, role: 'Admin' }) });
     assert(loggerLogSpy.calledWith(adminsResult));
   });
 
@@ -271,7 +279,7 @@ describe(commands.ENGAGE_COMMUNITY_USER_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'invalid', verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ communityId: 'invalid', verbose: true }) }),
       new CommandError(errorMessage));
   });
 });

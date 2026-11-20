@@ -1,22 +1,40 @@
 import fs from 'fs';
 import path from 'path';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().refine(val => validation.isValidGuid(val), {
+    message: 'The value must be a valid GUID.'
+  }).optional().alias('i'),
+  name: z.string().optional().alias('n'),
+  filePath: z.string()
+    .refine(val => {
+      const fullPath = path.resolve(val);
+      if (!fs.existsSync(fullPath)) {
+        return false;
+      }
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        return false;
+      }
+      return true;
+    }, {
+      message: 'Specified file does not exist or points to a directory.'
+    })
+    .alias('p')
+});
+
+declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
-  filePath: string;
 }
 
 class TeamsAppUpdateCommand extends GraphCommand {
@@ -28,62 +46,19 @@ class TeamsAppUpdateCommand extends GraphCommand {
     return 'Updates Teams app in the organization\'s app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.name].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either id or name, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'name']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-p, --filePath <filePath>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
-
-        const fullPath: string = path.resolve(args.options.filePath);
-
-        if (!fs.existsSync(fullPath)) {
-          return `File '${fullPath}' not found`;
-        }
-
-        if (fs.lstatSync(fullPath).isDirectory()) {
-          return `Path '${fullPath}' points to a directory`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

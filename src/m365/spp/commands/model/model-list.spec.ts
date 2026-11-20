@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './model-list.js';
+import command, { options } from './model-list.js';
 
 describe(commands.MODEL_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const models = [
     {
       "AIBuilderHybridModelType": null,
@@ -55,6 +56,7 @@ describe(commands.MODEL_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -96,14 +98,23 @@ describe(commands.MODEL_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['AIBuilderHybridModelType', 'ContentTypeName', 'LastTrained', 'UniqueId']);
   });
 
-  it('passes validation when required parameters are valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when required parameters are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when siteUrl is not valid', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'invalidUrl' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when siteUrl is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sales',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly handles site is not Content Site', async () => {
@@ -117,7 +128,7 @@ describe(commands.MODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal' }) }),
       new CommandError('https://contoso.sharepoint.com/sites/portal is not a content site.'));
   });
 
@@ -140,7 +151,7 @@ describe(commands.MODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/portal' }) }),
       new CommandError('Attempted to perform an unauthorized operation.'));
   });
 
@@ -160,7 +171,7 @@ describe(commands.MODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal' }) });
     assert(loggerLogSpy.calledOnceWithExactly(models));
   });
 
@@ -179,7 +190,7 @@ describe(commands.MODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/portal/' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/portal/' }) });
     assert(loggerLogSpy.calledOnceWithExactly(models));
   });
 });

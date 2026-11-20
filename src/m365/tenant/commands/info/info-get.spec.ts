@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './info-get.js';
+import command, { options } from './info-get.js';
 
 describe(commands.INFO_GET, () => {
   const domainName = 'contoso.com';
@@ -28,6 +28,7 @@ describe(commands.INFO_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +37,7 @@ describe(commands.INFO_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     if (!auth.connection.accessTokens[auth.defaultResource]) {
       auth.connection.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
@@ -79,19 +81,32 @@ describe(commands.INFO_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the tenantId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { tenantId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the tenantId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ tenantId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the tenantId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { tenantId: tenantId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the tenantId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ tenantId: tenantId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both domainName and tenantId are specified', async () => {
-    const actual = await command.validate({ options: { domainName: domainName, tenantId: tenantId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both domainName and tenantId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ domainName: domainName, tenantId: tenantId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      domainName: domainName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
   it('gets tenant information for the currently signed in user if no domain name or tenantId is passed', async () => {
@@ -107,7 +122,7 @@ describe(commands.INFO_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly(tenantInfoResponse));
     sinonUtil.restore(accessToken.getUserNameFromAccessToken);
   });
@@ -121,7 +136,7 @@ describe(commands.INFO_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { verbose: true, domainName: domainName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, domainName: domainName }) });
     assert(loggerLogSpy.calledOnceWithExactly(tenantInfoResponse));
   });
 
@@ -134,7 +149,7 @@ describe(commands.INFO_GET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { verbose: true, tenantId: tenantId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, tenantId: tenantId }) });
     assert(loggerLogSpy.calledOnceWithExactly(tenantInfoResponse));
   });
 
@@ -157,7 +172,7 @@ describe(commands.INFO_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { tenantId: tenantId } } as any), new CommandError("Unable to read the company information from the directory."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ tenantId: tenantId }) }), new CommandError("Unable to read the company information from the directory."));
   });
 
   it('handles error when trying to retrieve information for a non-existant tenant by domain name', async () => {
@@ -179,11 +194,11 @@ describe(commands.INFO_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(command.action(logger, { options: { domainName: 'xyz.com' } } as any), new CommandError("Unable to read the company information from the directory."));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ domainName: 'xyz.com' }) }), new CommandError("Unable to read the company information from the directory."));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { domainName: 'xyz.com' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ domainName: 'xyz.com' }) }), new CommandError('An error has occurred'));
   });
 });

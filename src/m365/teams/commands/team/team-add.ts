@@ -1,7 +1,8 @@
 import { Group, TeamsAsyncOperation } from '@microsoft/microsoft-graph-types';
 import { setTimeout } from 'timers/promises';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -12,21 +13,48 @@ import auth from '../../../../Auth.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  name: z.string().optional().alias('n'),
+  description: z.string().optional().alias('d'),
+  template: z.string().optional(),
+  wait: z.boolean().optional(),
+  ownerUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for option 'ownerUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional(),
+  ownerIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for option 'ownerIds': ${validation.isValidGuidArray(e.input as string)}.`
+    })
+    .optional(),
+  ownerEmails: z.string()
+    .refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+      error: e => `The following user principal names are invalid for option 'ownerEmails': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional(),
+  memberUserNames: z.string()
+    .refine(names => validation.isValidUserPrincipalNameArray(names) === true, {
+      error: e => `The following user principal names are invalid for option 'memberUserNames': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional(),
+  memberIds: z.string()
+    .refine(ids => validation.isValidGuidArray(ids) === true, {
+      error: e => `The following GUIDs are invalid for option 'memberIds': ${validation.isValidGuidArray(e.input as string)}.`
+    })
+    .optional(),
+  memberEmails: z.string()
+    .refine(emails => validation.isValidUserPrincipalNameArray(emails) === true, {
+      error: e => `The following user principal names are invalid for option 'memberEmails': ${validation.isValidUserPrincipalNameArray(e.input as string)}.`
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  description?: string;
-  name?: string;
-  template?: string;
-  wait?: boolean;
-  ownerUserNames?: string;
-  ownerIds?: string;
-  ownerEmails?: string;
-  memberUserNames?: string;
-  memberIds?: string;
-  memberEmails?: string;
 }
 
 class TeamsTeamAddCommand extends GraphCommand {
@@ -40,144 +68,40 @@ class TeamsTeamAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        name: typeof args.options.name !== 'undefined',
-        description: typeof args.options.description !== 'undefined',
-        template: typeof args.options.template !== 'undefined',
-        wait: !!args.options.wait,
-        ownerUserNames: typeof args.options.ownerUserNames !== 'undefined',
-        ownerIds: typeof args.options.ownerIds !== 'undefined',
-        ownerEmails: typeof args.options.ownerEmails !== 'undefined',
-        memberUserNames: typeof args.options.memberUserNames !== 'undefined',
-        memberIds: typeof args.options.memberIds !== 'undefined',
-        memberEmails: typeof args.options.memberEmails !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !!opts.template || opts.name !== undefined, {
+        message: `Specify 'name' when not using a template.`,
+        path: ['name'],
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !!opts.template || opts.description !== undefined, {
+        message: `Specify 'description' when not using a template.`,
+        path: ['description'],
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => [opts.ownerUserNames, opts.ownerIds, opts.ownerEmails].filter(o => o !== undefined).length <= 1, {
+        message: `Specify only one of the following options: 'ownerUserNames', 'ownerIds' or 'ownerEmails'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['ownerUserNames', 'ownerIds', 'ownerEmails']
+        }
+      })
+      .refine(opts => [opts.memberUserNames, opts.memberIds, opts.memberEmails].filter(o => o !== undefined).length <= 1, {
+        message: `Specify only one of the following options: 'memberUserNames', 'memberIds' or 'memberEmails'.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['memberUserNames', 'memberIds', 'memberEmails']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--template [template]'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--ownerUserNames [ownerUserNames]'
-      },
-      {
-        option: '--ownerIds [ownerIds]'
-      },
-      {
-        option: '--ownerEmails [ownerEmails]'
-      },
-      {
-        option: '--memberUserNames [memberUserNames]'
-      },
-      {
-        option: '--memberIds [memberIds]'
-      },
-      {
-        option: '--memberEmails [memberEmails]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.ownerUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'ownerUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.ownerEmails) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.ownerEmails);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'ownerEmails': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.ownerIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.ownerIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'ownerIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberUserNames) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberUserNames);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'memberUserNames': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberEmails) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.memberEmails);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'memberEmails': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        if (args.options.memberIds) {
-          const isValidGUIDArrayResult = validation.isValidGuidArray(args.options.memberIds);
-          if (isValidGUIDArrayResult !== true) {
-            return `The following GUIDs are invalid for the option 'memberIds': ${isValidGUIDArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['name'],
-        runsWhen: (args) => {
-          return !args.options.template;
-        }
-      },
-      {
-        options: ['description'],
-        runsWhen: (args) => {
-          return !args.options.template;
-        }
-      },
-      {
-        options: ['ownerUserNames', 'ownerIds', 'ownerEmails'],
-        runsWhen: (args) => {
-          return args.options.ownerUserNames || args.options.ownerIds || args.options.ownerEmails;
-        }
-      },
-      {
-        options: ['memberUserNames', 'memberIds', 'memberEmails'],
-        runsWhen: (args) => {
-          return args.options.memberUserNames || args.options.memberIds || args.options.memberEmails;
-        }
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

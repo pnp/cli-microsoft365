@@ -1,20 +1,27 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CanvasSection } from './clientsidepages.js';
 import { Page } from './Page.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  pageName: z.string().alias('n')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  pageName: string;
-  section: number;
-  webUrl: string;
 }
 
 class SpoPageSectionListCommand extends SpoCommand {
@@ -26,28 +33,8 @@ class SpoPageSectionListCommand extends SpoCommand {
     return 'Lists sections in the specific modern page';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --pageName <pageName>'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -56,24 +43,22 @@ class SpoPageSectionListCommand extends SpoCommand {
       const sections: CanvasSection[] = clientSidePage.sections;
 
       const isJSONOutput = !cli.shouldTrimOutput(args.options.output);
-      if (sections.length) {
-        const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
-        if (isJSONOutput) {
-          await logger.log(output);
-        }
-        else {
-          await logger.log(output.map(s => {
-            const sectionOutput: any = {
-              order: s.order,
-              columns: s.columns.length
-            };
+      const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
+      if (isJSONOutput) {
+        await logger.log(output);
+      }
+      else {
+        await logger.log(output.map(s => {
+          const sectionOutput: any = {
+            order: s.order,
+            columns: s.columns.length
+          };
 
-            if (s.isVertical) {
-              sectionOutput.isVertical = s.isVertical;
-            }
-            return sectionOutput;
-          }));
-        }
+          if (s.isVertical) {
+            sectionOutput.isVertical = s.isVertical;
+          }
+          return sectionOutput;
+        }));
       }
     }
     catch (err: any) {

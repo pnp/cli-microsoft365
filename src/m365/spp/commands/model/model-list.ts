@@ -1,5 +1,6 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import { odata } from '../../../../utils/odata.js';
 import { spp } from '../../../../utils/spp.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -7,12 +8,19 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  siteUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  siteUrl: string;
 }
 
 class SppModelListCommand extends SpoCommand {
@@ -28,32 +36,8 @@ class SppModelListCommand extends SpoCommand {
     return ['AIBuilderHybridModelType', 'ContentTypeName', 'LastTrained', 'UniqueId'];
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('siteUrl');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        return validation.isValidSharePointUrl(args.options.siteUrl);
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

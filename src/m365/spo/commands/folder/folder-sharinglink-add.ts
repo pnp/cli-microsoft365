@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
@@ -10,25 +11,51 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands.js';
 
+const allowedTypes = ['view', 'edit'] as const;
+const allowedScopes = ['anonymous', 'organization', 'users'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folderId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID for option 'folderId'.`
+    })
+    .optional(),
+  folderUrl: z.string().optional(),
+  type: z.string().pipe(z.enum(allowedTypes, {
+    error: e => `'${e.input}' is not a valid type. Allowed values are: ${allowedTypes.join(',')}`
+  })),
+  expirationDateTime: z.string()
+    .refine(dateTime => validation.isValidISODateTime(dateTime), {
+      error: e => `'${e.input}' is not a valid ISO date string.`
+    })
+    .optional(),
+  scope: z.enum(allowedScopes, {
+    error: e => `'${e.input}' is not a valid scope. Allowed values are: ${allowedScopes.join(', ')}.`
+  }).optional(),
+  retainInheritedPermissions: z.boolean().optional(),
+  recipients: z.string()
+    .refine(recipients => validation.isValidUserPrincipalNameArray(recipients) === true, {
+      error: e => {
+        const invalidUpns = String(e.input).split(',').map(upn => upn.trim()).filter(upn => !validation.isValidUserPrincipalName(upn));
+        return `The following user principal names are invalid for the option 'recipients': ${invalidUpns.join(', ')}.`;
+      }
+    })
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folderUrl?: string;
-  folderId?: string;
-  type: string;
-  expirationDateTime?: string;
-  scope?: string;
-  retainInheritiedPermissions?: boolean;
-  recipients?: string;
-}
-
 class SpoFolderSharingLinkAddCommand extends SpoCommand {
-  private readonly allowedTypes: string[] = ['view', 'edit'];
-  private readonly allowedScopes: string[] = ['anonymous', 'organization', 'users'];
-
   public get name(): string {
     return commands.FOLDER_SHARINGLINK_ADD;
   }
@@ -37,112 +64,26 @@ class SpoFolderSharingLinkAddCommand extends SpoCommand {
     return 'Creates a new sharing link to a folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderId: typeof args.options.folderId !== 'undefined',
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
-        type: typeof args.options.type !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
-        retainInheritiedPermissions: !!args.options.retainInheritiedPermissions,
-        recipients: typeof args.options.recipients !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.folderId, opts.folderUrl].filter(o => o !== undefined).length === 1, {
+        error: `Specify one of the following options: folderId, folderUrl.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['folderId', 'folderUrl']
+        }
+      })
+      .refine(opts => opts.scope !== 'users' || opts.recipients !== undefined, {
+        error: `Specify recipients when the scope is set to 'users'.`,
+        path: ['recipients'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--folderId [folderId]'
-      },
-      {
-        option: '--folderUrl [folderUrl]'
-      },
-      {
-        option: '--type <type>',
-        autocomplete: this.allowedTypes
-      },
-      {
-        option: '--expirationDateTime [expirationDateTime]'
-      },
-      {
-        option: '--scope [scope]',
-        autocomplete: this.allowedScopes
-      },
-      {
-        option: '--retainInheritedPermissions [retainInheritedPermissions]'
-      },
-      {
-        option: '--recipients [recipients]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.folderId && !validation.isValidGuid(args.options.folderId)) {
-          return `${args.options.folderId} is not a valid GUID`;
-        }
-
-        if (args.options.type && !this.allowedTypes.some(type => type === args.options.type)) {
-          return `'${args.options.type}' is not a valid type. Allowed values are: ${this.allowedTypes.join(',')}`;
-        }
-
-        if (args.options.scope) {
-          if (!this.allowedScopes.includes(args.options.scope)) {
-            return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(', ')}.`;
-          }
-        }
-
-        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
-          return `${args.options.expirationDateTime} is not a valid ISO date string.`;
-        }
-
-        if (args.options.recipients) {
-          const isValidUPNArrayResult = validation.isValidUserPrincipalNameArray(args.options.recipients);
-          if (isValidUPNArrayResult !== true) {
-            return `The following user principal names are invalid for the option 'recipients': ${isValidUPNArrayResult}.`;
-          }
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['folderId', 'folderUrl'] },
-      {
-        options: ['recipients'],
-        runsWhen: (args) => args.options.scope !== undefined && args.options.scope === 'users'
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folderId', 'folderUrl', 'type', 'expirationDateTime', 'scope', 'recipients');
-    this.types.boolean.push('retainInheritiedPermissions');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -169,7 +110,7 @@ class SpoFolderSharingLinkAddCommand extends SpoCommand {
           type: args.options.type,
           expirationDateTime: args.options.expirationDateTime,
           scope: args.options.scope,
-          retainInheritedPermissions: !!args.options.retainInheritiedPermissions
+          retainInheritedPermissions: !!args.options.retainInheritedPermissions
         }
       };
 

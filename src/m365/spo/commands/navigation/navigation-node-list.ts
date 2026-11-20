@@ -1,11 +1,11 @@
 import { Logger } from '../../../../cli/Logger.js';
 import { globalOptionsZod } from '../../../../Command.js';
 import { z } from 'zod';
-import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { NavigationNode } from './NavigationNode.js';
+import { MenuState } from './NavigationNode.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
@@ -14,7 +14,7 @@ export const options = z.strictObject({
       error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
     })
     .alias('u'),
-  location: z.enum(['QuickLaunch', 'TopNavigationBar']).alias('l')
+  location: z.string().pipe(z.enum(['QuickLaunch', 'TopNavigationBar'])).alias('l')
 });
 declare type Options = z.infer<typeof options>;
 
@@ -32,7 +32,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Id', 'Title', 'Url'];
+    return ['Key', 'Title', 'SimpleUrl'];
   }
 
   public get schema(): z.ZodType {
@@ -45,8 +45,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
     }
 
     try {
-      const res = await odata.getAllItems<NavigationNode>(`${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}?$expand=Children,Children/Children,Children/Children/Children`);
-      await logger.log(res);
+      const menuState: MenuState = args.options.location === 'TopNavigationBar'
+        ? await spo.getTopNavigationMenuState(args.options.webUrl)
+        : await spo.getQuickLaunchMenuState(args.options.webUrl);
+      await logger.log(menuState.Nodes);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

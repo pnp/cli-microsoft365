@@ -1,8 +1,12 @@
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant.js';
+
+export const options = globalOptionsZod.strict();
 
 class SpoServicePrincipalGrantListCommand extends GraphCommand {
   private readonly spoServicePrincipalDisplayName = 'SharePoint Online Web Client Extensibility';
@@ -17,6 +21,10 @@ class SpoServicePrincipalGrantListCommand extends GraphCommand {
 
   public alias(): string[] | undefined {
     return [commands.SP_GRANT_LIST];
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger): Promise<void> {

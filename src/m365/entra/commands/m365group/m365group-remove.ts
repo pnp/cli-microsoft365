@@ -1,9 +1,9 @@
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
-import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import config from '../../../../config.js';
@@ -11,15 +11,18 @@ import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
 import { setTimeout } from 'timers/promises';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.uuid().optional().alias('i'),
+  displayName: z.string().optional().alias('n'),
+  force: z.boolean().optional().alias('f'),
+  permanent: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
-  displayName?: string;
-  force?: boolean;
-  permanent?: boolean;
 }
 
 class EntraM365GroupRemoveCommand extends GraphCommand {
@@ -34,61 +37,19 @@ class EntraM365GroupRemoveCommand extends GraphCommand {
     return 'Removes a Microsoft 365 Group';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString(),
-        permanent: !!args.options.permanent
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '-f, --force'
-      },
-      {
-        option: '--permanent'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.id, opts.displayName].filter(o => o !== undefined).length === 1, {
+        error: 'Use one of the following options: id or displayName.',
+        params: {
+          customCode: 'optionSet',
+          options: ['id', 'displayName']
         }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'displayName'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('id', 'displayName');
-    this.types.boolean.push('permanent');
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

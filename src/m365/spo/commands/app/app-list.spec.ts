@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-list.js';
+import command, { options } from './app-list.js';
 
 describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.APP_LIST, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -101,7 +103,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert(loggerLogSpy.calledWith([
       {
         ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -146,7 +148,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }) });
     assert(loggerLogSpy.calledWith([
       {
         ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
@@ -203,7 +205,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith([
       {
         "AppCatalogVersion": "1.0.0.0",
@@ -244,17 +246,17 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
   it('handles if tenant appcatalog is null or not exist (debug)', async () => {
     sinon.stub(request, 'get').resolves(JSON.stringify({ "CorporateCatalogUrl": null }));
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true
-      }
-    } as any), new CommandError('Tenant app catalog is not configured.'));
+      })
+    }), new CommandError('Tenant app catalog is not configured.'));
   });
 
   it('correctly handles no apps in the site app catalog', async () => {
@@ -270,42 +272,52 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' }) });
     assert(loggerLogSpy.calledOnceWithExactly([]));
   });
 
-  it('fails validation when invalid scope is specified', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid scope is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Invalid option: expected one of "tenant"|"sitecollection"');
   });
 
-  it('passes validation when no scope is specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when no scope is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the scope is specified with \'tenant\'', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'tenant' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the scope is specified with \'tenant\'', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'tenant' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when appCatalogUrl is not a valid url', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when appCatalogUrl is not a valid url', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'sitecollection', appCatalogUrl: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
-  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'sitecollection' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'You must specify appCatalogUrl when the appCatalogScope is sitecollection');
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'contoso.sharepoint.com' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', async () => {
-    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', () => {
+    const actual = commandOptionsSchema.safeParse({ appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'Unrecognized key: "unknownOption"');
   });
 });

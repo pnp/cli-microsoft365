@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './hubsite-disconnect.js';
+import command, { options } from './hubsite-disconnect.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_DISCONNECT, () => {
@@ -44,6 +44,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
@@ -54,6 +55,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
 
     sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -115,39 +117,56 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid GUID`);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'Invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'Invalid' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if valid id is specified', async () => {
-    const actual = await command.validate({ options: { id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid id is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if valid title is specified', async () => {
-    const actual = await command.validate({ options: { title: title } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid title is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ title: title });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if valid url is specified', async () => {
-    const actual = await command.validate({ options: { url: url } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if valid url is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ url: url });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, title: title });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if no hub site is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: id }) });
 
     assert(promptIssued);
   });
 
   it('aborts disconnecting hub site when prompt not confirmed', async () => {
-    await command.action(logger, { options: { url: url } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: url }) });
     assert(patchStub.notCalled);
   });
 
@@ -164,11 +183,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         verbose: true,
         force: true
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: '00000000-0000-0000-0000-000000000000' }, 'Request body does not match');
@@ -188,11 +207,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         verbose: true,
         force: true
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: '00000000-0000-0000-0000-000000000000' }, 'Request body does not match');
@@ -212,11 +231,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: url,
         verbose: true,
         force: true
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: '00000000-0000-0000-0000-000000000000' }, 'Request body does not match');
@@ -239,9 +258,9 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title
-      }
+      })
     });
   });
 
@@ -278,10 +297,10 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         force: true
-      }
+      })
     }), new CommandError("Multiple hub sites with name 'Hub Site' found. Found: 55b979e7-36b6-4968-b3af-6ae221a3483f, a9d15b9d-152c-4fa2-be3a-3fbf086f3d49."));
   });
 
@@ -316,11 +335,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         verbose: true,
         force: true
-      }
+      })
     });
 
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: '00000000-0000-0000-0000-000000000000' }, 'Request body does not match');
@@ -342,10 +361,10 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         title: title,
         force: true
-      }
+      })
     }), new CommandError(`The specified hub site '${title}' does not exist.`));
   });
 
@@ -364,10 +383,10 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         url: url,
         force: true
-      }
+      })
     }), new CommandError(`The specified hub site '${url}' does not exist.`));
   });
 
@@ -385,10 +404,10 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(request, 'patch').rejects({ error: { 'odata.error': { message: { value: errorMessage } } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: id,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

@@ -129,6 +129,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'site.com', id: '255a50b2-527f-4413-8485-57f4c17a24d1' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'site.com' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the hub site ID is not a valid GUID', async () => {

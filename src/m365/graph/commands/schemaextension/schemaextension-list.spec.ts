@@ -124,6 +124,24 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       sinonUtil.restore(request.get);
     }
   });
+
+  it('returns an empty array when no schema extensions are found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
+          "value": []
+        };
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({})
+    });
+    assert(loggerLogSpy.calledOnceWithExactly([]));
+  });
+
   it('lists two schema extensions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
@@ -486,6 +504,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('fails validation if the owner is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ owner: '123' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, '123 is not a valid GUID');
   });
   it('fails validation if the status is not a valid status', () => {
     const actual = commandOptionsSchema.safeParse({ status: 'test' });

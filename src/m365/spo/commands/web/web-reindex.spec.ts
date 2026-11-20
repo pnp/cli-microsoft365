@@ -418,6 +418,7 @@ describe(commands.WEB_REINDEX, () => {
   it('fails validation if url is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ url: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'invalid is not a valid SharePoint Online site URL.');
   });
 
   it('passes validation if url is valid', () => {

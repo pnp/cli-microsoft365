@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './tab-add.js';
+import command, { options } from './tab-add.js';
 
 describe(commands.TAB_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.TAB_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -60,17 +62,15 @@ describe(commands.TAB_ADD, () => {
     assert.strictEqual(command.name, commands.TAB_ADD);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'test',
+      contentUrl: '/',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('has a description', () => {
@@ -82,71 +82,77 @@ describe(commands.TAB_ADD, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('fails validates for a incorrect channelId missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'test',
+      contentUrl: '/',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validates for a incorrect channelId missing trailing @thread.skype.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validates for a incorrect channelId missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'test',
+      contentUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('validates for a correct input.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validates for a incorrect channelId missing trailing @thread.skype.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'test',
+      contentUrl: '/'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('validates for a correct input.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'test',
+      contentUrl: '/'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('creates tab in channel within the Microsoft Teams team in the tenant', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return {
-          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+          "id": "119:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
-          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+          "webUrl": "https://teams.microsoft.com/l/channel/119:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         };
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-        channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
         contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
-      "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+      "id": "119:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
       "displayName": "testweb",
-      "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+      "webUrl": "https://teams.microsoft.com/l/channel/119:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
     }));
   });
 
@@ -154,19 +160,19 @@ describe(commands.TAB_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return {
-          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+          "id": "119:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
-          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+          "webUrl": "https://teams.microsoft.com/l/channel/119:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         };
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-        channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
         entityId: 'https://contoso.sharepoint.com/Shared%20Documents/',
@@ -174,12 +180,12 @@ describe(commands.TAB_ADD, () => {
         contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
-      "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+      "id": "119:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
       "displayName": "testweb",
-      "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+      "webUrl": "https://teams.microsoft.com/l/channel/119:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
     }));
   });
 
@@ -187,21 +193,21 @@ describe(commands.TAB_ADD, () => {
     const postStub: Sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return {
-          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+          "id": "119:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
-          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+          "webUrl": "https://teams.microsoft.com/l/channel/119:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         };
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         verbose: true,
         output: "text",
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-        channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
         entityId: 'https://contoso.sharepoint.com/Shared%20Documents/',
@@ -209,7 +215,7 @@ describe(commands.TAB_ADD, () => {
         contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
-      }
+      })
     });
     assert.deepEqual(postStub.firstCall.args[0].data, {
       'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
@@ -240,15 +246,15 @@ describe(commands.TAB_ADD, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-        channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
+        channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
         contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/'
-      }
-    } as any), new CommandError('An error has occurred'));
+      })
+    }), new CommandError('An error has occurred'));
   });
 
 });

@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,14 +11,18 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './engage-role-list.js';
+import command, { options } from './engage-role-list.js';
 
 describe(commands.ENGAGE_ROLE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -63,6 +69,16 @@ describe(commands.ENGAGE_ROLE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it(`should get a list of Viva Engage roles`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/employeeExperience/roles`) {
@@ -88,7 +104,7 @@ describe(commands.ENGAGE_ROLE_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { verbose: true }
+      options: commandOptionsSchema.parse({ verbose: true })
     });
 
     assert(
@@ -118,7 +134,7 @@ describe(commands.ENGAGE_ROLE_LIST, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} }),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });

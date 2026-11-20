@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './page-add.js';
+import command, { options } from './page-add.js';
 
 describe(commands.PAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const fileResponse = {
     Attachments: false,
     AuthorId: 3,
@@ -45,6 +46,7 @@ describe(commands.PAGE_ADD, () => {
     });
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -141,7 +143,7 @@ describe(commands.PAGE_ADD, () => {
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -257,7 +259,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' }) });
   });
 
   it('creates new modern page on root of tenant (debug)', async () => {
@@ -343,7 +345,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }) });
   });
 
   it('automatically appends the .aspx extension', async () => {
@@ -412,7 +414,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await assert.rejects(command.action(logger, { options: { name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -484,7 +486,7 @@ describe(commands.PAGE_ADD, () => {
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', title: 'My page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', title: 'My page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -566,7 +568,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -659,7 +661,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'NewsPage' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'NewsPage' }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -759,7 +761,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template', layoutType: 'Article' } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template', layoutType: 'Article' }) } as any);
     assert(loggerLogSpy.notCalled);
   });
 
@@ -846,7 +848,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage' }) });
   });
 
   it('creates new modern page with comments enabled', async () => {
@@ -917,7 +919,7 @@ describe(commands.PAGE_ADD, () => {
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1011,7 +1013,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: false } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: false }) });
     assert.deepStrictEqual(savedAsDraft, true);
   });
 
@@ -1102,7 +1104,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1193,7 +1195,7 @@ describe(commands.PAGE_ADD, () => {
     });
     sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
-    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' }) });
   });
 
   it('escapes special characters in user input', async () => {
@@ -1254,7 +1256,7 @@ describe(commands.PAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' } }));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' }) }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1263,174 +1265,106 @@ describe(commands.PAGE_ADD, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' }) }),
       new CommandError('An error has occurred'));
   });
 
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if webUrl is not an absolute URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('supports specifying webUrl', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--webUrl') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if webUrl is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'http://foo' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'http://foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('supports specifying page layout', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--layoutType') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying page promote option', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--promoteAs') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying if comments should be enabled', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--commentsEnabled') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation when name has no extension', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page', webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('supports specifying if page should be published', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--publish') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('fails validation if layout type is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('supports specifying page publish message', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--publishMessage') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation if layout type is Home', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Home' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if webUrl is not an absolute URL', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if layout type is Article', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'http://foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if layout type is SingleWebPartAppPage', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout type is RepostPage', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when name has no extension', async () => {
-    const actual = await command.validate({ options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout type is HeaderlessSearchResults', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if layout type is invalid', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation if layout type is Spaces', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout type is Home', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Home' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if layout type is Topic', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout type is Article', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if promote type is invalid', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if layout type is SingleWebPartAppPage', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if promote type is HomePage', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Home' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout type is RepostPage', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if promote type is NewsPage', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout type is HeaderlessSearchResults', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if promote type is Template', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if layout type is Spaces', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if promote type is HomePage but layout type is not Home', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'You can only promote home pages as site home page');
   });
 
-  it('passes validation if layout type is Topic', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if promote type is invalid', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if promote type is HomePage', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Home' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if promote type is NewsPage', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if promote type is Template', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if promote type is HomePage but layout type is not Home', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if promote type is NewsPage but layout type is not Article', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage', layoutType: 'Home' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if promote type is NewsPage but layout type is not Article', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage', layoutType: 'Home' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'You can only promote article pages as news article');
   });
 });

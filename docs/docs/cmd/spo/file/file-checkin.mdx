@@ -22,7 +22,7 @@ m365 spo file checkin [options]
 : The server- or site-relative decoded URL of the file to retrieve. Specify either `url` or `id` but not both.
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both.
+: The unique ID (GUID) of the file to retrieve. Specify either `url` or `id` but not both.
 
 `-t, --type [type]`
 : Type of the check in. Allowed values: `Minor`, `Major`, `Overwrite`. Defaults to `Major`.
@@ -54,7 +54,7 @@ m365 spo file checkin [options]
 
 ## Examples
 
-Checks in file with the specified UniqueId located in the specified site.
+Checks in file with the specified unique ID located in the specified site.
 
 ```sh
 m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'

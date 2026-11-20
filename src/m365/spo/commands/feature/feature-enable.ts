@@ -1,19 +1,33 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-interface CommandArgs {
-  options: Options;
+enum FeatureScope {
+  Site = 'Site',
+  Web = 'Web'
 }
 
-interface Options extends GlobalOptions {
-  webUrl: string;
-  id: string;
-  scope?: string;
-  force?: boolean;
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} is not a valid GUID for option id.`
+  }).alias('i'),
+  scope: zod.coercedEnum(FeatureScope).optional().alias('s'),
+  force: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
+interface CommandArgs {
+  options: Options;
 }
 
 class SpoFeatureEnableCommand extends SpoCommand {
@@ -25,71 +39,13 @@ class SpoFeatureEnableCommand extends SpoCommand {
     return 'Enables feature for the specified site or web';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        scope: args.options.scope || 'web',
-        force: args.options.force || false
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web']
-      },
-      {
-        option: '--force'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID for option id.`;
-        }
-
-        if (args.options.scope) {
-          if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
-            return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
-          }
-        }
-
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('scope', 's');
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let scope: string | undefined = args.options.scope;
+    const scope: string = args.options.scope ?? 'Web';
     const force: boolean = !!args.options.force;
-
-    if (!scope) {
-      scope = "web";
-    }
 
     if (this.verbose) {
       await logger.logToStderr(`Enabling feature '${args.options.id}' on scope '${scope}' for url '${args.options.webUrl}' (force='${force}')...`);

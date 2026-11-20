@@ -136,16 +136,19 @@ describe(commands.PAGE_LIST, () => {
   it('fails validation if the userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ userId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if the groupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ groupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('passes validation if the groupId is a valid GUID', () => {

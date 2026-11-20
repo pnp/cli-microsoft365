@@ -68,6 +68,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: 'foo' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, 'foo is not a valid SharePoint Online site URL.');
   });
 
   it('passes validation if all required options are specified', () => {

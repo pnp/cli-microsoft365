@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { Chat } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { validation } from '../../../../utils/validation.js';
@@ -11,21 +12,32 @@ import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  chatId: z.string().refine(val => validation.isValidTeamsChatId(val), {
+    message: 'The value is not a valid Teams ChatId.'
+  }).optional(),
+  userEmails: z.string().refine(val => {
+    const userEmails = val.trim().toLowerCase().split(',').filter(e => e && e !== '');
+    if (!userEmails || userEmails.length === 0) {
+      return false;
+    }
+    return userEmails.every(e => validation.isValidUserPrincipalName(e));
+  }, {
+    message: 'The option userEmails contains one or more invalid email addresses.'
+  }).alias('e').optional(),
+  chatName: z.string().optional(),
+  message: z.string().alias('m'),
+  contentType: z.enum(['text', 'html']).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  chatId?: string;
-  userEmails?: string;
-  chatName?: string;
-  message: string;
-  contentType?: string;
-}
-
 class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
-  private readonly contentTypes = ['text', 'html'];
-
   public get name(): string {
     return commands.CHAT_MESSAGE_SEND;
   }
@@ -34,72 +46,19 @@ class TeamsChatMessageSendCommand extends GraphDelegatedCommand {
     return 'Sends a chat message to a Microsoft Teams chat conversation.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        chatId: typeof args.options.chatId !== 'undefined',
-        userEmails: typeof args.options.userEmails !== 'undefined',
-        chatName: typeof args.options.chatName !== 'undefined',
-        contentType: args.options.contentType ?? 'text'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.chatId, opts.userEmails, opts.chatName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify one of chatId, userEmails or chatName, but not more than one.',
+        params: {
+          customCode: 'optionSet',
+          options: ['chatId', 'userEmails', 'chatName']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '--chatId [chatId]'
-      },
-      {
-        option: '-e, --userEmails [userEmails]'
-      },
-      {
-        option: '--chatName [chatName]'
-      },
-      {
-        option: '-m, --message <message>'
-      },
-      {
-        option: '--contentType [contentType]',
-        autocomplete: this.contentTypes
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid Teams ChatId.`;
-        }
-
-        if (args.options.userEmails) {
-          const userEmails = args.options.userEmails.trim().toLowerCase().split(',').filter(e => e && e !== '');
-          if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
-            return `${args.options.userEmails} contains one or more invalid email addresses.`;
-          }
-        }
-
-        if (args.options.contentType && !this.contentTypes.includes(args.options.contentType)) {
-          return `'${args.options.contentType}' is not a valid value for option contentType. Allowed values are ${this.contentTypes.join(', ')}.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['chatId', 'userEmails', 'chatName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,6 +1,5 @@
 import { Channel } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { teams } from '../../../../utils/teams.js';
@@ -8,19 +7,39 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { cli } from '../../../../cli/cli.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'The value must be a valid GUID.'
+    })
+    .optional()
+    .alias('i'),
+  teamName: z.string()
+    .optional(),
+  channelId: z.string()
+    .refine(val => validation.isValidTeamsChannelId(val), {
+      message: 'The value is not a valid Teams channel id.'
+    })
+    .optional()
+    .alias('c'),
+  channelName: z.string()
+    .optional(),
+  userIds: z.string()
+    .optional(),
+  userDisplayNames: z.string()
+    .optional(),
+  owner: z.boolean()
+    .optional()
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  teamId?: string;
-  teamName?: string;
-  channelId?: string;
-  channelName?: string;
-  userIds?: string;
-  userDisplayNames?: string;
-  owner: boolean;
 }
 
 class TeamsChannelMemberAddCommand extends GraphCommand {
@@ -32,77 +51,33 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return 'Adds a specified member in the specified Microsoft Teams private or shared team channel';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        teamId: typeof args.options.teamId !== 'undefined',
-        teamName: typeof args.options.teamName !== 'undefined',
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined',
-        userIds: typeof args.options.userIds !== 'undefined',
-        userDisplayNames: typeof args.options.userDisplayNames !== 'undefined',
-        owner: args.options.owner
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.teamId, opts.teamName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either teamId or teamName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['teamId', 'teamName']
+        }
+      })
+      .refine(opts => [opts.channelId, opts.channelName].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either channelId or channelName, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['channelId', 'channelName']
+        }
+      })
+      .refine(opts => [opts.userIds, opts.userDisplayNames].filter(x => x !== undefined).length === 1, {
+        message: 'Specify either userIds or userDisplayNames, but not both.',
+        params: {
+          customCode: 'optionSet',
+          options: ['userIds', 'userDisplayNames']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-c, --channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '--userIds [userIds]'
-      },
-      {
-        option: '--userDisplayNames [userDisplayNames]'
-      },
-      {
-        option: '--owner'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['teamId', 'teamName'] },
-      { options: ['channelId', 'channelName'] },
-      { options: ['userIds', 'userDisplayNames'] }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

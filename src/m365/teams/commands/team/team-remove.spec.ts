@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-remove.js';
+import command, { options } from './team-remove.js';
 
 describe(commands.TEAM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.TEAM_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,22 +73,29 @@ describe(commands.TEAM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when the input is correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the input is correct', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when both id and name are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', name: 'Finance' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when neither id nor name is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails when team name does not exist', async () => {
@@ -102,32 +111,32 @@ describe(commands.TEAM_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'Finance',
         force: true
-      }
-    } as any), new CommandError("The specified team 'Finance' does not exist."));
+      })
+    }), new CommandError("The specified team 'Finance' does not exist."));
   });
 
   it('prompts before removing the specified team by id when force option not passed', async () => {
-    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "00000000-0000-0000-0000-000000000000" }) });
     assert(promptIssued);
   });
 
   it('prompts before removing the specified team by name when force option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, name: "Finance" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: "Finance" }) });
     assert(promptIssued);
   });
 
   it('aborts removing the specified team when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "00000000-0000-0000-0000-000000000000" }) });
     assert(postSpy.notCalled);
   });
 
   it('aborts removing the specified team when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: "00000000-0000-0000-0000-000000000000" }) });
     assert(postSpy.notCalled);
   });
 
@@ -146,7 +155,7 @@ describe(commands.TEAM_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: "00000000-0000-0000-0000-000000000000" }) });
     assert(teamsDeleteCallIssued);
   });
 
@@ -159,7 +168,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: "00000000-0000-0000-0000-000000000000", force: true }) });
   });
 
   it('removes the specified team by name without prompting when confirmed specified', async () => {
@@ -184,7 +193,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: "Finance", force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: "Finance", force: true }) });
   });
 
   it('should handle Microsoft graph error response', async () => {
@@ -208,6 +217,6 @@ describe(commands.TEAM_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }) }), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 });

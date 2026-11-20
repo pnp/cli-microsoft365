@@ -87,16 +87,19 @@ describe(commands.AUTOFILLCOLUMN_SET, () => {
   it('fails validation when siteUrl is not valid', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'invalidUrl', columnId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', listId: '421b1e42-794b-4c71-93ac-5ed92488b67d', prompt: 'test' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalidUrl' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation when column id is not valid', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', columnId: 'invalidId', listId: '421b1e42-794b-4c71-93ac-5ed92488b67d', prompt: 'test' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[1].message, `'invalidId' in parameter columnId is not a valid GUID.`);
   });
 
   it('fails validation when list id is not valid', async () => {
     const actual = commandOptionsSchema.safeParse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', columnId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', listId: 'invalidId', prompt: 'test' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[1].message, `'invalidId' in parameter listId is not a valid GUID.`);
   });
 
   it('fails validation when both columnId and columnTitle are provided', async () => {

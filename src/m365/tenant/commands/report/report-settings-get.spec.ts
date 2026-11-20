@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -9,12 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './report-settings-get.js';
+import command, { options } from './report-settings-get.js';
 
-describe(commands.REPORT_SETTINGS_SET, () => {
+describe(commands.REPORT_SETTINGS_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +26,8 @@ describe(commands.REPORT_SETTINGS_SET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -59,6 +65,16 @@ describe(commands.REPORT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('gets tenant level settings for microsoft 365 reports', async () => {
     const response = { "displayConcealedNames": true };
 
@@ -70,7 +86,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { debug: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true }) });
     assert.deepStrictEqual(loggerLogSpy.lastCall.args[0], response);
   });
 
@@ -83,7 +99,7 @@ describe(commands.REPORT_SETTINGS_SET, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: {} } as any),
+      command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError('An error has occurred')
     );
   });

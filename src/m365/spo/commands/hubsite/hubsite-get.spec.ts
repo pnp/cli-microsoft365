@@ -12,7 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
-import command from './hubsite-get.js';
+import command, { options } from './hubsite-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_GET, () => {
@@ -31,6 +31,7 @@ describe(commands.HUBSITE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -40,6 +41,7 @@ describe(commands.HUBSITE_GET, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -97,7 +99,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: validId }) });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
@@ -110,7 +112,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: validId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, id: validId }) });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
@@ -123,7 +125,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { title: validTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: validTitle }) });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
@@ -136,7 +138,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: validUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: validUrl }) });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
@@ -157,7 +159,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: validTitle } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: validTitle }) }),
       new CommandError("Multiple hub sites with Hub Site found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
   });
 
@@ -170,7 +172,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { title: validTitle } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ title: validTitle }) }),
       new CommandError(`The specified hub site ${validTitle} does not exist`));
   });
 
@@ -191,7 +193,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: validUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: validUrl }) }),
       new CommandError("Multiple hub sites with https://contoso.sharepoint.com found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
   });
 
@@ -206,7 +208,7 @@ describe(commands.HUBSITE_GET, () => {
 
     sinon.stub(cli, 'handleMultipleResultsFound').resolves(hubsiteResponse);
 
-    await command.action(logger, { options: { title: validTitle } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ title: validTitle }) });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
@@ -219,7 +221,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: validUrl } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: validUrl }) }),
       new CommandError(`The specified hub site ${validUrl} does not exist`));
   });
 
@@ -241,7 +243,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'text' } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'text' }) }),
       new CommandError(`withAssociatedSites option is only allowed with json output mode`));
   });
 
@@ -294,7 +296,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', withAssociatedSites: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
@@ -337,26 +339,41 @@ describe(commands.HUBSITE_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' }) }),
       new CommandError(`The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist`));
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, 'abc is not a valid GUID');
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it(`fails validation if the specified url is invalid`, async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'invalid URL'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it(`fails validation if the specified url is invalid`, () => {
+    const actual = commandOptionsSchema.safeParse({
+      url: 'invalid URL'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'invalid URL' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation if id and title are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, title: validTitle });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if no hub site is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ id: validId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

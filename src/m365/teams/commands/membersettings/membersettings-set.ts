@@ -1,22 +1,29 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { globalOptionsZod } from '../../../../Command.js';
+import { z } from 'zod';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  teamId: z.string()
+    .refine(val => validation.isValidGuid(val), {
+      message: 'teamId must be a valid GUID'
+    })
+    .alias('i'),
+  allowAddRemoveApps: z.boolean().optional(),
+  allowCreateUpdateChannels: z.boolean().optional(),
+  allowCreateUpdateRemoveConnectors: z.boolean().optional(),
+  allowCreateUpdateRemoveTabs: z.boolean().optional(),
+  allowDeleteChannels: z.boolean().optional()
+});
+
+declare type Options = z.infer<typeof options>;
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  allowAddRemoveApps?: boolean;
-  allowCreateUpdateChannels?: boolean;
-  allowCreateUpdateRemoveConnectors?: boolean;
-  allowCreateUpdateRemoveTabs?: boolean;
-  allowDeleteChannels?: boolean;
-  teamId: string;
 }
 
 class TeamsMemberSettingsSetCommand extends GraphCommand {
@@ -36,65 +43,8 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
     return 'Updates member settings of a Microsoft Teams team';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initTypes();
-    this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      TeamsMemberSettingsSetCommand.booleanProps.forEach(p => {
-        this.telemetryProperties[p] = (args.options as any)[p];
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--allowAddRemoveApps [allowAddRemoveApps]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowDeleteChannels [allowDeleteChannels]',
-        autocomplete: ['true', 'false']
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('allowAddRemoveApps', 'allowCreateUpdateChannels', 'allowCreateUpdateRemoveConnectors', 'allowCreateUpdateRemoveTabs', 'allowDeleteChannels');
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.teamId)) {
-          return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

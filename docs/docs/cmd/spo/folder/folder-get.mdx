@@ -22,7 +22,7 @@ m365 spo folder get [options]
 : The server- or site-relative decoded URL of the folder to retrieve. Specify either `folderUrl` or `id` but not both.
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the folder to retrieve. Specify either `url` or `id` but not both.
+: The unique ID (GUID) of the folder to retrieve. Specify either `url` or `id` but not both.
 
 `--withPermissions`
 : Set if you want to return associated roles and permissions of the folder. 
@@ -63,7 +63,7 @@ Get folder properties for a folder with a specific site-relative URL.
 m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents"
 ```
 
-Get folder properties for a folder with a specific id (UniqueId).
+Get folder properties for a folder with a specific id (unique ID).
 
 ```sh
 m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --id "b2307a39-e878-458b-bc90-03bc578531d6"

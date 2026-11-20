@@ -1,18 +1,23 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { periodBasedReportOptions } from '../../../base/PeriodBasedReport.js';
 import commands from '../../commands.js';
 import command from './m365group-report-activitycounts.js';
 
 describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof periodBasedReportOptions;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -20,6 +25,8 @@ describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof periodBasedReportOptions;
   });
 
   beforeEach(() => {
@@ -57,6 +64,21 @@ describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation on invalid period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'abc' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation on valid period', () => {
+    const actual = commandOptionsSchema.safeParse({ period: 'D7' });
+    assert.strictEqual(actual.success, true);
+  });
+
   it('gets the number of group activities across group workloads for the given period', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityCounts(period='D7')`) {
@@ -70,7 +92,7 @@ describe(commands.M365GROUP_REPORT_ACTIVITYCOUNTS, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { period: 'D7' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ period: 'D7' }) });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityCounts(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });

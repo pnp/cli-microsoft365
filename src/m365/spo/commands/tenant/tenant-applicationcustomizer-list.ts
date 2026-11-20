@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
+import { CommandError, globalOptionsZod } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
@@ -8,6 +9,8 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
+export const options = globalOptionsZod.strict();
+
 class SpoTenantApplicationCustomizerListCommand extends SpoCommand {
   public get name(): string {
     return commands.TENANT_APPLICATIONCUSTOMIZER_LIST;
@@ -15,6 +18,10 @@ class SpoTenantApplicationCustomizerListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Retrieves a list of application customizers that are installed tenant-wide.';
+  }
+
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public defaultProperties(): string[] | undefined {

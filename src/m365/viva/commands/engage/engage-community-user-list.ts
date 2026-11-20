@@ -12,7 +12,7 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   communityId: z.string().optional(),
   communityDisplayName: z.string().optional().alias('n'),
-  entraGroupId: z.uuid().optional(),
+  entraGroupId: z.guid().optional(),
   role: z.enum(['Admin', 'Member']).optional().alias('r')
 });
 declare type Options = z.infer<typeof options>;

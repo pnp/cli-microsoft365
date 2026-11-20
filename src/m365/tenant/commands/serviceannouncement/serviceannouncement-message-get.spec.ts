@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from "../../commands.js";
-import command from './serviceannouncement-message-get.js';
+import command, { options } from './serviceannouncement-message-get.js';
 
 describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const testId = 'MC001337';
   const testIncorrectId = '123456';
@@ -78,6 +79,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -116,22 +118,26 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if incorrect message ID is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        id: testIncorrectId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, `${testIncorrectId} is not a valid message ID`);
+  it('fails validation if incorrect message ID is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: testIncorrectId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if correct message ID is provided', async () => {
-    const actual = await command.validate({
-      options: {
-        id: testId
-      }
-    }, commandInfo);
-    assert(actual);
+  it('passes validation if correct message ID is provided', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: testId
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: testId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly retrieves service update message', async () => {
@@ -144,9 +150,9 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         id: testId
-      }
+      })
     });
     assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
@@ -163,10 +169,10 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         id: testId
-      }
+      })
     });
     assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
@@ -175,14 +181,14 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
 
   it('fails when the message does not exist for the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testIncorrectId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testId}`) {
         throw resResourceNotExist;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: testIncorrectId } } as any), new CommandError(resResourceNotExist.error.message));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: testId }) }), new CommandError(resResourceNotExist.error.message));
   });
 
   it('lists all properties for output json', async () => {
@@ -197,10 +203,10 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
 
     await command.action(logger, {
       options:
-      {
-        id: testId,
-        output: 'json'
-      }
+        commandOptionsSchema.parse({
+          id: testId,
+          output: 'json'
+        })
     });
     assert(loggerLogSpy.calledWith(resMessage));
   });

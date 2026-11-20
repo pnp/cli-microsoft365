@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -8,17 +9,35 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+const fieldOptions: string[] = ['DefaultValue', 'AddToDefaultContentType', 'AddToNoContentType', 'AddToAllContentTypes', 'AddFieldInternalNameHint', 'AddFieldToDefaultView', 'AddFieldCheckDisplayName'];
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  listTitle: z.string().optional().alias('l'),
+  listId: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `${e.input} in option listId is not a valid GUID`
+  }).optional(),
+  listUrl: z.string().optional(),
+  xml: z.string().alias('x'),
+  options: z.string().refine(val => {
+    const items = val.split(',').map(o => o.trim());
+    return items.every(item => fieldOptions.indexOf(item) !== -1);
+  }, {
+    error: e => {
+      const items = (e.input as string).split(',').map((o: string) => o.trim());
+      const invalid = items.find((item: string) => fieldOptions.indexOf(item) === -1);
+      return `${invalid} is not a valid value for the options argument. Allowed values are ${fieldOptions.join('|')}`;
+    }
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
-  xml: string;
-  options?: string;
 }
 
 class SpoFieldAddCommand extends SpoCommand {
@@ -30,80 +49,15 @@ class SpoFieldAddCommand extends SpoCommand {
     return 'Adds a new list or site column using the CAML field definition';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listId: typeof args.options.listId !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        options: typeof args.options.options !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.listId, opts.listTitle, opts.listUrl].filter(o => o !== undefined).length <= 1, {
+        error: 'Specify either list id or title or list url, but not multiple'
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-x, --xml <xml>'
-      },
-      {
-        option: '--options [options]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url, but not multiple`;
-        }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
-        }
-
-        if (args.options.options) {
-          let optionsError: string | boolean = true;
-          const options: string[] = ['DefaultValue', 'AddToDefaultContentType', 'AddToNoContentType', 'AddToAllContentTypes', 'AddFieldInternalNameHint', 'AddFieldToDefaultView', 'AddFieldCheckDisplayName'];
-          args.options.options.split(',').forEach(o => {
-            o = o.trim();
-            if (options.indexOf(o) < 0) {
-              optionsError = `${o} is not a valid value for the options argument. Allowed values are DefaultValue|AddToDefaultContentType|AddToNoContentType|AddToAllContentTypes|AddFieldInternalNameHint|AddFieldToDefaultView|AddFieldCheckDisplayName`;
-            }
-          });
-          return optionsError;
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -13,7 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './meeting-add.js';
+import command, { options } from './meeting-add.js';
 
 describe(commands.MEETING_ADD, () => {
   const startTime = '2022-04-04T03:00:00Z';
@@ -30,6 +30,7 @@ describe(commands.MEETING_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let fakeTimers: SinonFakeTimers;
 
   before(() => {
@@ -43,6 +44,7 @@ describe(commands.MEETING_ADD, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
@@ -69,6 +71,7 @@ describe(commands.MEETING_ADD, () => {
       request.get,
       request.post,
       entraUser.getUserIdByEmail,
+      accessToken.getUserNameFromAccessToken,
       fakeTimers
     ]);
   });
@@ -87,96 +90,175 @@ describe(commands.MEETING_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('completes validation when no parameters are provided', async () => {
-    const actual = await command.validate({ options: { startTime: undefined, endTime: undefined, subject: undefined, participantUserNames: undefined, organizerEmail: undefined, recordAutomatically: undefined } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('completes validation when only the startTime parameter is provided, and it is a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { startTime: startTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 
-  it('completes validation when both the startTime and endTime parameters are provided, and they are valid ISODateTimes', async () => {
-    const actual = await command.validate({ options: { startTime: startTime, endTime: endTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('preserves option aliases and types in command metadata', () => {
+    const actual = commandInfo.options
+      .filter(option => !['debug', 'verbose', 'output', 'query'].includes(option.name))
+      .map(option => ({ name: option.name, short: option.short, type: option.type, required: option.required }));
+    assert.deepStrictEqual(actual, [
+      { name: 'startTime', short: 's', type: 'string', required: false },
+      { name: 'endTime', short: 'e', type: 'string', required: false },
+      { name: 'subject', short: undefined, type: 'string', required: false },
+      { name: 'participantUserNames', short: 'p', type: 'string', required: false },
+      { name: 'organizerEmail', short: undefined, type: 'string', required: false },
+      { name: 'recordAutomatically', short: 'r', type: 'boolean', required: false }
+    ]);
   });
 
-  it('completes validation when only the subject parameter is provided', async () => {
-    const actual = await command.validate({ options: { subject: subject } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation when startTime and endTime are equal', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime, endTime: startTime });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('completes validation when only the organizerEmail parameter is provided', async () => {
-    const actual = await command.validate({ options: { organizerEmail: organizerEmail } }, commandInfo);
-    assert.strictEqual(actual, true);
+  for (const option of ['startTime', 'endTime']) {
+    it(`fails validation when ${option} equals the current time`, () => {
+      const actual = commandOptionsSchema.safeParse({ [option]: '2020-01-01T12:00:00.000Z' });
+      assert.strictEqual(actual.success, false);
+    });
+  }
+
+  it('normalizes participant user names', () => {
+    const actual = commandOptionsSchema.parse({ participantUserNames: ' ABC@Email.com , ABC2@Email.com ' });
+    assert.deepStrictEqual(actual.participantUserNames, ['abc@email.com', 'abc2@email.com']);
   });
 
-  it('completes validation when only the participantUserNames parameter is provided', async () => {
-    const actual = await command.validate({ options: { participantUserNames: participantUserNames } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('reports only invalid participant user names', () => {
+    const actual = commandOptionsSchema.safeParse({ participantUserNames: 'abc@email.com,invalid,abc2@email.com,invalid2' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, "The following user principal names are invalid for the option 'participantUserNames': invalid, invalid2.");
   });
 
-  it('completes validation when the correct endTime is provided, and the startTime is not provided', async () => {
-    const actual = await command.validate({ options: { endTime: endTime } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with the organizer runtime token', () => {
+    const actual = commandOptionsSchema.safeParse({ organizerEmail: '@meusername' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the startTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { startTime: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('preserves the standalone participant runtime token for resolution', () => {
+    const actual = commandOptionsSchema.parse({ participantUserNames: ' @MEUSERNAME ' });
+    assert.strictEqual(actual.participantUserNames, '@meusername');
   });
 
-  it('fails validation startTIme is provided and occurs before the current time.', async () => {
-    const actual = await command.validate({ options: { startTime: '1990-12-31' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('creates a meeting with the signed-in user as a participant using a runtime token', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('ABC@Email.com');
+    const postStub = sinon.stub(request, 'post').resolves(meeting);
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ participantUserNames: '@meusername' })});
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      participants: { attendees: [{ upn: 'abc@email.com' }] }
+    });
+    assert(loggerLogSpy.calledOnceWithExactly(meeting));
   });
 
-  it('fails validation when the correct startTime is provided, and the endTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { startTime: startTime, endTime: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('rejects participant runtime tokens with application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ participantUserNames: '@meusername' })}),
+      new CommandError("It's not possible to use @meusername with application permissions"));
   });
 
-  it('fails validation when the endTime is before the startTime', async () => {
-    const actual = await command.validate({ options: { startTime: '2023-01-01', endTime: '2022-12-31' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when no parameters are provided', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: undefined, endTime: undefined, subject: undefined, participantUserNames: undefined, organizerEmail: undefined, recordAutomatically: undefined });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when only the endTime is provided and occurs before the current time.', async () => {
-    const actual = await command.validate({ options: { endTime: '1990-12-31' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when only the startTime parameter is provided, and it is a valid ISODateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the organizerEmail parameter is not a valid email address', async () => {
-    const actual = await command.validate({ options: { organizerEmail: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when both the startTime and endTime parameters are provided, and they are valid ISODateTimes', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime, endTime: endTime });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the participantUserNames is not a valid', async () => {
-    const actual = await command.validate({ options: { participantUserNames: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when only the subject parameter is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ subject: subject });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the participantUserNames are not separated by comma', async () => {
-    const actual = await command.validate({ options: { participantUserNames: 'abc@email.com|abc2@email.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when only the organizerEmail parameter is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ organizerEmail: organizerEmail });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the participantUserNames has incorrect format', async () => {
-    const actual = await command.validate({ options: { participantUserNames: 'abc@email.com,foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when only the participantUserNames parameter is provided', () => {
+    const actual = commandOptionsSchema.safeParse({ participantUserNames: participantUserNames });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the startDate is after the endDate', async () => {
-    const actual = await command.validate({ options: { startTime: '2023-01-01', endTime: '2022-12-31' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('completes validation when the correct endTime is provided, and the startTime is not provided', () => {
+    const actual = commandOptionsSchema.safeParse({ endTime: endTime });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when the startTime is not a valid ISODateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation startTIme is provided and occurs before the current time.', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: '1990-12-31' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the correct startTime is provided, and the endTime is not a valid ISODateTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: startTime, endTime: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the endTime is before the startTime', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: '2023-01-01', endTime: '2022-12-31' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when only the endTime is provided and occurs before the current time.', () => {
+    const actual = commandOptionsSchema.safeParse({ endTime: '1990-12-31' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the organizerEmail parameter is not a valid email address', () => {
+    const actual = commandOptionsSchema.safeParse({ organizerEmail: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the participantUserNames is not a valid', () => {
+    const actual = commandOptionsSchema.safeParse({ participantUserNames: 'foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the participantUserNames are not separated by comma', () => {
+    const actual = commandOptionsSchema.safeParse({ participantUserNames: 'abc@email.com|abc2@email.com' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the participantUserNames has incorrect format', () => {
+    const actual = commandOptionsSchema.safeParse({ participantUserNames: 'abc@email.com,foo' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the startDate is after the endDate', () => {
+    const actual = commandOptionsSchema.safeParse({ startTime: '2023-01-01', endTime: '2022-12-31' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('throws an error when the organizerEmail is not provided while signed in using app-only authentication', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) }),
       new CommandError(`The option 'organizerEmail' is required when creating a meeting using app only permissions`));
   });
 
@@ -185,10 +267,10 @@ describe(commands.MEETING_ADD, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         organizerEmail: organizerEmail
-      }
+      })
     }), new CommandError(`The option 'organizerEmail' is not supported when creating a meeting using delegated permissions`));
   });
 
@@ -207,9 +289,9 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -232,10 +314,10 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         endTime: endTime
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -258,10 +340,10 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -284,11 +366,11 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -311,12 +393,12 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
         subject: subject
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -339,13 +421,13 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participantUserNames: participantUserNames
-      }
+        participantUserNames: ' ABC@Email.com , ABC2@Email.com '
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -379,14 +461,14 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
         subject: subject,
         participantUserNames: participantUserNames,
         recordAutomatically: true
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
@@ -431,7 +513,7 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
@@ -439,7 +521,7 @@ describe(commands.MEETING_ADD, () => {
         participantUserNames: participantUserNames,
         recordAutomatically: true,
         organizerEmail: organizerEmail
-      }
+      })
     });
 
     assert.strictEqual(calledUrl, `https://graph.microsoft.com/v1.0/users/${testOrganizerId}/onlineMeetings`);
@@ -480,7 +562,7 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
@@ -488,7 +570,7 @@ describe(commands.MEETING_ADD, () => {
         participantUserNames: participantUserNames,
         recordAutomatically: true,
         organizerEmail: organizerEmail
-      }
+      })
     }), new CommandError(`The specified user with email organizer@email.com does not exist`)
     );
   });
@@ -513,14 +595,14 @@ describe(commands.MEETING_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         startTime: startTime,
         endTime: endTime,
         subject: subject,
         participantUserNames: participantUserNames,
         recordAutomatically: true
-      }
+      })
     }), new CommandError('An error has occurred.'));
   });
 });

@@ -15,8 +15,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './meeting-transcript-get.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './meeting-transcript-get.js';
 import { PassThrough } from 'stream';
 
 describe(commands.MEETING_TRANSCRIPT_GET, () => {
@@ -25,7 +24,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
   const email = 'user@tenant.com';
   const meetingId = 'MSo5MWZmMmUxNy04NGRlLTQ1NWEtODgxNS01MmIyMTY4M2Y2NGUqMCoqMTk6bWVldGluZ19ZMlEzTlRRMFpEWXRaamMzWkMwMFlUVmhMVGt4TTJJdFpURmtNMkUwTUdGak1qVmpAdGhyZWFkLnYy';
   const id = 'MSMjMCMjZDAwYWU3NjUtNmM2Yi00NjQxLTgwMWQtMTkzMmFmMjEzNzdh';
-  const outputFile = 'c:\transcript.vtt';
+  const outputFile = 'transcript.vtt';
   const meetingTranscriptResponse = {
     "id": "MSMjMCMjZDAwYWU3NjUtNmM2Yi00NjQxLTgwMWQtMTkzMmFmMjEzNzdh",
     "meetingId": "MSo5MWZmMmUxNy04NGRlLTQ1NWEtODgxNS01MmIyMTY4M2Y2NGUqMCoqMTk6bWVldGluZ19ZMlEzTlRRMFpEWXRaamMzWkMwMFlUVmhMVGt4TTJJdFpURmtNMkUwTUdGak1qVmpAdGhyZWFkLnYy",
@@ -34,10 +33,13 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
     "createdDateTime": "2021-09-17T06:09:24.8968037Z"
   };
 
+  const validOptions = { meetingId: meetingId, id: id };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -50,6 +52,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       accessToken: 'abc'
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -75,7 +78,6 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       entraUser.getUserIdByEmail,
       entraUser.getUserIdByUpn,
       cli.executeCommandWithOutput,
-      cli.getSettingWithDefaultValue,
       fs.createWriteStream
     ]);
   });
@@ -94,93 +96,128 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: 'foo', meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('preserves option aliases, types and requirements in command metadata', () => {
+    const actual = commandInfo.options
+      .filter(option => !['debug', 'verbose', 'output', 'query'].includes(option.name))
+      .map(option => ({ name: option.name, short: option.short, type: option.type, required: option.required }));
+    assert.deepStrictEqual(actual, [
+      { name: 'userId', short: 'u', type: 'string', required: false },
+      { name: 'userName', short: 'n', type: 'string', required: false },
+      { name: 'email', short: undefined, type: 'string', required: false },
+      { name: 'meetingId', short: 'm', type: 'string', required: true },
+      { name: 'id', short: 'i', type: 'string', required: true },
+      { name: 'outputFile', short: 'f', type: 'string', required: false }
+    ]);
   });
 
-  it('fails validation when the userName is not valid', async () => {
-    const actual = await command.validate({ options: { userName: 'foo', meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ ...validOptions, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when the email is not valid', async () => {
-    const actual = await command.validate({ options: { email: 'foo', meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('passes validation without a user selector', () => {
+    const actual = commandOptionsSchema.safeParse(validOptions);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('succeeds validation when the userId, meetingId, and id are valid', async () => {
-    const actual = await command.validate({ options: { userId: userId, meetingId: meetingId, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('succeeds validation when the userName, meetingId, and id are valid', async () => {
-    const actual = await command.validate({ options: { userName: userName, meetingId: meetingId, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('succeeds validation when the email, meetingId, and id are valid', async () => {
-    const actual = await command.validate({ options: { email: email, meetingId: meetingId, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when the userId, email, and userName are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  for (const [selector, value, token] of [
+    ['userId', userId, '@meid'],
+    ['userName', userName, '@meusername'],
+    ['email', userName, '@meusername']
+  ]) {
+    it(`passes validation with a valid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: value });
+      assert.strictEqual(actual.success, true);
     });
 
-    const actual = await command.validate({ options: { userId: userId, userName: userName, email: email, meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the userId and email are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+    it(`fails validation with an invalid ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: 'invalid' });
+      assert.strictEqual(actual.success, false);
     });
 
-    const actual = await command.validate({ options: { userId: userId, email: email, meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the userId and userName are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+    it(`passes validation with the runtime token for ${selector}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [selector]: token });
+      assert.strictEqual(actual.success, true);
     });
+  }
 
-    const actual = await command.validate({ options: { userId: userId, userName: userName, meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the userName and email are given', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  for (const selectors of [
+    { userId: userId, userName: userName },
+    { userId: userId, email: userName },
+    { userName: userName, email: userName },
+    { userId: userId, userName: userName, email: userName }
+  ]) {
+    it(`fails validation with conflicting selectors: ${Object.keys(selectors).join(', ')}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, ...selectors });
+      assert.strictEqual(actual.success, false);
+      assert(actual.error?.issues.some(issue => issue.code === 'custom' &&
+        issue.params?.customCode === 'optionSet' &&
+        JSON.stringify(issue.params.options) === JSON.stringify(['userId', 'userName', 'email'])));
     });
+  }
 
-    const actual = await command.validate({ options: { userId: userId, email: email, meetingId: meetingId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  for (const requiredOption of Object.keys(validOptions)) {
+    it(`fails validation without required option ${requiredOption}`, () => {
+      const actual = commandOptionsSchema.safeParse({ ...validOptions, [requiredOption]: undefined });
+      assert.strictEqual(actual.success, false);
+    });
+  }
+
+  it('fails validation when the userId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: 'foo', meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if path doesn\'t exist', async () => {
+  it('fails validation when the userName is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: 'foo', meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the email is not valid', () => {
+    const actual = commandOptionsSchema.safeParse({ email: 'foo', meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('succeeds validation when the userId, meetingId, and id are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('succeeds validation when the userName, meetingId, and id are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('succeeds validation when the email, meetingId, and id are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ email: email, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when the userId, email, and userName are given', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId, userName: userName, email: email, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the userId and email are given', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId, email: email, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the userId and userName are given', () => {
+    const actual = commandOptionsSchema.safeParse({ userId: userId, userName: userName, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the userName and email are given', () => {
+    const actual = commandOptionsSchema.safeParse({ userName: userName, email: email, meetingId: meetingId, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { meetingId: meetingId, id: id, outputFile: 'abc' } }, commandInfo);
+    const actual = commandOptionsSchema.safeParse({ meetingId: meetingId, id: id, outputFile: 'abc' });
     sinonUtil.restore(fs.existsSync);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
   it('retrieves transcript correctly for the given meetingId for the current user', async () => {
@@ -193,7 +230,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'Invalid request.';
     });
 
-    await command.action(logger, { options: { meetingId: meetingId, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId, id: id }) });
     assert(loggerLogSpy.calledWith(meetingTranscriptResponse));
   });
 
@@ -208,7 +245,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'Invalid request.';
     });
 
-    await command.action(logger, { options: { userId: userId, meetingId: meetingId, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, meetingId: meetingId, id: id }) });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptResponse));
   });
@@ -224,7 +261,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'Invalid request.';
     });
 
-    await command.action(logger, { options: { userName: userName, meetingId: meetingId, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ userName: userName, meetingId: meetingId, id: id }) });
 
     assert(loggerLogSpy.calledWith(meetingTranscriptResponse));
   });
@@ -249,7 +286,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'Invalid request.';
     });
 
-    await command.action(logger, { options: { verbose: true, email: email, meetingId: meetingId, id: id } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, email: email, meetingId: meetingId, id: id }) });
     assert(loggerLogSpy.calledWith(meetingTranscriptResponse));
   });
 
@@ -279,7 +316,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
     });
 
     try {
-      await command.action(logger, { options: { verbose: true, meetingId: meetingId, id: id, outputFile: outputFile } });
+      await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, meetingId: meetingId, id: id, outputFile: outputFile }) });
       assert(fsStub.calledOnce);
     }
     finally {
@@ -300,7 +337,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'The specified meeting transcript was not found';
     });
 
-    await assert.rejects(command.action(logger, { options: { meetingId: meetingId, id: id } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId, id: id }) }),
       new CommandError(`The specified meeting transcript was not found`));
   });
 
@@ -329,7 +366,7 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
       throw 'Invalid request.';
     });
 
-    await assert.rejects(command.action(logger, { options: { meetingId: meetingId, id: id, outputFile: outputFile } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId, id: id, outputFile: outputFile }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -338,21 +375,21 @@ describe(commands.MEETING_TRANSCRIPT_GET, () => {
 
     sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, meetingId: meetingId, id: id } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ verbose: true, meetingId: meetingId, id: id }) }),
       new CommandError(errorMessage));
   });
 
   it('correctly handles error when options are missing', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { meetingId: meetingId, id: id } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ meetingId: meetingId, id: id }) }),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting transcript using app only permissions`));
   });
 
   it('correctly handles error when options are missing with a delegated token', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
-    await assert.rejects(command.action(logger, { options: { userId: userId, meetingId: meetingId, id: id } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ userId: userId, meetingId: meetingId, id: id }) }),
       new CommandError(`The options 'userId', 'userName', and 'email' cannot be used while retrieving meeting transcript using delegated permissions`));
   });
 });

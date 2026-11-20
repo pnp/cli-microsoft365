@@ -7,10 +7,12 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './containertype-list.js';
+import command, { options } from './containertype-list.js';
 import { CommandError } from '../../../../Command.js';
 import { odata } from '../../../../utils/odata.js';
 import { accessToken } from '../../../../utils/accessToken.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 
 const containerTypeData = [
   {
@@ -57,6 +59,8 @@ describe(commands.CONTAINERTYPE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -65,6 +69,8 @@ describe(commands.CONTAINERTYPE_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(accessToken, 'assertAccessTokenType').withArgs('delegated').returns();
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -115,7 +121,7 @@ describe(commands.CONTAINERTYPE_LIST, () => {
       throw 'Invalid GET request ' + url;
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ verbose: true }) });
     assert(loggerLogSpy.calledOnceWith(containerTypeData));
   });
 
@@ -124,9 +130,9 @@ describe(commands.CONTAINERTYPE_LIST, () => {
     sinon.stub(odata, 'getAllItems').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true
-      }
+      })
     }), new CommandError('An error has occurred'));
   });
 });

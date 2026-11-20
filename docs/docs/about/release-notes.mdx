@@ -4,33 +4,124 @@ sidebar_position: 4
 
 # Release notes
 
+## v12.1.0
+
+### Changes
+
+- migrated `spo group` commands to Zod [#7329](https://github.com/pnp/cli-microsoft365/issues/7329)
+- migrated `spo propertybag` and `spo roledefinition` commands to Zod [#7337](https://github.com/pnp/cli-microsoft365/issues/7337)
+- migrated `spo eventreceiver` and `spo externaluser` commands to Zod [#7325](https://github.com/pnp/cli-microsoft365/issues/7325)
+- fixed shrinkwrap to use public npm package URLs
+- migrated `spo folder` commands to Zod [#7328](https://github.com/pnp/cli-microsoft365/issues/7328)
+- migrated `spo file` commands to Zod [#7327](https://github.com/pnp/cli-microsoft365/issues/7327)
+- added minimal permissions for 'spo listitem record' commands [#7486](https://github.com/pnp/cli-microsoft365/issues/7486)
+- migrated spo page commands to Zod [#7336](https://github.com/pnp/cli-microsoft365/issues/7336)
+- added minimal permissions for 'viva engage community' commands [#7536](https://github.com/pnp/cli-microsoft365/issues/7536)
+- migrated spfx commands to Zod [#7318](https://github.com/pnp/cli-microsoft365/issues/7318)
+- migrated viva commands to Zod [#7358](https://github.com/pnp/cli-microsoft365/issues/7358)
+- migrated `entra app` commands to Zod [#6890](https://github.com/pnp/cli-microsoft365/issues/6890)
+- fixed CSV parsing in [spo listitem batch add](../cmd/spo/listitem/listitem-batch-add.mdx), [spo listitem batch remove](../cmd/spo/listitem/listitem-batch-remove.mdx), and [spo listitem batch set](../cmd/spo/listitem/listitem-batch-set.mdx) commands [#7693](https://github.com/pnp/cli-microsoft365/issues/7693)
+
 ## v12.0.0
 
 ### New commands
 
+**Entra ID:**
+
+- [entra agent blueprint list](../cmd/entra/agent/agent-blueprint-list.mdx) - retrieves a list of templates defining the agent identity type [#7252](https://github.com/pnp/cli-microsoft365/issues/7252)
+- [entra agent blueprintprincipal list](../cmd/entra/agent/agent-blueprintprincipal-list.mdx) - retrieves a list of agent blueprint principals [#7253](https://github.com/pnp/cli-microsoft365/issues/7253)
+
+**Outlook:**
+
+- [outlook calendargroup add](../cmd/outlook/calendargroup/calendargroup-add.mdx) - creates a new calendar group for a user [#7103](https://github.com/pnp/cli-microsoft365/issues/7103)
+- [outlook event add](../cmd/outlook/event/event-add.mdx) - creates an event in the default calendar or a specific calendar of a user [#7123](https://github.com/pnp/cli-microsoft365/issues/7123)
+
+**SharePoint:**
+
+- [spo folder unarchive](../cmd/spo/folder/folder-unarchive.mdx) - unarchives a folder [#7182](https://github.com/pnp/cli-microsoft365/issues/7182)
+- [spo page unpublish](../cmd/spo/page/page-unpublish.mdx) - unpublishes a modern page [#7540](https://github.com/pnp/cli-microsoft365/issues/7540)
+- [spo web rule get](../cmd/spo/web/web-rule-get.mdx) - retrieves information about a specific alert from a SharePoint list [#6862](https://github.com/pnp/cli-microsoft365/issues/6862)
+
+**SharePoint Embedded:**
+
+- [spe container permission add](../cmd/spe/container/container-permission-add.mdx) - adds permission to a SharePoint Embedded container for a specified user [#6159](https://github.com/pnp/cli-microsoft365/issues/6159)
+- [spe container permission remove](../cmd/spe/container/container-permission-remove.mdx) - removes permissions from a SharePoint Embedded container [#6161](https://github.com/pnp/cli-microsoft365/issues/6161)
+- [spe container permission set](../cmd/spe/container/container-permission-set.mdx) - updates SharePoint Embedded container permission [#6160](https://github.com/pnp/cli-microsoft365/issues/6160)
 
 ### Changes
 
-- added minimal permissions for 'spo list' commands [#7484](https://github.com/pnp/cli-microsoft365/issues/7484)
-- added minimal permissions for 'spo listitem attachment' [#7485](https://github.com/pnp/cli-microsoft365/issues/7485)
-- added minimal permissions for 'spo list webhook' commands [#7483](https://github.com/pnp/cli-microsoft365/issues/7483)
-- added minimal permissions for 'spo list defaultvalue' commands [#7480](https://github.com/pnp/cli-microsoft365/issues/7480)
-- added minimal permissions for 'spo list view' commands [#7482](https://github.com/pnp/cli-microsoft365/issues/7482)
-- added minimal permissions for 'tenant miscellaneous' commands [#7530](https://github.com/pnp/cli-microsoft365/issues/7530)
-- added minimal permissions for 'spo file' commands [#7273](https://github.com/pnp/cli-microsoft365/issues/7273)
-- added minimal permissions for 'spo list related' commands [#7481](https://github.com/pnp/cli-microsoft365/issues/7481)
-- added minimal permissions for 'spo folder related' commands [#7274](https://github.com/pnp/cli-microsoft365/issues/7274)
 - added support for heft for spfx CI/CD commands [#7091](https://github.com/pnp/cli-microsoft365/issues/7091)
-- migrated `spo cdn` commands to Zod [#7321](https://github.com/pnp/cli-microsoft365/issues/7321)
+- added support for SPFx v1.24.0-rc.0 [#7476](https://github.com/pnp/cli-microsoft365/issues/7476)
 - enhanced `spo storageentity` commands to reference tenant app catalog [#7128](https://github.com/pnp/cli-microsoft365/issues/7128)
 - enhanced [spo site list](../cmd/spo/site/site-list.mdx) command [#6547](https://github.com/pnp/cli-microsoft365/issues/6547)
-- migrated `spo`, `spo homesite`, and `spo hidedefaultthemes` commands to Zod [#7330](https://github.com/pnp/cli-microsoft365/issues/7330)
-- migrated `spo user`, `spo userprofile`, and `spo web` commands to Zod [#7345](https://github.com/pnp/cli-microsoft365/issues/7345)
-- added minimal permissions for `teams app` commands [#7519](https://github.com/pnp/cli-microsoft365/issues/7519)
 - updated archive warnings in [spo file archive](../cmd/spo/file/file-archive.mdx), [spo file unarchive](../cmd/spo/file/file-unarchive.mdx), and [spo folder archive](../cmd/spo/folder/folder-archive.mdx) commands [#7576](https://github.com/pnp/cli-microsoft365/pull/7576)
 - enhanced [spo site apppermission add](../cmd/spo/site/site-apppermission-add.mdx) command documentation [#7575](https://github.com/pnp/cli-microsoft365/pull/7575)
-- enhanced the release workflow to support trusted publishing [#7261](https://github.com/pnp/cli-microsoft365/pull/7261)
+- removed `properties` option for `spo listitem get` [#7616](https://github.com/pnp/cli-microsoft365/pull/7616)
+- fixed system update for sites with different managed path [#7610](https://github.com/pnp/cli-microsoft365/issues/7610)
+- fixed [spo file get](../cmd/spo/file/file-get.mdx) command not being able to fetch JSON files as string [#7591](https://github.com/pnp/cli-microsoft365/issues/7591)
+- added support for Node 26 [#7473](https://github.com/pnp/cli-microsoft365/pull/7473)
+- migrated to TypeScript 7 [#7377](https://github.com/pnp/cli-microsoft365/pull/7377)
 - enhanced custom MSAL cache plugin with msal-node-extensions [#7398](https://github.com/pnp/cli-microsoft365/pull/7398)
+- enhanced the release workflow to support trusted publishing [#7261](https://github.com/pnp/cli-microsoft365/pull/7261)
+- replaces AppInsights with Google Analytics [#7586](https://github.com/pnp/cli-microsoft365/pull/7586)
+- added GitLab support for federated identity [#7463](https://github.com/pnp/cli-microsoft365/issues/7463)
+- added v12 upgrade guidance and sample scripts updates [#7574](https://github.com/pnp/cli-microsoft365/issues/7574)
+- fixed docs page modified date [#7612](https://github.com/pnp/cli-microsoft365/issues/7612)
+- replaced 'UniqueId' with 'unique ID' in command docs [#7639](https://github.com/pnp/cli-microsoft365/issues/7639)
+- added support for SPFx v1.24.0 [#7670](https://github.com/pnp/cli-microsoft365/pull/7670)
+- fixed retrieving client ID using [cli consent](../cmd/cli/cli-consent.mdx) command [#7654](https://github.com/pnp/cli-microsoft365/issues/7654)
+- fixed app-only login failing when the access token has no `oid` claim [#7589](https://github.com/pnp/cli-microsoft365/issues/7589)
+- replaced `wmic` with `tasklist` for detecting the shell on Windows [#7672](https://github.com/pnp/cli-microsoft365/pull/7672)
+- fixed [spo externaluser list](../cmd/spo/externaluser/externaluser-list.mdx) command returning no output when SharePoint returns external users [#7674](https://github.com/pnp/cli-microsoft365/issues/7674)
+- added minimal permissions for `spo file` commands [#7273](https://github.com/pnp/cli-microsoft365/issues/7273)
+- added minimal permissions for `spo file sharinglink` commands [#7271](https://github.com/pnp/cli-microsoft365/issues/7271)
+- added minimal permissions for `spo folder related` commands [#7274](https://github.com/pnp/cli-microsoft365/issues/7274)
+- added minimal permissions for `spo folder sharinglink` commands [#7275](https://github.com/pnp/cli-microsoft365/issues/7275)
+- added minimal permissions for `spo list` commands [#7484](https://github.com/pnp/cli-microsoft365/issues/7484)
+- added minimal permissions for `spo list defaultvalue` commands [#7480](https://github.com/pnp/cli-microsoft365/issues/7480)
+- added minimal permissions for `spo list related` commands [#7481](https://github.com/pnp/cli-microsoft365/issues/7481)
+- added minimal permissions for `spo list view` commands [#7482](https://github.com/pnp/cli-microsoft365/issues/7482)
+- added minimal permissions for `spo list webhook` commands [#7483](https://github.com/pnp/cli-microsoft365/issues/7483)
+- added minimal permissions for `spo listitem attachment` commands [#7485](https://github.com/pnp/cli-microsoft365/issues/7485)
+- added minimal permissions for `teams app` commands [#7519](https://github.com/pnp/cli-microsoft365/issues/7519)
+- added minimal permissions for `teams tab` commands [#7527](https://github.com/pnp/cli-microsoft365/issues/7527)
+- added minimal permissions for `tenant miscellaneous` commands [#7530](https://github.com/pnp/cli-microsoft365/issues/7530)
+- added minimal permissions for `tenant people profilecardproperty` commands [#7531](https://github.com/pnp/cli-microsoft365/issues/7531)
+- added minimal permissions for `tenant serviceannouncement related` commands [#7532](https://github.com/pnp/cli-microsoft365/issues/7532)
+- added minimal permissions for `viva engage message` commands [#7537](https://github.com/pnp/cli-microsoft365/issues/7537)
+- migrated `spo`, `spo homesite`, and `spo hidedefaultthemes` commands to Zod [#7330](https://github.com/pnp/cli-microsoft365/issues/7330)
+- migrated `spo app` commands to Zod [#7319](https://github.com/pnp/cli-microsoft365/issues/7319)
+- migrated `spo cdn` commands to Zod [#7321](https://github.com/pnp/cli-microsoft365/issues/7321)
+- migrated `spo commandset` commands to Zod [#7322](https://github.com/pnp/cli-microsoft365/issues/7322)
+- migrated `spo feature` and `spo field` commands to Zod [#7326](https://github.com/pnp/cli-microsoft365/issues/7326)
+- migrated `spo hubsite` commands to Zod [#7331](https://github.com/pnp/cli-microsoft365/issues/7331)
+- migrated `spo sitescript` commands to Zod [#7342](https://github.com/pnp/cli-microsoft365/issues/7342)
+- migrated `spo user`, `spo userprofile`, and `spo web` commands to Zod [#7345](https://github.com/pnp/cli-microsoft365/issues/7345)
+- migrated `spp` commands to Zod [#7346](https://github.com/pnp/cli-microsoft365/issues/7346)
+- migrated `teams channel` commands to Zod [#7348](https://github.com/pnp/cli-microsoft365/issues/7348)
+- migrated `teams chat` commands to Zod [#7349](https://github.com/pnp/cli-microsoft365/issues/7349)
+- migrated `teams meeting` commands to Zod [#7350](https://github.com/pnp/cli-microsoft365/issues/7350)
+- migrated `util` commands to Zod [#7357](https://github.com/pnp/cli-microsoft365/issues/7357)
+- migrated `teams message` commands to Zod [#7351](https://github.com/pnp/cli-microsoft365/issues/7351)
+- migrated `teams report`, `teams tab`, `teams team`, and `teams user` commands to Zod [#7353](https://github.com/pnp/cli-microsoft365/issues/7353)
+- migrated `entra m365group` commands to Zod [#6849](https://github.com/pnp/cli-microsoft365/issues/6849)
+- migrated `spo listitem` commands to Zod [#7334](https://github.com/pnp/cli-microsoft365/issues/7334)
+- migrated `tenant report` and `tenant serviceannouncement` commands to Zod [#7355](https://github.com/pnp/cli-microsoft365/issues/7355)
+- added support for SPFx v1.24.1 [#7685](https://github.com/pnp/cli-microsoft365/pull/7685)
+- migrated `spe` commands to Zod [#7317](https://github.com/pnp/cli-microsoft365/issues/7317)
+- migrated `spo applicationcustomizer` and `spo apppage` commands to Zod [#7320](https://github.com/pnp/cli-microsoft365/issues/7320)
+- migrated `tenant people` and `tenant info` commands to Zod [#7354](https://github.com/pnp/cli-microsoft365/issues/7354)
+- migrated `spo serviceprincipal` commands to Zod [#7339](https://github.com/pnp/cli-microsoft365/issues/7339)
+- migrated `spo tenant` commands to Zod [#7343](https://github.com/pnp/cli-microsoft365/issues/7343)
+- migrated `spo term` and `spo theme` commands to Zod [#7344](https://github.com/pnp/cli-microsoft365/issues/7344)
+- migrated `spo sitedesign` commands to Zod [#7341](https://github.com/pnp/cli-microsoft365/issues/7341)
+- migrated `spo orgassetslibrary` and `spo orgnewssite` commands to Zod [#7335](https://github.com/pnp/cli-microsoft365/issues/7335)
+- migrated `teams app` commands to Zod [#7347](https://github.com/pnp/cli-microsoft365/issues/7347)
+- migrated `spo customaction` commands to Zod [#7324](https://github.com/pnp/cli-microsoft365/issues/7324)
+- migrated `spo knowledgehub` and `spo navigation` commands to Zod [#7332](https://github.com/pnp/cli-microsoft365/issues/7332)
+- migrated `spo report` and `spo search` commands to Zod [#7338](https://github.com/pnp/cli-microsoft365/issues/7338)
+- migrated `teams settings` commands to Zod [#7352](https://github.com/pnp/cli-microsoft365/issues/7352)
+- migrated `spo contenttype` commands to Zod [#7323](https://github.com/pnp/cli-microsoft365/issues/7323)
 
 ### ⚠️ Breaking changes
 
@@ -41,6 +132,9 @@ sidebar_position: 4
 - enhanced `teams` commands to use teams util [#7048](https://github.com/pnp/cli-microsoft365/issues/7048)
 - removed the `spo web alert list` and `spo web alert remove` aliases [#6865](https://github.com/pnp/cli-microsoft365/issues/6865)
 - replaced `recycle` option by `permanent` option and removed `skipRecycleBin` option in favor of `permanent` for `entra`, `spo`, and `spe` commands [#7110](https://github.com/pnp/cli-microsoft365/issues/7110)
+- updated the [spo navigation node list](../cmd/spo/navigation/navigation-node-list.mdx) command to use a new API endpoint, changing the output shape [#7139](https://github.com/pnp/cli-microsoft365/issues/7139)
+- updated `spo navigation node` commands to use the new API [#7617](https://github.com/pnp/cli-microsoft365/issues/7617)
+- updated `list` commands to return an empty array instead of no output when no items are found [#7676](https://github.com/pnp/cli-microsoft365/issues/7676)
 
 ## [v11.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v11.11.0)
 

@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './user-list.js';
+import command, { options } from './user-list.js';
 
 describe(commands.USER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -26,6 +27,7 @@ describe(commands.USER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -64,62 +66,63 @@ describe(commands.USER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when invalid role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when invalid role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation when valid teamId and no role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid teamId and no role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid teamId and Owner role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Owner'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid teamId and Owner role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Owner'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid teamId and Member role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Member'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid teamId and Member role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Member'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when valid teamId and Guest role specified', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Guest'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid teamId and Guest role specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      role: 'Guest'
+    });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when teamId is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly lists all users in a Microsoft Team', async () => {
@@ -141,7 +144,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: "00000000-0000-0000-0000-000000000000" }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -177,7 +180,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, teamId: "00000000-0000-0000-0000-000000000000" }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -204,7 +207,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000", role: "Owner" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: "00000000-0000-0000-0000-000000000000", role: "Owner" }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -234,7 +237,7 @@ describe(commands.USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000", role: "Member" } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: "00000000-0000-0000-0000-000000000000", role: "Member" }) });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00000000-0000-0000-0000-000000000001",
@@ -260,6 +263,6 @@ describe(commands.USER_LIST, () => {
 
     sinon.stub(request, 'get').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ teamId: "00000000-0000-0000-0000-000000000000" }) }), new CommandError('An error has occurred'));
   });
 });

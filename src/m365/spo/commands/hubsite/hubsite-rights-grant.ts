@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
@@ -8,14 +9,21 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  hubSiteUrl: z.string().refine(url => validation.isValidSharePointUrl(url) === true, {
+    error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+  }).alias('u'),
+  principals: z.string().alias('p'),
+  rights: z.enum(['Join'], {
+    error: e => `${e.input} is not a valid rights value. Allowed values Join`
+  }).alias('r')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  hubSiteUrl: string;
-  principals: string;
-  rights: string;
 }
 
 class SpoHubSiteRightsGrantCommand extends SpoCommand {
@@ -27,43 +35,8 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
     return 'Grants permissions to join the hub site for one or more principals';
   }
 
-  constructor() {
-    super();
-
-    this.#initOptions();
-    this.#initValidators();
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --hubSiteUrl <hubSiteUrl>'
-      },
-      {
-        option: '-p, --principals <principals>'
-      },
-      {
-        option: '-r, --rights <rights>',
-        autocomplete: ['Join']
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.hubSiteUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.rights !== 'Join') {
-          return `${args.options.rights} is not a valid rights value. Allowed values Join`;
-        }
-
-        return true;
-      }
-    );
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

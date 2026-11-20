@@ -293,16 +293,19 @@ describe(commands.PIM_ROLE_ASSIGNMENT_ADD, () => {
   it('fails validation when startDateTime is not a valid ISO 8601 date', async () => {
     const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, startDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO 8601 date time string.`);
   });
 
   it('fails validation when endDateTime is not a valid ISO 8601 date', async () => {
     const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, endDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO 8601 date time string.`);
   });
 
   it('fails validation when duration is not a valid ISO 8601 duration', async () => {
     const actual = commandOptionsSchema.safeParse({ roleDefinitionId: roleDefinitionId, duration: 'PY6M4DT12H30M5S' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'PY6M4DT12H30M5S' is not a valid ISO 8601 duration.`);
   });
 
   it('fails validation when administrativeUnitId is not a valid GUID', async () => {

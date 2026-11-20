@@ -8,13 +8,17 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './container-activate.js';
+import command, { options } from './container-activate.js';
 import { CommandError } from '../../../../Command.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { cli } from '../../../../cli/cli.js';
 
 describe(commands.CONTAINER_ACTIVATE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const containerId = 'b!ISJs1WRro0y0EWgkUYcktDa0mE8zSlFEqFzqRn70Zwp1CEtDEBZgQICPkRbil_5Z';
 
@@ -24,6 +28,8 @@ describe(commands.CONTAINER_ACTIVATE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -60,6 +66,21 @@ describe(commands.CONTAINER_ACTIVATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation when id is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      verbose: true
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: containerId,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('activates container by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/storage/fileStorage/containers/${formatting.encodeQueryParameter(containerId)}/activate`) {
@@ -69,7 +90,7 @@ describe(commands.CONTAINER_ACTIVATE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: containerId, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ id: containerId, verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -94,7 +115,7 @@ describe(commands.CONTAINER_ACTIVATE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: containerId, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ id: containerId, verbose: true }) }),
       new CommandError(error.error.message));
   });
 });

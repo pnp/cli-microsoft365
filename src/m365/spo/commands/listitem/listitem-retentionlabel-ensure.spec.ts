@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './listitem-retentionlabel-ensure.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './listitem-retentionlabel-ensure.js';
 
 describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
@@ -69,6 +68,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -78,6 +78,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -99,8 +100,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -117,91 +117,72 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if listId, listTitle or listUrl option is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1, name: labelName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listId, listTitle or listUrl option is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listItemId: 1, name: labelName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listItemId: 1, listTitle: listTitle, name: labelName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', listItemId: 1, listTitle: listTitle, name: labelName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: '12345', listItemId: 1, name: labelName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: '12345', listItemId: 1, name: labelName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('fails validation if both listId and listTitle options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both listId and listTitle options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1, name: labelName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listItemId is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listItemId is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, name: labelName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if listItemId is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 'abc', listTitle: listTitle, name: labelName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if listItemId is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listItemId: 'abc', listTitle: listTitle, name: labelName });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if name or id option is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if name or id option is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listItemId: 1, listId: listId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: '12345', listItemId: 1, listId: listId } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both name and id options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listItemId: 1, listId: listId, name: labelName, id: labelId });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: labelId, listItemId: 1, listId: listId } }, commandInfo);
-    assert(actual);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: '12345', listItemId: 1, listId: listId });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, '12345 is not a valid GUID');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: 1, name: labelName } }, commandInfo);
-    assert(actual);
+  it('passes validation if the id option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, id: labelId, listItemId: 1, listId: listId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: 1, name: labelName } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: 1, name: labelName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: 1, name: labelName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: 1, name: labelName, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('applies a retentionlabel based on listId and name without assetId', async () => {
@@ -222,13 +203,13 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: false,
         listId: listId,
         webUrl: webUrl,
         listItemId: 1,
         name: labelName
-      }
+      })
     });
     assert(loggerLogStderrSpy.notCalled);
   });
@@ -270,14 +251,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         listId: listId,
         webUrl: webUrl,
         listItemId: 1,
         id: labelId,
         assetId: 'XYZ'
-      }
+      })
     }));
   });
 
@@ -317,14 +298,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1,
         id: labelId,
         assetId: 'XYZ'
-      }
+      })
     }));
   });
 
@@ -361,14 +342,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
         id: labelId,
         assetId: 'XYZ'
-      }
+      })
     }));
   });
 
@@ -393,13 +374,13 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: false,
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
         name: 'Some non-existing label'
-      }
+      })
     }), new CommandError('Cannot find retention label with name: Some non-existing label'));
   });
 
@@ -416,13 +397,13 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: false,
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
-        id: 'invalid'
-      }
+        id: 'def61080-111c-4aea-b72f-5b60e516e36c'
+      })
     }), new CommandError('The specified retention label does not exist or is not published to this SharePoint site. Use the name of the label if you want to apply an unpublished label.'));
   });
 
@@ -432,24 +413,13 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: false,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
         name: labelName
-      }
+      })
     }), new CommandError(errorMessage));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 });

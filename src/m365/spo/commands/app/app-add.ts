@@ -1,28 +1,44 @@
 import fs from 'fs';
 import path from 'path';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
+import { zod } from '../../../../utils/zod.js';
 import commands from '../../commands.js';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  filePath: z.string()
+    .refine(filePath => fs.existsSync(path.resolve(filePath)), {
+      error: e => `File '${path.resolve(e.input as string)}' not found`,
+      abort: true
+    })
+    .refine(filePath => !fs.lstatSync(path.resolve(filePath)).isDirectory(), {
+      error: e => `Path '${path.resolve(e.input as string)}' points to a directory`
+    })
+    .alias('p'),
+  overwrite: z.boolean().optional(),
+  appCatalogScope: zod.coercedEnum({ tenant: 'tenant', sitecollection: 'sitecollection' }).optional().alias('s'),
+  appCatalogUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .optional()
+    .alias('u')
+});
+
+declare type Options = z.infer<typeof options>;
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  appCatalogUrl?: string;
-  filePath: string;
-  overwrite?: boolean;
-  appCatalogScope?: string;
-}
-
 class SpoAppAddCommand extends SpoAppBaseCommand {
-  private readonly appCatalogScopeOptions = ['tenant', 'sitecollection'];
-
   public get name(): string {
     return commands.APP_ADD;
   }
@@ -31,73 +47,19 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return 'Adds an app to the specified SharePoint Online app catalog';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        overwrite: !!args.options.overwrite,
-        appCatalogScope: args.options.appCatalogScope || 'tenant',
-        appCatalogUrl: typeof args.options.appCatalogUrl !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => opts.appCatalogScope !== 'sitecollection' || opts.appCatalogUrl !== undefined, {
+        error: 'You must specify appCatalogUrl when appCatalogScope is sitecollection',
+        path: ['appCatalogUrl'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-p, --filePath <filePath>'
-      },
-      {
-        option: '-s, --appCatalogScope [appCatalogScope]',
-        autocomplete: this.appCatalogScopeOptions
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      },
-      {
-        option: '--overwrite [overwrite]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.appCatalogScope) {
-          const appCatalogScope = args.options.appCatalogScope.toLowerCase();
-          if (this.appCatalogScopeOptions.indexOf(appCatalogScope) === -1) {
-            return `${args.options.appCatalogScope} is not a valid appCatalogScope. Allowed values are: ${this.appCatalogScopeOptions.join(', ')}`;
-          }
-
-          if (appCatalogScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when appCatalogScope is sitecollection`;
-          }
-        }
-
-        const fullPath: string = path.resolve(args.options.filePath);
-
-        if (!fs.existsSync(fullPath)) {
-          return `File '${fullPath}' not found`;
-        }
-
-        if (fs.lstatSync(fullPath).isDirectory()) {
-          return `Path '${fullPath}' points to a directory`;
-        }
-
-        if (args.options.appCatalogUrl) {
-          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-        }
-
-        return true;
-      }
-    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

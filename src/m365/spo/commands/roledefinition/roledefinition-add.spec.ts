@@ -11,12 +11,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './roledefinition-add.js';
+import command, { options } from './roledefinition-add.js';
 
 describe(commands.ROLEDEFINITION_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -25,6 +26,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -61,35 +63,25 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', name: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', name: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.ok(actual.error.issues[0].message.includes(`'foo' is not a valid SharePoint Online site URL.`));
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails if non existing PermissionKind rights specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', rights: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are EmptyMask|ViewListItems|AddListItems|EditListItems|DeleteListItems|ApproveItems|OpenItems|ViewVersions|DeleteVersions|CancelCheckout|ManagePersonalViews|ManageLists|ViewFormPages|AnonymousSearchAccessList|Open|ViewPages|AddAndCustomizePages|ApplyThemeAndBorder|ApplyStyleSheets|ViewUsageData|CreateSSCSite|ManageSubwebs|CreateGroups|ManagePermissions|BrowseDirectories|BrowseUserInfo|AddDelPrivateWebParts|UpdatePersonalWebParts|ManageWeb|AnonymousSearchAccessWebLists|UseClientIntegration|UseRemoteAPIs|ManageAlerts|CreateAlerts|EditMyUserInfo|EnumeratePermissions|FullMask.`);
+  it('fails if non existing PermissionKind rights specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', rights: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('has correct PermissionKind rights specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', rights: 'FullMask' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('offers autocomplete for the rights option', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--rights') > -1) {
-        assert(options[i].autocomplete);
-        return;
-      }
-    }
-    assert(false);
+  it('has correct PermissionKind rights specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'abc', rights: 'FullMask' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds role definition to web with name, description and right', async () => {
@@ -101,13 +93,13 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         name: 'test',
         description: 'test',
         rights: 'FullMask'
-      }
+      })
     });
   });
 
@@ -120,11 +112,11 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         name: 'test'
-      }
+      })
     });
   });
 
@@ -139,10 +131,37 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         name: 'test'
-      }
+      })
     }), new CommandError(err));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', name: 'test', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('returns a descriptive validation error for an invalid PermissionKind right', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      name: 'abc',
+      rights: 'FullMask, invalidRight'
+    });
+
+    assert.strictEqual(actual.success, false);
+
+    if (actual.success) {
+      assert.fail('Expected validation to fail');
+    }
+
+    assert.ok(actual.error.issues[0].message.includes(
+      "Rights option ' invalidRight' is not recognized as valid PermissionKind choice."
+    ));
+    assert.ok(actual.error.issues[0].message.includes(
+      'Please note it is case-sensitive. Allowed values are '
+    ));
+    assert.ok(actual.error.issues[0].message.includes('FullMask'));
   });
 });

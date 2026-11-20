@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './group-add.js';
+import command, { options } from './group-add.js';
 
 const validSharePointUrl = 'https://contoso.sharepoint.com/sites/project-x';
 const validName = 'Project leaders';
@@ -32,6 +32,7 @@ describe(commands.GROUP_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -40,6 +41,7 @@ describe(commands.GROUP_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -77,14 +79,24 @@ describe(commands.GROUP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', name: validName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', name: validName });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the url is valid and name is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: validSharePointUrl, name: validName } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url is valid and name is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: validSharePointUrl, name: validName });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: validSharePointUrl,
+      name: validName,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('correctly adds group to site', async () => {
@@ -97,10 +109,10 @@ describe(commands.GROUP_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: validSharePointUrl,
         name: validName
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(groupAddedResponse));
   });
@@ -118,6 +130,11 @@ describe(commands.GROUP_ADD, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(error.error['odata.error'].message.value));
+    await assert.rejects(command.action(logger, {
+      options: commandOptionsSchema.parse({
+        webUrl: validSharePointUrl,
+        name: validName
+      })
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 }); 

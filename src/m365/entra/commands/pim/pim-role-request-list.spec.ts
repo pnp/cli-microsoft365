@@ -369,6 +369,7 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
   it('fails validation when userName is not a valid user principal name', async () => {
     const actual = commandOptionsSchema.safeParse({ userName: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid user principal name for option 'userName'.`);
   });
 
   it('fails validation when groupId is not a valid GUID', async () => {
@@ -379,6 +380,7 @@ describe(commands.PIM_ROLE_REQUEST_LIST, () => {
   it('fails validation when createdDateTime is not a valid ISO 8601 date', async () => {
     const actual = commandOptionsSchema.safeParse({ createdDateTime: 'foo' });
     assert.notStrictEqual(actual.success, true);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid ISO 8601 date time string for option 'createdDateTime'.`);
   });
 
   it('fails validation when status has invalid value', async () => {

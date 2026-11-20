@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './channel-get.js';
+import command, { options } from './channel-get.js';
 import { teams } from '../../../../utils/teams.js';
 
 describe(commands.CHANNEL_GET, () => {
@@ -31,6 +31,7 @@ describe(commands.CHANNEL_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -39,6 +40,7 @@ describe(commands.CHANNEL_GET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -80,34 +82,28 @@ describe(commands.CHANNEL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        id: channelId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      id: channelId
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation for a incorrect id missing leading 19:.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        id: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation for a incorrect id missing leading 19:.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      id: 'invalid'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('correctly validates the when all options are valid', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: teamId,
-        id: channelId
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('correctly validates the when all options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: teamId,
+      id: channelId
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('fails to get channel information due to wrong channel id', async () => {
@@ -128,11 +124,11 @@ describe(commands.CHANNEL_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         id: channelId
-      }
-    } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
+      })
+    }), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
   });
 
   it('should get channel information for the Microsoft Teams team by id', async () => {
@@ -144,10 +140,10 @@ describe(commands.CHANNEL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         id: channelId
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(channelResponse));
   });
@@ -161,10 +157,10 @@ describe(commands.CHANNEL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         primary: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(channelResponse));
   });
@@ -173,10 +169,10 @@ describe(commands.CHANNEL_GET, () => {
     sinon.stub(teams, 'getChannelByDisplayName').withArgs(teamId, channelName).resolves(channelResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: teamName,
         name: channelName
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(channelResponse));
   });
@@ -190,10 +186,10 @@ describe(commands.CHANNEL_GET, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamName: teamName,
         primary: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(channelResponse));
   });
@@ -202,11 +198,16 @@ describe(commands.CHANNEL_GET, () => {
     sinon.stub(teams, 'getChannelByDisplayName').withArgs(teamId, channelName).resolves(channelResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: teamId,
         name: channelName
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(channelResponse));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f', id: '19:4eKaXatxQJ4Xj3eUvCt4Zx5TPKBhF8jS7SfQYaA7lBY1@thread.tacv2', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });

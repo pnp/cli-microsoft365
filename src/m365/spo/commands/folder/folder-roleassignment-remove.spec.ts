@@ -11,8 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-roleassignment-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './folder-roleassignment-remove.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 
@@ -77,6 +76,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let requests: any[];
   let promptIssued: boolean = false;
   const userResponse = {
@@ -117,6 +117,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -167,67 +168,67 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: -5 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Specified principalId '-5' is not a valid number.`);
   });
 
-  it('passes validation if the principalId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the principalId option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if principalId and upn are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if principalId and groupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, groupName: 'someGroup' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if upn and groupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither upn nor principalId or groupName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither upn nor principalId or groupName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if folderUrl is not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if folderUrl is not specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entraGroupId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option entraGroupId.`);
   });
 
-  it('passes validation if the entraGroupId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: '37455d5c-e466-4e49-8eba-808b5acec21b' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the entraGroupId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: '37455d5c-e466-4e49-8eba-808b5acec21b' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('remove role assignment from folder by folderUrl', async () => {
@@ -240,13 +241,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         principalId: 11,
         force: true
-      }
+      })
     });
   });
 
@@ -262,13 +263,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
+      })
     });
   });
 
@@ -285,14 +286,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
         force: true
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('remove role assignment from folder and get principal id by group name', async () => {
@@ -307,13 +308,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
         force: true
-      }
+      })
     });
   });
 
@@ -330,13 +331,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
         force: true
-      }
+      })
     });
   });
 
@@ -353,13 +354,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         entraGroupName: 'Marketing',
         force: true
-      }
+      })
     });
   });
 
@@ -376,24 +377,24 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
         force: true
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('aborts removing role assignment when prompt not confirmed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup'
-      }
+      })
     });
 
     assert(requests.length === 0);
@@ -401,12 +402,12 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('prompts before removing role assignment when confirmation argument not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup'
-      }
+      })
     });
     assert(promptIssued);
   });
@@ -425,12 +426,12 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup'
-      }
+      })
     });
   });
 });

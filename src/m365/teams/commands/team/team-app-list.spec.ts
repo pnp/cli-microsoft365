@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './team-app-list.js';
+import command, { options } from './team-app-list.js';
 import teamGetCommand from './team-get.js';
 
 describe(commands.TEAM_APP_LIST, () => {
@@ -24,6 +24,7 @@ describe(commands.TEAM_APP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -32,6 +33,7 @@ describe(commands.TEAM_APP_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -71,14 +73,29 @@ describe(commands.TEAM_APP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: 'invalid' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the teamId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: teamId } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the teamId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: teamId });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation when both teamId and teamName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: teamId, teamName: teamName });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when neither teamId nor teamName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ teamId: teamId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails when team does not exist in tenant', async () => {
@@ -89,7 +106,7 @@ describe(commands.TEAM_APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { teamName: teamName, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ teamName: teamName, verbose: true }) }),
       new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
@@ -110,7 +127,7 @@ describe(commands.TEAM_APP_LIST, () => {
       throw 'Invalid response';
     });
 
-    await command.action(logger, { options: { teamName: teamName, verbose: true, output: 'json' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamName: teamName, verbose: true, output: 'json' }) });
     assert(loggerLogSpy.calledWith(jsonResponse));
   });
 
@@ -123,7 +140,7 @@ describe(commands.TEAM_APP_LIST, () => {
       throw 'Invalid response';
     });
 
-    await command.action(logger, { options: { teamId: teamId, verbose: true, output: 'text' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ teamId: teamId, verbose: true, output: 'text' }) });
     assert(loggerLogSpy.calledWith(friendlyResponse));
   });
 });

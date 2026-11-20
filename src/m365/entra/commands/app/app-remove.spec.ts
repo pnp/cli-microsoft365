@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-remove.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
 
@@ -39,6 +39,7 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -98,75 +99,56 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if appId and name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if objectId and name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if objectId and name specified', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither appId, objectId, nor name specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, objectId, nor name specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the objectId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { objectId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the objectId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { appId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid guid', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: 'abc' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (appId)', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (appId)', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (objectId)', async () => {
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (objectId)', () => {
+    const actual = commandOptionsSchema.safeParse({ objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { name: 'My app' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (name)', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'My app' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the app when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
-      }
+      })
     });
 
     assert(promptIssued);
@@ -177,9 +159,9 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
-      }
+      })
     });
     assert(deleteRequestStub.notCalled);
   });
@@ -189,40 +171,40 @@ describe(commands.APP_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app with specified app (client) ID', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
         force: true
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app with specified object ID', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         objectId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
         force: true
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app with specified name', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         name: 'myapp',
         force: true
-      }
+      })
     });
     assert(deleteRequestStub.called);
   });
@@ -232,7 +214,7 @@ describe(commands.APP_REMOVE, () => {
     const error = `App with appId 'd75be2e1-0204-4f95-857d-51a37cf40be8' not found in Microsoft Entra ID`;
     sinon.stub(entraApp, 'getAppRegistrationByAppId').rejects(new Error(error));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true }) }), new CommandError(error));
   });
 
   it('fails to get app by name when app does not exists', async () => {
@@ -240,27 +222,20 @@ describe(commands.APP_REMOVE, () => {
     const error = `App with name 'myapp' not found in Microsoft Entra ID`;
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', force: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'myapp', force: true }) }), new CommandError(error));
   });
 
   it('fails when multiple apps with same name exists', async () => {
     sinonUtil.restore(entraApp.getAppRegistrationByAppName);
     const error = `Multiple apps with name 'myapp' found in Microsoft Entra ID. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952.`;
     sinon.stub(entraApp, 'getAppRegistrationByAppName').rejects(new Error(error));
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'myapp',
         force: true
-      }
+      })
     }), new CommandError(error));
   });
 });

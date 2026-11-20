@@ -12,13 +12,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-install.js';
+import command, { options } from './app-install.js';
 import { entraUser } from '../../../../utils/entraUser.js';
 
 describe(commands.APP_INSTALL, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +28,7 @@ describe(commands.APP_INSTALL, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -67,114 +69,54 @@ describe(commands.APP_INSTALL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when neither teamId, userId nor userName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when neither teamId, userId nor userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when teamId and userId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when teamId and userId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      teamId: '00000000-0000-0000-0000-000000000000',
+      userId: '00000000-0000-0000-0000-000000000000'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        teamId: '00000000-0000-0000-0000-000000000000',
-        userId: '00000000-0000-0000-0000-000000000000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when teamId and userName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when teamId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      teamId: '00000000-0000-0000-0000-000000000000',
+      userName: 'steve@contoso.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        teamId: '00000000-0000-0000-0000-000000000000',
-        userName: 'steve@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation when userId and userName are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when userId and userName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      userId: '00000000-0000-0000-0000-000000000000',
+      userName: 'steve@contoso.com'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        userId: '00000000-0000-0000-0000-000000000000',
-        userName: 'steve@contoso.com'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and name options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both id and name options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+      name: 'Test app',
+      teamId: '00000000-0000-0000-0000-000000000000'
     });
-
-    const actual = await command.validate({
-      options: {
-        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
-        name: 'Test app',
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if both id and name options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation if both id and name options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: '00000000-0000-0000-0000-000000000000'
     });
-
-    const actual = await command.validate({
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('fails to get Teams app when app does not exist', async () => {
@@ -186,42 +128,36 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Test app',
         teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
+      })
+    }), new CommandError('The specified Teams app does not exist'));
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid',
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the teamId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      teamId: 'invalid',
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the id is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'not-a78e-fd77-4599-97a5-dbb6372846c5',
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: 'not-a78e-fd77-4599-97a5-dbb6372846c5',
+      teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
-  it('fails validation if the userId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the userId is not a valid guid.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      userId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.notStrictEqual(actual.success, true);
   });
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
@@ -252,12 +188,12 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         name: 'Test app',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    } as any), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
+      })
+    }), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
   });
 
   it('handles selecting single result when multiple Teams apps found with the specified name', async () => {
@@ -291,42 +227,36 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'Test app'
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
 
-  it('passes validation when the id and teamId are correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id and teamId are correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+      teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the id and userId are correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
-        userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id and userId are correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+      userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation when the id and userName are correct', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
-        userName: 'steve@contoso.com'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when the id and userName are correct', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+      userName: 'steve@contoso.com'
+    });
+    assert.strictEqual(actual.success, true);
   });
 
   it('adds app from the catalog to a Microsoft Team', async () => {
@@ -340,10 +270,10 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
@@ -373,11 +303,11 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'Test app',
         debug: true
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
@@ -395,10 +325,10 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
@@ -416,11 +346,11 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce',
         debug: true
-      }
+      })
     });
   });
 
@@ -435,10 +365,10 @@ describe(commands.APP_INSTALL, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userName: 'steve@contoso.com',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
+      })
     });
     assert.strictEqual(log.length, 0);
   });
@@ -458,10 +388,10 @@ describe(commands.APP_INSTALL, () => {
     sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
+      })
     } as any), new CommandError(error.error.message));
   });
 
@@ -501,11 +431,11 @@ describe(commands.APP_INSTALL, () => {
     sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
+      })
+    }), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
@@ -526,11 +456,20 @@ describe(commands.APP_INSTALL, () => {
     sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce',
         debug: true
-      }
-    } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
+      })
+    }), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

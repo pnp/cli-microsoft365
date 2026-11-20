@@ -120,16 +120,19 @@ describe(commands.NOTEBOOK_ADD, () => {
   it('fails validation if webUrl is not a valid webUrl', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, webUrl: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid SharePoint Online site URL.`);
   });
 
   it('fails validation if the userId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, userId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('fails validation if the groupId is not a valid GUID', () => {
     const actual = commandOptionsSchema.safeParse({ name: name, groupId: 'invalid' });
     assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID.`);
   });
 
   it('passes validation if no option but name specified', () => {
