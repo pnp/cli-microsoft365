@@ -1,0 +1,72 @@
+import Global from '../../_global.mdx';
+
+# spo web roleassignment list
+
+Lists all role assignments for a specific web.
+
+## Usage
+
+```sh
+m365 spo web roleassignment list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site.
+```
+
+<Global />
+
+## Examples
+
+List all role assignments of a specific site
+
+```sh
+m365 spo web roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing"
+```
+
+## Response
+
+```json
+[
+  {
+    "Member": {
+      "Id": 3,
+      "IsHiddenInUI": false,
+      "LoginName": "Marketing Owners",
+      "Title": "Marketing Owners",
+      "PrincipalType": 8,
+      "AllowMembersEditMembership": false,
+      "AllowRequestToJoinLeave": false,
+      "AutoAcceptRequestToJoinLeave": false,
+      "Description": null,
+      "OnlyAllowMembersViewMembership": false,
+      "OwnerTitle": "Marketing Owners",
+      "RequestToJoinLeaveEmailSetting": ""
+    },
+    "RoleDefinitionBindings": [
+      {
+        "BasePermissions": {
+          "High": "2147483647",
+          "Low": "4294967295"
+        },
+        "Description": "Has full control.",
+        "Hidden": false,
+        "Id": 1073741829,
+        "Name": "Full Control",
+        "Order": 1,
+        "RoleTypeKind": 5
+      }
+    ],
+    "PrincipalId": 3
+  }
+]
+```
+
+:::info
+
+You can also retrieve role assignments using the `--withPermissions` option of [spo web get](./web-get.mdx) if you need the full web properties alongside permissions in a single request.
+
+:::
