@@ -16,7 +16,7 @@ env:
   # YAML anchor lets us reference this in matrix arrays.
   # If you change this value, also update the hardcoded nodeBuild
   # values in the test job's fromJSON include entries.
-  NODE_VERSION: &node_version 24
+  NODE_VERSION: &node_version 26
 
 jobs:
   build:
@@ -69,7 +69,7 @@ jobs:
         nodeRun: [*node_version]
         nodeBuild: [*node_version]
         # nodeBuild values in include entries must match the node_version anchor above
-        include: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[{"os":"ubuntu-latest","nodeRun":20,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":22,"nodeBuild":24},{"os":"ubuntu-latest","nodeRun":26,"nodeBuild":24}]') || fromJSON('[]') }}
+        include: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[{"os":"ubuntu-latest","nodeRun":22,"nodeBuild":26}]') || fromJSON('[]') }}
 
     steps:
       # Windows runners run out of memory during tests without extra pagefile

@@ -112,7 +112,7 @@
 
 ## Install
 
-To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 20 and higher, but we recommend you to use the Node.js LTS version available at the moment.
+To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI is tested with Node.js versions 22 and 26.
 
 ```
 npm install -g @pnp/cli-microsoft365
@@ -198,7 +198,7 @@ m365 spo site get --url https://contoso.sharepoint.com --output text
 
 ## Build
 
-To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 24.0.0` installed.
+To build and run this CLI locally, you will need [`node`](https://nodejs.org) `26.x` installed. Node.js 26 is the version used for development and package builds.
 
 ```sh
 # Clone this repository
