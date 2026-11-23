@@ -13,8 +13,10 @@ export const options = z.strictObject({
   ...globalOptionsZod.shape,
   communityId: z.string().optional(),
   communityDisplayName: z.string().optional().alias('n'),
-  entraGroupId: z.uuid().optional(),
-  id: z.uuid().optional(),
+  entraGroupId: z.guid().optional(),
+  id: z.string().refine(id => validation.isValidGuid(id), {
+    error: e => `'${e.input}' is not a valid GUID.`
+  }).optional(),
   userName: z.string()
     .refine(userName => validation.isValidUserPrincipalName(userName), {
       error: e => `'${e.input}' is not a valid user principal name.`

@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-roleassignment-add.js';
+import command, { options } from './folder-roleassignment-add.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 
@@ -76,6 +76,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   const groupResponse = {
     Id: 11,
     IsHiddenInUI: false,
@@ -167,6 +168,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -209,74 +211,83 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 'abc', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: -5, roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Specified principalId '-5' is not a valid number.`);
   });
 
-  it('passes validation if the principalId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the principalId option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the roleDefinitionId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the roleDefinitionId option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: -5 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `Specified roleDefinitionId '-5' is not a valid number.`);
   });
 
-  it('passes validation if the roleDefinitionId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the roleDefinitionId option is a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if principalId and upn are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if principalId and groupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if upn and groupName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if roleDefinitionId and roleDefinitionName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if roleDefinitionId and roleDefinitionName are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation neither groupName nor principalId or upn is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation neither groupName nor principalId or upn is specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', roleDefinitionName: 'readers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: 'invalid', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entraGroupId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: 'invalid', roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option entraGroupId.`);
   });
 
-  it('passes validation if the entraGroupId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: '37455d5c-e466-4e49-8eba-808b5acec21b', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the entraGroupId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', entraGroupId: '37455d5c-e466-4e49-8eba-808b5acec21b', roleDefinitionId: 1073741827 });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
@@ -291,13 +302,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -311,13 +322,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents',
         principalId: 11,
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -334,14 +345,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('add the role assignment to the specified folder based on the group name and role definition id', async () => {
@@ -356,13 +367,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -379,14 +390,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('add the role assignment to the specified folder based on the principal id and role definition name', async () => {
@@ -402,13 +413,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getRoleDefintionByName').resolves(roledefintionResponse);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         principalId: 11,
         roleDefinitionName: 'Full Control'
-      }
+      })
     });
   });
 
@@ -425,14 +436,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(spo, 'getRoleDefintionByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         principalId: 11,
         roleDefinitionName: 'Full Control1'
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 
   it('adds the role assignment to the specified root folder based on the Entra group id and role definition id', async () => {
@@ -448,13 +459,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents',
         entraGroupId: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 
@@ -471,13 +482,13 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents',
         entraGroupName: 'Marketing',
         roleDefinitionId: 1073741827
-      }
+      })
     });
   });
 });

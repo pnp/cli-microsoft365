@@ -14,7 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { GraphFileDetails } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './file-sharinglink-remove.js';
+import command, { options } from './file-sharinglink-remove.js';
 
 describe(commands.FILE_SHARINGLINK_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/demo';
@@ -31,6 +31,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -40,6 +41,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -84,28 +86,34 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, id: id });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, id: id });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '12345', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '12345', id: id });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing the specified sharing link to a file when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId,
         id: id
-      }
+      })
     });
 
 
@@ -118,11 +126,11 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileUrl: fileUrl,
         id: id
-      }
+      })
     });
 
     assert(deleteSpy.notCalled);
@@ -149,12 +157,12 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         fileId: fileId,
         id: id
-      }
+      })
     });
     assert(requestDeleteStub.called);
   });
@@ -178,13 +186,13 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         verbose: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         id: id,
         force: true
-      }
+      })
     });
     assert(requestDeleteStub.called);
   });
@@ -199,13 +207,13 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId,
         id: id,
         force: true,
         verbose: true
-      }
+      })
     } as any), new CommandError(`File Not Found.`));
   });
 });

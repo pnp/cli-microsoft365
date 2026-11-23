@@ -1,5 +1,6 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -9,15 +10,27 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { FolderProperties } from './FolderProperties.js';
 
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  name: z.string(),
+  folderUrl: z.string().optional(),
+  folderId: z.string()
+    .refine(id => validation.isValidGuid(id), {
+      error: e => `'${e.input}' is not a valid GUID.`
+    })
+    .optional()
+    .alias('i')
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  name: string;
-  folderUrl?: string;
-  folderId?: string;
 }
 
 class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
@@ -29,66 +42,19 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     return 'Applies a retention label to a folder';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
-        folderId: typeof args.options.folderId !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => [opts.folderUrl, opts.folderId].filter(o => o !== undefined).length === 1, {
+        error: `Specify either 'folderUrl' or 'folderId', but not both.`,
+        params: {
+          customCode: 'optionSet',
+          options: ['folderUrl', 'folderId']
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--name <name>'
-      },
-      {
-        option: '--folderUrl [folderUrl]'
-      },
-      {
-        option: '-i, --folderId [folderId]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.folderId &&
-          !validation.isValidGuid(args.options.folderId as string)) {
-          return `${args.options.folderId} is not a valid GUID`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['folderUrl', 'folderId'] });
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'name', 'folderUrl', 'folderId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -108,10 +108,6 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     return 'Upgrades SharePoint Framework project to the specified version';
   }
 
-  protected get allowedOutputs(): string[] {
-    return ['json', 'text', 'md', 'tour'];
-  }
-
   public get schema(): z.ZodType {
     return options;
   }

@@ -111,6 +111,19 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true }) });
   });
 
+  it('keeps csv values that look like numbers as text when adding items', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return mockBatchSuccessfulResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, csvContent: `\uFEFFTitle,Zip,Phone,Code,Exp\nA,"00123",+31612345678,12345678901234567890,1e3`, listId: listId }) });
+    const data: string = postStub.firstCall.args[0].data;
+    assert(data.includes('[{"FieldName":"Title","FieldValue":"A"},{"FieldName":"Zip","FieldValue":"00123"},{"FieldName":"Phone","FieldValue":"+31612345678"},{"FieldName":"Code","FieldValue":"12345678901234567890"},{"FieldName":"Exp","FieldValue":"1e3"}]'));
+  });
+
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);

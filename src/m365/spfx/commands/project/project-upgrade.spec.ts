@@ -4226,4 +4226,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       assert.strictEqual(actual.data.shell, 'powershell');
     }
   });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      shell: 'cmd',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
 });

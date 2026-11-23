@@ -11,13 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './folder-get.js';
+import command, { options } from './folder-get.js';
 
 describe(commands.FOLDER_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let stubGetResponses: any;
 
   const expectedFolder = {
@@ -380,6 +381,7 @@ describe(commands.FOLDER_GET, () => {
       });
     };
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -417,52 +419,73 @@ describe(commands.FOLDER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', url: '/Shared Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', url: '/Shared Documents' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', id: '12345' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'12345' is not a valid GUID.`);
+  });
+
+  it('fails validation if both url and id are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents', id: 'b2307a39-e878-458b-bc90-03bc578531d6' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if neither url nor id are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('should correctly handle folder get reject request', async () => {
     stubGetResponses(new Promise((resolve, reject) => { reject('error1'); }));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
-      }
-    } as any), new CommandError('error1'));
+      })
+    }), new CommandError('error1'));
   });
 
   it('should show tip when folder get rejects with error code 500', async () => {
     sinon.stub(request, 'get').rejects({ statusCode: 500 });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
-      }
-    } as any), new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
+      })
+    }), new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
   });
 
   it('should correctly handle folder get success request', async () => {
     stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
-      }
+      })
     });
     assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
   });
@@ -471,11 +494,11 @@ describe(commands.FOLDER_GET, () => {
     const request = stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
-      }
+      })
     });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderById(\'b2307a39-e878-458b-bc90-03bc578531d6\')');
@@ -485,11 +508,11 @@ describe(commands.FOLDER_GET, () => {
     const request = stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
-      }
+      })
     });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents\')');
@@ -499,11 +522,11 @@ describe(commands.FOLDER_GET, () => {
     const request = stubGetResponses();
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/'
-      }
+      })
     });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2Ftest1%2FShared%20Documents\')');
@@ -513,11 +536,11 @@ describe(commands.FOLDER_GET, () => {
     sinon.stub(request, 'get').resolves(expectedFolder);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/FolderPermission',
         withPermissions: true
-      }
+      })
     });
     assert(loggerLogSpy.calledWith(expectedFolder));
   });
@@ -533,11 +556,11 @@ describe(commands.FOLDER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: 'https://contoso.sharepoint.com',
         url: 'Shared Documents',
         withPermissions: true
-      }
-    } as any), new CommandError(error));
+      })
+    }), new CommandError(error));
   });
 });

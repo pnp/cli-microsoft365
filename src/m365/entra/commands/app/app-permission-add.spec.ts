@@ -13,8 +13,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-permission-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-permission-add.js';
 import { entraApp } from "../../../../utils/entraApp.js";
 
 describe(commands.APP_PERMISSION_ADD, () => {
@@ -30,6 +29,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,6 +38,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
@@ -106,7 +107,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -128,7 +129,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: appName, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appName: appName, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -150,7 +151,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, verbose: true }) });
     assert(patchStub.called);
   });
 
@@ -181,7 +182,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(amountOfPostCalls, 2);
   });
 
@@ -217,7 +218,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(numberOfPostCalls, 3);
   });
 
@@ -253,7 +254,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appId: appId, delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, delegatedPermissions: delegatedPermissions, applicationPermissions: applicationPermissions, grantAdminConsent: true, verbose: true }) });
     assert.strictEqual(amountOfPostCalls, 3);
   });
 
@@ -272,7 +273,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: api, verbose: true }) }),
       new CommandError(`Service principal ${servicePrincipalName} not found`));
   });
 
@@ -292,91 +293,72 @@ describe(commands.APP_PERMISSION_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermissions: api, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ appId: appId, applicationPermissions: api, verbose: true }) }),
       new CommandError(`Permission ${permissionName} for service principal ${servicePrincipalName} not found`));
   });
 
-  it('passes validation if applicationPermission is passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if applicationPermission is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if delegatedPermission is passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, delegatedPermissions: delegatedPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if delegatedPermission is passed', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: appId, delegatedPermissions: delegatedPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if both applicationPermission or delegatedPermission are passed', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions, delegatedPermissions: delegatedPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if both applicationPermission or delegatedPermission are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions, delegatedPermissions: delegatedPermissions });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both applicationPermission or delegatedPermission is not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation if both applicationPermission or delegatedPermission is not passed', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '123', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the appId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: appId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if the appObjectId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '123', applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if the appObjectId is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: appObjectId, applicationPermissions: applicationPermissions });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if neither the appId nor the appObjectId are provided.', () => {
+    const actual = commandOptionsSchema.safeParse({
+      applicationPermissions: applicationPermissions
     });
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: '123', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the appId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appId: appId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if the appObjectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: '123', applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the appObjectId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { appObjectId: appObjectId, applicationPermissions: applicationPermissions } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if neither the appId nor the appObjectId are provided.', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation when both appId and appObjectId are specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      appId: appId,
+      appObjectId: appObjectId,
+      applicationPermissions: applicationPermissions
     });
-
-    const actual = await command.validate({
-      options: {
-        applicationPermissions: applicationPermissions
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation when both appId and appObjectId are specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      appId: appId,
+      applicationPermissions: applicationPermissions,
+      unknownOption: 'value'
     });
-
-    const actual = await command.validate({
-      options: {
-        appId: appId,
-        appObjectId: appObjectId,
-        applicationPermissions: applicationPermissions
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    assert.strictEqual(actual.success, false);
   });
 });

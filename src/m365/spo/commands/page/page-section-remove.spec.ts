@@ -135,7 +135,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
 
   it('aborts removing section when prompt not confirmed', async () => {
     const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) });
 
     assert(confirmationStub.calledOnce);
   });
@@ -160,7 +160,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 }) });
 
     assert(postStub.calledOnce);
   });
@@ -240,7 +240,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: mockEmptyPage
     });
@@ -321,7 +321,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockOneColumnSectionHTML(1, false, true)}${mockPageSettingsHTML}</div>`
     });
@@ -402,7 +402,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockOneColumnSectionHTML(1, false, true)}${mockOneColumnSectionHTML(2, true)}${mockPageSettingsHTML}${mockBackgroundControlHTML}</div>`
     });
@@ -483,7 +483,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 4, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 4, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockVerticalSectionHTML()}${mockOneColumnSectionHTML(2)}${mockOneColumnSectionHTML(3, false, true)}${mockPageSettingsHTML}</div>`
     });
@@ -564,7 +564,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockOneColumnSectionHTML(1, true)}${mockTwoColumnsSectionHTML(2)}${mockPageSettingsHTML}</div>`
     });
@@ -645,7 +645,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 6, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 6, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2)}${mockThreeColumnSectionHTML(3)}${mockTwoColumnLeftSectionHTML(4)}${mockTwoColumnRightSectionHTML(5)}${mockPageSettingsHTML}</div>`
     });
@@ -726,7 +726,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockTwoColumnsSectionHTML(1, false, false, true)}${mockPageSettingsHTML}</div>`
     });
@@ -807,7 +807,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockTwoColumnsSectionHTML(1, false, false, false, true)}${mockPageSettingsHTML}</div>`
     });
@@ -888,7 +888,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 2, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 2, force: true }) });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       CanvasContent1: `<div>${mockOneColumnSectionHTML()}${mockTwoColumnsSectionHTML(2, true)}${mockPageSettingsHTML}</div>`
     });
@@ -957,7 +957,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) }),
       new CommandError('Page home.aspx is not a modern page.'));
   });
 
@@ -976,7 +976,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) }),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -985,7 +985,7 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, force: true }) }),
       new CommandError('An error has occurred'));
   });
 
@@ -998,8 +998,8 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: -1, force: true } } as any),
-      new CommandError('Section -1 not found'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 99, force: true }) }),
+      new CommandError('Section 99 not found'));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -1021,5 +1021,39 @@ describe(commands.PAGE_SECTION_REMOVE, () => {
   it('passes validation when the webUrl is a valid SharePoint URL and name, section and force are specified', async () => {
     const actual = await commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1, force: false });
     assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation if section is less than 1', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 0
+    });
+
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(
+      actual.error.issues[0].message,
+      'The value of parameter section must be 1 or higher'
+    );
+  });
+
+  it('fails validation if section is not an integer', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 1.5
+    });
+
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl: 'https://contoso.sharepoint.com',
+      pageName: 'home.aspx',
+      section: 1,
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

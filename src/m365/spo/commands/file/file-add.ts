@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -11,23 +12,35 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
+export const options = z.object({
+  ...globalOptionsZod.shape,
+  webUrl: z.string()
+    .refine(url => validation.isValidSharePointUrl(url) === true, {
+      error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
+    })
+    .alias('u'),
+  folder: z.string(),
+  path: z.string()
+    .refine(filePath => fs.existsSync(filePath), {
+      error: 'Specified path of the file to add does not exist',
+      abort: true
+    })
+    .alias('p'),
+  contentType: z.string().optional().alias('c'),
+  checkOut: z.boolean().optional(),
+  checkInComment: z.string().optional(),
+  approve: z.boolean().optional(),
+  approveComment: z.string().optional(),
+  publish: z.boolean().optional(),
+  publishComment: z.string().optional(),
+  overwrite: z.boolean().optional(),
+  fileName: z.string().optional()
+}).catchall(z.unknown());
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  webUrl: string;
-  folder: string;
-  path: string;
-  contentType?: string;
-  checkOut?: boolean;
-  checkInComment?: string;
-  approve?: boolean;
-  approveComment?: string;
-  publish?: boolean;
-  publishComment?: string;
-  overwrite?: boolean;
-  fileName?: string;
 }
 
 interface FieldValue {
@@ -76,100 +89,26 @@ class SpoFileAddCommand extends SpoCommand {
     return true;
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initTypes();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        contentType: typeof args.options.contentType !== 'undefined',
-        checkOut: !!args.options.checkOut,
-        checkInComment: typeof args.options.checkInComment !== 'undefined',
-        approve: !!args.options.approve,
-        approveComment: typeof args.options.approveComment !== 'undefined',
-        publish: !!args.options.publish,
-        publishComment: typeof args.options.publishComment !== 'undefined',
-        overwrite: !!args.options.overwrite,
-        fileName: typeof args.options.fileName !== 'undefined'
+  public getRefinedSchema(schema: typeof options): z.ZodObject<any> | undefined {
+    return schema
+      .refine(opts => !opts.publishComment || opts.publish, {
+        error: '--publishComment cannot be used without --publish',
+        path: ['publish'],
+        params: {
+          customCode: 'required'
+        }
+      })
+      .refine(opts => !opts.approveComment || opts.approve, {
+        error: '--approveComment cannot be used without --approve',
+        path: ['approve'],
+        params: {
+          customCode: 'required'
+        }
       });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--folder <folder>'
-      },
-      {
-        option: '-p, --path <path>'
-      },
-      {
-        option: '-c, --contentType [contentType]'
-      },
-      {
-        option: '--checkOut'
-      },
-      {
-        option: '--checkInComment [checkInComment]'
-      },
-      {
-        option: '--approve'
-      },
-      {
-        option: '--approveComment [approveComment]'
-      },
-      {
-        option: '--publish'
-      },
-      {
-        option: '--publishComment [publishComment]'
-      },
-      {
-        option: '--overwrite'
-      },
-      {
-        option: '--fileName [fileName]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.path && !fs.existsSync(args.options.path)) {
-          return 'Specified path of the file to add does not exist';
-        }
-
-        if (args.options.publishComment && !args.options.publish) {
-          return '--publishComment cannot be used without --publish';
-        }
-
-        if (args.options.approveComment && !args.options.approve) {
-          return '--approveComment cannot be used without --approve';
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('webUrl', 'folder', 'path', 'contentType', 'checkInComment', 'approveComment', 'publishComment', 'fileName');
-    this.types.boolean.push('checkOut', 'approve', 'publish', 'overwrite');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

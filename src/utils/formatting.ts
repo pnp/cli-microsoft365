@@ -87,14 +87,15 @@ export const formatting = {
     return response;
   },
 
-  parseCsvToJson(s: string, quoteChar: string = '"', delimiter: string = ','): any {
+  parseCsvToJson(s: string, options: { quoteChar?: string; delimiter?: string; cast?: boolean } = {}): any {
     return parse(s, {
-      quote: quoteChar,
-      delimiter: delimiter,
+      quote: options.quoteChar ?? '"',
+      delimiter: options.delimiter ?? ',',
+      bom: true,
       columns: true,
       skipEmptyLines: true,
       ltrim: true,
-      cast: true
+      cast: options.cast ?? true
     });
   },
 

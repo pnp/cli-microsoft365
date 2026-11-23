@@ -5,6 +5,7 @@ import path from 'path';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -13,11 +14,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import spoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
 import commands from '../../commands.js';
-import command from './project-permissions-grant.js';
+import command, { options } from './project-permissions-grant.js';
 
 describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerStderrLogSpy: sinon.SinonSpy;
   const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react';
@@ -84,6 +87,8 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
+    commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -128,7 +133,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(null);
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Couldn't find project root folder`, 1));
   });
 
@@ -137,7 +142,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
 
     sinon.stub(fs, 'existsSync').returns(false);
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`The package-solution.json file could not be found`));
   });
 
@@ -156,9 +161,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     });
 
     await command.action(logger, {
-      options: {
-        debug: true
-      }
+      options: commandOptionsSchema.parse({ debug: true })
     });
     assert(loggerLogSpy.calledWith(grantResponse));
   });
@@ -183,8 +186,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     });
 
     await command.action(logger, {
-      options: {
-      }
+      options: commandOptionsSchema.parse({})
     });
     assert.strictEqual(loggerStderrLogSpy.calledWith(chalk.yellow("An OAuth permission with the resource Microsoft Graph and scope User.ReadBasic.All already exists.Parameter name: permissionRequest")), true);
   });
@@ -201,7 +203,19 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
       throw new CommandError('Unknown case');
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({}) }),
       new CommandError(`Something went wrong`));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation with no options', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, true);
   });
 });

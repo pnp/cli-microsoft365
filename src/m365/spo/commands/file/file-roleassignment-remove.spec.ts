@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import command from './file-roleassignment-remove.js';
+import command, { options } from './file-roleassignment-remove.js';
 import { spo } from '../../../../utils/spo.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 
@@ -145,6 +145,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -154,6 +155,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -201,38 +203,45 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, principalId: principalId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileId: fileId, principalId: principalId, force: true });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', principalId: principalId, force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: 'foo', principalId: principalId, force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the entraGroupId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, entraGroupId: 'Invalid Guid', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the entraGroupId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, entraGroupId: 'Invalid Guid', force: true });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'Invalid Guid' is not a valid GUID for option entraGroupId.`);
   });
 
-  it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'Hi', force: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the principalId option is not a number', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, principalId: 'Hi', force: true });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, force: true } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if webUrl and fileId are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, force: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, force: true, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before removing role assignment from the file when force option not passed', async () => {
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId,
         principalId: principalId
-      }
+      })
     });
 
 
@@ -243,11 +252,11 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         webUrl: webUrl,
         fileId: fileId,
         principalId: principalId
-      }
+      })
     });
 
     assert(postSpy.notCalled);
@@ -267,12 +276,12 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         principalId: principalId
-      }
+      })
     });
   });
 
@@ -290,13 +299,13 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileId: fileId,
         upn: upn,
         force: true
-      }
+      })
     });
   });
 
@@ -314,13 +323,13 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileId: fileId,
         groupName: groupName,
         force: true
-      }
+      })
     });
   });
 
@@ -339,13 +348,13 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileId: fileId,
         entraGroupId: graphGroup.id,
         force: true
-      }
+      })
     });
   });
 
@@ -364,13 +373,13 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileId: fileId,
         entraGroupName: graphGroup.displayName,
         force: true
-      }
+      })
     });
   });
 
@@ -379,13 +388,13 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
         principalId: principalId,
         force: true
-      }
+      })
     }), new CommandError(errorMessage));
   });
 });

@@ -131,41 +131,41 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
   });
 
   it('prompts before removing the control', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId }) });
     assert(confirmationPromptStub.calledOnce);
   });
 
   it('aborts removing the control when prompt is not confirmed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId }) });
     assert(patchStub.notCalled);
   });
 
   it('does not log a response', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly removes page control', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, force: true }) });
 
     assert.strictEqual(patchStub.firstCall.args[0].data.CanvasContent1, removedCanvasContent1);
   });
 
   it('correctly removes page control without extension', async () => {
     const pageNameWithoutExtension = pageName.replace('.aspx', '');
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageNameWithoutExtension, id: controlId, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageNameWithoutExtension, id: controlId, force: true }) });
 
     assert.strictEqual(patchStub.firstCall.args[0].data.CanvasContent1, removedCanvasContent1);
   });
 
   it('correctly removes page control and publishes page', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, force: true, verbose: true }) });
 
     assert(pagePublishStub.calledOnce);
   });
 
   it('correctly removes page control and keeps page as draft', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, draft: true, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, draft: true, force: true }) });
 
     assert.strictEqual(patchStub.firstCall.args[0].data.CanvasContent1, removedCanvasContent1);
     assert(pagePublishStub.notCalled);
@@ -175,12 +175,12 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').resolves({ CanvasContent1: '' });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, force: true }) }),
       new CommandError(`Page '${pageName}' doesn't contain canvas control '${controlId}'.`));
   });
 
   it('correctly handles error when control with specified ID is not found on page', async () => {
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: 'b27bbb8f-8aa2-4bd8-b11b-5addf65983b0', force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: 'b27bbb8f-8aa2-4bd8-b11b-5addf65983b0', force: true }) }),
       new CommandError(`Control with ID 'b27bbb8f-8aa2-4bd8-b11b-5addf65983b0' was not found on page '${pageName}'.`));
   });
 
@@ -200,7 +200,18 @@ describe(commands.PAGE_CONTROL_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, pageName: pageName, id: controlId, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, pageName: pageName, id: controlId, force: true }) }),
       new CommandError(errorMessage));
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      webUrl,
+      pageName,
+      id: controlId,
+      unknownOption: 'value'
+    });
+
+    assert.strictEqual(actual.success, false);
   });
 });

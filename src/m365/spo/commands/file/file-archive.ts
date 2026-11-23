@@ -17,7 +17,7 @@ export const options = z.strictObject({
     })
     .alias('u'),
   url: z.string().optional(),
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   force: z.boolean().optional().alias('f')
 });
 

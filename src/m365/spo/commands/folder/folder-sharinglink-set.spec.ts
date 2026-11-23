@@ -11,7 +11,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
-import command from './folder-sharinglink-set.js';
+import command, { options } from './folder-sharinglink-set.js';
 import { spo } from '../../../../utils/spo.js';
 import { drive } from '../../../../utils/drive.js';
 import { Drive } from '@microsoft/microsoft-graph-types';
@@ -21,6 +21,7 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const folderId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
@@ -65,6 +66,7 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -107,24 +109,43 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderId: folderId, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', folderId: folderId, id: id });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the folderId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderId: 'invalid', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the folderId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: 'invalid', id: id });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option 'folderId'.`);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: 'invalid date', id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the id option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, id: 'invalid' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid' is not a valid GUID for option 'id'.`);
   });
 
-  it('passes validation if options are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('fails validation if the expirationDateTime option is not a valid date', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: 'invalid date', id: id });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'invalid date' is not a valid ISO date string.`);
+  });
+
+  it('fails validation if both folderId and folderUrl are specified', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, folderUrl: folderUrl, id: id });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, folderId: folderId, id: id, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('passes validation if options are valid', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'https://contoso.sharepoint.com', folderId: folderId, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id });
+    assert.strictEqual(actual.success, true);
   });
 
   it('updates a sharing link to a folder specified by the id', async () => {
@@ -138,7 +159,7 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, folderId: folderId, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderId: folderId, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true }) });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
 
@@ -153,7 +174,7 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true } } as any);
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true }) });
     assert(loggerLogSpy.calledWith(graphResponse));
   });
 
@@ -170,7 +191,7 @@ describe(commands.FOLDER_SHARINGLINK_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, folderUrl: folderUrl, expirationDateTime: '2024-05-05T16:57:00.000Z', id: id, verbose: true }) }),
       new CommandError(`Drive 'https://contoso.sharepoint.com/sites/project-x/shared%20documents/folder1' not found`));
   });
 });

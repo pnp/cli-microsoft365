@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './file-retentionlabel-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './file-retentionlabel-remove.js';
 
 describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -34,6 +33,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -43,6 +43,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse()! as typeof options;
   });
 
   beforeEach(() => {
@@ -89,7 +90,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('prompts before removing retentionlabel from a file when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: webUrl, fileUrl: fileUrl }) });
 
     assert(promptIssued);
   });
@@ -100,10 +101,10 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         fileUrl: fileUrl,
         webUrl: webUrl
-      }
+      })
     });
     assert(postSpy.notCalled);
   });
@@ -130,10 +131,10 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         fileUrl: fileUrl,
         webUrl: webUrl
-      }
+      })
     }));
   });
 
@@ -159,11 +160,10 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     });
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         fileId: fileId,
-        webUrl: webUrl,
-        listItemId: 1
-      }
+        webUrl: webUrl
+      })
     }));
   });
 
@@ -187,13 +187,12 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
 
     await assert.doesNotReject(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         fileId: fileId,
         webUrl: webUrl,
-        listItemId: 1,
         force: true
-      }
+      })
     }));
   });
 
@@ -203,58 +202,48 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         force: true,
         fileUrl: fileUrl,
         webUrl: webUrl
-      }
+      })
     }), new CommandError(errorMessage));
   });
 
-  it('fails validation if both fileUrl or fileId options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both fileUrl or fileId options are not passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileUrl: fileUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: 'foo', fileUrl: fileUrl });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileUrl: fileUrl } }, commandInfo);
-    assert(actual);
+  it('passes validation if the url option is a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileUrl: fileUrl });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '12345' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the fileId option is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: '12345' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if the fileId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId } }, commandInfo);
-    assert(actual);
+  it('passes validation if the fileId option is a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if both fileId and fileUrl options are passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
+  });
 
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, fileUrl: fileUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if both fileId and fileUrl options are passed', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, fileId: fileId, fileUrl: fileUrl });
+    assert.strictEqual(actual.success, false);
   });
 });

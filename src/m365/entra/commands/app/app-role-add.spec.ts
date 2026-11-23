@@ -11,14 +11,14 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './app-role-add.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './app-role-add.js';
 import { entraApp } from '../../../../utils/entraApp.js';
 
 describe(commands.APP_ROLE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -27,6 +27,7 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -92,14 +93,14 @@ describe(commands.APP_ROLE_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     });
   });
 
@@ -147,14 +148,14 @@ describe(commands.APP_ROLE_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'applications',
         claim: 'Custom.Role',
         verbose: true
-      }
+      })
     });
   });
 
@@ -203,7 +204,7 @@ describe(commands.APP_ROLE_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         appName: 'My app',
         name: 'Role',
@@ -211,7 +212,7 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'both',
         claim: 'Custom.Role',
         verbose: true
-      }
+      })
     });
   });
 
@@ -230,13 +231,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -247,13 +248,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     }), new CommandError(`App with appId '9b1b1e42-794b-4c71-93ac-5ed92488b67f' not found in Microsoft Entra ID`));
   });
 
@@ -263,13 +264,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -280,13 +281,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     }), new CommandError(error));
   });
 
@@ -295,13 +296,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
@@ -320,13 +321,13 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     } as any), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -348,105 +349,78 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'patch').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
-      }
+      })
     } as any), new CommandError('An error has occurred'));
   });
 
-  it('fails validation if appId and appObjectId specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and appObjectId specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appId and appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if appObjectId and appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if appObjectId and appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app', name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if neither appId, appObjectId nor appName specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { name: 'Managers', description: 'Managers', allowedMembers: 'userGroups', claim: 'managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if neither appId, appObjectId nor appName specified', () => {
+    const actual = commandOptionsSchema.safeParse({ name: 'Managers', description: 'Managers', allowedMembers: 'usersGroups', claim: 'managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if invalid allowedMembers specified', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'invalid', name: 'Managers', description: 'Managers', claim: 'managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid allowedMembers specified', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'invalid', name: 'Managers', description: 'Managers', claim: 'managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if claim length exceeds 120 chars', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ullamcorper, arcu vel finibus facilisis, orci velit lectus.', name: 'Managers', description: 'Managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if claim length exceeds 120 chars', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ullamcorper, arcu vel finibus facilisis, orci velit lectus.', name: 'Managers', description: 'Managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if claim starts with a .', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: '.claim', name: 'Managers', description: 'Managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if claim starts with a .', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: '.claim', name: 'Managers', description: 'Managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('fails validation if claim contains invalid characters', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: 'cláim', name: 'Managers', description: 'Managers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if claim contains invalid characters', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', allowedMembers: 'usersGroups', claim: 'cláim', name: 'Managers', description: 'Managers' });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation if required options specified (appId)', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (appId)', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (appObjectId)', async () => {
-    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (appObjectId)', () => {
+    const actual = commandOptionsSchema.safeParse({ appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('passes validation if required options specified (appName)', async () => {
-    const actual = await command.validate({ options: { appName: 'My app', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation if required options specified (appName)', () => {
+    const actual = commandOptionsSchema.safeParse({ appName: 'My app', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' });
+    assert.strictEqual(actual.success, true);
   });
 
   it('returns an empty array for an invalid member type', () => {
     const actual = (command as any).getAllowedMemberTypes({ options: { allowedMembers: 'foo' } });
     assert.deepStrictEqual(actual, []);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role', unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 });
