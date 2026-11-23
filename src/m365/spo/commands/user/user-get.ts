@@ -105,7 +105,7 @@ class SpoUserGetCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: requestUrl,
+      url: requestUrl + '?$select=*,AadObjectId',
       method: 'GET',
       headers: {
         accept: 'application/json;odata=nometadata'
