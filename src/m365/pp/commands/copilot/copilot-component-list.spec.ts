@@ -234,6 +234,14 @@ describe(commands.COPILOT_COMPONENT_LIST, () => {
       new CommandError(`The specified copilot '${validCopilotName}' does not exist.`));
   });
 
+  it('keeps the original message when resolving the copilot name rejects with a wrapped error', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').resolves(envUrl);
+    sinon.stub(cli, 'executeCommandWithOutput').rejects({ error: new CommandError(`The specified copilot '${validCopilotName}' does not exist.`), stderr: '' });
+
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ environmentName: validEnvironment, copilotName: validCopilotName }) }),
+      new CommandError(`The specified copilot '${validCopilotName}' does not exist.`));
+  });
+
   it('correctly handles API OData error', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').resolves(envUrl);
     sinon.stub(request, 'get').rejects({ error: { message: 'An error has occurred' } });
