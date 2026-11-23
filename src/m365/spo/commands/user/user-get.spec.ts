@@ -35,7 +35,8 @@ describe(commands.USER_GET, () => {
     "IsShareByEmailGuestUser": false,
     "IsSiteAdmin": false,
     "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
-    "UserPrincipalName": validUserName
+    "UserPrincipalName": validUserName,
+    "AadObjectId": { "NameId": "00af4ea3-3f02-4857-abe2-357dd6ccceb2", "NameIdIssuer": "urn:federation:microsoftonline" }
   };
 
   const groupM365Response = {
@@ -158,7 +159,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetById('10')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetById('10')?$select=*,AadObjectId`) {
         return userResponse;
       }
 
@@ -179,7 +180,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user by email', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(validEmail)}')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(validEmail)}')?$select=*,AadObjectId`) {
         return userResponse;
       }
 
@@ -200,7 +201,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user by loginName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(validLoginName)}')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(validLoginName)}')?$select=*,AadObjectId`) {
         return userResponse;
       }
 
@@ -227,7 +228,7 @@ describe(commands.USER_GET, () => {
         };
       }
 
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetById('10')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetById('10')?$select=*,AadObjectId`) {
         return userResponse;
       }
 
@@ -252,7 +253,7 @@ describe(commands.USER_GET, () => {
         return groupM365Response.value[0];
       }
 
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByEmail('finance%40contoso.onmicrosoft.com')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByEmail('finance%40contoso.onmicrosoft.com')?$select=*,AadObjectId`) {
         return {
           "Id": 45,
           "IsHiddenInUI": false,
@@ -303,7 +304,7 @@ describe(commands.USER_GET, () => {
         return groupSecurityResponse;
       }
 
-      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByLoginName('c:0t.c|tenant|${validEntraGroupId}')`) {
+      if (opts.url === `${validWebUrl}/_api/web/siteusers/GetByLoginName('c:0t.c|tenant|${validEntraGroupId}')?$select=*,AadObjectId`) {
         return {
           "Id": 31,
           "IsHiddenInUI": false,
@@ -349,7 +350,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves current logged-in user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/currentuser') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/currentuser?$select=*,AadObjectId') {
         return {
           "Id": 6,
           "IsHiddenInUI": false,

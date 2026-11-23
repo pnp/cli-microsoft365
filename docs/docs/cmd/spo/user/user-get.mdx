@@ -104,7 +104,11 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x
       "NameId": "100320022ec308a7",
       "NameIdIssuer": "urn:federation:microsoftonline"
     },
-    "UserPrincipalName": "johndoe@contoso.onmicrosoft.com"
+    "UserPrincipalName": "johndoe@contoso.onmicrosoft.com",
+    "AadObjectId": {
+      "NameId": "00af4ea3-3f02-4857-abe2-357dd6ccceb2",
+      "NameIdIssuer": "urn:federation:microsoftonline"
+    }
   }
   ```
 
@@ -112,6 +116,7 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x
   <TabItem value="Text">
 
   ```text
+  AadObjectId                   : {"NameId":"00af4ea3-3f02-4857-abe2-357dd6ccceb2","NameIdIssuer":"urn:federation:microsoftonline"}
   Email                         : johndoe@contoso.onmicrosoft.com
   Expiration                    :
   Id                            : 10
@@ -130,8 +135,8 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x
   <TabItem value="CSV">
 
   ```csv
-  Id,IsHiddenInUI,LoginName,Title,PrincipalType,Email,Expiration,IsEmailAuthenticationGuestUser,IsShareByEmailGuestUser,IsSiteAdmin,UserId,UserPrincipalName
-  10,,i:0#.f|membership|johndoe@contoso.onmicrosoft.com,John Doe,1,johndoe@contoso.onmicrosoft.com,,,,,"{""NameId"":""100320022ec308a7"",""NameIdIssuer"":""urn:federation:microsoftonline""}",johndoe@contoso.onmicrosoft.com
+  Id,IsHiddenInUI,LoginName,Title,PrincipalType,Email,Expiration,IsEmailAuthenticationGuestUser,IsShareByEmailGuestUser,IsSiteAdmin,UserId,UserPrincipalName,AadObjectId
+  10,,i:0#.f|membership|johndoe@contoso.onmicrosoft.com,John Doe,1,johndoe@contoso.onmicrosoft.com,,,,,"{""NameId"":""100320022ec308a7"",""NameIdIssuer"":""urn:federation:microsoftonline""}",johndoe@contoso.onmicrosoft.com,"{""NameId"":""00af4ea3-3f02-4857-abe2-357dd6ccceb2"",""NameIdIssuer"":""urn:federation:microsoftonline""}"
   ```
 
   </TabItem>
