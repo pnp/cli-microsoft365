@@ -59,7 +59,7 @@ class SpoWebRoleAssignmentListCommand extends SpoCommand {
         r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
       });
 
-      if (args.options.output && args.options.output !== 'json') {
+      if (args.options.output && args.options.output !== 'json' && !args.options.query) {
         await logger.log(response.value.map(assignment => ({
           PrincipalId: assignment.PrincipalId,
           Member: assignment.Member.Title,
