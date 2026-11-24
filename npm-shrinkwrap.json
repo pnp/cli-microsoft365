@@ -23,7 +23,7 @@
         "chalk": "^6.0.1",
         "clipboardy": "^5.3.2",
         "configstore": "^8.0.0",
-        "csv-parse": "^6.2.1",
+        "csv-parse": "^7.0.3",
         "csv-stringify": "^6.9.0",
         "easy-table": "^1.2.0",
         "jmespath": "^0.16.0",
@@ -67,7 +67,7 @@
         "@types/uuid": "^10.0.0",
         "@types/yargs-parser": "^21.0.3",
         "@typescript-eslint/eslint-plugin": "^8.72.2",
-        "@typescript-eslint/parser": "^8.58.0",
+        "@typescript-eslint/parser": "^8.72.2",
         "c8": "^12.0.0",
         "eslint": "^10.15.0",
         "eslint-plugin-mocha": "^12.0.2",
@@ -601,7 +601,9 @@
       }
     },
     "node_modules/@nodable/entities": {
-      "version": "2.1.0",
+      "version": "3.1.0",
+      "resolved": "https://registry.npmjs.org/@nodable/entities/-/entities-3.1.0.tgz",
+      "integrity": "sha512-LsS/DjHr+uDM647Gru/cA8+J3a3HfhttwCKLyuoyN7yXTFCxKBtSgMQBvrW9yNPa2/zDRUNuGPaH5QUFoa4arQ==",
       "funding": [
         {
           "type": "github",
@@ -1482,7 +1484,9 @@
       }
     },
     "node_modules/adaptive-expressions/node_modules/@xmldom/xmldom": {
-      "version": "0.8.13",
+      "version": "0.8.15",
+      "resolved": "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.8.15.tgz",
+      "integrity": "sha1-cev4Bynk6VIh1Rmsmx4erqd4SQc=",
       "license": "MIT",
       "engines": {
         "node": ">=10.0.0"
@@ -1581,6 +1585,18 @@
       "version": "0.5.0-alpha.4",
       "license": "BSD-3-Clause"
     },
+    "node_modules/anynum": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/anynum/-/anynum-1.0.1.tgz",
+      "integrity": "sha1-KqwA4I3603JsHUYuYNvC+DFlmkQ=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/NaturalIntelligence"
+        }
+      ],
+      "license": "MIT"
+    },
     "node_modules/argparse": {
       "version": "3.0.4",
       "resolved": "https://registry.npmjs.org/argparse/-/argparse-3.0.4.tgz",
@@ -1638,6 +1654,26 @@
       },
       "engines": {
         "node": ">= 6.0.0"
+      }
+    },
+    "node_modules/axios/node_modules/follow-redirects": {
+      "version": "1.16.2",
+      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.2.tgz",
+      "integrity": "sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==",
+      "funding": [
+        {
+          "type": "individual",
+          "url": "https://github.com/sponsors/RubenVerborgh"
+        }
+      ],
+      "license": "MIT",
+      "engines": {
+        "node": ">=4.0"
+      },
+      "peerDependenciesMeta": {
+        "debug": {
+          "optional": true
+        }
       }
     },
     "node_modules/axios/node_modules/https-proxy-agent": {
@@ -2185,7 +2221,9 @@
       }
     },
     "node_modules/csv-parse": {
-      "version": "6.2.1",
+      "version": "7.0.3",
+      "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-7.0.3.tgz",
+      "integrity": "sha512-YFd3QM/yo17vH91L1IOZuvl09zM0zEEtdfTcOCKWcMdM++MNaQSyp09slXyFCLaPXvHstQFx/xC8myiFHSMUvw==",
       "license": "MIT"
     },
     "node_modules/csv-stringify": {
@@ -2779,7 +2817,9 @@
       }
     },
     "node_modules/fast-wrap-ansi": {
-      "version": "0.2.0",
+      "version": "0.2.2",
+      "resolved": "https://registry.npmjs.org/fast-wrap-ansi/-/fast-wrap-ansi-0.2.2.tgz",
+      "integrity": "sha1-lelSoBRbzj9ZrVbhefhMSNQHKTU=",
       "license": "MIT",
       "dependencies": {
         "fast-string-width": "^3.0.2"
@@ -2800,9 +2840,9 @@
       }
     },
     "node_modules/fast-xml-parser": {
-      "version": "5.8.0",
-      "resolved": "https://registry.npmjs.org/fast-xml-parser/-/fast-xml-parser-5.8.0.tgz",
-      "integrity": "sha512-6bIM7fsJxeo3uXv7OncQYsBAMPJ7V16Slahl/6M98C/i2q+vB1+4a0MtrvYwDFEUrwDSbAmeLDRXsOBwrL7yAg==",
+      "version": "5.11.2",
+      "resolved": "https://registry.npmjs.org/fast-xml-parser/-/fast-xml-parser-5.11.2.tgz",
+      "integrity": "sha512-R9iDuNrQYeQut46cn2r2wHKn4HYzVDvDm5J1wW+koZewykv0yuO2HChTYeZtrULyHIDM9cj9TUXloCsueCQUog==",
       "funding": [
         {
           "type": "github",
@@ -2811,14 +2851,30 @@
       ],
       "license": "MIT",
       "dependencies": {
-        "@nodable/entities": "^2.1.0",
+        "@nodable/entities": "^3.0.1",
         "fast-xml-builder": "^1.2.0",
-        "path-expression-matcher": "^1.5.0",
-        "strnum": "^2.3.0",
-        "xml-naming": "^0.1.0"
+        "is-unsafe": "^2.0.0",
+        "path-expression-matcher": "^1.6.2",
+        "strnum": "^2.4.2",
+        "xml-naming": "^0.3.0"
       },
       "bin": {
         "fxparser": "src/cli/cli.js"
+      }
+    },
+    "node_modules/fast-xml-parser/node_modules/xml-naming": {
+      "version": "0.3.0",
+      "resolved": "https://registry.npmjs.org/xml-naming/-/xml-naming-0.3.0.tgz",
+      "integrity": "sha1-RsHhi/4oWEeZgt0qzPNNFudJ7aI=",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/NaturalIntelligence"
+        }
+      ],
+      "license": "MIT",
+      "engines": {
+        "node": ">=16.0.0"
       }
     },
     "node_modules/fdir": {
@@ -2908,26 +2964,6 @@
       "integrity": "sha512-5+ybhBZANEJxaH3X5evAFatUxLfEHSr7n6kYJ+1Qd0mUqr4eu9gIf6GDbWHf8RJijHrjjO8G+la14SlL2SeS1Q==",
       "dev": true,
       "license": "ISC"
-    },
-    "node_modules/follow-redirects": {
-      "version": "1.16.3",
-      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.3.tgz",
-      "integrity": "sha512-toOSoqN6d51Wjf1aOFJYcoVv1aND9rj/CwjLU0Vz40oDuSpWDayCeKe4JpL5NL0WdFvoOOCI3BRo69HahjbR1A==",
-      "funding": [
-        {
-          "type": "individual",
-          "url": "https://github.com/sponsors/RubenVerborgh"
-        }
-      ],
-      "license": "MIT",
-      "engines": {
-        "node": ">=4.0"
-      },
-      "peerDependenciesMeta": {
-        "debug": {
-          "optional": true
-        }
-      }
     },
     "node_modules/foreground-child": {
       "version": "3.3.1",
@@ -3412,6 +3448,18 @@
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/is-unsafe": {
+      "version": "2.0.3",
+      "resolved": "https://registry.npmjs.org/is-unsafe/-/is-unsafe-2.0.3.tgz",
+      "integrity": "sha512-ZBllczCCO267vgdFb6Tq3pv+LhHaCiGMdr+ZsuL+OopruAg7S+3ZDs1vD0RPC0uSrkjzbraxaGjtX1YBxjPeFQ==",
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/NaturalIntelligence"
+        }
+      ],
+      "license": "MIT"
     },
     "node_modules/is-wayland": {
       "version": "0.1.0",
@@ -4094,7 +4142,9 @@
       }
     },
     "node_modules/path-expression-matcher": {
-      "version": "1.5.0",
+      "version": "1.6.2",
+      "resolved": "https://registry.npmjs.org/path-expression-matcher/-/path-expression-matcher-1.6.2.tgz",
+      "integrity": "sha1-VnxzwHGX6dzvJOkO3NxXEFZZkWg=",
       "funding": [
         {
           "type": "github",
@@ -4592,7 +4642,9 @@
       }
     },
     "node_modules/serialize-javascript": {
-      "version": "7.0.5",
+      "version": "7.1.4",
+      "resolved": "https://registry.npmjs.org/serialize-javascript/-/serialize-javascript-7.1.4.tgz",
+      "integrity": "sha512-FqlEuoTq/zRmA4Lg6aOqyH3lCHbUtCB0bmHCeFniX2GBdDqMJM3FwdvEhlE5Pim1dlt2FfBdVPmUNNiGhhKqpw==",
       "dev": true,
       "license": "BSD-3-Clause",
       "engines": {
@@ -4789,14 +4841,19 @@
       }
     },
     "node_modules/strnum": {
-      "version": "2.3.0",
+      "version": "2.5.1",
+      "resolved": "https://registry.npmjs.org/strnum/-/strnum-2.5.1.tgz",
+      "integrity": "sha512-UM4nTLWzQiDBseVxUGxN0wJzIk0UU89Qi7pKXz9qISo+lhviJikTuikBsK/oFRlpvYHvSdz0TVoLyQ+sEpYwxA==",
       "funding": [
         {
           "type": "github",
           "url": "https://github.com/sponsors/NaturalIntelligence"
         }
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "dependencies": {
+        "anynum": "^1.0.1"
+      }
     },
     "node_modules/stubborn-fs": {
       "version": "2.0.0",
@@ -4928,14 +4985,16 @@
       }
     },
     "node_modules/test-exclude/node_modules/brace-expansion": {
-      "version": "5.0.6",
+      "version": "5.0.12",
+      "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.12.tgz",
+      "integrity": "sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
         "balanced-match": "^4.0.2"
       },
       "engines": {
-        "node": "18 || 20 || >=22"
+        "node": "20 || >=22"
       }
     },
     "node_modules/test-exclude/node_modules/glob": {
@@ -5103,7 +5162,9 @@
       }
     },
     "node_modules/undici": {
-      "version": "6.24.1",
+      "version": "6.29.1",
+      "resolved": "https://registry.npmjs.org/undici/-/undici-6.29.1.tgz",
+      "integrity": "sha512-EvRlUt/QqAEvXdQeRMYUfwOQsfzpDztykrG2owGEE/rBOBoYv9uF39ZzsNDh4lTFHhTr2XOZjKkYgueD12ZmGA==",
       "dev": true,
       "license": "MIT",
       "engines": {

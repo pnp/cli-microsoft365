@@ -267,8 +267,9 @@
   ],
   "overrides": {
     "adaptive-expressions": {
-      "fast-xml-parser": "5.8.0",
-      "@xmldom/xmldom": "^0.8.13",
+      "fast-xml-parser": "5.11.2",
+      "lodash": "4.18.1",
+      "@xmldom/xmldom": "^0.8.15",
       "uuid": "11.1.1"
     },
     "adaptivecards": {
@@ -276,7 +277,13 @@
     },
     "mocha": {
       "diff": "8.0.4",
-      "serialize-javascript": "7.0.5"
+      "serialize-javascript": "7.1.4"
+    },
+    "jsonwebtoken": {
+      "jws": "3.2.3"
+    },
+    "axios": {
+      "follow-redirects": "1.16.2"
     }
   },
   "dependencies": {
@@ -294,7 +301,7 @@
     "chalk": "^6.0.1",
     "clipboardy": "^5.3.2",
     "configstore": "^8.0.0",
-    "csv-parse": "^6.2.1",
+    "csv-parse": "^7.0.3",
     "csv-stringify": "^6.9.0",
     "easy-table": "^1.2.0",
     "jmespath": "^0.16.0",
@@ -332,7 +339,7 @@
     "@types/uuid": "^10.0.0",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/eslint-plugin": "^8.72.2",
-    "@typescript-eslint/parser": "^8.58.0",
+    "@typescript-eslint/parser": "^8.72.2",
     "c8": "^12.0.0",
     "eslint": "^10.15.0",
     "eslint-plugin-mocha": "^12.0.2",
