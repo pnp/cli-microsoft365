@@ -12,7 +12,7 @@ const consumingTenantOverridablesOptions = ['urlTemplate', 'isDiscoverabilityEna
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   name: z.string().alias('n'),
-  appId: z.uuid().optional(),
+  appId: z.guid().optional(),
   billingType: z.enum(['standard', 'trial', 'directToCustomer']).default('standard'),
   consumingTenantOverridables: z.string()
     .refine(values => values.split(',').every(v => consumingTenantOverridablesOptions.includes(v.trim())), {

@@ -9,7 +9,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   mailNickname: z.string().optional()
 });

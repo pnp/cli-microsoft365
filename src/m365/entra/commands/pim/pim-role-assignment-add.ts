@@ -15,13 +15,13 @@ import auth from '../../../../Auth.js';
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
   roleDefinitionName: z.string().optional().alias('n'),
-  roleDefinitionId: z.uuid().optional().alias('i'),
-  userId: z.uuid().optional(),
+  roleDefinitionId: z.guid().optional().alias('i'),
+  userId: z.guid().optional(),
   userName: z.string().optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.guid().optional(),
   groupName: z.string().optional(),
-  administrativeUnitId: z.uuid().optional(),
-  applicationId: z.uuid().optional(),
+  administrativeUnitId: z.guid().optional(),
+  applicationId: z.guid().optional(),
   justification: z.string().optional().alias('j'),
   startDateTime: z.string().refine(date => validation.isValidISODateTime(date), {
     error: e => `'${e.input}' is not a valid ISO 8601 date time string.`

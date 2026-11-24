@@ -50,12 +50,12 @@ export const options = z.strictObject({
     error: e => `'${e.input}' is not a valid SharePoint Online site URL.`
   }).alias('u'),
   listTitle: z.string().optional(),
-  listId: z.string().uuid()
+  listId: z.guid()
     .refine(value => validation.isValidGuid(value), {
       error: e => `'${e.input}' in parameter listId is not a valid GUID.`
     }).optional(),
   listUrl: z.string().optional(),
-  columnId: z.string().uuid()
+  columnId: z.guid()
     .refine(value => validation.isValidGuid(value), {
       error: e => `'${e.input}' in parameter columnId is not a valid GUID.`
     }).optional().alias('i'),

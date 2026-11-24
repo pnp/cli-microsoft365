@@ -11,7 +11,7 @@ import commands from '../../commands.js';
 
 export const options = z.looseObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   userName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid userName.`
   }).optional().alias('n'),
@@ -30,7 +30,7 @@ export const options = z.looseObject({
   companyName: z.string().max(64, { error: `The max length for the companyName option is 64 characters.` }).optional(),
   department: z.string().max(64, { error: `The max length for the department option is 64 characters.` }).optional(),
   preferredLanguage: z.string().min(2, { error: e => `'${e.input}' is not a valid preferredLanguage.` }).optional(),
-  managerUserId: z.uuid().optional(),
+  managerUserId: z.guid().optional(),
   managerUserName: z.string().refine(name => validation.isValidUserPrincipalName(name), {
     error: e => `'${e.input}' is not a valid user principal name.`
   }).optional(),

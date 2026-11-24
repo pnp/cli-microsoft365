@@ -9,7 +9,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().optional(),
   ids: z.string().refine(ids => !ids.split(',').some(e => !validation.isValidGuid(e)), {
     error: e => `'${e.input}' contains one or more invalid GUIDs.`

@@ -10,7 +10,7 @@ import commands from '../../commands.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  flowName: z.uuid(),
+  flowName: z.guid(),
   environmentName: z.string().alias('e'),
   status: z.enum(['Succeeded', 'Running', 'Failed', 'Cancelled']).optional(),
   triggerStartTime: z.string().refine(date => validation.isValidISODateTime(date), {

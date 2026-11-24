@@ -15,23 +15,23 @@ import { entraUser } from '../../../../utils/entraUser.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  roleDefinitionId: z.uuid().optional(),
+  roleDefinitionId: z.guid().optional(),
   roleDefinitionName: z.string().optional(),
   principal: z.string().refine(principal => validation.isValidGuid(principal) || validation.isValidUserPrincipalName(principal) || validation.isValidMailNickname(principal), {
     error: e => `'${e.input}' is not a valid GUID, UPN or group mail nickname.`
   }),
-  userId: z.uuid().optional(),
+  userId: z.guid().optional(),
   userName: z.string().refine(upn => validation.isValidUserPrincipalName(upn), {
     error: e => `'${e.input}' is not a valid UPN.`
   }).optional(),
-  administrativeUnitId: z.uuid().optional(),
+  administrativeUnitId: z.guid().optional(),
   administrativeUnitName: z.string().optional(),
-  applicationId: z.uuid().optional(),
-  applicationObjectId: z.uuid().optional(),
+  applicationId: z.guid().optional(),
+  applicationObjectId: z.guid().optional(),
   applicationName: z.string().optional(),
-  servicePrincipalId: z.uuid().optional(),
+  servicePrincipalId: z.guid().optional(),
   servicePrincipalName: z.string().optional(),
-  groupId: z.uuid().optional(),
+  groupId: z.guid().optional(),
   groupName: z.string().optional()
 });
 

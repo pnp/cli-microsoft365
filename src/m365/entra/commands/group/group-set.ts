@@ -19,7 +19,7 @@ const VisibilityEnum = {
 
 export const options = z.looseObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   newDisplayName: z.string().max(256, `The maximum amount of characters for 'newDisplayName' is 256.`).optional(),
   description: z.string().optional(),

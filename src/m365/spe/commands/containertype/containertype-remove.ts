@@ -16,7 +16,7 @@ interface CsomContainerType {
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   name: z.string().optional().alias('n'),
   force: z.boolean().optional().alias('f')
 });

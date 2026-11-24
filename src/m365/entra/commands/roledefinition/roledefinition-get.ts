@@ -9,7 +9,7 @@ import { validation } from '../../../../utils/validation.js';
 
 export const options = z.strictObject({
   ...globalOptionsZod.shape,
-  id: z.uuid().optional().alias('i'),
+  id: z.guid().optional().alias('i'),
   displayName: z.string().optional().alias('n'),
   properties: z.string().optional().alias('p')
 });
