@@ -22,8 +22,8 @@ export const options = z.strictObject({
     })
     .optional()
     .alias('i'),
-  listTitle: z.string().optional().alias('t'),
-  listUrl: z.string().optional(),
+  listTitle: z.string().min(1, { error: 'listTitle cannot be empty.' }).optional().alias('t'),
+  listUrl: z.string().min(1, { error: 'listUrl cannot be empty.' }).optional(),
   listItemId: z.number().int().positive()
 });
 
@@ -97,7 +97,7 @@ class SpoListItemRoleAssignmentListCommand extends SpoCommand {
         r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
       });
 
-      if (args.options.output && args.options.output !== 'json') {
+      if (args.options.output && args.options.output !== 'json' && !args.options.query) {
         await logger.log(response.value.map(r => ({
           PrincipalId: r.PrincipalId,
           Member: r.Member.Title,

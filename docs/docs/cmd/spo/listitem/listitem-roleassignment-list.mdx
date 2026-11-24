@@ -37,6 +37,25 @@ m365 spo listitem roleassignment list [options]
 
 You can also retrieve the role assignments of a list item together with its properties by using the `--withPermissions` option of the [spo listitem get](./listitem-get.mdx) command.
 
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
 ## Examples
 
 List all role assignments of a list item in a list specified by title

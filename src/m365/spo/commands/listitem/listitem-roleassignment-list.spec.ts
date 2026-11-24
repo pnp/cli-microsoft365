@@ -196,6 +196,16 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_LIST, () => {
     assert.strictEqual(actual.success, false);
   });
 
+  it('fails validation if listTitle is an empty string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listTitle: '', listItemId: listItemId });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation if listUrl is an empty string', () => {
+    const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listUrl: '', listItemId: listItemId });
+    assert.strictEqual(actual.success, false);
+  });
+
   it('fails validation with unknown options', () => {
     const actual = commandOptionsSchema.safeParse({ webUrl: webUrl, listId: listId, listItemId: listItemId, unknownOption: 'value' });
     assert.strictEqual(actual.success, false);
@@ -270,6 +280,21 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_LIST, () => {
         RoleDefinitionBindings: 'Design, Read'
       }
     ]));
+  });
+
+  it('logs the full role assignments in non-JSON output when a query is specified', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${listTitle}')${roleAssignmentsPath}`) {
+        return structuredClone(roleAssignmentsResponse);
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, output: 'text', query: '[].Member.Title' } });
+    const logged = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(logged[0].Member.Title, 'Marketing Owners');
+    assert.strictEqual(logged[1].RoleDefinitionBindings[0].Name, 'Design');
   });
 
   it('correctly handles API OData error', async () => {
