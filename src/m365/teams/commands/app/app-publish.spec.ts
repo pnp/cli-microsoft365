@@ -27,7 +27,7 @@ describe(commands.APP_PUBLISH, () => {
     distributionMethod: "organization"
   };
 
-  const fsStats: fs.Stats = {
+  const fsStats = {
     isDirectory: () => false,
     isFile: () => false,
     isBlockDevice: () => false,
@@ -53,7 +53,7 @@ describe(commands.APP_PUBLISH, () => {
     mtime: new Date(),
     ctime: new Date(),
     birthtime: new Date()
-  };
+  } as fs.Stats;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();

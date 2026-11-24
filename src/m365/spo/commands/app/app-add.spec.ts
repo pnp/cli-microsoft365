@@ -16,7 +16,7 @@ import commands from '../../commands.js';
 import command, { options } from './app-add.js';
 
 describe(commands.APP_ADD, () => {
-  const fsStats: fs.Stats = {
+  const fsStats = {
     isDirectory: () => false,
     isFile: () => false,
     isBlockDevice: () => false,
@@ -42,7 +42,7 @@ describe(commands.APP_ADD, () => {
     mtime: new Date(),
     ctime: new Date(),
     birthtime: new Date()
-  };
+  } as fs.Stats;
 
   let log: string[];
   let logger: Logger;

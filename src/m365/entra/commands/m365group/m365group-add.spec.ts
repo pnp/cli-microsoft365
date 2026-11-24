@@ -40,7 +40,7 @@ describe(commands.M365GROUP_ADD, () => {
     visibility: 'Public'
   };
 
-  const fsStats: fs.Stats = {
+  const fsStats = {
     isDirectory: () => false,
     isFile: () => false,
     isBlockDevice: () => false,
@@ -66,7 +66,7 @@ describe(commands.M365GROUP_ADD, () => {
     mtime: new Date(),
     ctime: new Date(),
     birthtime: new Date()
-  };
+  } as fs.Stats;
 
   let log: string[];
   let logger: Logger;

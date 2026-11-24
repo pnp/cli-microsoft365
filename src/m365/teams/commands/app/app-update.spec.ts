@@ -20,7 +20,7 @@ describe(commands.APP_UPDATE, () => {
   let commandInfo: CommandInfo;
   let commandOptionsSchema: typeof options;
 
-  const fsStats: fs.Stats = {
+  const fsStats = {
     isDirectory: () => false,
     isFile: () => false,
     isBlockDevice: () => false,
@@ -46,7 +46,7 @@ describe(commands.APP_UPDATE, () => {
     mtime: new Date(),
     ctime: new Date(),
     birthtime: new Date()
-  };
+  } as fs.Stats;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();

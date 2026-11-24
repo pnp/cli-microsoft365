@@ -164,7 +164,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
           if (this.verbose) {
             await logger.log(`Deleting temp folder at ${tmpDir}...`);
           }
-          fs.rmdirSync(tmpDir, { recursive: true });
+          fs.rmSync(tmpDir, { recursive: true });
         }
         if (error) {
           throw error;

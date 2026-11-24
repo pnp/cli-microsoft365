@@ -3,7 +3,7 @@ name: Check PR
 on: pull_request
 
 env:
-  NODE_VERSION: &node_version 24
+  NODE_VERSION: &node_version 26
 
 jobs:
   build:
@@ -57,13 +57,7 @@ jobs:
         nodeBuild: [*node_version]
         include:
           - os: ubuntu-latest
-            nodeRun: 20
-            nodeBuild: *node_version
-          - os: ubuntu-latest
             nodeRun: 22
-            nodeBuild: *node_version
-          - os: ubuntu-latest
-            nodeRun: 26
             nodeBuild: *node_version
 
     steps:

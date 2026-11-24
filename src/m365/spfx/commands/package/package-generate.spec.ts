@@ -54,7 +54,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinon.stub(fsUtil, 'readdirR').callsFake(_ => ['file1.png', 'file.json']);
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
+    sinon.stub(fs, 'rmSync').callsFake(_ => { });
     sinon.stub(fs, 'mkdirSync').callsFake(_ => '/tmp/abc/def');
     sinon.stub(fs, 'copyFileSync').callsFake(_ => { });
     sinon.stub(fs, 'statSync').callsFake(src => {
@@ -74,7 +74,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       fs.mkdtempSync,
       fs.mkdirSync,
       fs.readFileSync,
-      fs.rmdirSync,
+      fs.rmSync,
       fs.statSync,
       fs.writeFileSync,
       fsUtil.copyRecursiveSync,
@@ -208,8 +208,8 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('removes the temp directory after the package has been created', async () => {
-    sinonUtil.restore(fs.rmdirSync);
-    const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
+    sinonUtil.restore(fs.rmSync);
+    const fsRmSyncSpy = sinon.stub(fs, 'rmSync').callsFake(_ => { });
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
@@ -220,12 +220,12 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all'
       })
     });
-    assert(fsrmdirSyncSpy.called);
+    assert(fsRmSyncSpy.called);
   });
 
   it('removes the temp directory if creating the package failed', async () => {
-    sinonUtil.restore(fs.rmdirSync);
-    const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
+    sinonUtil.restore(fs.rmSync);
+    const fsRmSyncSpy = sinon.stub(fs, 'rmSync').callsFake(_ => { });
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
@@ -237,12 +237,12 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all'
       })
     }));
-    assert(fsrmdirSyncSpy.called);
+    assert(fsRmSyncSpy.called);
   });
 
   it('prompts user to remove the temp directory manually if removing it automatically failed', async () => {
-    sinonUtil.restore(fs.rmdirSync);
-    sinon.stub(fs, 'rmdirSync').throws(new Error('An error has occurred'));
+    sinonUtil.restore(fs.rmSync);
+    sinon.stub(fs, 'rmSync').throws(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, {
       options: commandOptionsSchema.parse({
         webPartTitle: 'Amsterdam weather',
