@@ -288,6 +288,7 @@ planner tenant settings set|Sets Microsoft Planner configuration of the tenant
 pp aibuildermodel get|Gets a specific AI builder model in the specified Power Platform environment
 pp aibuildermodel list|Lists available AI builder models in the specified Power Platform environment.
 pp aibuildermodel remove|Removes an AI builder model in the specified Power Platform environment.
+pp copilot component list|Lists the components of the specified copilot
 pp copilot get|Gets information about the specified copilot
 pp copilot list|Lists Microsoft Power Platform copilots in the specified Power Platform environment
 pp copilot remove|Removes the specified copilot
