@@ -1,4 +1,4 @@
-import { DependencyRule } from "./DependencyRule.js";
+import { DependencyRule } from './DependencyRule.js';
 
 export class FN001036_DEP_microsoft_sp_copilot_component extends DependencyRule {
   constructor(options: { packageVersion: string }) {
