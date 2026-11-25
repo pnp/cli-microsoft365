@@ -1,7 +1,7 @@
 ---
 name: update-release-notes
 description: 'Update release notes based on the latest changes from the current branch. Use when: "update release notes", "add to release notes", "write release notes", "document changes in release notes", "sync release notes with branch".'
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Update Release Notes
