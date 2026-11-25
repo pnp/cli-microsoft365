@@ -39,8 +39,8 @@ class EntraM365GroupRecycleBinItemListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-      const displayNameFilter: string = args.options.groupName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupName).replace(/'/g, `''`)}')` : '';
-      const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.groupMailNickname).replace(/'/g, `''`)}')` : '';
+      const displayNameFilter: string = args.options.groupName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupName)}')` : '';
+      const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.groupMailNickname)}')` : '';
       const topCount: string = '&$top=100';
       const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 

@@ -1198,66 +1198,22 @@ describe(commands.PAGE_ADD, () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' }) });
   });
 
-  it('escapes special characters in user input', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          urlOfFile: '/sites/team-a/sitepages/page.aspx',
-          templateFileType: 3
-        })) {
-        return {
-          "CheckInComment": "",
-          "CheckOutType": 2,
-          "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
-          "CustomizedPageStatus": 1,
-          "ETag": "\"{64201083-46BA-4966-8BC5-B0CB31E3456C},1\"",
-          "Exists": true,
-          "IrmEnabled": false,
-          "Length": "780",
-          "Level": 2,
-          "LinkingUri": null,
-          "LinkingUrl": "",
-          "MajorVersion": 0,
-          "MinorVersion": 1,
-          "Name": "page.aspx",
-          "ServerRelativeUrl": "/sites/team-a/SitePages/page.aspx",
-          "TimeCreated": "2018-03-18T20:44:17Z",
-          "TimeLastModified": "2018-03-18T20:44:17Z",
-          "Title": null,
-          "UIVersion": 1,
-          "UIVersionLabel": "0.1",
-          "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        };
+  it('escapes apostrophes in the publish message once', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages') {
+        return { UniqueId: '64201083-46ba-4966-8bc5-b0cb31e3456c', Id: 34 };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-          Title: 'page',
-          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return;
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return { Id: 1, BannerImageUrl: '', CanvasContent1: '[]', LayoutWebpartsContent: '[]' };
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return;
-      }
-
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/Publish(\'Don%39t%20tell\')') > -1) {
-        return;
-      }
-
-      throw 'Invalid request';
+      return;
     });
+    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
-    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' }) }));
-    assert(loggerLogSpy.notCalled);
+    await command.action(logger, { options: commandOptionsSchema.parse({ name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'It\'s done' }) });
+    assert.strictEqual(postStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/CheckIn(comment=@a1,checkintype=@a2)?@a1='It''s%20done'&@a2=1`);
   });
 
   it('correctly handles OData error when creating modern page', async () => {

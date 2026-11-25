@@ -35,7 +35,7 @@ export const chatUtil = {
    * @param logger a logger to pipe into the graph request odata helper.
    */
   async findExistingGroupChatsByName(name: string): Promise<Chat[]> {
-    const endpoint = `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter(name).replace("'", "''")}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
+    const endpoint = `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter(name)}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
     return odata.getAllItems<Chat>(endpoint);
   }
 };

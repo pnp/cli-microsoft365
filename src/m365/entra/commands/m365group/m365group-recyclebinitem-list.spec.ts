@@ -655,6 +655,13 @@ describe(commands.M365GROUP_RECYCLEBINITEM_LIST, () => {
     ]));
   });
 
+  it('escapes apostrophes in displayName and mailNickname filters once', async () => {
+    const getStub = sinon.stub(request, 'get').resolves({ value: [] });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ groupName: "Let's go", groupMailNickname: "let's_go" }) });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Let''s%20go') and startswith(MailNickname,'let''s_go')&$top=100`);
+  });
+
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));

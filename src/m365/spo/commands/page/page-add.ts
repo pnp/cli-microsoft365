@@ -243,7 +243,7 @@ class SpoPageAddCommand extends SpoCommand {
       }
       else {
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',

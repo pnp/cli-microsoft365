@@ -75,6 +75,9 @@ describe(commands.CHAT_GET, () => {
       else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter('Just a conversation')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
         return singleChatByNameResponse;
       }
+      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq 'Let''s%20go'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
+        return singleChatByNameResponse;
+      }
       else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter('Just a conversation with same name')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
         return multipleChatByNameResponse;
       }
@@ -251,6 +254,15 @@ describe(commands.CHAT_GET, () => {
     await command.action(logger, {
       options: commandOptionsSchema.parse({
         name: "Just a conversation"
+      })
+    });
+    assert(loggerLogSpy.calledWith(singleGroupChatResponse));
+  });
+
+  it('escapes apostrophes in the chat name once', async () => {
+    await command.action(logger, {
+      options: commandOptionsSchema.parse({
+        name: "Let's go"
       })
     });
     assert(loggerLogSpy.calledWith(singleGroupChatResponse));
