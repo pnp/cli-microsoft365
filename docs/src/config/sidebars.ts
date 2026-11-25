@@ -1939,6 +1939,11 @@ const sidebars: SidebarsConfig = {
           copilot: [
             {
               type: 'doc',
+              label: 'copilot component list',
+              id: 'cmd/pp/copilot/copilot-component-list'
+            },
+            {
+              type: 'doc',
               label: 'copilot get',
               id: 'cmd/pp/copilot/copilot-get'
             },
