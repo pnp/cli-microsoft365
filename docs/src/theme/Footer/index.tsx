@@ -9,7 +9,7 @@ import YouTubeSvg from '@site/static/img/youtube-icon.svg';
 import LinkSVG from '@site/static/img/link-icon.svg';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-function Footer(): JSX.Element | null {
+function Footer(): React.JSX.Element | null {
   const {
     siteConfig: { customFields }
   } = useDocusaurusContext();
