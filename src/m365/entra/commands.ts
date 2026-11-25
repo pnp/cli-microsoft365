@@ -10,6 +10,7 @@ export default {
   ADMINISTRATIVEUNIT_MEMBER_LIST: `${prefix} administrativeunit member list`,
   ADMINISTRATIVEUNIT_MEMBER_REMOVE: `${prefix} administrativeunit member remove`,
   ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD: `${prefix} administrativeunit roleassignment add`,
+  AGENT_IDENTITY_LIST: `${prefix} agent identity list`,
   AGENT_LIST: `${prefix} agent list`,
   AGENT_BLUEPRINT_LIST: `${prefix} agent blueprint list`,
   AGENT_BLUEPRINTPRINCIPAL_LIST: `${prefix} agent blueprintprincipal list`,

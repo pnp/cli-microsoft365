@@ -284,6 +284,15 @@ export default abstract class Command {
     return;
   }
 
+  /**
+   * Returns the properties used to trim object output in text mode.
+   * By default returns the command's cached default properties unchanged.
+   * Commands can override this to adjust the properties based on options.
+   */
+  public getDefaultPropertiesForOutput(options: GlobalOptions, defaults: string[] | undefined): string[] | undefined {
+    return defaults;
+  }
+
   public allowUnknownOptions(): boolean | undefined {
     return;
   }

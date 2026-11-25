@@ -40,6 +40,7 @@ entra administrativeunit remove|Removes an administrative unit
 entra administrativeunit roleassignment add|Assigns a Microsoft Entra role with administrative unit scope to a user
 entra agent blueprint list|Retrieves a list of templates defining the agent identity type
 entra agent blueprintprincipal list|Retrieves a list of agent blueprint principals
+entra agent identity list|Retrieves a list of agent identities
 entra agent list|Retrieves a list of agents
 entra app add|Creates new Entra app registration
 entra app get|Gets an Entra app registration
