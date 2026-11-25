@@ -586,7 +586,6 @@ describe(commands.WEB_SET, () => {
 
     await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' }) });
   });
-});
 
   it('enables noCrawl', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -663,3 +662,5 @@ describe(commands.WEB_SET, () => {
     const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', enableMinimalDownload: false });
     assert.strictEqual(actual.success, true);
   });
+
+});
