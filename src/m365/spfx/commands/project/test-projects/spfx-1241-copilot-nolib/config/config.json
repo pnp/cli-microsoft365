@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "hello-world-copilot-component": {
+      "components": [
+        {
+          "entrypoint": "./lib/copilotComponents/helloWorld/HelloWorldCopilotComponent.js",
+          "manifest": "./src/copilotComponents/helloWorld/HelloWorldCopilotComponent.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "HelloWorldCopilotComponentStrings": "lib/copilotComponents/helloWorld/loc/{locale}.js"
+  }
+}

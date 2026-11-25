@@ -648,11 +648,19 @@ describe(commands.PROJECT_DOCTOR, () => {
     await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];
     // 10 because SPFx v1.24.0 scaffolds a broken project
-    assert.strictEqual(findings.length, 10);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for a valid 1.24.1 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1241-webpart-react'));
+
+    await command.action(logger, { options: commandOptionsSchema.parse({}) });
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.length, 0);
+  });
+
+  it('e2e: shows correct number of findings for a valid 1.24.2 project', async () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1242-webpart-react'));
 
     await command.action(logger, { options: commandOptionsSchema.parse({}) });
     const findings: FindingToReport[] = log[0];

@@ -16,7 +16,8 @@ export const deps = [
   '@microsoft/sp-list-subscription',
   '@microsoft/sp-loader',
   '@microsoft/sp-odata-types',
-  '@microsoft/sp-page-context'
+  '@microsoft/sp-page-context',
+  '@microsoft/sp-copilot-component'
 ];
 
 export const devDeps = [
@@ -24,5 +25,7 @@ export const devDeps = [
   '@microsoft/eslint-plugin-spfx',
   '@microsoft/sp-build-web',
   '@microsoft/sp-module-interfaces',
-  '@microsoft/sp-tslint-rules'
+  '@microsoft/sp-tslint-rules',
+  '@microsoft/spfx-web-build-rig',
+  '@microsoft/spfx-heft-plugins'
 ];
