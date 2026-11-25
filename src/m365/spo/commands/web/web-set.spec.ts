@@ -587,3 +587,79 @@ describe(commands.WEB_SET, () => {
     await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' }) });
   });
 });
+
+  it('enables noCrawl', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (JSON.stringify(opts.data) === JSON.stringify({
+        NoCrawl: true
+      })) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', noCrawl: true }) });
+  });
+
+  it('disables noCrawl', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (JSON.stringify(opts.data) === JSON.stringify({
+        NoCrawl: false
+      })) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', noCrawl: false }) });
+  });
+
+  it('enables Minimal Download Strategy', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (JSON.stringify(opts.data) === JSON.stringify({
+        EnableMinimalDownload: true
+      })) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', enableMinimalDownload: true }) });
+  });
+
+  it('disables Minimal Download Strategy', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (JSON.stringify(opts.data) === JSON.stringify({
+        EnableMinimalDownload: false
+      })) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: 'https://contoso.sharepoint.com/sites/team-a', enableMinimalDownload: false }) });
+  });
+
+  it('passes validation if noCrawl is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', noCrawl: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if noCrawl is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', noCrawl: false });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if enableMinimalDownload is set to true', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', enableMinimalDownload: true });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('passes validation if enableMinimalDownload is set to false', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'https://contoso.sharepoint.com/sites/team-a', enableMinimalDownload: false });
+    assert.strictEqual(actual.success, true);
+  });
