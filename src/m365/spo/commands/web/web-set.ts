@@ -22,6 +22,8 @@ export const options = z.looseObject({
   }).alias('u'),
   footerEnabled: z.boolean().optional(),
   navAudienceTargetingEnabled: z.boolean().optional(),
+  noCrawl: z.boolean().optional(),
+  enableMinimalDownload: z.boolean().optional(),
   searchScope: z.preprocess(value => String(value).toLowerCase(), z.enum(['defaultscope', 'tenant', 'hub', 'site'])).optional(),
   welcomePage: z.string().optional()
 });
@@ -78,6 +80,12 @@ class SpoWebSetCommand extends SpoCommand {
     }
     if (typeof args.options.navAudienceTargetingEnabled !== 'undefined') {
       payload.NavAudienceTargetingEnabled = args.options.navAudienceTargetingEnabled;
+    }
+    if (typeof args.options.noCrawl !== 'undefined') {
+      payload.NoCrawl = args.options.noCrawl;
+    }
+    if (typeof args.options.enableMinimalDownload !== 'undefined') {
+      payload.EnableMinimalDownload = args.options.enableMinimalDownload;
     }
     if (typeof args.options.searchScope !== 'undefined') {
       const searchScope = args.options.searchScope.toLowerCase();
