@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './site-apppermission-add.js';
+import command, { options } from './site-apppermission-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_APPPERMISSION_ADD, () => {
@@ -19,6 +19,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
 
   //#region mocks
   const applicationMock = { "value": [{ "appId": "89ea5c94-7736-4e25-95ad-3fa95f62b66e", "displayName": "Foo App" }] };
@@ -32,6 +33,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -74,30 +76,27 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation with an incorrect URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation with an incorrect URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'https;//contoso,sharepoint:com/sites/sitecollection-name' is not a valid SharePoint Online site URL.`);
   });
 
-  it('fails validation if the appId is not a valid GUID', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
-        permission: "write",
-        appId: "123"
-      }
-    }, commandInfo);
-
-    assert.notStrictEqual(actual, true);
+  it('fails validation if the appId is not a valid GUID', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
+      permission: "write",
+      appId: "123"
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'123' is not a valid GUID.`);
   });
 
-  it('fails validation if both appId and appDisplayName options are not specified', async () => {
+  it('fails validation if both appId and appDisplayName options are not specified', () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -106,35 +105,39 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({
-      options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
-        permission: "write"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
+      permission: "write"
+    });
+    assert.strictEqual(actual.success, false);
   });
 
-  it('passes validation with a correct URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation with a correct URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+    });
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation if invalid value specified for permission', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "Invalid",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if invalid value specified for permission', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "Invalid",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+    });
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 
   it('fails when passing a site that does not exist', async () => {
@@ -157,12 +160,12 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    } as any), new CommandError('Requested site could not be found'));
+      })
+    }), new CommandError('Requested site could not be found'));
   });
 
   it('fails to get Microsoft Entra app when Microsoft Entra app does not exists', async () => {
@@ -191,13 +194,13 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    } as any), new CommandError('The specified Microsoft Entra app does not exist'));
+      })
+    }), new CommandError('The specified Microsoft Entra app does not exist'));
   });
 
   it('fails when multiple Microsoft Entra apps with same name exists', async () => {
@@ -237,12 +240,12 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       });
 
     await assert.rejects(command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "write",
         appDisplayName: "Foo App"
-      }
-    } as any), new CommandError('Multiple Microsoft Entra apps with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
+      })
+    }), new CommandError('Multiple Microsoft Entra apps with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
   });
 
   it('adds an application permission to the site by appId', async () => {
@@ -292,12 +295,12 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         output: "json"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -362,12 +365,12 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appDisplayName: "Foo App",
         output: "json"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -423,13 +426,13 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         appDisplayName: "Foo App",
         output: "json"
-      }
+      })
     });
     assert(loggerLogSpy.calledWith({
       "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -504,13 +507,13 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
 
     await command.action(logger, {
-      options: {
+      options: commandOptionsSchema.parse({
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "manage",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         appDisplayName: "Foo App",
         output: "json"
-      }
+      })
     });
 
     assert(loggerLogSpy.calledWith({

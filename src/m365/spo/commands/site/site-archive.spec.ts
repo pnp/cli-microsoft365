@@ -13,12 +13,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-archive.js';
+import command, { options } from './site-archive.js';
 
 describe(commands.SITE_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   const siteUrl = 'https://contoso.sharepoint.com/sites/Sales';
@@ -76,6 +77,7 @@ describe(commands.SITE_ARCHIVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -121,25 +123,31 @@ describe(commands.SITE_ARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = commandOptionsSchema.safeParse({ url: 'abc' });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'abc' is not a valid SharePoint Online site URL.`);
   });
 
-  it('passes validation when valid url passed', async () => {
-    const actual = await command.validate({ options: { url: siteUrl } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('passes validation when valid url passed', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl });
+    assert.strictEqual(actual.success, true);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({ url: siteUrl, unknownOption: 'value' });
+    assert.strictEqual(actual.success, false);
   });
 
   it('prompts before archiving the site when force option not passed', async () => {
-    await command.action(logger, { options: { url: siteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl }) });
 
     assert(promptIssued);
   });
 
   it('aborts archiving the site when prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
-    await command.action(logger, { options: { url: siteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl }) });
     assert(postStub.notCalled);
   });
 
@@ -154,7 +162,7 @@ describe(commands.SITE_ARCHIVE, () => {
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
-    await command.action(logger, { options: { url: siteUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, requestBody);
   });
 
@@ -167,7 +175,7 @@ describe(commands.SITE_ARCHIVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: siteUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, force: true, verbose: true }) });
     assert.deepStrictEqual(postStub.firstCall.args[0].data, requestBody);
   });
 
@@ -180,7 +188,7 @@ describe(commands.SITE_ARCHIVE, () => {
       }
     ]));
 
-    await assert.rejects(command.action(logger, { options: { url: siteUrl, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ url: siteUrl, force: true }) }),
       new CommandError('An error has occurred.'));
   });
 });

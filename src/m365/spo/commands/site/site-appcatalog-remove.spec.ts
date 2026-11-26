@@ -13,14 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
-import command from './site-appcatalog-remove.js';
-import { settingsNames } from '../../../../settingsNames.js';
+import command, { options } from './site-appcatalog-remove.js';
 
 describe(commands.SITE_APPCATALOG_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let commandOptionsSchema: typeof options;
   let promptIssued: boolean = false;
 
   before(() => {
@@ -37,6 +37,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
     auth.connection.active = true;
     auth.connection.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = cli.getCommandInfo(command);
+    commandOptionsSchema = commandInfo.command.getSchemaToParse() as typeof options;
   });
 
   beforeEach(() => {
@@ -84,14 +85,14 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
   });
 
   it('prompts before removing the site app catalog when force option not passed', async () => {
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/site' }) });
     assert(promptIssued);
   });
 
   it('aborts removing site app catalog when prompt not confirmed', async () => {
     const postSpy = sinon.stub(request, 'post').resolves();
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/site' }) });
     assert(postSpy.notCalled);
   });
 
@@ -124,7 +125,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true }) });
   });
 
   it('removes site collection app catalog (debug=true) while prompting for confirmation', async () => {
@@ -159,7 +160,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' }) });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -184,56 +185,40 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true } } as any), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true }) }), new CommandError('Unknown Error'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site', force: true }) }), new CommandError('An error has occurred'));
   });
 
-  it('supports specifying site url', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--siteUrl') > -1) {
-        assert(true);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('passes validation when the url option specified', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/site'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when the url option not specified', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
+  it('passes validation when the url option specified', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site'
     });
-
-    const actual = await command.validate({
-      options: {}
-    }, commandInfo);
-    assert.notDeepEqual(actual, true);
+    assert.strictEqual(actual.success, true);
   });
 
-  it('fails validation when the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({
-      options: {
-        siteUrl: 'foo'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('fails validation when the url option not specified', () => {
+    const actual = commandOptionsSchema.safeParse({});
+    assert.strictEqual(actual.success, false);
+  });
+
+  it('fails validation when the url option is not a valid SharePoint site URL', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'foo'
+    });
+    assert.strictEqual(actual.success, false);
+    assert.strictEqual(actual.error?.issues[0].message, `'foo' is not a valid SharePoint Online site URL.`);
+  });
+
+  it('fails validation with unknown options', () => {
+    const actual = commandOptionsSchema.safeParse({
+      siteUrl: 'https://contoso.sharepoint.com/sites/site',
+      unknownOption: 'value'
+    });
+    assert.strictEqual(actual.success, false);
   });
 });

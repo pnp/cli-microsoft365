@@ -72,7 +72,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
       "odata.null": true
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -87,7 +87,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', verbose: true }) });
     assert(postStub.calledOnce);
   });
 
@@ -102,7 +102,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
       throw 'Invalid request: ' + opts.url;
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', asAdmin: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', asAdmin: true }) });
     assert(postStub.calledOnce);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { siteUrl: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' });
   });
@@ -122,7 +122,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' }) }),
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 
