@@ -29,7 +29,7 @@ m365 spo web set [options]
 : Set to `true` to enable quick launch and to `false` to disable it
 
 `--headerLayout [headerLayout]`
-: Configures the site header. Allowed values `standard, compact`
+: Configures the site header. Allowed values `standard,compact`
 
 `--headerEmphasis [headerEmphasis]`
 : Configures the site header background. Allowed values `0`, `1`, `2`, `3`
@@ -70,7 +70,7 @@ Update subsite title
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --title Team-a
 ```
 
-Hide quick launch
+Hide quick launch on the subsite
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
@@ -82,25 +82,25 @@ Set site header layout to compact
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --headerLayout compact
 ```
 
-Set site header color
+Set site header color to primary theme background color
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
 ```
 
-Enable megamenu
+Enable megamenu in the site
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
 ```
 
-Hide footer
+Hide footer in the site
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --footerEnabled false
 ```
 
-Enable navigation audience targetting
+Enable navigation audience targetting in the site
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --navAudienceTargetingEnabled true
@@ -124,7 +124,7 @@ Set search scope to tenant scope
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --searchScope tenant
 ```
 
-Set welcome page
+Set welcome page for the web
 
 ```sh
 m365 spo web set  --url https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
@@ -136,4 +136,4 @@ The command won't return a response on success.
 
 ## More information
 
-- Web properties: https://learn.microsoft.com/sharepoint/dev/sp-add-ins/complete-basic-operations-using-sharepoint-rest-endpoints#web-properties
+- Web properties: [https://learn.microsoft.com/previous-versions/office/sharepoint-server/ee545886(v=office.15)](https://learn.microsoft.com/previous-versions/office/sharepoint-server/ee545886(v=office.15))
