@@ -43,6 +43,12 @@ m365 spo web set [options]
 `--navAudienceTargetingEnabled [navAudienceTargetingEnabled]`
 : Enable or disable site navigation audience targeting. Allowed values: `true` or `false`.
 
+`--noCrawl [noCrawl]`
+: Set whether search engines should crawl and index the web. Allowed values: `true` or `false`.
+
+`--enableMinimalDownload [enableMinimalDownload]`
+: Enable or disable Minimal Download Strategy for the web. Allowed values: `true` or `false`.
+
 `--searchScope [searchScope]`
 : Search scope to set in the site. Allowed values `DefaultScope`, `Tenant`, `Hub`, `Site`.
 
@@ -98,6 +104,18 @@ Enable navigation audience targetting in the site
 
 ```sh
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --navAudienceTargetingEnabled true
+```
+
+Prevent search engines from crawling the web
+
+```sh
+m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --noCrawl true
+```
+
+Enable Minimal Download Strategy
+
+```sh
+m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --enableMinimalDownload true
 ```
 
 Set search scope to tenant scope
