@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # teams team unarchive
 
@@ -29,6 +31,25 @@ This command supports admin permissions. Global admins and Microsoft Teams servi
 If the command finds multiple Microsoft Teams teams with the specified name, it will prompt you to disambiguate which team it should use, listing the discovered team IDs.
 
 This command restores users' ability to send messages and edit the team, abiding by tenant and team settings.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                |
+  |-----------------|----------------------------|
+  | Microsoft Graph | TeamSettings.ReadWrite.All |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                |
+  |-----------------|----------------------------|
+  | Microsoft Graph | TeamSettings.ReadWrite.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
