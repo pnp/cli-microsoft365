@@ -57,6 +57,36 @@ describe('validation/validation', () => {
     assert.strictEqual(result, false);
   });
 
+  it('isValidISODateDashOnly returns true if value is in ISO DateTime format with milliseconds', () => {
+    const result = validation.isValidISODateDashOnly("2019-03-22T10:15:30.123Z");
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidISODateDashOnly returns true if value is in ISO DateTime format with seconds and offset', () => {
+    const result = validation.isValidISODateDashOnly("2019-03-22T10:15:30+05:30");
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidISODateDashOnly returns true if value is in ISO DateTime format with minutes', () => {
+    const result = validation.isValidISODateDashOnly("2019-03-22T10:15Z");
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidISODateDashOnly returns false if ISO DateTime with milliseconds is followed by other characters', () => {
+    const result = validation.isValidISODateDashOnly("2019-03-22T10:15:30.123Zfoo");
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidISODateDashOnly returns false if ISO DateTime with seconds is surrounded by other characters', () => {
+    const result = validation.isValidISODateDashOnly("next friday 2019-03-22T10:15:30Z or later");
+    assert.strictEqual(result, false);
+  });
+
+  it('isValidISODateDashOnly returns false if ISO DateTime with minutes is preceded by other characters', () => {
+    const result = validation.isValidISODateDashOnly("x2019-03-22T10:15Z");
+    assert.strictEqual(result, false);
+  });
+
   it('isDateInRange returns true if date within monthOffset is passed', () => {
     const d: Date = new Date();
     d.setMonth(d.getMonth() - 1);
