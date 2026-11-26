@@ -119,7 +119,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
   });
 
   it('prompts before removing default values', async () => {
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldName: fieldName, folderUrl: folderUrl } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldName: fieldName, folderUrl: folderUrl }) });
     assert(confirmationPromptStub.calledOnce);
   });
 
@@ -141,7 +141,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid GET request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName }) });
     assert(putStub.notCalled);
   });
 
@@ -164,7 +164,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
 
     sinon.stub(request, 'put').resolves();
 
-    await command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true }) });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -193,7 +193,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid PUT request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listTitle: listTitle, fieldName: fieldName, force: true, verbose: true }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, '<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue></a><a href="/sites/Marketing/Shared%20Documents/Logos"><DefaultValue FieldName="DocumentType">Template</DefaultValue></a></MetadataDefaults>');
   });
 
@@ -222,7 +222,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid PUT request: ${opts.url}`;
     });
 
-    await command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldName: fieldName, folderUrl: siteRelativeFolderUrl, force: true, verbose: true } });
+    await command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldName: fieldName, folderUrl: siteRelativeFolderUrl, force: true, verbose: true }) });
     assert.deepStrictEqual(putStub.firstCall.args[0].data, '<MetadataDefaults><a href="/sites/Marketing/Shared%20Documents"><DefaultValue FieldName="Countries">19;#Belgium|442affc2-7fab-4f33-9590-330403a579c2;#18;#Croatia|59f1ab85-235b-4cf8-b669-4373cc9393c6</DefaultValue><DefaultValue FieldName="DocumentType">General</DefaultValue></a></MetadataDefaults>');
   });
 
@@ -245,7 +245,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
 
     const putStub = sinon.stub(request, 'put').resolves();
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: 'Foo', force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: 'Foo', force: true }) }),
       new CommandError("Default column value 'Foo' was not found."));
     assert(putStub.notCalled);
   });
@@ -259,7 +259,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid GET request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true }) }),
       new CommandError(`List '${listUrl}' was not found.`));
   });
 
@@ -277,7 +277,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid GET request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listId: listId, fieldName: fieldName, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listId: listId, fieldName: fieldName, force: true }) }),
       new CommandError('The specified list is not a document library.'));
   });
 
@@ -299,7 +299,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
     });
     const putStub = sinon.stub(request, 'put').resolves();
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true }) }),
       new CommandError(`Default column value '${fieldName}' was not found.`));
     assert(putStub.notCalled);
   });
@@ -321,7 +321,7 @@ describe(commands.LIST_DEFAULTVALUE_REMOVE, () => {
       throw `Invalid GET request: ${opts.url}`;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true } }),
+    await assert.rejects(command.action(logger, { options: commandOptionsSchema.parse({ webUrl: siteUrl, listUrl: listUrl, fieldName: fieldName, force: true }) }),
       new CommandError('You don\'t have permission to view this file.'));
   });
 });

@@ -473,6 +473,47 @@ describe('Command', () => {
     assert.strictEqual(JSON.stringify(actual), expected);
   });
 
+  it('allows unknown options when the command supports them', async () => {
+    const cmd = new MockCommand1();
+
+    const result = await cmd.validate(
+      { options: { unknownOption: 'value' } },
+      cli.getCommandInfo(cmd)
+    );
+
+    assert.strictEqual(result, true);
+  });
+
+  it('validates conditional and unconditional option sets', async () => {
+    const conditionalLast = new MockCommand3();
+    conditionalLast.optionSets.push(
+      { options: ['option1'] },
+      { options: ['option1'], runsWhen: () => false }
+    );
+
+    assert.strictEqual(
+      await conditionalLast.validate(
+        { options: { option1: 'value' } },
+        cli.getCommandInfo(conditionalLast)
+      ),
+      true
+    );
+
+    const conditionalFirst = new MockCommand3();
+    conditionalFirst.optionSets.push(
+      { options: ['option1'], runsWhen: () => false },
+      { options: ['option1'] }
+    );
+
+    assert.strictEqual(
+      await conditionalFirst.validate(
+        { options: { option1: 'value' } },
+        cli.getCommandInfo(conditionalFirst)
+      ),
+      true
+    );
+  });
+
   it('catches exception thrown by commandAction', async () => {
     const command = new MockCommand4();
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('Exception'));
