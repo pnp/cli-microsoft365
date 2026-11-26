@@ -1,4 +1,6 @@
 import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # teams user app remove
 
@@ -35,6 +37,25 @@ m365 teams user app remove [options]
 
 The `id` has to be the id of the app instance installed for the user.
 Do not use the ID from the manifest of the zip app package or the id from the Microsoft Teams App Catalog.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource        | Permissions                           |
+  |-----------------|---------------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadWriteForUser |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource        | Permissions                               |
+  |-----------------|-------------------------------------------|
+  | Microsoft Graph | TeamsAppInstallation.ReadWriteForUser.All |
+
+  </TabItem>
+</Tabs>
 
 ## Examples
 
