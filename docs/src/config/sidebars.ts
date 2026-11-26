@@ -4407,6 +4407,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'web roleassignment list',
+              id: 'cmd/spo/web/web-roleassignment-list'
+            },
+            {
+              type: 'doc',
               label: 'web roleassignment remove',
               id: 'cmd/spo/web/web-roleassignment-remove'
             },
