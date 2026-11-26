@@ -1,29 +1,49 @@
 import { Logger } from '../../../../cli/Logger.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
+import { z } from 'zod';
+import { globalOptionsZod } from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphDelegatedCommand from '../../../base/GraphDelegatedCommand.js';
 import commands from '../../commands.js';
 
+const allowedStatuses = ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred'] as const;
+
+export const options = z.strictObject({
+  ...globalOptionsZod.shape,
+  id: z.string().alias('i'),
+  title: z.string().optional().alias('t'),
+  status: z.string().refine(val => allowedStatuses.includes(val as typeof allowedStatuses[number]), {
+    message: `The value is not valid for status. Allowed values are ${allowedStatuses.join('|')}`
+  }).optional().alias('s'),
+  listName: z.string().optional(),
+  listId: z.string().optional(),
+  bodyContent: z.string().optional(),
+  bodyContentType: z.string().refine(val => ['text', 'html'].includes(val.toLowerCase()), {
+    message: 'The value is not valid for bodyContentType. Allowed values are text|html.'
+  }).optional(),
+  dueDateTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    message: 'The value is not a valid ISO date string.'
+  }).optional(),
+  importance: z.string().refine(val => ['low', 'normal', 'high'].includes(val.toLowerCase()), {
+    message: 'The value is not valid for importance. Allowed values are low|normal|high.'
+  }).optional(),
+  reminderDateTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    message: 'The value is not a valid ISO date string.'
+  }).optional(),
+  categories: z.string().optional(),
+  completedDateTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    message: 'The value is not a valid datetime.'
+  }).optional(),
+  startDateTime: z.string().refine(val => validation.isValidISODateTime(val), {
+    message: 'The value is not a valid datetime.'
+  }).optional()
+});
+
+declare type Options = z.infer<typeof options>;
+
 interface CommandArgs {
   options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id: string;
-  listName?: string;
-  listId?: string;
-  title?: string;
-  status?: string;
-  bodyContent?: string;
-  bodyContentType?: string;
-  dueDateTime?: string;
-  importance?: string;
-  reminderDateTime?: string;
-  categories?: string;
-  completedDateTime?: string;
-  startDateTime?: string;
 }
 
 class TodoTaskSetCommand extends GraphDelegatedCommand {
@@ -35,124 +55,15 @@ class TodoTaskSetCommand extends GraphDelegatedCommand {
     return 'Updates a task in a Microsoft To Do task list';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-    this.#initValidators();
-    this.#initOptionSets();
+  public get schema(): z.ZodType | undefined {
+    return options;
   }
 
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listName: typeof args.options.listName !== 'undefined',
-        status: typeof args.options.status !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
-        bodyContent: typeof args.options.bodyContent !== 'undefined',
-        bodyContentType: args.options.bodyContentType,
-        dueDateTime: typeof args.options.dueDateTime !== 'undefined',
-        importance: args.options.importance,
-        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined',
-        categories: typeof args.options.categories !== 'undefined',
-        completedDateTime: typeof args.options.completedDateTime !== 'undefined',
-        startDateTime: typeof args.options.startDateTime !== 'undefined'
-      });
+  public getRefinedSchema(schema: typeof options): z.ZodType | undefined {
+    return schema.refine(opts => [opts.listId, opts.listName].filter(x => x !== undefined).length === 1, {
+      message: `Specify either 'listId' or 'listName', but not both.`,
+      params: { customCode: 'optionSet', options: ['listId', 'listName'] }
     });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-s, --status [status]',
-        autocomplete: ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred']
-      },
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--bodyContent [bodyContent]'
-      },
-      {
-        option: '--bodyContentType [bodyContentType]',
-        autocomplete: ['text', 'html']
-      },
-      {
-        option: '--dueDateTime [dueDateTime]'
-      },
-      {
-        option: '--importance [importance]',
-        autocomplete: ['low', 'normal', 'high']
-      },
-      {
-        option: '--reminderDateTime [reminderDateTime]'
-      },
-      {
-        option: '--categories [categories]'
-      },
-      {
-        option: '--completedDateTime [completedDateTime]'
-      },
-      {
-        option: '--startDateTime [startDateTime]'
-      }
-    );
-  }
-
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.status &&
-          args.options.status !== 'notStarted' &&
-          args.options.status !== 'inProgress' &&
-          args.options.status !== 'completed' &&
-          args.options.status !== 'waitingOnOthers' &&
-          args.options.status !== 'deferred') {
-          return `${args.options.status} is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred`;
-        }
-
-        if (args.options.bodyContentType && ['text', 'html'].indexOf(args.options.bodyContentType.toLowerCase()) === -1) {
-          return `'${args.options.bodyContentType}' is not a valid value for the bodyContentType option. Allowed values are text|html`;
-        }
-
-        if (args.options.importance && ['low', 'normal', 'high'].indexOf(args.options.importance.toLowerCase()) === -1) {
-          return `'${args.options.importance}' is not a valid value for the importance option. Allowed values are low|normal|high`;
-        }
-
-        if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
-          return `'${args.options.dueDateTime}' is not a valid ISO date string`;
-        }
-
-        if (args.options.reminderDateTime && !validation.isValidISODateTime(args.options.reminderDateTime)) {
-          return `'${args.options.reminderDateTime}' is not a valid ISO date string`;
-        }
-
-        if (args.options.completedDateTime && !validation.isValidISODateTime(args.options.completedDateTime)) {
-          return `'${args.options.completedDateTime}' is not a valid datetime.`;
-        }
-
-        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-          return `'${args.options.startDateTime}' is not a valid datetime.`;
-        }
-
-        return true;
-      }
-    );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -179,7 +90,7 @@ class TodoTaskSetCommand extends GraphDelegatedCommand {
     }
   }
 
-  private async getTodoListId(options: GlobalOptions): Promise<string> {
+  private async getTodoListId(options: Options): Promise<string> {
     if (options.listId) {
       return options.listId;
     }
