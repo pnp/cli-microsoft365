@@ -1,0 +1,191 @@
+import Global from '../../_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo listitem roleassignment list
+
+Lists all role assignments of a list item
+
+## Usage
+
+```sh
+m365 spo listitem roleassignment list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the list item is located.
+
+`-i, --listId [listId]`
+: ID of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
+
+`-t, --listTitle [listTitle]`
+: Title of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
+
+`--listItemId <listItemId>`
+: ID of the list item.
+```
+
+<Global />
+
+## Remarks
+
+You can also retrieve the role assignments of a list item together with its properties by using the `--withPermissions` option of the [spo listitem get](./listitem-get.mdx) command.
+
+## Permissions
+
+<Tabs>
+  <TabItem value="Delegated">
+
+  | Resource   | Permissions          |
+  |------------|----------------------|
+  | SharePoint | AllSites.FullControl |
+
+  </TabItem>
+  <TabItem value="Application">
+
+  | Resource   | Permissions           |
+  |------------|-----------------------|
+  | SharePoint | Sites.FullControl.All |
+
+  </TabItem>
+</Tabs>
+
+## Examples
+
+List all role assignments of a list item in a list specified by title
+
+```sh
+m365 spo listitem roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --listTitle "Branding" --listItemId 125
+```
+
+List all role assignments of a list item in a list specified by ID
+
+```sh
+m365 spo listitem roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --listId a2baa9d6-ef21-4208-8753-342893c4f0d9 --listItemId 125
+```
+
+List all role assignments of a list item in a list specified by URL
+
+```sh
+m365 spo listitem roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --listUrl "/Lists/Branding" --listItemId 125
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Member": {
+        "Id": 3,
+        "IsHiddenInUI": false,
+        "LoginName": "Marketing Owners",
+        "Title": "Marketing Owners",
+        "PrincipalType": 8,
+        "AllowMembersEditMembership": false,
+        "AllowRequestToJoinLeave": false,
+        "AutoAcceptRequestToJoinLeave": false,
+        "Description": null,
+        "OnlyAllowMembersViewMembership": false,
+        "OwnerTitle": "Marketing Owners",
+        "RequestToJoinLeaveEmailSetting": ""
+      },
+      "RoleDefinitionBindings": [
+        {
+          "BasePermissions": {
+            "High": "2147483647",
+            "Low": "4294967295"
+          },
+          "Description": "Has full control.",
+          "Hidden": false,
+          "Id": 1073741829,
+          "Name": "Full Control",
+          "Order": 1,
+          "RoleTypeKind": 5,
+          "BasePermissionsValue": [
+            "ViewListItems",
+            "AddListItems",
+            "EditListItems",
+            "DeleteListItems",
+            "ApproveItems",
+            "OpenItems",
+            "ViewVersions",
+            "DeleteVersions",
+            "CancelCheckout",
+            "ManagePersonalViews",
+            "ManageLists",
+            "ViewFormPages",
+            "AnonymousSearchAccessList",
+            "Open",
+            "ViewPages",
+            "AddAndCustomizePages",
+            "ApplyThemeAndBorder",
+            "ApplyStyleSheets",
+            "ViewUsageData",
+            "CreateSSCSite",
+            "ManageSubwebs",
+            "CreateGroups",
+            "ManagePermissions",
+            "BrowseDirectories",
+            "BrowseUserInfo",
+            "AddDelPrivateWebParts",
+            "UpdatePersonalWebParts",
+            "ManageWeb",
+            "AnonymousSearchAccessWebLists",
+            "UseClientIntegration",
+            "UseRemoteAPIs",
+            "ManageAlerts",
+            "CreateAlerts",
+            "EditMyUserInfo",
+            "EnumeratePermissions"
+          ],
+          "RoleTypeKindValue": "Administrator"
+        }
+      ],
+      "PrincipalId": 3
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Member                : Marketing Owners
+  PrincipalId           : 3
+  RoleDefinitionBindings: Full Control
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  PrincipalId,Member,RoleDefinitionBindings
+  3,Marketing Owners,Full Control
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo listitem roleassignment list --webUrl "https://contoso.sharepoint.com/sites/Marketing" --listTitle "Branding" --listItemId "125"
+
+  Date: 11/21/2026
+
+  Property | Value
+  ---------|-------
+  PrincipalId | 3
+  Member | Marketing Owners
+  RoleDefinitionBindings | Full Control
+  ```
+
+  </TabItem>
+</Tabs>

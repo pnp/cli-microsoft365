@@ -200,6 +200,7 @@ export default {
   LISTITEM_RETENTIONLABEL_ENSURE: `${prefix} listitem retentionlabel ensure`,
   LISTITEM_RETENTIONLABEL_REMOVE: `${prefix} listitem retentionlabel remove`,
   LISTITEM_ROLEASSIGNMENT_ADD: `${prefix} listitem roleassignment add`,
+  LISTITEM_ROLEASSIGNMENT_LIST: `${prefix} listitem roleassignment list`,
   LISTITEM_ROLEASSIGNMENT_REMOVE: `${prefix} listitem roleassignment remove`,
   LISTITEM_ROLEINHERITANCE_BREAK: `${prefix} listitem roleinheritance break`,
   LISTITEM_ROLEINHERITANCE_RESET: `${prefix} listitem roleinheritance reset`,

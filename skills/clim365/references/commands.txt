@@ -564,6 +564,7 @@ spo listitem remove|Removes the specified list item
 spo listitem retentionlabel ensure|Applies a retention label to a list item
 spo listitem retentionlabel remove|Clears the retention label from a list item
 spo listitem roleassignment add|Adds a role assignment to a listitem.
+spo listitem roleassignment list|Lists all role assignments of a list item
 spo listitem roleassignment remove|Removes a role assignment from list item permissions
 spo listitem roleinheritance break|Breaks inheritance of list item
 spo listitem roleinheritance reset|Restores the role inheritance of list item, file, or folder

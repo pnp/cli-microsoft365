@@ -3475,6 +3475,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'listitem roleassignment list',
+              id: 'cmd/spo/listitem/listitem-roleassignment-list'
+            },
+            {
+              type: 'doc',
               label: 'listitem roleassignment remove',
               id: 'cmd/spo/listitem/listitem-roleassignment-remove'
             },
