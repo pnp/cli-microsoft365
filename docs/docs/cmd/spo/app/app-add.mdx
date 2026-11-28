@@ -56,6 +56,12 @@ If you try to upload a package that already exists in the app catalog without sp
   |------------|-----------------------|
   | SharePoint | Sites.FullControl.All |
 
+  :::info
+
+  From January 31, 2027, adding or overwriting a package in the tenant app catalog with app-only authentication also requires the `SharePointTenantSettings.ReadWrite.All` application permission on the SharePoint (Office 365 SharePoint Online) resource. The Microsoft Graph permission with the same name doesn't satisfy this check. Site collection app catalogs aren't affected. For more information, see [Configure app-only permissions for tenant App Catalog operations](https://learn.microsoft.com/sharepoint/dev/spfx/tenant-app-catalog-app-only-permissions).
+
+  :::
+
   </TabItem>
 </Tabs>
 
